@@ -29,7 +29,7 @@ from ..utils.statespacerealizations import (
 
 class StateSpace(Block):
     """
-    This block integrates a LTI MIMO state space modelwith the structure
+    This block integrates a LTI MIMO state space model with the structure
 
         d/dt x = A x + B u
              y = C x + D u 

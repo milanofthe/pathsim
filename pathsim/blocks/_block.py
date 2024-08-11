@@ -21,7 +21,7 @@ import uuid
 
 class Block:
     """
-    base Block object that defines the inputs, outputs and the connect method
+    Base 'Block' object that defines the inputs, outputs and the connect method.
 
     Block interconnections are handeled via the io interface of the blocks. 
     It is realized by dicts for the 'inputs' and for the 'outputs', where 
@@ -74,7 +74,7 @@ class Block:
     def reset(self):
         """
         Reset the blocks inputs and outputs and also its internal solver, if the 
-        block has a solver instance indicated by the 'has_engine' flag.
+        block has a solver instance.
         """
         #reset inputs and outputs while maintaining ports
         self.inputs  = {k:0.0 for k in sorted(self.inputs.keys())}  
@@ -169,6 +169,9 @@ class Block:
         It computes and returns the relative difference between the new output and 
         the previous output (before the step) to track convergence of the fixed-point 
         iteration.
+
+        RETURNS : 
+            error : (float) relative error to previous iteration for convergence control
         """
         return 0.0 
 
@@ -185,6 +188,9 @@ class Block:
 
         This only has to be implemented by blocks that have an internal 
         integration engine with an implicit solver.
+
+        RETURNS : 
+            error : (float) solver residual norm
         """
         return 0.0 
 
@@ -196,11 +202,15 @@ class Block:
         inputs and the current internal state. 
 
         It performes one timestep for the internal states. For instant time blocks, 
-        the 'step' method doesnt has to be implemented specifically, as it calls 
-        the 'update' method by default. 
+        the 'step' method does not has to be implemented specifically. 
         
         The method handles timestepping for dynamic blocks with internal states
-        such as 'Integrator', 'Delay', 'Differentiator', etc.
+        such as 'Integrator', 'StateSpace', etc.
+
+        RETURNS : 
+            success : (bool) step was successful
+            error   : (float) local truncation error from adaptive integrators
+            scale   : (float) timestep rescale from adaptive integrators
         """
 
         #by default no error estimate
