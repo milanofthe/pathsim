@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                INEAR TIME INVARIANT DYNAMICAL BLOCKS (blocks/lti.py)
+##               LINEAR TIME INVARIANT DYNAMICAL BLOCKS (blocks/lti.py)
 ##
 ##             This module defines linear time invariant dynamical blocks
 ##
