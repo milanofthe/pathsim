@@ -3,7 +3,7 @@
 
 ## Overview
 
-PathSim is a minimalistic and flexible block-based time-domain system simulation framework in Python. It provides a modular and intuitive approach to modeling and simulating complex dynamical systems using a directed computational graph. It is similar to Matlabs Simulink in spirit but works very differetly under the hood.
+PathSim is a minimalistic and flexible block-based time-domain system simulation framework in Python. It provides a modular and intuitive approach to modeling and simulating complex dynamical systems using a directed computational graph. It is similar to Matlab Simulink in spirit but works very differently under the hood.
 
 Key features of PathSim include:
 
@@ -16,8 +16,10 @@ Key features of PathSim include:
 - Wide range of numerical solvers, including implicit and explicit multi-stage, and adaptive Runge-Kutta methods such as `RKDP54` or `ESDIRK54`.
 - Modular and hierarchical modeling with (nested) subsystems.
 - Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, and more.
-- Easy extensibility, allowing users to define custom blocks by subclassing the base `Block` class and implementing just a handfull of methods.
+- Easy extensibility, allowing users to define custom blocks by subclassing the base `Block` class and implementing just a handfull of methods. 
 
+
+There are many example simulations in the `examples` directory that cover most of the functionalities of the pathsim package.
 
 ## Getting Started
 
@@ -40,7 +42,7 @@ It can be translated to a block diagram using integrators, amplifiers and adders
 
 ![png](README_files/harmonic_oscillator_blockdiagram.png)
 
-The topology of the block diagram above can be directly defined as blocks and connections in the pathsim framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks, connections and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
+The topology of the block diagram above can be directly defined as blocks and connections in the pathsim framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
 
 
 
@@ -90,29 +92,33 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-07-31 09:08:12,860 - INFO - LOGGING enabled
-    2024-07-31 09:08:12,860 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-07-31 09:08:12,861 - INFO - PATH LENGTH ESTIMATE 3, 'iterations_min' set to 3
-    2024-07-31 09:08:12,861 - INFO - RESET
-    2024-07-31 09:08:12,862 - INFO - RUN duration=50.0
-    2024-07-31 09:08:12,863 - INFO - STARTING progress tracker
-    2024-07-31 09:08:12,864 - INFO - progress=0%
-    2024-07-31 09:08:12,887 - INFO - progress=10%
-    2024-07-31 09:08:12,910 - INFO - progress=20%
-    2024-07-31 09:08:12,933 - INFO - progress=30%
-    2024-07-31 09:08:12,955 - INFO - progress=40%
-    2024-07-31 09:08:12,978 - INFO - progress=50%
-    2024-07-31 09:08:13,001 - INFO - progress=60%
-    2024-07-31 09:08:13,024 - INFO - progress=70%
-    2024-07-31 09:08:13,047 - INFO - progress=80%
-    2024-07-31 09:08:13,071 - INFO - progress=90%
-    2024-07-31 09:08:13,094 - INFO - progress=100%
-    2024-07-31 09:08:13,094 - INFO - FINISHED steps(total)=1001(1001) runtime=231.48ms
+    2024-08-11 21:08:32,152 - INFO - LOGGING enabled
+    2024-08-11 21:08:32,152 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-08-11 21:08:32,153 - INFO - PATH LENGTH ESTIMATE 3, 'iterations_min' set to 3
+    2024-08-11 21:08:32,154 - INFO - RESET
+    2024-08-11 21:08:32,154 - INFO - RUN duration=50.0
+    2024-08-11 21:08:32,155 - INFO - STARTING progress tracker
+    2024-08-11 21:08:32,155 - INFO - progress=0%
+    2024-08-11 21:08:32,179 - INFO - progress=10%
+    2024-08-11 21:08:32,202 - INFO - progress=20%
+    2024-08-11 21:08:32,226 - INFO - progress=30%
+    2024-08-11 21:08:32,251 - INFO - progress=40%
+    2024-08-11 21:08:32,277 - INFO - progress=50%
+    2024-08-11 21:08:32,302 - INFO - progress=60%
+    2024-08-11 21:08:32,325 - INFO - progress=70%
+    2024-08-11 21:08:32,347 - INFO - progress=80%
+    2024-08-11 21:08:32,371 - INFO - progress=90%
+    2024-08-11 21:08:32,393 - INFO - progress=100%
+    2024-08-11 21:08:32,393 - INFO - FINISHED steps(total)=1001(1001) runtime=238.25ms
     
 
 
     
 ![png](README_files/README_3_1.png)
     
+
+
+## Examples
+There are many examples of dynamical system simulations in the `examples` directory. They cover almost all the blocks currently available in PathSim as well as different solvers.
 
 
