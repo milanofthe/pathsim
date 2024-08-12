@@ -98,24 +98,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-08-11 21:09:13,304 - INFO - LOGGING enabled
-    2024-08-11 21:09:13,305 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-08-11 21:09:13,306 - INFO - PATH LENGTH ESTIMATE 3, 'iterations_min' set to 3
-    2024-08-11 21:09:13,306 - INFO - RESET
-    2024-08-11 21:09:13,307 - INFO - RUN duration=50.0
-    2024-08-11 21:09:13,307 - INFO - STARTING progress tracker
-    2024-08-11 21:09:13,308 - INFO - progress=0%
-    2024-08-11 21:09:13,332 - INFO - progress=10%
-    2024-08-11 21:09:13,354 - INFO - progress=20%
-    2024-08-11 21:09:13,376 - INFO - progress=30%
-    2024-08-11 21:09:13,399 - INFO - progress=40%
-    2024-08-11 21:09:13,421 - INFO - progress=50%
-    2024-08-11 21:09:13,445 - INFO - progress=60%
-    2024-08-11 21:09:13,467 - INFO - progress=70%
-    2024-08-11 21:09:13,490 - INFO - progress=80%
-    2024-08-11 21:09:13,512 - INFO - progress=90%
-    2024-08-11 21:09:13,535 - INFO - progress=100%
-    2024-08-11 21:09:13,535 - INFO - FINISHED steps(total)=1001(1001) runtime=227.38ms
+    2024-08-12 10:34:26,226 - INFO - LOGGING enabled
+    2024-08-12 10:34:26,228 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-08-12 10:34:26,228 - INFO - PATH LENGTH ESTIMATE 3, 'iterations_min' set to 3
+    2024-08-12 10:34:26,229 - INFO - RESET
+    2024-08-12 10:34:26,230 - INFO - RUN duration=50.0
+    2024-08-12 10:34:26,231 - INFO - STARTING progress tracker
+    2024-08-12 10:34:26,235 - INFO - progress=0%
+    2024-08-12 10:34:26,285 - INFO - progress=10%
+    2024-08-12 10:34:26,324 - INFO - progress=20%
+    2024-08-12 10:34:26,367 - INFO - progress=30%
+    2024-08-12 10:34:26,418 - INFO - progress=40%
+    2024-08-12 10:34:26,483 - INFO - progress=50%
+    2024-08-12 10:34:26,558 - INFO - progress=60%
+    2024-08-12 10:34:26,629 - INFO - progress=70%
+    2024-08-12 10:34:26,677 - INFO - progress=80%
+    2024-08-12 10:34:26,725 - INFO - progress=90%
+    2024-08-12 10:34:26,773 - INFO - progress=100%
+    2024-08-12 10:34:26,774 - INFO - FINISHED steps(total)=1001(1001) runtime=540.81ms
     
 
 
@@ -126,5 +126,4 @@ time, data = Sc.read()
 
 ## Examples
 There are many examples of dynamical system simulations in the `examples` directory. They cover almost all the blocks currently available in PathSim as well as different solvers.
-
 

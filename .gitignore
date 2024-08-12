@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Notebooks
+*.ipynb
+
 # Distribution / packaging
 .Python
 build/
