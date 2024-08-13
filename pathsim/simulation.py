@@ -172,6 +172,9 @@ class Simulation:
     def add_block(self, block):
         """
         Adds a new block to an existing 'Simulation' instance and initializes the solver.
+
+        INPUTS:
+            block : ('Block' instance) block to add to the simulation
         """
 
         #check if block already in block list
@@ -188,6 +191,9 @@ class Simulation:
     def add_connection(self, connection):
         """
         Adds a new connection to an existing 'Simulation' instance.
+
+        INPUTS:
+            connection : ('Connection' instance) connection to add to the simulation
         """
 
         #check if connection already in block list
@@ -295,6 +301,9 @@ class Simulation:
         """
         Change the numerical integrator for all stateful blocks 
         and transfer the internal states and other args.
+
+        INPUTS:
+            Solver : ('Solver' class) definition of numerical integrator
         """
 
         #update solver type
@@ -352,6 +361,9 @@ class Simulation:
         Sample data from blocks that implement the 'sample' method such 
         as 'Scope', 'Delay' and the blocks that sample from a random 
         distribution at a given time 't'.
+
+        INPUTS:
+            t : (float) time where to sample
         """
         for block in self.blocks:
             block.sample(t)
@@ -374,6 +386,9 @@ class Simulation:
         If no algebraic loops are present in the system, it usually converges
         already after 'iterations_min' as long as the path length has been 
         used as an estimate for the minimum number of iterations.
+
+        INPUTS:
+            t : (float) evaluation time of the system function
         """
 
         #perform minimum number of fixed-point iterations without error checking
@@ -422,6 +437,15 @@ class Simulation:
         This also tracks the evolution of the solution as an estimate 
         for the convergence via the max residual norm of the fixed point 
         equation of the previous solution.
+
+        INPUTS: 
+            t  : (float) evaluation time of dynamical timestepping
+            dt : (float) timestep
+
+        RETURNS: 
+            success                 : (bool) indicator if the timestep was successful
+            total_evaluations       : (int) total number of system evaluations
+            total_solver_iterations : (int) total number of implicit solver iterations
         """
 
         #total evaluations of system equation
@@ -457,14 +481,19 @@ class Simulation:
         intergation engines if they provide an error estimate 
         (for example embedded Runge-Kutta methods).
         
-        NOTE : 
+        NOTE: 
             Not to be confused with the global 'step' method, the '_step' 
             method executes the intermediate timesteps in multistage solvers 
             such as Runge-Kutta methods.
 
-        INPUTS : 
+        INPUTS: 
             t  : (float) evaluation time of dynamical timestepping
             dt : (float) timestep
+
+        RETURNS: 
+            success   : (bool) indicator if the timestep was successful
+            max_error : (float) maximum local truncation error from integration
+            scale     : (float) rescale factor for timestep
         """
 
         #initial timestep rescale and error estimate
@@ -490,9 +519,16 @@ class Simulation:
         'tolerance_lte', simulation state is reverted ('revert') to the 
         state before the 'step' method was called.
 
-        INPUTS : 
-            dt : (float) timestep
+        INPUTS: 
+            dt       : (float) timestep
             adaptive : (bool) use adaptive timestepping (if available)
+
+        RETURNS:
+            success                 : (bool) indicator if the timestep was successful
+            max_error               : (float) maximum local truncation error from integration
+            scale                   : (float) rescale factor for timestep
+            total_evaluations       : (int) total number of system evaluations
+            total_solver_iterations : (int) total number of implicit solver iterations
         """
 
         #default global timestep
@@ -558,9 +594,14 @@ class Simulation:
         """
         Perform multiple simulation timesteps for a given 'duration' in seconds.
 
-        INPUTS : 
+        INPUTS: 
             duration : (float) simulation time in seconds [s]
             reset    : (bool) reset the simulation before running
+
+        RETURN:
+            steps                   : (int) total number of simulation timesteps
+            total_evaluations       : (int) total number of system evaluations
+            total_solver_iterations : (int) total number of implicit solver iterations
         """
 
         #reset the simulation before running it
