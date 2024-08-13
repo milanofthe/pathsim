@@ -66,7 +66,7 @@ class Connection:
         'self'-connections also work without a problem. This is useful 
         for modeling direct feedback of a block to itself.
 
-    INPUTS : 
+    INPUTS: 
         source  : (tuple ('Block', int) OR 'Block') source block and optional source output port
         targets : (tuples of ('Block' int) OR multiple 'Block's) target blocks and optional target input ports
     """
@@ -84,6 +84,9 @@ class Connection:
         """
         Check if the connection 'self' overwrites the target port
         of connection 'other' and return 'True' if so.
+
+        INPUTS:
+            other : ('Connection' instance) other connection to check 
         """
 
         #catch self checking

@@ -46,7 +46,7 @@ class Simulation:
     take small steps to cover the behaviour of forcing functions. Adaptive timestepping and 
     implicit integrators are also available.
     
-    INPUTS :
+    INPUTS:
         blocks         : (list of 'Block' objects) blocks that make up the system
         connections    : (list of 'Connection' objects) connections that connect the blocks
         dt             : (float) transient simulation timestep

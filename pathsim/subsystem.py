@@ -21,7 +21,7 @@ class Interface(Block):
     """
     Bare-bone block that serves as a data interface for the 'Subsystem' class.
 
-    Basically it works like this:
+    It works like this:
     - Internal blocks of the subsystem are connected to the inputs and outputs 
       of this Interface block via the internal connections.
     - It behaves like a normal block (inherits the main 'Block' class methods).
@@ -231,6 +231,10 @@ class Subsystem(Block):
     def initialize_solver(self, Solver, tolerance_lte=1e-6):
         """
         initialize all internal blocks with numerical solver
+
+        INPUTS:
+            Solver : ('Solver' class) numerical solver definition
+            tolerance_lte : (float) tolerance for local truncation error
         """
         for block in self.blocks:
             block.initialize_solver(Solver, tolerance_lte)
@@ -239,6 +243,9 @@ class Subsystem(Block):
     def change_solver(self, Solver):
         """
         change solver types of all internal blocks
+
+        INPUTS:
+            Solver : ('Solver' class) numerical solver definition
         """
         for block in self.blocks:
             block.change_solver(Solver)
