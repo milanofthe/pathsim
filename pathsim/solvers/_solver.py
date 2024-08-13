@@ -107,15 +107,18 @@ class Solver:
         self.x_0 = self.x
 
 
-    def change(self, Solver):
+    def change(self, Solver, tolerance_lte=None):
         """
         Change the integration engine to a new type and initialize 
         with previous solver arguments so it can continue from where 
         the 'old' solver stopped.
         """
 
+        #check if new tolerance is defined
+        tol = self.tolerance_lte if tolerance_lte is None else tolerance_lte
+
         #create new engine from self
-        engine = Solver(self.initial_value, self.func, self.jac, self.tolerance_lte)
+        engine = Solver(self.initial_value, self.func, self.jac, tol)
         
         #set internal state of new engine from self
         engine.set(self.get())

@@ -1,11 +1,12 @@
 #########################################################################################
 ##
-##                          SUBSYSTEM DEFINITION (subsystem.py)
+##                                 SUBSYSTEM DEFINITION 
+##                                    (subsystem.py)
 ##
 ##              This module contains the 'Subsystem' and 'Interface' classes 
 ##         that manage subsystems that can be embedded within a larger simulation
 ##
-##                                   Milan Rother 2024
+##                                  Milan Rother 2024
 ##
 #########################################################################################
 

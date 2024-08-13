@@ -330,8 +330,8 @@ class Simulation:
 
     def reset(self):
         """
-        Reset the blocks to their initial state and the global time 
-        of the simulation.
+        Reset the blocks to their initial state and the global time of 
+        the simulation.
         """
 
         self._logger_info("RESET")

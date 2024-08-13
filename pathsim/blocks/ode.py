@@ -66,6 +66,7 @@ class ODE(Block):
         #initialize the integration engine with right hand side
         _jac = auto_jacobian(self.func) if self.jac is None else self.jac
         self.engine = Solver(self.initial_value, self.func, _jac, tolerance_lte)
+            
 
 
     def update(self, t):
