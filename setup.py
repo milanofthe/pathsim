@@ -11,7 +11,7 @@ setup(
     description="A block based time domain system simulation framework.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/milanofthe/PathSim",
+    url="https://github.com/milanofthe/pathsim",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

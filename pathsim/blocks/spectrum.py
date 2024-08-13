@@ -83,7 +83,12 @@ class Spectrum(Block):
         return 0
 
 
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
 
         #initialize the numerical integration engine with kernel
         def _f(x, u, t):
@@ -95,6 +100,22 @@ class Spectrum(Block):
         #initialize depending on forgetting factor
         if self.alpha == 0.0: self.engine = Solver(0.0, _f, None, tolerance_lte)
         else: self.engine = Solver(0.0, _f_decay, None, tolerance_lte)
+
+
+
+
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+
+    #     #initialize the numerical integration engine with kernel
+    #     def _f(x, u, t):
+    #         return np.kron(u, np.exp(-1j * self.omega * t))
+
+    #     def _f_decay(x, u, t):
+    #         return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
+
+    #     #initialize depending on forgetting factor
+    #     if self.alpha == 0.0: self.engine = Solver(0.0, _f, None, tolerance_lte)
+    #     else: self.engine = Solver(0.0, _f_decay, None, tolerance_lte)
 
 
     def reset(self):

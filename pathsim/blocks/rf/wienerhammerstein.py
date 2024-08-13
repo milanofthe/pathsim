@@ -101,8 +101,13 @@ class WienerHammersteinModel(Block):
         return int((np.any(self.D_1) and np.any(self.D_2)))
 
 
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
-        
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
+
         #right hand side function for ODE
         def _f(x, u, t):
             x_1, x_2 = x[:self.n_1], x[self.n_1:]
@@ -118,6 +123,25 @@ class WienerHammersteinModel(Block):
         
         #combined solver
         self.engine = Solver(np.zeros(self.n_1+self.n_2), _f, _jac, tolerance_lte)
+
+
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+        
+    #     #right hand side function for ODE
+    #     def _f(x, u, t):
+    #         x_1, x_2 = x[:self.n_1], x[self.n_1:]
+    #         dx_1 = np.dot(self.A_1, x_1) + np.dot(self.B_1, u) 
+    #         dx_2 = np.dot(self.A_2, x_2) + np.dot(self.B_2, self.func(np.dot(self.C_1, x_1) + np.dot(self.D_1, u)))
+    #         return np.hstack([dx_1, dx_2])
+
+    #     def _jac(x, u, t):
+    #         x_1, x_2 = x[:self.n_1], x[self.n_1:]
+    #         J_12 = np.zeros_like(self.A_1)
+    #         J_21 = np.dot(self.B_2, np.dot(self.C_1, self.jac(np.dot(self.C_1, x_1) + np.dot(self.D_1, u))))
+    #         return np.block([[self.A_1, J_12], [J_21, self.A_2]])
+        
+    #     #combined solver
+    #     self.engine = Solver(np.zeros(self.n_1+self.n_2), _f, _jac, tolerance_lte)
 
 
     def update(self, t):
@@ -204,7 +228,13 @@ class HammersteinModel(Block):
         return int(np.any(self.D))
 
 
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
+
         #right hand side function for ODE
         def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
         def _jac(x, u, t): return self.A
@@ -212,6 +242,16 @@ class HammersteinModel(Block):
         #solver
         n, _ = self.A.shape
         self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
+
+
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    #     #right hand side function for ODE
+    #     def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
+    #     def _jac(x, u, t): return self.A
+        
+    #     #solver
+    #     n, _ = self.A.shape
+    #     self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
 
 
     def update(self, t):
@@ -293,13 +333,31 @@ class WienerModel(Block):
         #check if direct passthrough exists
         return int(np.any(self.D))
 
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
+
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
+
         #right hand side function for ODE
         def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
         def _jac(x, u, t): return self.A 
+
         #solver
         n, _ = self.A.shape
         self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
+
+
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    #     #right hand side function for ODE
+    #     def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
+    #     def _jac(x, u, t): return self.A 
+    #     #solver
+    #     n, _ = self.A.shape
+    #     self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
+
 
     def update(self, t):
         #compute implicit balancing update
@@ -308,9 +366,11 @@ class WienerModel(Block):
         self.outputs = array_to_dict(self.func(y))
         return max_rel_error_dicts(prev_outputs, self.outputs)
 
+
     def solve(self, t, dt):
         #advance solution of implicit update equation
         return self.engine.solve(dict_to_array(self.inputs), t, dt)
+
 
     def step(self, t, dt):
         #compute update step with integration engine

@@ -124,8 +124,9 @@ class Simulation:
         #check if connections are valid
         self._check_connections()
 
-        #initialize all blocks with numerical integration solver
-        self._initialize_solver()
+        #set numerical integration solver to all blocks 
+        # self._initialize_solver()
+        self._set_solver()
 
         #compute the length of the longest path in the system
         self._estimate_path_length()
@@ -182,7 +183,8 @@ class Simulation:
             raise ValueError(f"block {block} already part of simulation")
 
         #initialize numerical integrator of block
-        block.initialize_solver(self.Solver, self.tolerance_lte)
+        # block.initialize_solver(self.Solver, self.tolerance_lte)
+        block.set_solver(self.Solver, self.tolerance_lte)
 
         #add block to global blocklist
         self.blocks.append(block)
@@ -274,56 +276,92 @@ class Simulation:
 
     # solver management -----------------------------------------------------------
 
-    def _initialize_solver(self):
+    def _set_solver(self, Solver=None, tolerance_lte=None):
         """
         Initialize all blocks with solver for numerical integration
-        and tolerance for local truncation error 'self.tolerance_lte'.
+        and tolerance for local truncation error 'tolerance_lte'.
+
+        If blocks already have solvers, change the numerical integrator
+        to the 'Solver' class.
+        
+        INPUTS:
+            Solver : ('Solver' class) numerical solver definition
+            tolerance_lte : (float) tolerance for local truncation error
         """
 
-        #iterate all blocks and initialize integration engines
-        for block in self.blocks:
-            block.initialize_solver(self.Solver, self.tolerance_lte)
+        #update global solver class
+        if Solver is not None: 
+            self.Solver = Solver
+
+        #update tolerance for local truncation error
+        if tolerance_lte is not None: 
+            self.tolerance_lte = tolerance_lte
 
         #initialize dummy engine to get solver attributes
         self.engine = self.Solver()
 
-        #flag for adaptive solver selection
+        #flag for adaptive and explicit solver selection
         self.is_adaptive = self.engine.is_adaptive
-
-        #flag for explicit solver selection
         self.is_explicit = self.engine.is_explicit
 
-        #logging message
-        self._logger_info(f"SOLVER {self.engine} adaptive={self.is_adaptive} implicit={not self.is_explicit}")
-
-
-    def change_solver(self, Solver):
-        """
-        Change the numerical integrator for all stateful blocks 
-        and transfer the internal states and other args.
-
-        INPUTS:
-            Solver : ('Solver' class) definition of numerical integrator
-        """
-
-        #update solver type
-        self.Solver = Solver
-
-        #iterate all blocks and change the solvers
+        #iterate all blocks and set integration engines
         for block in self.blocks:
-            block.change_solver(self.Solver)
-
-        #change local dummy engine
-        self.engine = self.engine.change(self.Solver)
-
-        #flag for adaptive solver selection
-        self.is_adaptive = self.engine.is_adaptive
-
-        #flag for explicit solver selection
-        self.is_explicit = self.engine.is_explicit
+            block.set_solver(self.Solver, self.tolerance_lte)
 
         #logging message
         self._logger_info(f"SOLVER {self.engine} adaptive={self.is_adaptive} implicit={not self.is_explicit}")
+
+
+    # def _initialize_solver(self):
+    #     """
+    #     Initialize all blocks with solver for numerical integration
+    #     and tolerance for local truncation error 'self.tolerance_lte'.
+    #     """
+
+    #     #iterate all blocks and initialize integration engines
+    #     for block in self.blocks:
+    #         block.initialize_solver(self.Solver, self.tolerance_lte)
+
+    #     #initialize dummy engine to get solver attributes
+    #     self.engine = self.Solver()
+
+    #     #flag for adaptive solver selection
+    #     self.is_adaptive = self.engine.is_adaptive
+
+    #     #flag for explicit solver selection
+    #     self.is_explicit = self.engine.is_explicit
+
+    #     #logging message
+    #     self._logger_info(f"SOLVER {self.engine} adaptive={self.is_adaptive} implicit={not self.is_explicit}")
+
+
+    # def change_solver(self, Solver):
+    #     """
+    #     Change the numerical integrator for all stateful blocks 
+    #     and transfer the internal states and other args.
+
+    #     INPUTS:
+    #         Solver : ('Solver' class) definition of numerical integrator
+    #     """
+
+    #     #update solver type
+    #     self.Solver = Solver
+
+    #     #iterate all blocks and change the solvers
+    #     for block in self.blocks:
+    #         block.change_solver(self.Solver)
+
+    #     #change local dummy engine
+    #     self.engine = self.engine.change(self.Solver)
+
+    #     #flag for adaptive solver selection
+    #     self.is_adaptive = self.engine.is_adaptive
+
+    #     #flag for explicit solver selection
+    #     self.is_explicit = self.engine.is_explicit
+
+    #     #logging message
+    #     self._logger_info(f"SOLVER {self.engine} adaptive={self.is_adaptive} implicit={not self.is_explicit}")
 
 
     # resetting -------------------------------------------------------------------

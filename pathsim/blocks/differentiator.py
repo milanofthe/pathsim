@@ -44,11 +44,24 @@ class Differentiator(Block):
     def __len__(self):
         return 1
 
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
+
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
         #initialize the numerical integration engine with kernel
         def _f(x, u, t): return - self.f_max * (x - u) 
         def _jac(x, u, t): return - self.f_max
         self.engine = Solver(0.0, _f, _jac, tolerance_lte)
+
+
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    #     #initialize the numerical integration engine with kernel
+    #     def _f(x, u, t): return - self.f_max * (x - u) 
+    #     def _jac(x, u, t): return - self.f_max
+    #     self.engine = Solver(0.0, _f, _jac, tolerance_lte)
+
 
     def update(self, t):
         #compute implicit balancing update
@@ -56,9 +69,11 @@ class Differentiator(Block):
         self.outputs[0] = -self.f_max * (self.engine.get() - self.inputs[0])
         return rel_error(prev_output, self.outputs[0])
 
+
     def solve(self, t, dt):
         #advance solution of implicit update equation
         return self.engine.solve(self.inputs[0], t, dt)
+
 
     def step(self, t, dt):
         #compute update step with integration engine

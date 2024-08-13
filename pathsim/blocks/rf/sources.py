@@ -33,6 +33,7 @@ class SquareWaveSource(Block):
         self.amplitude = amplitude
         self.frequency = frequency
 
+
     def update(self, t):
         self.outputs[0] = self.amplitude * square_wave(t, self.frequency)
         return 0.0
@@ -45,6 +46,7 @@ class TriangleWaveSource(Block):
 
         self.amplitude = amplitude
         self.frequency = frequency
+
 
     def update(self, t):
         self.outputs[0] = self.amplitude * triangle_wave(t, self.frequency)
@@ -59,6 +61,7 @@ class SinusoidalSource(Block):
         self.amplitude = amplitude
         self.frequency = frequency
         self.phase = phase
+
 
     def update(self, t):
         omega = 2*np.pi*self.frequency
@@ -75,6 +78,7 @@ class GaussianPulseSource(Block):
         self.f_max = f_max
         self.tau = tau
 
+
     def update(self, t):
         self.outputs[0] = self.amplitude * gaussian(t-self.tau, self.f_max)
         return 0.0
@@ -87,6 +91,7 @@ class StepSource(Block):
 
         self.amplitude = amplitude
         self.tau = tau
+
 
     def update(self, t):
         self.outputs[0] = self.amplitude * float(t > self.tau)
@@ -104,10 +109,24 @@ class ChirpSource(Block):
         self.BW = BW
         self.T = T
 
-    def initialize_solver(self, Solver, tolerance_lte):
+
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
+
         #initialize the numerical integration engine with kernel
         def _f(x, u, t): return self.BW * (1 + triangle_wave(t, 1/self.T))/2
         self.engine = Solver(self.f0, _f, None, tolerance_lte)
+
+
+    # def initialize_solver(self, Solver, tolerance_lte):
+    #     #initialize the numerical integration engine with kernel
+    #     def _f(x, u, t): return self.BW * (1 + triangle_wave(t, 1/self.T))/2
+    #     self.engine = Solver(self.f0, _f, None, tolerance_lte)
+
 
     def update(self, t):
         #compute implicit balancing update
@@ -115,12 +134,14 @@ class ChirpSource(Block):
         self.outputs[0] = self.amplitude * np.sin(phase)
         return 0.0
 
+
     def solve(self, t, dt):
         #advance solution of implicit update equation
         self.engine.solve(0.0, t, dt)
 
         #no error for chirp source
         return 0.0
+
 
     def step(self, t, dt):
         #compute update step with integration engine

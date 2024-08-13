@@ -229,27 +229,45 @@ class Subsystem(Block):
 
     # methods for blocks with integration engines -------------------------------------------
 
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, tolerance_lte=1e-6):
         """
-        initialize all internal blocks with numerical solver
+        Initialize all blocks with solver for numerical integration
+        and tolerance for local truncation error 'tolerance_lte'.
 
+        If blocks already have solvers, change the numerical integrator
+        to the 'Solver' class.
+        
         INPUTS:
             Solver : ('Solver' class) numerical solver definition
             tolerance_lte : (float) tolerance for local truncation error
         """
+
+        #iterate all blocks and set integration engines
         for block in self.blocks:
-            block.initialize_solver(Solver, tolerance_lte)
+            block.set_solver(Solver, tolerance_lte)
 
 
-    def change_solver(self, Solver):
-        """
-        change solver types of all internal blocks
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    #     """
+    #     initialize all internal blocks with numerical solver
 
-        INPUTS:
-            Solver : ('Solver' class) numerical solver definition
-        """
-        for block in self.blocks:
-            block.change_solver(Solver)
+    #     INPUTS:
+    #         Solver : ('Solver' class) numerical solver definition
+    #         tolerance_lte : (float) tolerance for local truncation error
+    #     """
+    #     for block in self.blocks:
+    #         block.initialize_solver(Solver, tolerance_lte)
+
+
+    # def change_solver(self, Solver):
+    #     """
+    #     change solver types of all internal blocks
+
+    #     INPUTS:
+    #         Solver : ('Solver' class) numerical solver definition
+    #     """
+    #     for block in self.blocks:
+    #         block.change_solver(Solver)
 
 
     def revert(self):

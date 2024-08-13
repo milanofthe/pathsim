@@ -51,6 +51,6 @@ Sim = Simulation(blocks, connections, dt=dt, log=True)
 #run the simulation for some time
 Sim.run(3*tau)
 
-Sco.plot(".-")
+Sco.plot()
 
 plt.show()

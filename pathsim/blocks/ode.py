@@ -61,12 +61,20 @@ class ODE(Block):
     def __len__(self):
         return 0
 
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    #     #initialize the integration engine with right hand side
+    #     _jac = auto_jacobian(self.func) if self.jac is None else self.jac
+    #     self.engine = Solver(self.initial_value, self.func, _jac, tolerance_lte)
 
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
+
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
         #initialize the integration engine with right hand side
         _jac = auto_jacobian(self.func) if self.jac is None else self.jac
         self.engine = Solver(self.initial_value, self.func, _jac, tolerance_lte)
-            
 
 
     def update(self, t):

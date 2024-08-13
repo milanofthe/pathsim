@@ -81,9 +81,23 @@ class OneOverFNoise(Block):
         self.white_noise_value = 0.0
         self.n_samples = 0
 
-    def initialize_solver(self, Solver, tolerance_lte):
+
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
+
         #initialize the numerical integration engine with kernel
-        self.engine = Solver(0.0, lambda x, u, t: u, None, tolerance_lte)
+        def _f(x, u, t): return u
+        self.engine = Solver(0.0, _f, None, tolerance_lte)
+
+
+    # def initialize_solver(self, Solver, tolerance_lte):
+    #     #initialize the numerical integration engine with kernel
+    #     self.engine = Solver(0.0, lambda x, u, t: u, None, tolerance_lte)
+
 
     def reset(self):
         #reset inputs and outputs
@@ -97,10 +111,12 @@ class OneOverFNoise(Block):
         #reset engine
         self.engine.reset()
 
+
     def update(self, t):
         #set outputs
         self.outputs[0] = self.engine.get()
         return 0.0
+
 
     def sample(self, t):
         """
@@ -111,10 +127,12 @@ class OneOverFNoise(Block):
             self.white_noise_value = np.random.normal(scale=self.sigma) 
             self.n_samples += 1
 
+
     def solve(self, t, dt):
         #advance solution of implicit update equation
         self.engine.solve(self.white_noise_value, t, dt)
         return 0.0
+
 
     def step(self, t, dt):
         #compute update step with integration engine
@@ -144,9 +162,23 @@ class SinusoidalPhaseNoiseSource(Block):
         self.noise_1 = np.random.normal() 
         self.noise_2 = np.random.normal() 
 
-    def initialize_solver(self, Solver, tolerance_lte):
+
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
+
         #initialize the numerical integration engine with kernel
-        self.engine = Solver(0.0, lambda x, u, t: u, None, tolerance_lte)
+        def _f(x, u, t): return u
+        self.engine = Solver(0.0, _f, None, tolerance_lte)
+
+
+    # def initialize_solver(self, Solver, tolerance_lte):
+    #     #initialize the numerical integration engine with kernel
+    #     self.engine = Solver(0.0, lambda x, u, t: u, None, tolerance_lte)
+
 
     def reset(self):
         #reset inputs and outputs
@@ -160,6 +192,7 @@ class SinusoidalPhaseNoiseSource(Block):
         #reset engine
         self.engine.reset()
 
+
     def update(self, t):
 
         #compute phase error
@@ -168,6 +201,7 @@ class SinusoidalPhaseNoiseSource(Block):
         #set output
         self.outputs[0] = self.amplitude * np.sin(self.omega*t + self.phase + phase_error)
         return 0.0
+
 
     def sample(self, t):
         """
@@ -179,10 +213,12 @@ class SinusoidalPhaseNoiseSource(Block):
             self.noise_2 = np.random.normal() 
             self.n_samples += 1
 
+
     def solve(self, t, dt):
         #advance solution of implicit update equation
         self.engine.solve(self.noise_2, t, dt)
         return 0.0
+
 
     def step(self, t, dt):
         #compute update step with integration engine

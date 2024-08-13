@@ -71,12 +71,22 @@ class StateSpace(Block):
         #check if direct passthrough exists
         return int(np.any(self.D))
 
-        
-    def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    
+    def set_solver(self, Solver, tolerance_lte=1e-6):
+        #change solver if already initialized
+        if self.engine is not None:
+            self.engine = self.engine.change(Solver, tolerance_lte)
+            return #quit early
         #initialize the integration engine with right hand side
         def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
         def _jac(x, u, t): return self.A
         self.engine = Solver(self.initial_value, _f, _jac, tolerance_lte)
+
+    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
+    #     #initialize the integration engine with right hand side
+    #     def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
+    #     def _jac(x, u, t): return self.A
+    #     self.engine = Solver(self.initial_value, _f, _jac, tolerance_lte)
 
 
     def update(self, t):
