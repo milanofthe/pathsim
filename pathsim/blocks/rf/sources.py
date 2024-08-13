@@ -122,12 +122,6 @@ class ChirpSource(Block):
         self.engine = Solver(self.f0, _f, None, tolerance_lte)
 
 
-    # def initialize_solver(self, Solver, tolerance_lte):
-    #     #initialize the numerical integration engine with kernel
-    #     def _f(x, u, t): return self.BW * (1 + triangle_wave(t, 1/self.T))/2
-    #     self.engine = Solver(self.f0, _f, None, tolerance_lte)
-
-
     def update(self, t):
         #compute implicit balancing update
         phase = 2 * np.pi * self.engine.get()

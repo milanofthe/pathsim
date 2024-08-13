@@ -94,11 +94,6 @@ class OneOverFNoise(Block):
         self.engine = Solver(0.0, _f, None, tolerance_lte)
 
 
-    # def initialize_solver(self, Solver, tolerance_lte):
-    #     #initialize the numerical integration engine with kernel
-    #     self.engine = Solver(0.0, lambda x, u, t: u, None, tolerance_lte)
-
-
     def reset(self):
         #reset inputs and outputs
         self.inputs  = {0:0.0}  
@@ -173,11 +168,6 @@ class SinusoidalPhaseNoiseSource(Block):
         #initialize the numerical integration engine with kernel
         def _f(x, u, t): return u
         self.engine = Solver(0.0, _f, None, tolerance_lte)
-
-
-    # def initialize_solver(self, Solver, tolerance_lte):
-    #     #initialize the numerical integration engine with kernel
-    #     self.engine = Solver(0.0, lambda x, u, t: u, None, tolerance_lte)
 
 
     def reset(self):

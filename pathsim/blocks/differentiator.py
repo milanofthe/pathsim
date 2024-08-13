@@ -56,13 +56,6 @@ class Differentiator(Block):
         self.engine = Solver(0.0, _f, _jac, tolerance_lte)
 
 
-    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
-    #     #initialize the numerical integration engine with kernel
-    #     def _f(x, u, t): return - self.f_max * (x - u) 
-    #     def _jac(x, u, t): return - self.f_max
-    #     self.engine = Solver(0.0, _f, _jac, tolerance_lte)
-
-
     def update(self, t):
         #compute implicit balancing update
         prev_output = self.outputs[0]

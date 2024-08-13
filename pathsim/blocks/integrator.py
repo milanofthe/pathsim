@@ -52,13 +52,7 @@ class Integrator(Block):
         #initialize the integration engine
         def _f(x, u, t): return u
         self.engine = Solver(self.initial_value, _f, None, tolerance_lte)
-
-
-    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
-    #     #initialize the integration engine
-    #     def _f(x, u, t): return u
-    #     self.engine = Solver(self.initial_value, _f, None, tolerance_lte)
-
+        
 
     def update(self, t):
         self.outputs = array_to_dict(self.engine.get())

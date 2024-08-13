@@ -125,25 +125,6 @@ class WienerHammersteinModel(Block):
         self.engine = Solver(np.zeros(self.n_1+self.n_2), _f, _jac, tolerance_lte)
 
 
-    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
-        
-    #     #right hand side function for ODE
-    #     def _f(x, u, t):
-    #         x_1, x_2 = x[:self.n_1], x[self.n_1:]
-    #         dx_1 = np.dot(self.A_1, x_1) + np.dot(self.B_1, u) 
-    #         dx_2 = np.dot(self.A_2, x_2) + np.dot(self.B_2, self.func(np.dot(self.C_1, x_1) + np.dot(self.D_1, u)))
-    #         return np.hstack([dx_1, dx_2])
-
-    #     def _jac(x, u, t):
-    #         x_1, x_2 = x[:self.n_1], x[self.n_1:]
-    #         J_12 = np.zeros_like(self.A_1)
-    #         J_21 = np.dot(self.B_2, np.dot(self.C_1, self.jac(np.dot(self.C_1, x_1) + np.dot(self.D_1, u))))
-    #         return np.block([[self.A_1, J_12], [J_21, self.A_2]])
-        
-    #     #combined solver
-    #     self.engine = Solver(np.zeros(self.n_1+self.n_2), _f, _jac, tolerance_lte)
-
-
     def update(self, t):
         #compute implicit balancing update
         prev_outputs = self.outputs.copy()
@@ -244,16 +225,6 @@ class HammersteinModel(Block):
         self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
 
 
-    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
-    #     #right hand side function for ODE
-    #     def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
-    #     def _jac(x, u, t): return self.A
-        
-    #     #solver
-    #     n, _ = self.A.shape
-    #     self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
-
-
     def update(self, t):
         #compute implicit balancing update
         prev_outputs = self.outputs.copy()
@@ -348,15 +319,6 @@ class WienerModel(Block):
         #solver
         n, _ = self.A.shape
         self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
-
-
-    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
-    #     #right hand side function for ODE
-    #     def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
-    #     def _jac(x, u, t): return self.A 
-    #     #solver
-    #     n, _ = self.A.shape
-    #     self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
 
 
     def update(self, t):

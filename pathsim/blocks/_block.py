@@ -87,23 +87,6 @@ class Block:
 
     # methods for blocks with integration engines ---------------------------------------
 
-    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
-    #     """
-    #     Initialize the numerical integration engine with local truncation error 
-    #     tolerance if required.
-    #     If the block doesnt require an integration engine, this method just passes.
-    #     """
-    #     pass
-
-    # def change_solver(self, Solver):
-    #     """
-    #     Changes the solver type of the integration engine of the block, if the 
-    #     block has a solver instance.
-    #     """
-    #     if self.engine is not None:
-    #         self.engine = self.engine.change(Solver)
-
-
     def set_solver(self, Solver, tolerance_lte=1e-6):
         """
         Initialize the numerical integration engine with local truncation error 

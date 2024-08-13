@@ -82,12 +82,6 @@ class StateSpace(Block):
         def _jac(x, u, t): return self.A
         self.engine = Solver(self.initial_value, _f, _jac, tolerance_lte)
 
-    # def initialize_solver(self, Solver, tolerance_lte=1e-6):
-    #     #initialize the integration engine with right hand side
-    #     def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
-    #     def _jac(x, u, t): return self.A
-    #     self.engine = Solver(self.initial_value, _f, _jac, tolerance_lte)
-
 
     def update(self, t):
         #compute implicit balancing update 
