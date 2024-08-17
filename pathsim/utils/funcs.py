@@ -1,6 +1,6 @@
 ########################################################################################
 ##
-##                                  UTILITY FUNCTIONS 
+##                                 UTILITY FUNCTIONS  
 ##                                  (utils/funcs.py)
 ##
 ##                                Milan Rother 2023/24

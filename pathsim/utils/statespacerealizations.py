@@ -14,54 +14,6 @@ import numpy as np
 
 # STATESPACE REALIZATION ===============================================================
 
-def frobenius_realization(b, a):
-    """
-    Build a real-valued state-space model from a transfer function in rational form
-    where 'b' and 'a' are the numerator and denominator polynomial coefficients.
-    
-            b[0] s^m + b[1] s^(m-1) + ... + b[m]
-    H(s) = -------------------------------------
-            a[0] s^n + a[1] s^(n-1) + ... + a[n]
-
-    Returns:
-        A, B, C, D: State-space matrices
-    """
-    
-    # Ensure input is numpy array
-    a = np.array(a, dtype=float)
-    b = np.array(b, dtype=float)
-    
-    # Ensure a[0] is 1 by normalizing the coefficients
-    if a[0] != 1:
-        a = a / a[0]
-        b = b / a[0]
-    
-    # Order of the system
-    n = len(a) - 1  
-
-    # Construct the companion matrix A
-    A = np.zeros((n, n))
-    A[1:, :-1] = np.eye(n-1)
-    A[:, -1] = -a[1:][::-1]
-    
-    # Construct the input vector B
-    B = np.zeros(n)
-    B[-1] = 1
-    
-    # Construct the output vector C
-    m = len(b) - 1
-    
-    if m < n:
-        b = np.pad(b, (n - m, 0), "constant")
-    
-    C = b[1:] - b[0] * a[1:]
-    
-    # Construct the direct transmission term D
-    D = b[0] if m == n else 0.0
-
-    return A, B, C, D
-
-
 def gilbert_realization(Poles, Residues, Const=0.0, tolerance=1e-9):
         
     """
