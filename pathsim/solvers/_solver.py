@@ -49,6 +49,9 @@ class Solver:
         #flag to identify adaptive/fixed timestep solvers
         self.is_adaptive = False
 
+        #current evaluation stage for multistage solvers
+        self.stage = 0
+
         #intermediate evaluation times for multistage solvers as ratios between [t, t+dt]
         self.eval_stages = [0.0]
 
@@ -238,7 +241,7 @@ class ExplicitSolver(Solver):
         time = time_start
 
         #step until duration is reached
-        while time < time_end:
+        while time < time_end + dt:
 
             #perform single timestep
             success, error, scale = self.integrate_singlestep(time, dt)
@@ -369,7 +372,7 @@ class ImplicitSolver(Solver):
         time = time_start
 
         #step until duration is reached
-        while time < time_end:
+        while time < time_end + dt:
 
             #integrate for single timestep
             success, error, scale = self.integrate_singlestep(time, dt, tolerance_fpi, max_iterations)
