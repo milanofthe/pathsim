@@ -58,7 +58,7 @@ class ProgressTracker:
             self.logger.info(f"FINISHED steps(total)={self.successful_steps}({self.steps}) runtime={runtime*1e3:.2f}ms")
 
 
-    def check(self, progress=0.0, success=False, msg=""):
+    def check(self, progress, success=False, msg=""):
         """
         Update the progress of the generator. 
 
@@ -74,9 +74,10 @@ class ProgressTracker:
         #compute progress in percent (round to integer)
         percentage = int(100 * progress)
 
-        #count failed steps
-        if success: 
-            self.successful_steps += 1
+        #count successful steps
+        self.successful_steps += int(success)
+        
+        #count total steps
         self.steps += 1
 
         #generation condition is progress less then 1
