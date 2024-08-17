@@ -1,10 +1,10 @@
 
 ########################################################################################
 ##
-##                             ADAPTIV BUFFER CLASS DEFINITION 
-##                                (utils/adaptivebuffer.py)
+##                         ADAPTIV BUFFER CLASS DEFINITION 
+##                            (utils/adaptivebuffer.py)
 ##
-##                                    Milan Rother 2024
+##                                Milan Rother 2024
 ##
 ########################################################################################
 
@@ -15,7 +15,6 @@ from bisect import bisect_left
 
 
 # HELPER CLASS =========================================================================
-
 
 class AdaptiveBuffer:
     """
@@ -37,6 +36,7 @@ class AdaptiveBuffer:
         self.clean_every = 100
         self.counter = 0
 
+
     def add(self, t, value):
 
         #add the time-value tuple
@@ -50,6 +50,7 @@ class AdaptiveBuffer:
         else:
             self.counter += 1
 
+    
     def get(self, t):
 
         #default 0
@@ -75,9 +76,8 @@ class AdaptiveBuffer:
         #linear interpolation
         return y0 + (y1 - y0) * (target_time - t0) / (t1 - t0)
 
+
     def clear(self):
         #reset everything
         self.buffer = deque()
         self.counter = 0
-
-

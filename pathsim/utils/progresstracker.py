@@ -36,6 +36,7 @@ class ProgressTracker:
         #for progress display in percent
         self.display_percentages = list(range(0, 101, log_interval))
 
+
     def __iter__(self):
 
         #starting progress tracker
@@ -56,7 +57,8 @@ class ProgressTracker:
         if self.logger:
             self.logger.info(f"FINISHED steps(total)={self.successful_steps}({self.steps}) runtime={runtime*1e3:.2f}ms")
 
-    def check(self, progress, success=False, msg=""):
+
+    def check(self, progress=0.0, success=False, msg=""):
         """
         Update the progress of the generator. 
 
