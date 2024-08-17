@@ -21,8 +21,7 @@ from ...utils.funcs import (
     )
 
 from ...utils.statespacerealizations import (
-    gilbert_realization,
-    frobenius_realization
+    gilbert_realization
     )
 
 
