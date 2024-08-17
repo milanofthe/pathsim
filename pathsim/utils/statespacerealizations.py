@@ -14,7 +14,7 @@ import numpy as np
 
 # STATESPACE REALIZATION ===============================================================
 
-def gilbert_realization(Poles, Residues, Const=0.0, tolerance=1e-9):
+def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
         
     """
     Build real valued statespace model from transfer function 
@@ -38,12 +38,34 @@ def gilbert_realization(Poles, Residues, Const=0.0, tolerance=1e-9):
         tolerance : (float) relative tolerance for checking real poles
     """
 
-    #dimension checks for residue matrices
-    if isinstance(Residues, (list, tuple)) or Residues.size == len(Residues):
-        Residues = np.reshape(Residues, (len(Residues), 1, 1))
+    #check validity of args
+    if not Poles or not Residues:
+        raise ValueError("No 'Poles' and 'Residues' defined!")
 
-    #get dimensions for MIMO
-    N, m, n = Residues.shape
+    if len(Poles) != len(Residues):
+        raise ValueError("Same number of 'Poles' and 'Residues' have to be given!")
+
+    #make array
+    Residues = np.asarray(Residues)
+
+    #check shape of residues for MIMO, etc
+    if Residues.ndim == 1:
+        N, m, n = Residues.size, 1, 1
+        Residues = np.reshape(Residues, (N, m, n))
+    elif Residues.ndim == 2:
+        N, m, n = *Residues.shape, 1
+        Residues = np.reshape(Residues, (N, m, n))
+    elif Residues.ndim == 3:
+        N, m, n = Residues.shape
+    else:
+        raise ValueError(f"shape mismatch of 'Residues': Residues.shape={Residues.shape}")
+
+    # #dimension checks for residue matrices
+    # if isinstance(Residues, (list, tuple)) or Residues.size == len(Residues):
+    #     Residues = np.reshape(Residues, (len(Residues), 1, 1))
+
+    # #get dimensions for MIMO
+    # N, m, n = Residues.shape
 
     #initialize companion matrix
     a = np.zeros((N, N))

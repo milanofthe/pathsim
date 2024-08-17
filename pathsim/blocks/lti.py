@@ -21,9 +21,9 @@ from ..utils.funcs import (
     )
 
 from ..utils.statespacerealizations import (
-    gilbert_realization,
-    frobenius_realization
+    gilbert_realization
     )
+
 
 # LTI BLOCKS ============================================================================
 
@@ -102,8 +102,6 @@ class StateSpace(Block):
         return self.engine.step(dict_to_array(self.inputs), t, dt)
 
 
-
-
 class TransferFunction(StateSpace):
     """
     This block integrates a LTI (MIMO for pole residue) transfer function.
@@ -147,7 +145,3 @@ class TransferFunction(StateSpace):
 
         #initialize statespace model
         super().__init__(A, B, C, D)
-        
-
-        
-            

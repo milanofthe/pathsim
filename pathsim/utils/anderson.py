@@ -151,11 +151,11 @@ class NewtonAndersonAcceleration(AndersonAcceleration):
 
         #early exit for scalar or purely vectorial values
         if np.isscalar(f) or np.ndim(jac) == 1:
-            return x - f / (jac - 1.0)
+            return x - f / (jac - 1.0), abs(f)
 
         #vectorial values (newton raphson)
         jac_f = jac - np.eye(len(f))
-        return x - np.linalg.solve(jac_f, f)
+        return x - np.linalg.solve(jac_f, f), np.linalg.norm(f)
 
 
     def step(self, x, g, jac=None):
@@ -166,8 +166,15 @@ class NewtonAndersonAcceleration(AndersonAcceleration):
         """
 
         #newton step if jacobian available
-        if jac is None: _x = x
-        else: _x = self._newton(x, g, jac)
-        
-        #anderson step
-        return super().step(_x, g)
+        if jac is None: 
+
+            #regular anderson step with residual
+            return super().step(x, g)
+        else: 
+            #newton step with residual
+            _x, res = self._newton(x, g, jac)
+
+            #anderson step with no residual
+            y, _ = super().step(_x, g)
+
+            return y, res
