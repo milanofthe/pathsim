@@ -25,6 +25,7 @@ class DelayTest(unittest.TestCase):
 
     def test_init(self):
 
+        #test specific initialization
         D = Delay(tau=1)
 
         self.assertTrue(isinstance(D._buffer, AdaptiveBuffer))

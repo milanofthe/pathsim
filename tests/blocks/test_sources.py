@@ -48,7 +48,6 @@ class ConstantTest(unittest.TestCase):
         self.assertEqual(C.get(0), 5)
 
 
-
 class SourceTest(unittest.TestCase):
     """
     Test the implementation of the 'Source' block class
@@ -112,7 +111,6 @@ class SourceTest(unittest.TestCase):
 
         #test if error is allways 0
         self.assertEqual(err, 0)
-
 
 
 # RUN TESTS LOCALLY ====================================================================
