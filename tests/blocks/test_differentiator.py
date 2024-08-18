@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                                  TESTS FOR 
-##                            'blocks.integrator.py'
+##                          'blocks.differentiator.py'
 ##
 ##                              Milan Rother 2024
 ##
@@ -12,7 +12,7 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.integrator import Integrator
+from pathsim.blocks.differentiator import Differentiator
 
 #base solver for testing
 from pathsim.solvers._solver import Solver 
@@ -20,70 +20,80 @@ from pathsim.solvers._solver import Solver
 
 # TESTS ================================================================================
 
-class IntegratorTest(unittest.TestCase):
+class DifferentiatorTest(unittest.TestCase):
     """
-    Test the implementation of the 'Integrator' block class
+    Test the implementation of the 'Differentiator' block class
     """
 
     def test_init(self):
 
         #test default initialization
-        I = Integrator()
-        self.assertEqual(I.initial_value, 0.0)
-        self.assertEqual(I.engine, None)
+        D = Differentiator()
+        self.assertEqual(D.f_max, 1e2)
+        self.assertEqual(D.engine, None)
 
         #test special initialization
-        I = Integrator(initial_value=1.0)
-        self.assertEqual(I.initial_value, 1.0)
+        D = Differentiator(f_max=1e3)
+        self.assertEqual(D.f_max, 1e3)
 
 
     def test_len(self):
 
-        I = Integrator()
+        D = Differentiator()
 
-        #no direct passthrough
-        self.assertEqual(len(I), 0)
+        #has direct passthrough
+        self.assertEqual(len(D), 1)
 
 
     def test_str(self):
 
-        I = Integrator()
+        D = Differentiator()
 
         #test default str method
-        self.assertEqual(str(I), "Integrator")
+        self.assertEqual(str(D), "Differentiator")
 
 
     def test_set_solver(self):
 
-        I = Integrator()
+        D = Differentiator()
 
         #test that no solver is initialized
-        self.assertEqual(I.engine, None)
+        self.assertEqual(D.engine, None)
 
-        I.set_solver(Solver, tolerance_lte=1e-6)
+        D.set_solver(Solver, tolerance_lte=1e-6)
 
         #test that solver is now available
-        self.assertTrue(isinstance(I.engine, Solver))
-        self.assertEqual(I.engine.tolerance_lte, 1e-6)
+        self.assertTrue(isinstance(D.engine, Solver))
+        self.assertEqual(D.engine.tolerance_lte, 1e-6)
 
-        I.set_solver(Solver, tolerance_lte=1e-3)
+        D.set_solver(Solver, tolerance_lte=1e-3)
 
         #test that solver tolerance is changed
-        self.assertEqual(I.engine.tolerance_lte, 1e-3)
+        self.assertEqual(D.engine.tolerance_lte, 1e-3)
 
 
     def test_update(self):
 
-        I = Integrator(initial_value=5.5)
-        I.set_solver(Solver)
+        D = Differentiator()
+        D.set_solver(Solver)
 
-        err = I.update(0)
+        #test that input is zero
+        self.assertEqual(D.inputs[0], 0.0)
+
+        err = D.update(0)
 
         #test if error is correctly 0
         self.assertEqual(err, 0.0)
 
-        #test if engine state is retrieved correctly
-        self.assertEqual(I.get(0), 5.5)
+        #test if state is retrieved correctly
+        self.assertEqual(D.get(0), 0.0)
+
+        D.set(0, 2)
+
+        err = D.update(0)
+
+        #test if error is correctly calculated
+        self.assertEqual(err, D.f_max*2)
 
 
     def test_step(self):
