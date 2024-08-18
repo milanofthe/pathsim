@@ -39,7 +39,7 @@ class Block:
         self.inputs  = {0:0.0}  
         self.outputs = {0:0.0} 
 
-        #initialiye integration engine as 'None' by default
+        #initialize integration engine as 'None' by default
         self.engine = None
 
         #unique block identifier
