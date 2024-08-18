@@ -22,7 +22,6 @@ from ..utils.funcs import (
 
 # MISO BLOCKS ===========================================================================
 
-
 class Multiplier(Block):
     """
     multiplies / product of all input signals (MISO)
