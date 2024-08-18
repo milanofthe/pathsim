@@ -31,9 +31,7 @@ class Integrator(Block):
         initial_value : (float or array) initial value of integrator
     """
 
-    def __init__(self, 
-                 initial_value=0.0, 
-                 event_func=None):
+    def __init__(self, initial_value=0.0):
         super().__init__()
 
         #save initial value
