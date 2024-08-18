@@ -82,7 +82,7 @@ class RNGTest(unittest.TestCase):
             self.assertNotEqual(old, R.get(0))
 
 
-        #next test finite sampling rate (samples every second)
+        #next test finite sampling rate (samples every two seconds)
         R = RNG(sampling_rate=0.5)
 
         for t in range(10):

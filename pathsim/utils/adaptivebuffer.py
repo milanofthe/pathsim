@@ -37,6 +37,10 @@ class AdaptiveBuffer:
         self.counter = 0
 
 
+    def __len__(self):
+        return len(self.buffer)
+
+
     def add(self, t, value):
 
         #add the time-value tuple
