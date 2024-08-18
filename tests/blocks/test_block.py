@@ -103,6 +103,9 @@ class BlockTest(unittest.TestCase):
         self.assertEqual(B.get(1), 1)
         self.assertEqual(B.get(2), 2)
 
+        #undefined output -> defaults to 0.0
+        self.assertEqual(B.get(100), 0.0)
+
 
     def test_update(self):
 
@@ -126,7 +129,6 @@ class BlockTest(unittest.TestCase):
 
         #test default implementation 
         self.assertEqual(B.step(None, None), (True, 0.0, 1.0))
-
 
 
 
