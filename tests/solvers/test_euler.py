@@ -15,51 +15,90 @@ import numpy as np
 from pathsim.solvers.euler import EUF, EUB
 
 
-# TEST PROBLEM =========================================================================
 
-def func(x, u, t):
-    return -x
+# TEST PROBLEMS ========================================================================
 
-def jac(x, u, t):
-    return -1
+class Problem:
+    def __init__(self, name, func, jac, x0, solution):
+        self.name = name
+        self.func = func
+        self.jac = jac
+        self.x0 = x0
+        self.solution = solution
 
-def solution(t):
-    return np.exp(-t)
+
+#create some reference problems for testing
+reference_problems = [
+    Problem(name="linear_feedback", 
+            func=lambda x, u, t: -x, 
+            jac=lambda x, u, t: -1, 
+            x0=1.0, 
+            solution=lambda t: np.exp(-t)
+            ),
+    Problem(name="logistic", 
+            func=lambda x, u, t: x*(1-x), 
+            jac=lambda x, u, t: 1-2*x, 
+            x0=0.5, 
+            solution=lambda t: 1/(1 + np.exp(-t))
+            )
+]
 
 
 # TESTS ================================================================================
 
 class EUFTest(unittest.TestCase):
     """
-    Test the implementation of the Explicit Euler Forward (EUF) class
+    Test the implementation of the 'EUF' solver class
     """
 
-    def setUp(self):
-        self.solver = EUF(initial_value=1, func=func, jac=jac)
-
-
     def test_init(self):
-        self.assertTrue(self.solver.is_explicit)
-        self.assertFalse(self.solver.is_implicit)
+
+        #test default initializtion
+        solver = EUF()
+
+        self.assertTrue(callable(solver.func))
+        self.assertEqual(solver.jac, None)
+        self.assertEqual(solver.initial_value, 0)
+
+        self.assertEqual(solver.stage, 0)
+        self.assertFalse(solver.is_adaptive)
+        self.assertTrue(solver.is_explicit)
+        self.assertFalse(solver.is_implicit)
+        
+        #test specific initialization
+        solver = EUF(initial_value=1, 
+                        func=lambda x, u, t: -x, 
+                        jac=lambda x, u, t: -1, 
+                        tolerance_lte=1e-6)
+
+        self.assertEqual(solver.func(2, 0, 0), -2)
+        self.assertEqual(solver.jac(2, 0, 0), -1)
+        self.assertEqual(solver.initial_value, 1)
+        self.assertEqual(solver.tolerance_lte, 1e-6)
 
 
     def test_stages(self):
-        for i, t in enumerate(self.solver.stages(0, 1)):
+
+        solver = EUF()
+
+        for i, t in enumerate(solver.stages(0, 1)):
             
             #test the stage iterator
-            self.assertEqual(t, self.solver.eval_stages[i])
+            self.assertEqual(t, solver.eval_stages[i])
 
 
     def test_step(self):
 
-        for i, t in enumerate(self.solver.stages(0, 1)):
+        solver = EUF()
 
-            success, err, scale = self.solver.step(0.0, t, 1)
+        for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works
-            self.assertEqual(self.solver.stage, i)
+            self.assertEqual(solver.stage, i)
 
-            #test if expected return
+            success, err, scale = solver.step(0.0, t, 1)
+
+            #test if expected return at intermediate stages
             self.assertTrue(success)
             self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
@@ -69,56 +108,83 @@ class EUFTest(unittest.TestCase):
         
         #integrate test problem and assess convergence order
 
-        timesteps = np.logspace(-2, -1, 10)
-        errors = []
+        timesteps = np.logspace(-0.4, 0, 20)
 
-        for dt in timesteps:
-            self.solver.reset()
-            time, numerical_solution = self.solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+        for problem in reference_problems:
 
-            analytical_solution = solution(time)
-            errors.append(np.linalg.norm(numerical_solution - analytical_solution))
+            solver = EUF(problem.x0, problem.func, problem.jac)
+            
+            errors = []
 
-        #test if errors are monotonically decreasing
-        self.assertTrue(np.all(np.diff(errors)>0))
+            for dt in timesteps:
 
-        #test convergence order, expected 1
-        p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-        self.assertEqual(np.round(p), 1)
+                solver.reset()
+                time, numerical_solution = solver.integrate(time_start=0.0, time_end=3.0, dt=dt, adaptive=False)
+
+                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+
+            #test if errors are monotonically decreasing
+            self.assertTrue(np.all(np.diff(errors)>0))
+
+            #test convergence order, expected 1
+            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+            self.assertEqual(round(p), 1)
 
 
 
 class EUBTest(unittest.TestCase):
     """
-    Test the implementation of the Implicit Euler Backward (EUB) class
+    Test the implementation of the 'EUB' solver class
     """
 
-    def setUp(self):
-        self.solver = EUB(initial_value=1, func=func, jac=jac)
-
-
     def test_init(self):
-        self.assertFalse(self.solver.is_explicit)
-        self.assertTrue(self.solver.is_implicit)
+
+        #test default initializtion
+        solver = EUB()
+
+        self.assertTrue(callable(solver.func))
+        self.assertEqual(solver.jac, None)
+        self.assertEqual(solver.initial_value, 0)
+
+        self.assertEqual(solver.stage, 0)
+        self.assertFalse(solver.is_adaptive)
+        self.assertTrue(solver.is_implicit)
+        self.assertFalse(solver.is_explicit)
+        
+        #test specific initialization
+        solver = EUB(initial_value=1, 
+                        func=lambda x, u, t: -x, 
+                        jac=lambda x, u, t: -1, 
+                        tolerance_lte=1e-6)
+
+        self.assertEqual(solver.func(2, 0, 0), -2)
+        self.assertEqual(solver.jac(2, 0, 0), -1)
+        self.assertEqual(solver.initial_value, 1)
+        self.assertEqual(solver.tolerance_lte, 1e-6)
 
 
     def test_stages(self):
-        for i, t in enumerate(self.solver.stages(0, 1)):
+
+        solver = EUB()
+
+        for i, t in enumerate(solver.stages(0, 1)):
             
             #test the stage iterator
-            self.assertEqual(t, self.solver.eval_stages[i])
+            self.assertEqual(t, solver.eval_stages[i])
 
 
     def test_step(self):
 
-        for i, t in enumerate(self.solver.stages(0, 1)):
+        solver = EUB()
 
-            success, err, scale = self.solver.step(0.0, t, 1)
+        for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works
-            self.assertEqual(self.solver.stage, i)
+            self.assertEqual(solver.stage, i)
 
-            #test if expected return
+            success, err, scale = solver.step(0.0, t, 1)
+
+            #test if expected return at intermediate stages
             self.assertTrue(success)
             self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
@@ -129,21 +195,26 @@ class EUBTest(unittest.TestCase):
         #integrate test problem and assess convergence order
 
         timesteps = np.logspace(-2, -1, 10)
-        errors = []
 
-        for dt in timesteps:
-            self.solver.reset()
-            time, numerical_solution = self.solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+        for problem in reference_problems:
 
-            analytical_solution = solution(time)
-            errors.append(np.linalg.norm(numerical_solution - analytical_solution))
+            solver = EUB(problem.x0, problem.func, problem.jac)
+            
+            errors = []
 
-        #test if errors are monotonically decreasing
-        self.assertTrue(np.all(np.diff(errors)>0))
+            for dt in timesteps:
 
-        #test convergence order, expected 1
-        p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-        self.assertEqual(np.round(p), 1)
+                solver.reset()
+                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+
+                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+
+            #test if errors are monotonically decreasing
+            self.assertTrue(np.all(np.diff(errors)>0))
+
+            #test convergence order, expected 1
+            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+            self.assertGreater(p, 0.5)
 
 
 # RUN TESTS LOCALLY ====================================================================

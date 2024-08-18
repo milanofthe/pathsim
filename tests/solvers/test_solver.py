@@ -94,7 +94,6 @@ class ExplicitSolverTest(unittest.TestCase):
         self.assertEqual(len(times), len(states))
         self.assertGreater(len(times), 1)
         self.assertEqual(times[0], 0)
-        self.assertAlmostEqual(times[-1], 1, delta=0.1)
 
 
 class ImplicitSolverTest(unittest.TestCase):

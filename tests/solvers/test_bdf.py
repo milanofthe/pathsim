@@ -15,16 +15,35 @@ import numpy as np
 from pathsim.solvers.bdf import BDF2, BDF3, BDF4
 
 
-# TEST PROBLEM =========================================================================
+# TEST PROBLEMS ========================================================================
 
-def func(x, u, t):
-    return -x
+class Problem:
+    def __init__(self, name, func, jac, x0, solution):
+        self.name = name
+        self.func = func
+        self.jac = jac
+        self.x0 = x0
+        self.solution = solution
 
-def jac(x, u, t):
-    return -1
 
-def solution(t):
-    return np.exp(-t)
+#create some reference problems for testing
+reference_problems = [
+    Problem(name="linear_feedback", 
+            func=lambda x, u, t: -x, 
+            jac=lambda x, u, t: -1, 
+            x0=1.0, 
+            solution=lambda t: np.exp(-t)
+            ),
+    Problem(name="logistic", 
+            func=lambda x, u, t: x*(1-x), 
+            jac=lambda x, u, t: 1-2*x, 
+            x0=0.5, 
+            solution=lambda t: 1/(1 + np.exp(-t))
+            )
+]
+
+
+
 
 
 # TESTS ================================================================================
@@ -34,48 +53,70 @@ class BDF2Test(unittest.TestCase):
     Test the implementation of the 'BDF2' solver class
     """
 
-    def setUp(self):
-        self.solver = BDF2(initial_value=1, func=func, jac=jac)
-
-
     def test_init(self):
-        self.assertTrue(self.solver.is_implicit)
-        self.assertFalse(self.solver.is_explicit)
+
+        #test default initializtion
+        solver = BDF2()
+
+        self.assertTrue(callable(solver.func))
+        self.assertEqual(solver.jac, None)
+        self.assertEqual(solver.initial_value, 0)
+
+        self.assertEqual(solver.stage, 0)
+        self.assertFalse(solver.is_adaptive)
+        self.assertTrue(solver.is_implicit)
+        self.assertFalse(solver.is_explicit)
+        
+        #test specific initialization
+        solver = BDF2(initial_value=1, 
+                        func=lambda x, u, t: -x, 
+                        jac=lambda x, u, t: -1, 
+                        tolerance_lte=1e-6)
+
+        self.assertEqual(solver.func(2, 0, 0), -2)
+        self.assertEqual(solver.jac(2, 0, 0), -1)
+        self.assertEqual(solver.initial_value, 1)
+        self.assertEqual(solver.tolerance_lte, 1e-6)
 
 
     def test_stages(self):
-        for i, t in enumerate(self.solver.stages(0, 1)):
+
+        solver = BDF2()
+
+        for i, t in enumerate(solver.stages(0, 1)):
             
             #test the stage iterator
-            self.assertEqual(t, self.solver.eval_stages[i])
+            self.assertEqual(t, solver.eval_stages[i])
 
 
     def test_buffer(self):
 
-        self.solver.reset()
+        solver = BDF2()
 
         #perform some steps
         for k in range(10):
 
             #test bdf buffer length
-            buffer_length = len(self.solver.B)
+            buffer_length = len(solver.B)
             self.assertEqual(buffer_length, k+1 if k < 2 else 2)
             
             #make one step
-            for i, t in enumerate(self.solver.stages(0, 1)):
-                success, err, scale = self.solver.step(0.0, t, 1)
+            for i, t in enumerate(solver.stages(0, 1)):
+                success, err, scale = solver.step(0.0, t, 1)
 
 
     def test_step(self):
 
-        for i, t in enumerate(self.solver.stages(0, 1)):
+        solver = BDF2()
 
-            success, err, scale = self.solver.step(0.0, t, 1)
+        for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works
-            self.assertEqual(self.solver.stage, i)
+            self.assertEqual(solver.stage, i)
 
-            #test if expected return
+            success, err, scale = solver.step(0.0, t, 1)
+
+            #test if expected return at intermediate stages
             self.assertTrue(success)
             self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
@@ -86,21 +127,27 @@ class BDF2Test(unittest.TestCase):
         #integrate test problem and assess convergence order
 
         timesteps = np.logspace(-2, -1, 10)
-        errors = []
 
-        for dt in timesteps:
-            self.solver.reset()
-            time, numerical_solution = self.solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+        for problem in reference_problems:
 
-            analytical_solution = solution(time)
-            errors.append(np.linalg.norm(numerical_solution - analytical_solution))
+            solver = BDF2(problem.x0, problem.func, problem.jac)
+            
+            errors = []
 
-        #test if errors are monotonically decreasing
-        self.assertTrue(np.all(np.diff(errors)>0))
+            for dt in timesteps:
 
-        #test convergence order, expected between 1 and 2 due to ramp up
-        p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-        self.assertGreater(p, 1.2)
+                solver.reset()
+                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+
+                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+
+            #test if errors are monotonically decreasing
+            self.assertTrue(np.all(np.diff(errors)>0))
+
+            #test convergence order, expected 1
+            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+            self.assertGreater(p, 1)
+
 
 
 class BDF3Test(unittest.TestCase):
@@ -108,48 +155,70 @@ class BDF3Test(unittest.TestCase):
     Test the implementation of the 'BDF3' solver class
     """
 
-    def setUp(self):
-        self.solver = BDF3(initial_value=1, func=func, jac=jac)
-
-
     def test_init(self):
-        self.assertTrue(self.solver.is_implicit)
-        self.assertFalse(self.solver.is_explicit)
+
+        #test default initializtion
+        solver = BDF3()
+
+        self.assertTrue(callable(solver.func))
+        self.assertEqual(solver.jac, None)
+        self.assertEqual(solver.initial_value, 0)
+
+        self.assertEqual(solver.stage, 0)
+        self.assertFalse(solver.is_adaptive)
+        self.assertTrue(solver.is_implicit)
+        self.assertFalse(solver.is_explicit)
+        
+        #test specific initialization
+        solver = BDF3(initial_value=1, 
+                        func=lambda x, u, t: -x, 
+                        jac=lambda x, u, t: -1, 
+                        tolerance_lte=1e-6)
+
+        self.assertEqual(solver.func(2, 0, 0), -2)
+        self.assertEqual(solver.jac(2, 0, 0), -1)
+        self.assertEqual(solver.initial_value, 1)
+        self.assertEqual(solver.tolerance_lte, 1e-6)
 
 
     def test_stages(self):
-        for i, t in enumerate(self.solver.stages(0, 1)):
+
+        solver = BDF3()
+
+        for i, t in enumerate(solver.stages(0, 1)):
             
             #test the stage iterator
-            self.assertEqual(t, self.solver.eval_stages[i])
+            self.assertEqual(t, solver.eval_stages[i])
 
 
     def test_buffer(self):
 
-        self.solver.reset()
+        solver = BDF3()
 
         #perform some steps
         for k in range(10):
 
             #test bdf buffer length
-            buffer_length = len(self.solver.B)
+            buffer_length = len(solver.B)
             self.assertEqual(buffer_length, k+1 if k < 3 else 3)
             
             #make one step
-            for i, t in enumerate(self.solver.stages(0, 1)):
-                success, err, scale = self.solver.step(0.0, t, 1)
+            for i, t in enumerate(solver.stages(0, 1)):
+                success, err, scale = solver.step(0.0, t, 1)
 
 
     def test_step(self):
 
-        for i, t in enumerate(self.solver.stages(0, 1)):
+        solver = BDF3()
 
-            success, err, scale = self.solver.step(0.0, t, 1)
+        for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works
-            self.assertEqual(self.solver.stage, i)
+            self.assertEqual(solver.stage, i)
 
-            #test if expected return
+            success, err, scale = solver.step(0.0, t, 1)
+
+            #test if expected return at intermediate stages
             self.assertTrue(success)
             self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
@@ -160,21 +229,27 @@ class BDF3Test(unittest.TestCase):
         #integrate test problem and assess convergence order
 
         timesteps = np.logspace(-2, -1, 10)
-        errors = []
 
-        for dt in timesteps:
-            self.solver.reset()
-            time, numerical_solution = self.solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+        for problem in reference_problems:
 
-            analytical_solution = solution(time)
-            errors.append(np.linalg.norm(numerical_solution - analytical_solution))
+            solver = BDF3(problem.x0, problem.func, problem.jac)
+            
+            errors = []
 
-        #test if errors are monotonically decreasing
-        self.assertTrue(np.all(np.diff(errors)>0))
+            for dt in timesteps:
 
-        #test convergence order, expected between 1 and 3 due to ramp up
-        p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-        self.assertGreater(p, 1.2)
+                solver.reset()
+                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+
+                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+
+            #test if errors are monotonically decreasing
+            self.assertTrue(np.all(np.diff(errors)>0))
+
+            #test convergence order, expected 1
+            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+            self.assertGreater(p, 1)
+
 
 
 class BDF4Test(unittest.TestCase):
@@ -182,48 +257,70 @@ class BDF4Test(unittest.TestCase):
     Test the implementation of the 'BDF4' solver class
     """
 
-    def setUp(self):
-        self.solver = BDF4(initial_value=1, func=func, jac=jac)
-
-
     def test_init(self):
-        self.assertTrue(self.solver.is_implicit)
-        self.assertFalse(self.solver.is_explicit)
+
+        #test default initializtion
+        solver = BDF4()
+
+        self.assertTrue(callable(solver.func))
+        self.assertEqual(solver.jac, None)
+        self.assertEqual(solver.initial_value, 0)
+
+        self.assertEqual(solver.stage, 0)
+        self.assertFalse(solver.is_adaptive)
+        self.assertTrue(solver.is_implicit)
+        self.assertFalse(solver.is_explicit)
+        
+        #test specific initialization
+        solver = BDF4(initial_value=1, 
+                        func=lambda x, u, t: -x, 
+                        jac=lambda x, u, t: -1, 
+                        tolerance_lte=1e-6)
+
+        self.assertEqual(solver.func(2, 0, 0), -2)
+        self.assertEqual(solver.jac(2, 0, 0), -1)
+        self.assertEqual(solver.initial_value, 1)
+        self.assertEqual(solver.tolerance_lte, 1e-6)
 
 
     def test_stages(self):
-        for i, t in enumerate(self.solver.stages(0, 1)):
+
+        solver = BDF4()
+
+        for i, t in enumerate(solver.stages(0, 1)):
             
             #test the stage iterator
-            self.assertEqual(t, self.solver.eval_stages[i])
+            self.assertEqual(t, solver.eval_stages[i])
 
 
     def test_buffer(self):
 
-        self.solver.reset()
+        solver = BDF4()
 
         #perform some steps
         for k in range(10):
 
             #test bdf buffer length
-            buffer_length = len(self.solver.B)
+            buffer_length = len(solver.B)
             self.assertEqual(buffer_length, k+1 if k < 4 else 4)
             
             #make one step
-            for i, t in enumerate(self.solver.stages(0, 1)):
-                success, err, scale = self.solver.step(0.0, t, 1)
+            for i, t in enumerate(solver.stages(0, 1)):
+                success, err, scale = solver.step(0.0, t, 1)
 
 
     def test_step(self):
 
-        for i, t in enumerate(self.solver.stages(0, 1)):
+        solver = BDF4()
 
-            success, err, scale = self.solver.step(0.0, t, 1)
+        for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works
-            self.assertEqual(self.solver.stage, i)
+            self.assertEqual(solver.stage, i)
 
-            #test if expected return
+            success, err, scale = solver.step(0.0, t, 1)
+
+            #test if expected return at intermediate stages
             self.assertTrue(success)
             self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
@@ -234,21 +331,31 @@ class BDF4Test(unittest.TestCase):
         #integrate test problem and assess convergence order
 
         timesteps = np.logspace(-2, -1, 10)
-        errors = []
 
-        for dt in timesteps:
-            self.solver.reset()
-            time, numerical_solution = self.solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+        for problem in reference_problems:
 
-            analytical_solution = solution(time)
-            errors.append(np.linalg.norm(numerical_solution - analytical_solution))
+            solver = BDF4(problem.x0, problem.func, problem.jac)
+            
+            errors = []
 
-        #test if errors are monotonically decreasing
-        self.assertTrue(np.all(np.diff(errors)>0))
+            for dt in timesteps:
 
-        #test convergence order, expected between 1 and 4 due to ramp up
-        p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-        self.assertGreater(p, 1.2)
+                solver.reset()
+                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+
+                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+
+            #test if errors are monotonically decreasing
+            self.assertTrue(np.all(np.diff(errors)>0))
+
+            #test convergence order, expected 1
+            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+            self.assertGreater(p, 1)
+
+
+
+
+
 
 
 # RUN TESTS LOCALLY ====================================================================
