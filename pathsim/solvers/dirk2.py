@@ -17,7 +17,6 @@ from ..utils.funcs import numerical_jacobian
 
 class DIRK2(ImplicitSolver):
     """
-
     The 2-stage SSP-optimal Diagonally Implicit Runge–Kutta (DIRK) method 
     of second order, namely the second order RK with the largest radius 
     of absolute monotonicity. 
