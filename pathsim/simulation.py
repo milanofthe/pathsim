@@ -45,7 +45,7 @@ class Simulation:
     (SSPRK22) method which is quite fast and has ok accuracy, especially if you are forced to 
     take small steps to cover the behaviour of forcing functions. Adaptive timestepping and 
     implicit integrators are also available.
-    
+
     INPUTS:
         blocks         : (list of 'Block' objects) blocks that make up the system
         connections    : (list of 'Connection' objects) connections that connect the blocks
@@ -64,9 +64,9 @@ class Simulation:
                  blocks=[], 
                  connections=[], 
                  dt=0.01, 
-                 dt_min=0.0,
-                 dt_max=None,
-                 Solver=SSPRK22,
+                 dt_min=0.0, 
+                 dt_max=None, 
+                 Solver=SSPRK22, 
                  tolerance_fpi=1e-12, 
                  tolerance_lte=1e-8, 
                  iterations_min=None, 
@@ -125,7 +125,6 @@ class Simulation:
         self._check_connections()
 
         #set numerical integration solver to all blocks 
-        # self._initialize_solver()
         self._set_solver()
 
         #compute the length of the longest path in the system
