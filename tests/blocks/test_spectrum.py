@@ -113,15 +113,6 @@ class SpectrumTest(unittest.TestCase):
         self.assertTrue(np.all(spec == np.zeros(100)))
 
 
-    def test_step(self):
-        pass #not implemented, only makes sense in full simulation
-
-
-    def test_solve(self):
-        pass #not implemented, only makes sense in full simulation
-
-
-
 # RUN TESTS LOCALLY ====================================================================
 
 if __name__ == '__main__':

@@ -86,15 +86,6 @@ class IntegratorTest(unittest.TestCase):
         self.assertEqual(I.get(0), 5.5)
 
 
-    def test_step(self):
-        pass #not implemented, only makes sense in full simulation
-
-
-    def test_solve(self):
-        pass #not implemented, only makes sense in full simulation
-
-
-
 # RUN TESTS LOCALLY ====================================================================
 
 if __name__ == '__main__':

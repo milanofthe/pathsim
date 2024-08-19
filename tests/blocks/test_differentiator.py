@@ -96,15 +96,6 @@ class DifferentiatorTest(unittest.TestCase):
         self.assertEqual(err, D.f_max*2)
 
 
-    def test_step(self):
-        pass #not implemented, only makes sense in full simulation
-
-
-    def test_solve(self):
-        pass #not implemented, only makes sense in full simulation
-
-
-
 # RUN TESTS LOCALLY ====================================================================
 
 if __name__ == '__main__':

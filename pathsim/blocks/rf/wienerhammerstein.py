@@ -20,7 +20,7 @@ from ...utils.funcs import (
     auto_jacobian
     )
 
-from ...utils.statespacerealizations import (
+from ...utils.gilbert import (
     gilbert_realization
     )
 

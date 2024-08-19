@@ -125,14 +125,6 @@ class StateSpaceTest(unittest.TestCase):
         self.assertAlmostEqual(S.get(0), 2.2, 8)
 
 
-    def test_step(self):
-        pass #not implemented, only makes sense in full simulation
-
-
-    def test_solve(self):
-        pass #not implemented, only makes sense in full simulation
-
-
 class TransferFunctionTest(unittest.TestCase):
     """
     Test the implementation of the 'TransferFunction' block class
