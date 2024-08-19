@@ -20,7 +20,7 @@ from pathsim.solvers._solver import Solver
 
 # TESTS ================================================================================
 
-class SpectrumTest(unittest.TestCase):
+class TestSpectrum(unittest.TestCase):
     """
     Test the implementation of the 'Spectrum' block class
     """
