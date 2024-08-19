@@ -84,24 +84,26 @@ class Spectrum(Block):
 
 
     def set_solver(self, Solver, tolerance_lte=1e-6):
+        
+        if self.engine is None:
+            
+            #initialize the numerical integration engine with kernel
+            def _f(x, u, t):
+                return np.kron(u, np.exp(-1j * self.omega * t))
 
-        #change solver if already initialized
-        if self.engine is not None:
+            def _f_decay(x, u, t):
+                return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
+
+            #initialize depending on forgetting factor
+            if self.alpha == 0.0: self.engine = Solver(0.0, _f, None, tolerance_lte)
+            else: self.engine = Solver(0.0, _f_decay, None, tolerance_lte)
+
+        else:
+
+            #change solver if already initialized
             self.engine = self.engine.change(Solver, tolerance_lte)
-            return #quit early
 
-        #initialize the numerical integration engine with kernel
-        def _f(x, u, t):
-            return np.kron(u, np.exp(-1j * self.omega * t))
-
-        def _f_decay(x, u, t):
-            return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
-
-        #initialize depending on forgetting factor
-        if self.alpha == 0.0: self.engine = Solver(0.0, _f, None, tolerance_lte)
-        else: self.engine = Solver(0.0, _f_decay, None, tolerance_lte)
-
-
+        
     def reset(self):
         #reset inputs
         self.inputs = {k:0.0 for k in sorted(self.inputs.keys())}  
@@ -117,10 +119,17 @@ class Spectrum(Block):
 
         #just return 'None' if no engine initialized
         if self.engine is None:
-            return self.freq, np.zeros_like(self.freq).reshape((-1, len(self.freq)))
+            return self.freq, np.zeros_like(self.freq)
 
-        #get and reshape spectra
-        spec = np.reshape(self.engine.get(), (-1, len(self.freq)))
+        #get state from engine
+        state = self.engine.get()
+
+        #catch case where state has not been updated
+        if state == self.engine.initial_value:
+            return self.freq, np.zeros_like(self.freq)
+
+        #reshape state into spectra
+        spec = np.reshape(state, (-1, len(self.freq)))
 
         #rescale spectrum and return it
         if self.alpha != 0.0:

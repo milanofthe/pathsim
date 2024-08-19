@@ -155,7 +155,9 @@ class TransferFunctionTest(unittest.TestCase):
         self.assertEqual(T.D, 5.5)
 
         #test specific initialization (mimo)
-        T = TransferFunction(Poles=np.array([1, 2]), Residues=2*np.ones((2, 2)), Const=np.ones(2))
+        T = TransferFunction(Poles=np.array([1, 2]), 
+                             Residues=2*np.ones((2, 2)), 
+                             Const=np.ones(2))
         self.assertTrue(np.all(T.A == np.diag(np.array([1, 2]))))
         self.assertTrue(np.all(T.B == np.ones(2)))
         self.assertTrue(np.all(T.C == 2*np.ones(2)))
