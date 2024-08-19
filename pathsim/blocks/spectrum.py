@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from ._block import Block
-from ..utils.funcs import dict_to_array, dB
+from ..utils.funcs import dict_to_array
 from ..utils.realtimeplotter import RealtimePlotter
 
 
@@ -267,7 +267,6 @@ class Spectrum(Block):
                 wrt.writerow(sample)
 
 
-
 class RealtimeSpectrum(Spectrum):
 
     """
@@ -285,7 +284,6 @@ class RealtimeSpectrum(Spectrum):
         t_wait    : (float) t_wait time before starting RFT
         alpha     : (float) exponential forgetting factor for realtime spectrum
         labels    : (list of strings) labels for the inputs
-        transform : (callable) spectrum transformation for plotting, i.e. abs, dB, ...
     """
 
     def __init__(self, freq=[], t_wait=0.0, alpha=0.0, labels=[]):
@@ -316,4 +314,3 @@ class RealtimeSpectrum(Spectrum):
 
         #no error estimate
         return True, 0.0, 1.0
-    
