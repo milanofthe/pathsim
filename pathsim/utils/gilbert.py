@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                       METHODS FOR STATESPACE REALIZATIONS
-##                        (utils/statespacerealizations.py)
+##                                (utils/gilbert.py)
 ##
 ##                                Milan Rother 2024
 ##
@@ -38,15 +38,16 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
         tolerance : (float) relative tolerance for checking real poles
     """
 
+    #make arrays
+    Poles = np.atleast_1d(Poles)
+    Residues = np.atleast_1d(Residues)
+
     #check validity of args
-    if not Poles or not Residues:
+    if not len(Poles) or  not len(Residues):
         raise ValueError("No 'Poles' and 'Residues' defined!")
 
     if len(Poles) != len(Residues):
         raise ValueError("Same number of 'Poles' and 'Residues' have to be given!")
-
-    #make array
-    Residues = np.asarray(Residues)
 
     #check shape of residues for MIMO, etc
     if Residues.ndim == 1:

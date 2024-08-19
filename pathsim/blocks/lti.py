@@ -20,7 +20,7 @@ from ..utils.funcs import (
     array_to_dict
     )
 
-from ..utils.statespacerealizations import (
+from ..utils.gilbert import (
     gilbert_realization
     )
 
@@ -43,21 +43,22 @@ class StateSpace(Block):
     """
 
     def __init__(self, 
-                 A, B, C, D, 
+                 A=-1.0, B=1.0, C=-1.0, D=1.0, 
                  initial_value=None):
-
         super().__init__()
 
-        #statespace matrices
-        self.A = A
-        self.B = B
-        self.C = C
-        self.D = D
+        #statespace matrices with input shape validation
+        self.A = np.atleast_2d(A)
+        self.B = np.atleast_1d(B)
+        self.C = np.atleast_1d(C)
+        self.D = np.atleast_1d(D)
 
         #get statespace dimensions
-        n, _     = self.A.shape 
-        _, n_in  = self.B.shape 
-        n_out, _ = self.C.shape
+        n, _ = self.A.shape 
+        if self.B.ndim == 1: n_in = 1 
+        else: _, n_in = self.B.shape 
+        if self.C.ndim == 1: n_out = 1 
+        else: n_out, _ = self.C.shape
 
         #set io channels
         self.inputs  = {i:0.0 for i in range(n_in)}
@@ -73,14 +74,21 @@ class StateSpace(Block):
 
     
     def set_solver(self, Solver, tolerance_lte=1e-6):
-        #change solver if already initialized
-        if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
-            return #quit early
-        #initialize the integration engine with right hand side
-        def _f(x, u, t): return np.dot(self.A, x) + np.dot(self.B, u) 
-        def _jac(x, u, t): return self.A
-        self.engine = Solver(self.initial_value, _f, _jac, tolerance_lte)
+        
+        if self.engine is None:
+
+            def _f(x, u, t): 
+                return np.dot(self.A, x) + np.dot(self.B, u) 
+            def _jac(x, u, t): 
+                return self.A
+
+            #initialize the integration engine with right hand side
+            self.engine = Solver(self.initial_value, _f, _jac, tolerance_lte)
+
+        else:
+
+            #change solver if already initialized
+            self.engine = self.engine.change(Solver, tolerance_lte)        
 
 
     def update(self, t):

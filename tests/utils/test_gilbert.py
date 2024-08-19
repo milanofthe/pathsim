@@ -1,6 +1,7 @@
 ########################################################################################
 ##
-##                      TESTS FOR 'utils/statespacerealizations.py'
+##                                    TESTS FOR
+##                               'utils/gilbert.py'
 ##
 ##                                Milan Rother 2024
 ##
@@ -10,7 +11,7 @@
 
 import unittest
 import numpy as np
-from pathsim.utils.statespacerealizations import gilbert_realization
+from pathsim.utils.gilbert import gilbert_realization
 
 
 # HELPER FUNCTIONS =====================================================================
