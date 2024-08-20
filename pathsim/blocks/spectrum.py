@@ -125,7 +125,7 @@ class Spectrum(Block):
         state = self.engine.get()
 
         #catch case where state has not been updated
-        if state == self.engine.initial_value:
+        if np.all(state == self.engine.initial_value):
             return self.freq, np.zeros_like(self.freq)
 
         #reshape state into spectra
