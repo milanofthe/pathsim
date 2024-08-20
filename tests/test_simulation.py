@@ -134,7 +134,7 @@ class TestSimulation(unittest.TestCase):
 class TestSimulationIVP(unittest.TestCase):
     """
     special test case:
-    linear feedback initial value problem    
+    linear feedback initial value problem with default solver (SSPRK22)
     """
 
     def setUp(self):
