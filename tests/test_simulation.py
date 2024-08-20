@@ -94,8 +94,36 @@ class TestSimulation(unittest.TestCase):
             Sim.add_block(B1)
 
 
-    def test_add_connection(self): pass
+    def test_add_connection(self): 
+
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+
+        Sim = Simulation(blocks=[B1, B2, B3], 
+                         connections=[C1],
+                         log=False)
+
+        self.assertEqual(Sim.connections, [C1])
+
+        #test adding a connection
+        C2 = Connection(B2, B3)
+        Sim.add_connection(C2)
+        self.assertEqual(Sim.connections, [C1, C2])
+
+        #test adding the same connection again
+        with self.assertRaises(ValueError):
+            Sim.add_connection(C2)
+        self.assertEqual(Sim.connections, [C1, C2])
+
+        #test adding a connection that overrides B3
+        C3 = Connection(B1, B3) 
+        with self.assertRaises(ValueError):
+            Sim.add_connection(C3)
+        self.assertEqual(Sim.connections, [C1, C2])
+
+
     def test_set_solver(self): pass
+    def test_update(self): pass
     def test_step(self): pass
     def test_run(self): pass
 
