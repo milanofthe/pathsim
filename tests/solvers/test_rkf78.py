@@ -48,7 +48,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class RKF78Test(unittest.TestCase):
+class TestRKF78(unittest.TestCase):
     """
     Test the implementation of the 'RKF78' solver class
     """

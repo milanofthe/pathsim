@@ -18,7 +18,7 @@ from pathsim.utils.realtimeplotter import RealtimePlotter
 
 # TESTS ================================================================================
 
-class RealtimePlotterTest(unittest.TestCase):
+class TestRealtimePlotter(unittest.TestCase):
     """
     test the implementation of the 'RealtimePlotter' class 
     """

@@ -20,7 +20,7 @@ from pathsim.utils.anderson import (
 
 # TESTS ================================================================================
 
-class AndersonAccelerationTest(unittest.TestCase):
+class TestAndersonAcceleration(unittest.TestCase):
     """
     test the implementation of the 'AndersonAcceleration' class 
     """
@@ -89,7 +89,7 @@ class AndersonAccelerationTest(unittest.TestCase):
         self.assertAlmostEqual(np.linalg.norm(x), 1.0, places=7)
 
 
-class NewtonAndersonAccelerationTest(unittest.TestCase):
+class TestNewtonAndersonAcceleration(unittest.TestCase):
     """
     test the implementation of the 'NewtonAndersonAcceleration' class 
     """

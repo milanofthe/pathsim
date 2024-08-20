@@ -19,7 +19,7 @@ from pathsim.utils.adaptivebuffer import (
 
 # TESTS ================================================================================
 
-class AdaptiveBufferTest(unittest.TestCase):
+class TestAdaptiveBuffer(unittest.TestCase):
     """
     test the implementation of the 'AdaptiveBuffer' class 
     """

@@ -46,7 +46,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class EUFTest(unittest.TestCase):
+class TestEUF(unittest.TestCase):
     """
     Test the implementation of the 'EUF' solver class
     """
@@ -132,7 +132,7 @@ class EUFTest(unittest.TestCase):
 
 
 
-class EUBTest(unittest.TestCase):
+class TestEUB(unittest.TestCase):
     """
     Test the implementation of the 'EUB' solver class
     """

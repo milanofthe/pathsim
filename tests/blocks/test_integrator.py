@@ -20,7 +20,7 @@ from pathsim.solvers._solver import Solver
 
 # TESTS ================================================================================
 
-class IntegratorTest(unittest.TestCase):
+class TestIntegrator(unittest.TestCase):
     """
     Test the implementation of the 'Integrator' block class
     """

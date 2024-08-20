@@ -29,7 +29,7 @@ def simple_jac(x, u, t):
 
 # TESTS ================================================================================
 
-class BaseSolverTest(unittest.TestCase):
+class TestBaseSolver(unittest.TestCase):
     """
     Test the implementation of the base 'Solver' class
     """

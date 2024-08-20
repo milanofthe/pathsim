@@ -24,7 +24,7 @@ from pathsim.utils.funcs import (
 
 # TESTS ================================================================================
 
-class UtilsFuncsTest(unittest.TestCase):
+class TestUtilsFuncs(unittest.TestCase):
     """
     test all the array-dict conversions and functions for error calculation
     """
@@ -77,7 +77,7 @@ class UtilsFuncsTest(unittest.TestCase):
                          1/0.00139)
 
 
-class JacobianTest(unittest.TestCase):
+class TestJacobian(unittest.TestCase):
     """
     testing of numerical jacobian calculation
     """

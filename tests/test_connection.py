@@ -18,7 +18,7 @@ from pathsim.blocks._block import Block
 
 # TESTS ================================================================================
 
-class ConnectionTest(unittest.TestCase):
+class TestConnection(unittest.TestCase):
     """
     Test the implementation of the 'Connection' class
     """

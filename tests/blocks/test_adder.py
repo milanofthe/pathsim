@@ -17,7 +17,7 @@ from pathsim.blocks.adder import Adder
 
 # TESTS ================================================================================
 
-class AdderTest(unittest.TestCase):
+class TestAdder(unittest.TestCase):
     """
     Test the implementation of the 'Adder' block class
     """

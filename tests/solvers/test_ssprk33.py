@@ -45,7 +45,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class SSPRK33Test(unittest.TestCase):
+class TestSSPRK33(unittest.TestCase):
     """
     Test the implementation of the 'SSPRK33' solver class
     """

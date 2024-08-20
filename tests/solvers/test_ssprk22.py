@@ -45,7 +45,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class SSPRK22Test(unittest.TestCase):
+class TestSSPRK22(unittest.TestCase):
     """
     Test the implementation of the 'SSPRK22' solver class
     """

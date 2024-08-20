@@ -19,7 +19,7 @@ from pathsim.utils.progresstracker import (
 
 # TESTS ================================================================================
 
-class ProgressTrackerTest(unittest.TestCase):
+class TestProgressTracker(unittest.TestCase):
     """
     test the implementation of the 'ProgressTracker' class 
     """

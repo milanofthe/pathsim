@@ -17,7 +17,7 @@ from pathsim.blocks._block import Block
 
 # TESTS ================================================================================
 
-class BlockTest(unittest.TestCase):
+class TestBlock(unittest.TestCase):
     """
     Test the implementation of the base 'Block' class
     """

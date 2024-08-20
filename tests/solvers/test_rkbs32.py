@@ -47,7 +47,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class RKBS32Test(unittest.TestCase):
+class TestRKBS32(unittest.TestCase):
     """
     Test the implementation of the 'RKBS32' solver class
     """

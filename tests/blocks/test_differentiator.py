@@ -20,7 +20,7 @@ from pathsim.solvers._solver import Solver
 
 # TESTS ================================================================================
 
-class DifferentiatorTest(unittest.TestCase):
+class TestDifferentiator(unittest.TestCase):
     """
     Test the implementation of the 'Differentiator' block class
     """

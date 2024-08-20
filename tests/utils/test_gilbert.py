@@ -26,7 +26,7 @@ def evaluate_poleresidue(s, Poles, Residues, Const):
 
 # TESTS ================================================================================
 
-class GilbertRealizationTest(unittest.TestCase):
+class TestGilbertRealization(unittest.TestCase):
     """
     Test the implementation of the gilbert statespace realization
     """

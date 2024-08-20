@@ -17,7 +17,7 @@ from pathsim.blocks.rng import RNG
 
 # TESTS ================================================================================
 
-class RNGTest(unittest.TestCase):
+class TestRNG(unittest.TestCase):
     """
     Test the implementation of the 'RNG' block class
     """

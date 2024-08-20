@@ -18,7 +18,7 @@ from pathsim.utils.adaptivebuffer import AdaptiveBuffer
 
 # TESTS ================================================================================
 
-class DelayTest(unittest.TestCase):
+class TestDelay(unittest.TestCase):
     """
     Test the implementation of the 'Delay' block class
     """

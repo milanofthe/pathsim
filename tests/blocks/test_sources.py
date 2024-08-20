@@ -17,7 +17,7 @@ from pathsim.blocks.sources import Source, Constant
 
 # TESTS ================================================================================
 
-class ConstantTest(unittest.TestCase):
+class TestConstant(unittest.TestCase):
     """
     Test the implementation of the 'Constant' block class
     """
@@ -48,7 +48,7 @@ class ConstantTest(unittest.TestCase):
         self.assertEqual(C.get(0), 5)
 
 
-class SourceTest(unittest.TestCase):
+class TestSource(unittest.TestCase):
     """
     Test the implementation of the 'Source' block class
     """

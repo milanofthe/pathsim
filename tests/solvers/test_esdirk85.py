@@ -45,7 +45,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class ESDIRK85Test(unittest.TestCase):
+class TestESDIRK85(unittest.TestCase):
     """
     Test the implementation of the 'ESDIRK85' solver class
     """

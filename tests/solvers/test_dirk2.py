@@ -46,7 +46,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class DIRK2Test(unittest.TestCase):
+class TestDIRK2(unittest.TestCase):
     """
     Test the implementation of the 'DIRK2' solver class
     """

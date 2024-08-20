@@ -17,7 +17,7 @@ from pathsim.blocks.scope import Scope, RealtimeScope
 
 # TESTS ================================================================================
 
-class ScopeTest(unittest.TestCase):
+class TestScope(unittest.TestCase):
     """
     Test the implementation of the 'Scope' block class
     """
@@ -182,7 +182,7 @@ class ScopeTest(unittest.TestCase):
         self.assertTrue(np.all(np.equal(result, _time[5:])))
 
 
-class RealtimeScopeTest(unittest.TestCase):
+class TestRealtimeScope(unittest.TestCase):
     """
     Test the implementation of the 'RealtimeScope' block class
     """

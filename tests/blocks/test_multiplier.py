@@ -17,7 +17,7 @@ from pathsim.blocks.multiplier import Multiplier
 
 # TESTS ================================================================================
 
-class MultiplierTest(unittest.TestCase):
+class TestMultiplier(unittest.TestCase):
     """
     Test the implementation of the 'Multiplier' block class
     """

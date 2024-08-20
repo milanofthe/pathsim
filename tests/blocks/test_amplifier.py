@@ -17,7 +17,7 @@ from pathsim.blocks.amplifier import Amplifier
 
 # TESTS ================================================================================
 
-class AmplifierTest(unittest.TestCase):
+class TestAmplifier(unittest.TestCase):
     """
     Test the implementation of the 'Amplifier' block class
     """

@@ -17,7 +17,7 @@ from pathsim.blocks.function import Function
 
 # TESTS ================================================================================
 
-class FunctionTest(unittest.TestCase):
+class TestFunction(unittest.TestCase):
     """
     Test the implementation of the 'Function' block class
     """

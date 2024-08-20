@@ -46,7 +46,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class RKV65Test(unittest.TestCase):
+class TestRKV65(unittest.TestCase):
     """
     Test the implementation of the 'RKV65' solver class
     """

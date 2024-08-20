@@ -48,7 +48,7 @@ reference_problems = [
 
 # TESTS ================================================================================
 
-class BDF2Test(unittest.TestCase):
+class TestBDF2(unittest.TestCase):
     """
     Test the implementation of the 'BDF2' solver class
     """
@@ -150,7 +150,7 @@ class BDF2Test(unittest.TestCase):
 
 
 
-class BDF3Test(unittest.TestCase):
+class TestBDF3(unittest.TestCase):
     """
     Test the implementation of the 'BDF3' solver class
     """
@@ -252,7 +252,7 @@ class BDF3Test(unittest.TestCase):
 
 
 
-class BDF4Test(unittest.TestCase):
+class TestBDF4(unittest.TestCase):
     """
     Test the implementation of the 'BDF4' solver class
     """

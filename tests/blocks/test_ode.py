@@ -20,7 +20,7 @@ from pathsim.solvers._solver import Solver
 
 # TESTS ================================================================================
 
-class ODETest(unittest.TestCase):
+class TestODE(unittest.TestCase):
     """
     Test the implementation of the 'ODE' block class
     """

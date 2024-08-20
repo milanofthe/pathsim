@@ -20,7 +20,7 @@ from pathsim.solvers._solver import Solver
 
 # TESTS ================================================================================
 
-class StateSpaceTest(unittest.TestCase):
+class TestStateSpace(unittest.TestCase):
     """
     Test the implementation of the 'StateSpace' block class
     """
@@ -125,7 +125,7 @@ class StateSpaceTest(unittest.TestCase):
         self.assertAlmostEqual(S.get(0), 2.2, 8)
 
 
-class TransferFunctionTest(unittest.TestCase):
+class TtestTransferFunction(unittest.TestCase):
     """
     Test the implementation of the 'TransferFunction' block class
 
