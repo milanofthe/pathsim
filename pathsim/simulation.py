@@ -318,7 +318,11 @@ class Simulation:
     def reset(self):
         """
         Reset the blocks to their initial state and the global time of 
-        the simulation.
+        the simulation. For recording blocks such as 'Scope', their recorded 
+        data is also reset. 
+
+        Afterwards the system function os evaluated with '_update' to update
+        the block inputs and outputs.
         """
 
         self._logger_info("RESET")
@@ -326,9 +330,12 @@ class Simulation:
         #reset simulation time
         self.time = 0.0
 
-        #reset blocks
+        #reset blocks to initial state
         for block in self.blocks:
             block.reset()
+
+        #evaluate system function
+        self._update(0.0)
 
 
     # timestepping ----------------------------------------------------------------

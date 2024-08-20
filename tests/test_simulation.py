@@ -131,47 +131,37 @@ class TestSimulation(unittest.TestCase):
     def test_run(self): pass
 
 
-class TestSimulationFeedback(unittest.TestCase):
+class TestSimulationIVP(unittest.TestCase):
     """
-    replicates 'example_feedback.py' with tests    
+    special test case:
+    linear feedback initial value problem    
     """
 
     def setUp(self):
 
         #modules from pathsim for test case
         from pathsim.blocks import (
-            Integrator, 
-            Source, 
-            Scope, 
-            Amplifier, 
-            Adder
+            Integrator, Scope, 
+            Amplifier, Adder
             )
 
-        #simulation timestep
-        dt = 0.02
-
-        #step delay
-        tau = 3
-
         #blocks that define the system
-        self.Src = Source(lambda t: int(t>tau))
-        self.Int = Integrator(0)
+        self.Int = Integrator(1.0)
         self.Amp = Amplifier(-1)
         self.Add = Adder()
-        self.Sco = Scope(labels=["step", "response"])
+        self.Sco = Scope(labels=["response"])
 
-        blocks = [self.Src, self.Int, self.Amp, self.Add, self.Sco]
+        blocks = [self.Int, self.Amp, self.Add, self.Sco]
 
         #the connections between the blocks
         connections = [
-            Connection(self.Src, self.Add[0], self.Sco[0]),
             Connection(self.Amp, self.Add[1]),
             Connection(self.Add, self.Int),
-            Connection(self.Int, self.Amp, self.Sco[1])
+            Connection(self.Int, self.Amp, self.Sco)
             ]
 
         #initialize simulation with the blocks, connections, timestep and logging enabled
-        self.Sim = Simulation(blocks, connections, dt=dt, log=False)
+        self.Sim = Simulation(blocks, connections, dt=0.02, log=False)
 
 
     def test_init(self):
@@ -179,8 +169,8 @@ class TestSimulationFeedback(unittest.TestCase):
         from pathsim.solvers import SSPRK22
 
         #test initialization of simulation
-        self.assertEqual(len(self.Sim.blocks), 5)
-        self.assertEqual(len(self.Sim.connections), 4)
+        self.assertEqual(len(self.Sim.blocks), 4)
+        self.assertEqual(len(self.Sim.connections), 3)
         self.assertEqual(self.Sim.dt, 0.02)
         self.assertEqual(self.Sim.iterations_min, 2)
         self.assertTrue(isinstance(self.Sim.engine, SSPRK22))
@@ -188,7 +178,6 @@ class TestSimulationFeedback(unittest.TestCase):
         self.assertFalse(self.Sim.is_adaptive)
 
         #test if engine setup was correct
-        self.assertTrue(self.Src.engine is None)
         self.assertTrue(isinstance(self.Int.engine, SSPRK22)) # <-- only the Integrator needs an engine
         self.assertTrue(self.Amp.engine is None)
         self.assertTrue(self.Add.engine is None)
@@ -199,7 +188,10 @@ class TestSimulationFeedback(unittest.TestCase):
 
         #reset first
         self.Sim.reset()
+
+        #check if reset was sucecssful
         self.assertEqual(self.Sim.time, 0.0)
+        self.assertEqual(self.Int.get(0), self.Int.initial_value)
 
         #step using global timestep
         success, err, scl, te, ts = self.Sim.step()
@@ -212,10 +204,64 @@ class TestSimulationFeedback(unittest.TestCase):
         #step again using custom timestep
         self.Sim.step(dt=2.2*self.Sim.dt)
         self.assertEqual(self.Sim.time, 3.2*self.Sim.dt)
+        self.assertLess(self.Int.get(0), self.Int.initial_value)
+
+        #test if scope recorded correctly
+        time, data = self.Sco.read()
+        for a, b in zip(time, [self.Sim.dt, 3.2*self.Sim.dt]):
+            self.assertEqual(a, b)
+
+        #reset again
+        self.Sim.reset()
+
+        #check if reset was sucecssful
+        self.assertEqual(self.Sim.time, 0.0)
+        self.assertEqual(self.Int.get(0), self.Int.initial_value)
+
+
+    def test_run(self):
+
+        #reset first
+        self.Sim.reset()
+
+        #check if reset was sucecssful
+        self.assertEqual(self.Sim.time, 0.0)
+        self.assertEqual(self.Int.get(0), self.Int.initial_value)
+
+        #test running for some time
+        self.Sim.run(duration=2, reset=True)
+        self.assertEqual(self.Sim.time, 2)
+        
+        time, data = self.Sco.read()
+        _time = np.arange(0, 2.02, 0.02)
+
+        #time recording matches and solution decays
+        self.assertLess(np.linalg.norm(time - _time), 1e-13) 
+        self.assertTrue(np.all(np.diff(data) < 0.0))
+
+        #test running for some time with reset
+        self.Sim.run(duration=1, reset=True)
+        self.assertEqual(self.Sim.time, 1)
+
+        time, data = self.Sco.read()
+        _time = np.arange(0, 1.02, 0.02)
+
+        #time recording matches and solution decays
+        self.assertLess(np.linalg.norm(time - _time), 1e-13) 
+
+        #test running for some time without reset
+        self.Sim.run(duration=2, reset=False)
+        self.assertEqual(self.Sim.time, 3)
+
+        time, data = self.Sco.read()
+        _time = np.arange(0, 3.02, 0.02)
+
+        #time recording matches and solution decays
+        self.assertLess(np.linalg.norm(time - _time), 1e-13) 
 
 
 
-    def test_run(self): pass
+
 
 
 
