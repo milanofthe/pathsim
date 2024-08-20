@@ -19,11 +19,14 @@ from pathsim.blocks._block import Block
 from pathsim.connection import Connection
 
 
+
 # TESTS ================================================================================
 
 class TestSimulation(unittest.TestCase):
     """
     Test the implementation of the 'Simulation' class
+
+    only very minimal functonality
     """
 
     def test_init(self):
@@ -126,6 +129,94 @@ class TestSimulation(unittest.TestCase):
     def test_update(self): pass
     def test_step(self): pass
     def test_run(self): pass
+
+
+class TestSimulationFeedback(unittest.TestCase):
+    """
+    replicates 'example_feedback.py' with tests    
+    """
+
+    def setUp(self):
+
+        #modules from pathsim for test case
+        from pathsim.blocks import (
+            Integrator, 
+            Source, 
+            Scope, 
+            Amplifier, 
+            Adder
+            )
+
+        #simulation timestep
+        dt = 0.02
+
+        #step delay
+        tau = 3
+
+        #blocks that define the system
+        self.Src = Source(lambda t: int(t>tau))
+        self.Int = Integrator(0)
+        self.Amp = Amplifier(-1)
+        self.Add = Adder()
+        self.Sco = Scope(labels=["step", "response"])
+
+        blocks = [self.Src, self.Int, self.Amp, self.Add, self.Sco]
+
+        #the connections between the blocks
+        connections = [
+            Connection(self.Src, self.Add[0], self.Sco[0]),
+            Connection(self.Amp, self.Add[1]),
+            Connection(self.Add, self.Int),
+            Connection(self.Int, self.Amp, self.Sco[1])
+            ]
+
+        #initialize simulation with the blocks, connections, timestep and logging enabled
+        self.Sim = Simulation(blocks, connections, dt=dt, log=False)
+
+
+    def test_init(self):
+
+        from pathsim.solvers import SSPRK22
+
+        #test initialization of simulation
+        self.assertEqual(len(self.Sim.blocks), 5)
+        self.assertEqual(len(self.Sim.connections), 4)
+        self.assertEqual(self.Sim.dt, 0.02)
+        self.assertEqual(self.Sim.iterations_min, 2)
+        self.assertTrue(isinstance(self.Sim.engine, SSPRK22))
+        self.assertTrue(self.Sim.is_explicit)
+        self.assertFalse(self.Sim.is_adaptive)
+
+        #test if engine setup was correct
+        self.assertTrue(self.Src.engine is None)
+        self.assertTrue(isinstance(self.Int.engine, SSPRK22)) # <-- only the Integrator needs an engine
+        self.assertTrue(self.Amp.engine is None)
+        self.assertTrue(self.Add.engine is None)
+        self.assertTrue(self.Sco.engine is None)
+
+
+    def test_step(self):
+
+        #reset first
+        self.Sim.reset()
+        self.assertEqual(self.Sim.time, 0.0)
+
+        #step using global timestep
+        success, err, scl, te, ts = self.Sim.step()
+        self.assertEqual(self.Sim.time, self.Sim.dt)
+        self.assertEqual(err, 0.0) #fixed solver
+        self.assertEqual(scl, 1.0) #fixed solver
+        self.assertEqual(ts, 0) #no implicit solver
+        self.assertGreaterEqual(te, self.Sim.iterations_min)
+        
+        #step again using custom timestep
+        self.Sim.step(dt=2.2*self.Sim.dt)
+        self.assertEqual(self.Sim.time, 3.2*self.Sim.dt)
+
+
+
+    def test_run(self): pass
+
 
 
 # RUN TESTS LOCALLY ====================================================================

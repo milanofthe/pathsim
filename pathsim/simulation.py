@@ -82,8 +82,11 @@ class Simulation:
         self.dt_min = dt_min
         self.dt_max = dt_max
 
-        #numerical integrator to be used
+        #numerical integrator to be used (class definition)
         self.Solver = Solver
+
+        #numerical integrator instance -> initialized later
+        self.engine = None
 
         #error tolerances
         self.tolerance_fpi = tolerance_fpi
@@ -515,7 +518,7 @@ class Simulation:
             total_solver_iterations : (int) total number of implicit solver iterations
         """
 
-        #default global timestep
+        #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
 
