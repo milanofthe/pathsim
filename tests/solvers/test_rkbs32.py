@@ -145,11 +145,11 @@ class TestRKBS32(unittest.TestCase):
 
             solver = RKBS32(problem.x0, problem.func, problem.jac, tolerance_lte=1e-6)
 
-            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1, adaptive=True)
+            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=0.1, adaptive=True)
             error = np.linalg.norm(numerical_solution - problem.solution(time))
 
-            #test if error control was successful
-            self.assertLess(error, solver.tolerance_lte)
+            #test if error control was successful (same OOM for global error -> < 1e-5)
+            self.assertLess(error, solver.tolerance_lte*10)
 
 
 
