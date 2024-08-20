@@ -66,17 +66,19 @@ class Subsystem(Block):
         connections : (list of 'Connection' objects) internal connections of the subsystem
     """
 
-    def __init__(self, blocks=[], connections=[]):
+    def __init__(self, blocks=None, connections=None):
         super().__init__()
 
         #internal connecions
-        self.connections = connections
+        self.connections = [] if connections is None else connections
         
         #collect and organize internal blocks
         self.blocks, self.interface = [], None
-        for block in blocks:
-            if isinstance(block, Interface): self.interface = block
-            else: self.blocks.append(block)
+
+        if blocks is not None:
+            for block in blocks:
+                if isinstance(block, Interface): self.interface = block
+                else: self.blocks.append(block)
 
         #check if interface is defined
         if self.interface is None:

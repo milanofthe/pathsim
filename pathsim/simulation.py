@@ -61,8 +61,8 @@ class Simulation:
     """
 
     def __init__(self, 
-                 blocks=[], 
-                 connections=[], 
+                 blocks=None, 
+                 connections=None, 
                  dt=0.01, 
                  dt_min=0.0, 
                  dt_max=None, 
@@ -74,8 +74,8 @@ class Simulation:
                  log=True):
 
         #system definition
-        self.blocks = blocks
-        self.connections = connections
+        self.blocks = [] if blocks is None else blocks
+        self.connections = [] if connections is None else connections
 
         #simulation timestep and bounds
         self.dt = dt
@@ -182,7 +182,6 @@ class Simulation:
             raise ValueError(f"block {block} already part of simulation")
 
         #initialize numerical integrator of block
-        # block.initialize_solver(self.Solver, self.tolerance_lte)
         block.set_solver(self.Solver, self.tolerance_lte)
 
         #add block to global blocklist

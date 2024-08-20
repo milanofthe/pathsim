@@ -168,7 +168,7 @@ class TestSubsystem(unittest.TestCase):
 
         B1 = Block()
         I1 = Interface()
-        C1 = Connection(I1, B1, I1)
+        C1 = Connection(I1, B1)
         S = Subsystem(blocks=[I1, B1], connections=[C1])
 
         err = S.update(0)
