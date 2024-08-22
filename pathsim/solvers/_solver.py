@@ -256,7 +256,9 @@ class ExplicitSolver(Solver):
 
             #rescale and apply bounds to timestep
             if adaptive:
-                dt = np.clip(scale*dt, dt_min, dt_max)
+                if dt_min is not None and scale*dt < dt_min:
+                    raise RuntimeError("Error control requires timestep smaller 'dt_min'!")
+                dt = np.clip(scale*dt, None, dt_max)
 
         #return the evaluation times and the states
         return np.array(output_times), np.array(output_states)
@@ -378,16 +380,21 @@ class ImplicitSolver(Solver):
             success, error, scale = self.integrate_singlestep(time, dt, tolerance_fpi, max_iterations)
 
             #check if timestep was successful
-            if adaptive and not success:
-                self.revert()
-            else:
+            if success:
                 time += dt
                 output_states.append(self.x)
                 output_times.append(time)
+            else:
+                if adaptive:
+                    self.revert()
+                else:
+                    raise RuntimeError("Timestep not successfull for non-adaptive solver!")
 
             #rescale and apply bounds to timestep
             if adaptive:
-                dt = np.clip(scale*dt, dt_min, dt_max)
+                if dt_min is not None and scale*dt < dt_min:
+                    raise RuntimeError("Error control requires timestep smaller 'dt_min'!")
+                dt = np.clip(scale*dt, None, dt_max)
 
         #return the evaluation times and the states
         return np.array(output_times), np.array(output_states)
