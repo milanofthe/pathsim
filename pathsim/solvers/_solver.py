@@ -305,7 +305,7 @@ class ImplicitSolver(Solver):
                              time=0.0, 
                              dt=0.1, 
                              tolerance_fpi=1e-12, 
-                             max_iterations=1000):
+                             max_iterations=200):
         """
         Directly integrate the function 'func' for a single timestep 'dt' with 
         implicit solvers. This method is primarily intended for testing purposes.
@@ -329,9 +329,9 @@ class ImplicitSolver(Solver):
                 if error_sol < tolerance_fpi: 
                     break
 
-            #catch convergence error
+            #catch convergence error -> revert interrupt timestep
             if error_sol > tolerance_fpi:
-                raise RuntimeError(f"solver not converged in {max_iterations} iterations with error {error_sol}")
+                return False, error_sol, 0.75
             
             #perform explicit component of timestep
             success, error, scale = self.step(0.0, t, dt)
@@ -359,7 +359,7 @@ class ImplicitSolver(Solver):
             dt             : (float) timestep or initial timestep for adaptive solvers
             dt_min         : (float) lower bound for timestep, default '0.0'
             dt_max         : (float) upper bound for timestep, default 'None'
-            adaptive       : (bool) usa adaptive timestepping if available
+            adaptive       : (bool) use adaptive timestepping if available
             tolerance_fpi  : (float) tolerance for fixed-point solver  
             max_iterations : (int) maximum number of fixed-point solver iterations
         """
