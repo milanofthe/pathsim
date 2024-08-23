@@ -38,7 +38,7 @@ class Simulation:
     shorter or something similar that prohibits instant time information flow. 
 
     Convergence check for the fixed-point iteration loop with 'tolerance_fpi' is based on 
-    relative error to previous iteration and should not be touched.
+    max absolute error (max-norm) to previous iteration and should not be touched.
 
     Multiple numerical integrators are implemented in the 'pathsim.solvers' module. 
     The default solver is a fixed timestep 2nd order Strong Stability Preserving Runge Kutta 
@@ -53,7 +53,7 @@ class Simulation:
         dt_min         : (float) lower bound for timestep, default '0.0'
         dt_max         : (float) upper bound for timestep, default 'None'
         Solver         : ('Solver' class) solver for numerical integration from pathsim.solvers
-        tolerance_fpi  : (float) relative tolerance for convergence of fixed-point iterations
+        tolerance_fpi  : (float) absolute tolerance for convergence of fixed-point iterations
         tolerance_lte  : (float) absolute tolerance for local truncation error (integrator error controller)
         iterations_min : (int) minimum number of fixed-point iterations for system function evaluation
         iterations_max : (int) maximum allowed number of fixed-point iterations for system function evaluation

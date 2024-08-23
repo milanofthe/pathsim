@@ -13,8 +13,7 @@ import numpy as np
 from ._block import Block
 
 from ..utils.funcs import (
-    rel_error, 
-    max_rel_error_dicts, 
+    max_error_dicts, 
     array_to_dict,
     dict_to_array
     )
@@ -76,8 +75,8 @@ class Function(Block):
         if np.isscalar(output):
             prev_output = self.outputs[0]
             self.outputs[0] = output
-            return rel_error(prev_output, self.outputs[0])
+            return abs(prev_output - self.outputs[0])
         else:
             prev_outputs = self.outputs.copy()
             self.outputs = array_to_dict(output)
-            return max_rel_error_dicts(prev_outputs, self.outputs)
+            return max_error_dicts(prev_outputs, self.outputs)

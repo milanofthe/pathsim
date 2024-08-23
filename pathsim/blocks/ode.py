@@ -14,7 +14,6 @@ import numpy as np
 from ._block import Block
 
 from ..utils.funcs import (
-    max_rel_error_dicts,
     dict_to_array, 
     array_to_dict,
     auto_jacobian

@@ -14,10 +14,7 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.funcs import (
-    rel_error,
-    dict_to_array
-    )
+from ..utils.funcs import dict_to_array
 
 
 # MISO BLOCKS ===========================================================================
@@ -30,4 +27,4 @@ class Multiplier(Block):
     def update(self, t):
         prev_output = self.outputs[0]
         self.outputs[0] = np.prod(dict_to_array(self.inputs), axis=0)
-        return rel_error(prev_output, self.outputs[0])
+        return abs(prev_output - self.outputs[0])

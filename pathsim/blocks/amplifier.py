@@ -11,7 +11,6 @@
 
 from ._block import Block
 
-from ..utils.funcs import rel_error
 
 # SISO BLOCKS ===========================================================================
 
@@ -32,4 +31,4 @@ class Amplifier(Block):
     def update(self, t):
         prev_output = self.outputs[0]
         self.outputs[0]  = self.gain * self.inputs[0]
-        return rel_error(prev_output, self.outputs[0])
+        return abs(prev_output - self.outputs[0])

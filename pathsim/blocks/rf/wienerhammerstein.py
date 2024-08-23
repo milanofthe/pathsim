@@ -14,7 +14,7 @@ import numpy as np
 from .._block import Block
 
 from ...utils.funcs import (
-    max_rel_error_dicts,
+    max_error_dicts,
     dict_to_array, 
     array_to_dict,
     auto_jacobian
@@ -137,7 +137,7 @@ class WienerHammersteinModel(Block):
         y_2 = np.dot(self.C_2, x_2) + np.dot(self.D_2, self.func(y_1))
         
         self.outputs = array_to_dict(y_2)
-        return max_rel_error_dicts(prev_outputs, self.outputs)
+        return max_error_dicts(prev_outputs, self.outputs)
 
 
     def solve(self, t, dt):
@@ -230,7 +230,7 @@ class HammersteinModel(Block):
         u = dict_to_array(self.inputs)
         y = np.dot(self.C, self.engine.get()) + np.dot(self.D, self.func(u))
         self.outputs = array_to_dict(y)
-        return max_rel_error_dicts(prev_outputs, self.outputs)
+        return max_error_dicts(prev_outputs, self.outputs)
 
     def solve(self, t, dt):
         #advance solution of implicit update equation
@@ -325,7 +325,7 @@ class WienerModel(Block):
         prev_outputs = self.outputs.copy()
         y = np.dot(self.C, self.engine.get()) + np.dot(self.D, dict_to_array(self.inputs))
         self.outputs = array_to_dict(self.func(y))
-        return max_rel_error_dicts(prev_outputs, self.outputs)
+        return max_error_dicts(prev_outputs, self.outputs)
 
 
     def solve(self, t, dt):

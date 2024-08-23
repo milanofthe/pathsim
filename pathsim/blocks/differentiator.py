@@ -12,11 +12,8 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.funcs import rel_error
-
 
 # BLOCKS ================================================================================
-
 
 class Differentiator(Block):
     """
@@ -60,7 +57,7 @@ class Differentiator(Block):
         #compute implicit balancing update
         prev_output = self.outputs[0]
         self.outputs[0] = -self.f_max * (self.engine.get() - self.inputs[0])
-        return rel_error(prev_output, self.outputs[0])
+        return abs(prev_output - self.outputs[0])
 
 
     def solve(self, t, dt):

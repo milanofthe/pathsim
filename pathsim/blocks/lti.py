@@ -15,7 +15,7 @@ import numpy as np
 from ._block import Block
 
 from ..utils.funcs import (
-    max_rel_error_dicts,
+    max_error_dicts,
     dict_to_array, 
     array_to_dict
     )
@@ -97,7 +97,7 @@ class StateSpace(Block):
         u = dict_to_array(self.inputs)
         y = np.dot(self.C, self.engine.get()) + np.dot(self.D, u)
         self.outputs = array_to_dict(y)
-        return max_rel_error_dicts(prev_outputs, self.outputs)
+        return max_error_dicts(prev_outputs, self.outputs)
 
 
     def solve(self, t, dt):

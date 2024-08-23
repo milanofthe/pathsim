@@ -63,6 +63,29 @@ def rel_error(a, b):
     else: return abs((a - b)/a)
 
 
+def abs_error(a, b):
+    """
+    Computes the absolute error between two scalars.
+    """
+    return abs(a - b)
+
+
+def max_error(a, b):
+    """
+    Computes the maximum absolute error / deviation between two
+    iterables such as lists with numerical values. Returns a scalar 
+    value representing the maximum deviation.
+
+    NOTE:
+        this is actually faster then 'max' over a list comprehension
+    """
+    max_err = 0.0
+    for err in map(abs_error, a, b):
+        if err > max_err: 
+            max_err = err
+    return max_err
+
+
 def max_rel_error(a, b):
     """
     Computes the maximum relative error between two iterables 
@@ -79,6 +102,15 @@ def max_rel_error(a, b):
         if err > max_err: 
             max_err = err
     return max_err
+
+
+def max_error_dicts(a, b):
+    """
+    Computes the maximum absolute error between two dictionaries 
+    with numerical values. It returns a scalar value representing 
+    the maximum absolute error. 
+    """
+    return max_error(a.values(), b.values())
 
 
 def max_rel_error_dicts(a, b):
