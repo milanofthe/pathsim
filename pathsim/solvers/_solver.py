@@ -392,7 +392,6 @@ class ImplicitSolver(Solver):
                 time += dt
                 output_states.append(self.x)
                 output_times.append(time)
-                    
 
             #rescale and apply bounds to timestep
             if adaptive:
