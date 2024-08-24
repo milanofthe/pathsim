@@ -30,14 +30,10 @@ from pathsim.solvers import (
 dt = 0.1
 
 #initial position and velocity
-x0 = 2
-v0 = 5
+x0, v0 = 2, 5
 
 #parameters (mass, damping, spring constant)
 m, c, k = 0.8, 0.2, 1.5
-c = 0.2
-k = 1.5
-
 
 #blocks that define the system
 I1 = Integrator(v0)   # integrator for velocity
