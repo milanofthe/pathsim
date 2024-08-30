@@ -569,7 +569,7 @@ class Simulation:
         #if step not successful and adaptive -> quit early
         if adaptive and not success:
             self._revert()
-            return False, error, scale, total_evaluations, total_solver_iterations
+            return success, error, scale, total_evaluations, total_solver_iterations
         
         #increment global time and continue simulation
         self.time += dt 
@@ -581,7 +581,7 @@ class Simulation:
         self._sample(self.time)
 
         #max local truncation error, timestep rescale, successful step
-        return True, error, scale, total_evaluations, total_solver_iterations
+        return success, error, scale, total_evaluations, total_solver_iterations
 
 
     def run(self, duration=10, reset=True):

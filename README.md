@@ -7,8 +7,8 @@ PathSim is a minimalistic and flexible block-based time-domain system simulation
 
 Key features of PathSim include:
 
-- Decentralized architecture where each dynamical block has their own numerical integration engine. 
-- The system is solved directly on the computational graph instead of compiling a unified differetial algebraic system.
+- Decentralized architecture where each dynamical block has their own numerical integration engine.
+- The system is solved directly on the computational graph instead of compiling a unified differential algebraic system.
 - This has some advantages such as hot-swappable blocks during simulation and reading simulation results directly from the scopes.
 - The block execution is decoupled from the data transfer, which enables parallelization (future) and linear computational complexity scaling for sparsely connected systems.
 - Support for MIMO (Multiple Input, Multiple Output) blocks, enabling the creation of complex interconnected system topologies.
@@ -16,7 +16,8 @@ Key features of PathSim include:
 - Wide range of numerical solvers, including implicit and explicit multi-stage, and adaptive Runge-Kutta methods such as `RKDP54` or `ESDIRK54`.
 - Modular and hierarchical modeling with (nested) subsystems.
 - Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, and more.
-- Easy extensibility, allowing users to define custom blocks by subclassing the base `Block` class and implementing just a handfull of methods. 
+- Easy extensibility, allowing users to define custom blocks by subclassing the base `Block` class and implementing just a handful of methods.
+
 
 
 ## Installation
@@ -48,7 +49,7 @@ It can be translated to a block diagram using integrators, amplifiers and adders
 
 ![png](README_files/harmonic_oscillator_blockdiagram.png)
 
-The topology of the block diagram above can be directly defined as blocks and connections in the pathsim framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
+The topology of the block diagram above can be directly defined as blocks and connections in the PathSim framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
 
 
 
@@ -67,13 +68,12 @@ m, c, k = 0.8, 0.2, 1.5
 # Create blocks 
 I1 = Integrator(v0)   # integrator for velocity
 I2 = Integrator(x0)   # integrator for position
-A1 = Amplifier(c)
-A2 = Amplifier(k)
-A3 = Amplifier(-1/m)
+A1 = Amplifier(-c/m)
+A2 = Amplifier(-k/m)
 P1 = Adder()
-Sc = Scope(labels=["velocity", "position"])
+Sc = Scope(labels=["velocity v(t)", "position x(t)"])
 
-blocks = [I1, I2, A1, A2, A3, P1, Sc]
+blocks = [I1, I2, A1, A2, P1, Sc]
 
 # Create connections
 connections = [
@@ -81,8 +81,7 @@ connections = [
     Connection(I2, A2, Sc[1]),
     Connection(A1, P1),           # default connection to port 0
     Connection(A2, P1[1]),        # specific connection to port 1
-    Connection(P1, A3),
-    Connection(A3, I1)
+    Connection(P1, I1)
     ]
 
 # Create a simulation instance from the blocks and connections
@@ -98,24 +97,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-08-12 10:38:03,838 - INFO - LOGGING enabled
-    2024-08-12 10:38:03,839 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-08-12 10:38:03,840 - INFO - PATH LENGTH ESTIMATE 3, 'iterations_min' set to 3
-    2024-08-12 10:38:03,840 - INFO - RESET
-    2024-08-12 10:38:03,841 - INFO - RUN duration=50.0
-    2024-08-12 10:38:03,842 - INFO - STARTING progress tracker
-    2024-08-12 10:38:03,843 - INFO - progress=0%
-    2024-08-12 10:38:03,881 - INFO - progress=10%
-    2024-08-12 10:38:03,921 - INFO - progress=20%
-    2024-08-12 10:38:03,957 - INFO - progress=30%
-    2024-08-12 10:38:03,990 - INFO - progress=40%
-    2024-08-12 10:38:04,028 - INFO - progress=50%
-    2024-08-12 10:38:04,065 - INFO - progress=60%
-    2024-08-12 10:38:04,103 - INFO - progress=70%
-    2024-08-12 10:38:04,138 - INFO - progress=80%
-    2024-08-12 10:38:04,175 - INFO - progress=90%
-    2024-08-12 10:38:04,208 - INFO - progress=100%
-    2024-08-12 10:38:04,209 - INFO - FINISHED steps(total)=1001(1001) runtime=366.36ms
+    2024-08-30 14:19:54,673 - INFO - LOGGING enabled
+    2024-08-30 14:19:54,674 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-08-30 14:19:54,675 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-08-30 14:19:54,676 - INFO - RESET
+    2024-08-30 14:19:54,677 - INFO - RUN duration=50.0
+    2024-08-30 14:19:54,678 - INFO - STARTING progress tracker
+    2024-08-30 14:19:54,679 - INFO - progress=0%
+    2024-08-30 14:19:54,714 - INFO - progress=10%
+    2024-08-30 14:19:54,742 - INFO - progress=20%
+    2024-08-30 14:19:54,767 - INFO - progress=30%
+    2024-08-30 14:19:54,792 - INFO - progress=40%
+    2024-08-30 14:19:54,816 - INFO - progress=50%
+    2024-08-30 14:19:54,843 - INFO - progress=60%
+    2024-08-30 14:19:54,868 - INFO - progress=70%
+    2024-08-30 14:19:54,894 - INFO - progress=80%
+    2024-08-30 14:19:54,919 - INFO - progress=90%
+    2024-08-30 14:19:54,944 - INFO - progress=100%
+    2024-08-30 14:19:54,945 - INFO - FINISHED steps(total)=1001(1001) runtime=265.87ms
     
 
 
@@ -126,3 +125,8 @@ time, data = Sc.read()
 
 ## Examples
 There are many examples of dynamical system simulations in the `examples` directory. They cover almost all the blocks currently available in PathSim as well as different solvers.
+
+
+```python
+
+```
