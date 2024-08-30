@@ -71,7 +71,7 @@ I2 = Integrator(x0)   # integrator for position
 A1 = Amplifier(-c/m)
 A2 = Amplifier(-k/m)
 P1 = Adder()
-Sc = Scope(labels=["velocity v(t)", "position x(t)"])
+Sc = Scope(labels=["v(t)", "x(t)"])
 
 blocks = [I1, I2, A1, A2, P1, Sc]
 
@@ -97,24 +97,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-08-30 14:19:54,673 - INFO - LOGGING enabled
-    2024-08-30 14:19:54,674 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-08-30 14:19:54,675 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-08-30 14:19:54,676 - INFO - RESET
-    2024-08-30 14:19:54,677 - INFO - RUN duration=50.0
-    2024-08-30 14:19:54,678 - INFO - STARTING progress tracker
-    2024-08-30 14:19:54,679 - INFO - progress=0%
-    2024-08-30 14:19:54,714 - INFO - progress=10%
-    2024-08-30 14:19:54,742 - INFO - progress=20%
-    2024-08-30 14:19:54,767 - INFO - progress=30%
-    2024-08-30 14:19:54,792 - INFO - progress=40%
-    2024-08-30 14:19:54,816 - INFO - progress=50%
-    2024-08-30 14:19:54,843 - INFO - progress=60%
-    2024-08-30 14:19:54,868 - INFO - progress=70%
-    2024-08-30 14:19:54,894 - INFO - progress=80%
-    2024-08-30 14:19:54,919 - INFO - progress=90%
-    2024-08-30 14:19:54,944 - INFO - progress=100%
-    2024-08-30 14:19:54,945 - INFO - FINISHED steps(total)=1001(1001) runtime=265.87ms
+    2024-08-30 14:20:10,361 - INFO - LOGGING enabled
+    2024-08-30 14:20:10,362 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-08-30 14:20:10,363 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-08-30 14:20:10,364 - INFO - RESET
+    2024-08-30 14:20:10,365 - INFO - RUN duration=50.0
+    2024-08-30 14:20:10,366 - INFO - STARTING progress tracker
+    2024-08-30 14:20:10,367 - INFO - progress=0%
+    2024-08-30 14:20:10,400 - INFO - progress=10%
+    2024-08-30 14:20:10,429 - INFO - progress=20%
+    2024-08-30 14:20:10,455 - INFO - progress=30%
+    2024-08-30 14:20:10,480 - INFO - progress=40%
+    2024-08-30 14:20:10,504 - INFO - progress=50%
+    2024-08-30 14:20:10,528 - INFO - progress=60%
+    2024-08-30 14:20:10,553 - INFO - progress=70%
+    2024-08-30 14:20:10,578 - INFO - progress=80%
+    2024-08-30 14:20:10,603 - INFO - progress=90%
+    2024-08-30 14:20:10,628 - INFO - progress=100%
+    2024-08-30 14:20:10,629 - INFO - FINISHED steps(total)=1001(1001) runtime=262.03ms
     
 
 
