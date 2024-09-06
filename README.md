@@ -18,11 +18,9 @@ Key features of PathSim include:
 - Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, and more.
 - Easy extensibility, allowing users to define custom blocks by subclassing the base `Block` class and implementing just a handful of methods.
 
-
-
 ## Installation
 
-Version `0.1.0` of pathsim is pip installable
+Version `0.2.0` of pathsim is pip installable
 
 ```console
 $ pip install pathsim
@@ -97,24 +95,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-08-30 14:37:38,165 - INFO - LOGGING enabled
-    2024-08-30 14:37:38,166 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-08-30 14:37:38,167 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-08-30 14:37:38,168 - INFO - RESET
-    2024-08-30 14:37:38,168 - INFO - RUN duration=50.0
-    2024-08-30 14:37:38,169 - INFO - STARTING progress tracker
-    2024-08-30 14:37:38,170 - INFO - progress=0%
-    2024-08-30 14:37:38,194 - INFO - progress=10%
-    2024-08-30 14:37:38,223 - INFO - progress=20%
-    2024-08-30 14:37:38,260 - INFO - progress=30%
-    2024-08-30 14:37:38,312 - INFO - progress=40%
-    2024-08-30 14:37:38,349 - INFO - progress=50%
-    2024-08-30 14:37:38,384 - INFO - progress=60%
-    2024-08-30 14:37:38,412 - INFO - progress=70%
-    2024-08-30 14:37:38,440 - INFO - progress=80%
-    2024-08-30 14:37:38,467 - INFO - progress=90%
-    2024-08-30 14:37:38,495 - INFO - progress=100%
-    2024-08-30 14:37:38,496 - INFO - FINISHED steps(total)=1001(1001) runtime=325.56ms
+    2024-09-06 19:24:12,431 - INFO - LOGGING enabled
+    2024-09-06 19:24:12,432 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-09-06 19:24:12,432 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-09-06 19:24:12,433 - INFO - RESET
+    2024-09-06 19:24:12,433 - INFO - RUN duration=50.0
+    2024-09-06 19:24:12,433 - INFO - STARTING progress tracker
+    2024-09-06 19:24:12,434 - INFO - progress=0%
+    2024-09-06 19:24:12,450 - INFO - progress=10%
+    2024-09-06 19:24:12,467 - INFO - progress=20%
+    2024-09-06 19:24:12,484 - INFO - progress=30%
+    2024-09-06 19:24:12,502 - INFO - progress=40%
+    2024-09-06 19:24:12,519 - INFO - progress=50%
+    2024-09-06 19:24:12,536 - INFO - progress=60%
+    2024-09-06 19:24:12,554 - INFO - progress=70%
+    2024-09-06 19:24:12,571 - INFO - progress=80%
+    2024-09-06 19:24:12,589 - INFO - progress=90%
+    2024-09-06 19:24:12,608 - INFO - progress=100%
+    2024-09-06 19:24:12,608 - INFO - FINISHED steps(total)=1001(1001) runtime=175.26ms
     
 
 
