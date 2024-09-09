@@ -19,12 +19,12 @@
 class Connection:
 
     """
-    Class to handle input-output relations of blocks by connecting 
-    them (directed graph) and transfering data from the output port 
-    of the source block to the input port of the target block.
+    Class to handle input-output relations of blocks by connecting them (directed graph) 
+    and transfering data from the output port of the source block to the input port of 
+    the target block.
 
-    The default ports for connection are (0) -> (0), since these 
-    are the default inputs that are used in the SISO blocks.
+    The default ports for connection are (0) -> (0), since these are the default inputs 
+    that are used in the SISO blocks.
 
     EXAMPLE:
 
@@ -33,20 +33,19 @@ class Connection:
             B1 = Block...
             B2 = Block...
 
-        that we want to connect. We initialize a 'Connection' 
-        with the blocks directly as the arguments if we want to 
-        connect the default ports (0) -> (0) 
+        that we want to connect. We initialize a 'Connection' with the blocks directly 
+        as the arguments if we want to connect the default ports (0) -> (0) 
 
             C = Connection(B1, B2)
 
-        which is a connection from block 'B1' to 'B2'. If we want 
-        to explicitly declare the input and output ports we can do 
-        that by giving tuples (lists also work) as the arguments
+        which is a connection from block 'B1' to 'B2'. If we want to explicitly declare 
+        the input and output ports we can do that by giving tuples (lists also work) as 
+        the arguments
      
             C = Connection((B1, 0), (B2, 0))
 
-        which is exactly the default port setup. Connecting output 
-        port (1) of 'B1' to the default input port (0) of 'B2' do
+        which is exactly the default port setup. Connecting output port (1) of 'B1' to 
+        the default input port (0) of 'B2' do
 
             C = Connection((B1, 1), (B2, 0))
 
@@ -54,17 +53,23 @@ class Connection:
 
             C = Connection((B1, 1), B2).
 
-        The 'Connection' class also supports multiple targets for 
-        a single source. This is specified by just adding more blocks 
-        with their respective ports into the constructor like this:
+        The 'Connection' class also supports multiple targets for a single source. 
+        This is specified by just adding more blocks with their respective ports into 
+        the constructor like this:
 
-            C = Connection(B1, (B2,0), (B2,1), B3, ...)
+            C = Connection(B1, (B2, 0), (B2, 1), B3, ...)
 
-        The port definitions follow the same structure as for 
-        single target connections.
+        The port definitions follow the same structure as for single target connections.
 
-        'self'-connections also work without a problem. This is useful 
-        for modeling direct feedback of a block to itself.
+        'self'-connections also work without a problem. This is useful for modeling direct 
+        feedback of a block to itself.
+        
+        The port specification can be simplified (quality of life) by using the __getitem__ 
+        method that is implemented in the base 'Block' class. It returns the tuple of block
+        and port pair that is used for the port specification in the 'Connection' 
+        initialization. For example the following initializations are equivalent:
+
+            Connection(B1[1], B2[3]) <=> Connection((B1, 1), (B2, 3))
 
     INPUTS: 
         source  : (tuple ('Block', int) OR 'Block') source block and optional source output port

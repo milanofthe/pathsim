@@ -1,0 +1,18 @@
+2024-09-09 10:23:21,303 - INFO - LOGGING enabled
+2024-09-09 10:23:21,303 - INFO - SOLVER ESDIRK54 adaptive=True implicit=True
+2024-09-09 10:23:21,303 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
+2024-09-09 10:23:21,303 - INFO - RESET
+2024-09-09 10:23:21,303 - INFO - RUN duration=300
+2024-09-09 10:23:21,303 - INFO - STARTING progress tracker
+2024-09-09 10:23:21,372 - INFO - progress=0%
+2024-09-09 10:23:22,587 - INFO - progress=10%
+2024-09-09 10:23:23,085 - INFO - progress=20%
+2024-09-09 10:23:28,574 - INFO - progress=30%
+2024-09-09 10:23:28,819 - INFO - progress=40%
+2024-09-09 10:23:29,653 - INFO - progress=50%
+2024-09-09 10:23:34,282 - INFO - progress=60%
+2024-09-09 10:23:34,570 - INFO - progress=70%
+2024-09-09 10:23:36,260 - INFO - progress=80%
+2024-09-09 10:23:39,877 - INFO - progress=90%
+2024-09-09 10:23:40,289 - INFO - progress=100%
+2024-09-09 10:23:40,289 - INFO - FINISHED steps(total)=1262(1306) runtime=18980.10ms
