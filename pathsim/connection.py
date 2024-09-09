@@ -86,7 +86,8 @@ class Connection:
 
 
     def __str__(self):
-        return f"Connection from {self.source} to " + ", ".join(self.targets)
+        src, prt = self.source
+        return f"Connection from ({src}, {prt}) to " + ", ".join([ f"({trg}, {prt})" for trg, prt in self.targets])
 
 
     def overwrites(self, other):

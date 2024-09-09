@@ -45,7 +45,7 @@ blocks = [In1, In2, Amp, Fnc, Sco]
 #connections between the blocks
 connections = [
     Connection(In1, In2, Sco[1]), 
-    Connection(In2, Fnc, Sco),
+    Connection(In2, Fnc, Sco[1]),
     Connection(Fnc, Amp), 
     Connection(Amp, In1)
     ]
