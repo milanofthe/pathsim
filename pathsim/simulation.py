@@ -201,12 +201,12 @@ class Simulation:
 
         #check if connection already in block list
         if connection in self.connections:
-            raise ValueError(f"connection {connection} already part of simulation")
+            raise ValueError(f"{connection} already part of simulation")
 
         #check if connection overwrites existing connections
         for conn in self.connections:
             if connection.overwrites(conn):
-                _msg = f"connection {connection} overwrites {conn}"
+                _msg = f"{connection} overwrites {conn}"
                 self._logger_error(_msg)
                 raise ValueError(_msg)
 
@@ -234,7 +234,7 @@ class Simulation:
             #check if connections overwrite each other and raise exception
             for conn_2 in self.connections[(i+1):]:
                 if conn_1.overwrites(conn_2):
-                    _msg = f"connection {conn_1} overwrites {conn_2}"
+                    _msg = f"{conn_1} overwrites {conn_2}"
                     self._logger_error(_msg)
                     raise ValueError(_msg)
 
