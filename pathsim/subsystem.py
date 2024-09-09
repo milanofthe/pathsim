@@ -109,7 +109,7 @@ class Subsystem(Block):
             path_length = path_length_dfs(self.connections, block)
             if path_length > max_path_length:
                 max_path_length = path_length
-        return max_path_length + 1 #longer due to 'Interface' block
+        return max_path_length
 
 
     def _check_connections(self):

@@ -85,6 +85,10 @@ class Connection:
         self.targets = [trg if isinstance(trg, (list, tuple)) else (trg, 0) for trg in targets]
 
 
+    def __str__(self):
+        return f"Connection from {self.source} to " + ", ".join(self.targets)
+
+
     def overwrites(self, other):
         """
         Check if the connection 'self' overwrites the target port
