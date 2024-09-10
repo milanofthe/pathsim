@@ -49,7 +49,7 @@ class Simulation:
     INPUTS:
         blocks         : (list of 'Block' objects) blocks that make up the system
         connections    : (list of 'Connection' objects) connections that connect the blocks
-        dt             : (float) transient simulation timestep
+        dt             : (float) transient simulation timestep in time units
         dt_min         : (float) lower bound for timestep, default '0.0'
         dt_max         : (float) upper bound for timestep, default 'None'
         Solver         : ('Solver' class) solver for numerical integration from pathsim.solvers
@@ -221,11 +221,7 @@ class Simulation:
         Check if connections are valid and if there is no input port that recieves 
         multiple outputs and could be overwritten unintentionally.
 
-        If multiple outputs are assigned to the same input, a warning is displayed 
-        in the logging and the target port index is incremented by one. 
-        This is more convenient, because with this, the input ports for multi input blocks 
-        where the port assignment doesnt matter (such as 'Multiplier' and 'Adder') dont 
-        have to be specified explicitly.   
+        If multiple outputs are assigned to the same input, a 'ValueError' is raised.
         """
 
         #iterate connections and check if they are valid
@@ -589,7 +585,7 @@ class Simulation:
         Perform multiple simulation timesteps for a given 'duration' in seconds.
 
         INPUTS: 
-            duration : (float) simulation time in seconds [s]
+            duration : (float) simulation time (in time units)
             reset    : (bool) reset the simulation before running
 
         RETURN:

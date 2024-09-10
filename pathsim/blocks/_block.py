@@ -13,8 +13,7 @@
 
 # IMPORTS ===============================================================================
 
-#for unique identifiers of blocks
-import uuid
+#no dependencies
 
 
 # BASE BLOCK CLASS ======================================================================
@@ -41,9 +40,6 @@ class Block:
 
         #initialize integration engine as 'None' by default
         self.engine = None
-
-        #unique block identifier
-        self.id = uuid.uuid4()
 
 
     def __str__(self):
