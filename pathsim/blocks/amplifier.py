@@ -26,7 +26,7 @@ class Amplifier(Block):
     def __init__(self, gain=1.0):
         super().__init__()
         self.gain = gain
-        
+
 
     def update(self, t):
         prev_output = self.outputs[0]

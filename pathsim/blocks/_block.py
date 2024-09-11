@@ -67,6 +67,14 @@ class Block:
         return (self, key)
         
 
+    def get_metadata(self):
+        """
+        Create a dict representation of the block with all its metadata 
+        for netlist generation
+        """
+        return {"type" : self.__class__}
+
+
     def reset(self):
         """
         Reset the blocks inputs and outputs and also its internal solver, if the 

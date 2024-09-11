@@ -88,11 +88,6 @@ class Subsystem(Block):
         self._check_connections()
 
 
-    def __str__(self):
-        _b = "\n".join(["    " + str(block) for block in self.blocks])
-        return f"Subsystem\n" + _b
-
-
     def __len__(self):
         """
         Recursively compute the longest signal path in the subsytem by 
