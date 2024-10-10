@@ -26,13 +26,19 @@ class Solver:
     This depends on the type of solver (implicit/explicit, multistage, adaptive).
 
     INPUTS : 
-        initial_value : (float or array) initial condition / integration constant
-        func          : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
-        jac           : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
-        tolerance_lte : (float) absolute tolerance for local truncation error (for solvers with error estimate)
+        initial_value     : (float or array) initial condition / integration constant
+        func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
+        jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
+        tolerance_lte_abs : (float) absolute tolerance for local truncation error (for solvers with error estimate)
+        tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
 
         #set buffer, initial state and initial condition    
         self.x_0 = self.x = self.initial_value = initial_value
@@ -43,8 +49,9 @@ class Solver:
         #jacobian of right hand side function
         self.jac = jac
 
-        #tolerance for local truncation error (for adaptive solvers)
-        self.tolerance_lte = tolerance_lte  
+        #tolerances for local truncation error (for adaptive solvers)
+        self.tolerance_lte_abs = tolerance_lte_abs  
+        self.tolerance_lte_rel = tolerance_lte_rel  
 
         #flag to identify adaptive/fixed timestep solvers
         self.is_adaptive = False
@@ -58,6 +65,13 @@ class Solver:
 
     def __str__(self):
         return self.__class__.__name__
+
+
+    def __len__(self):
+        """
+        return the size of the internal state, i.e. the order
+        """
+        return len(self.x)
 
 
     def stages(self, t, dt):
@@ -133,10 +147,10 @@ class Solver:
 
     def error_controller(self):
         """
-        Returns the estimated local truncation error and scaling factor 
+        Returns the estimated local truncation error (abs and rel) and scaling factor 
         for the timestep, only relevant for adaptive timestepping methods.
         """
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0
 
 
     def revert(self):
@@ -163,7 +177,7 @@ class Solver:
         returns the local truncation error estimate and the 
         rescale factor for the timestep if the solver is adaptive.
         """
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0
 
 
 # EXTENDED BASE SOLVER CLASSES =========================================================
@@ -173,14 +187,24 @@ class ExplicitSolver(Solver):
     Base class for explicit solver definition.
 
     INPUTS : 
-        initial_value : (float or array) initial condition / integration constant
-        func          : (callable) function to integrate with state (x), input (u) and time (t) dependency
-        jac           : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
-        tolerance_lte : (float) absolute tolerance for local truncation error (for solvers with error estimate)
+        initial_value     : (float or array) initial condition / integration constant
+        func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
+        jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
+        tolerance_lte_abs : (float) absolute tolerance for local truncation error (for solvers with error estimate)
+        tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
-        super().__init__(initial_value, func, jac, tolerance_lte)
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
+        super().__init__(initial_value, 
+                         func, 
+                         jac, 
+                         tolerance_lte_abs, 
+                         tolerance_lte_rel)
 
         #flag to identify implicit/explicit solvers
         self.is_explicit = True
@@ -207,9 +231,9 @@ class ExplicitSolver(Solver):
 
         #iterate solver stages (explicit updates)
         for t in self.stages(time, dt):
-            success, error, scale = self.step(0.0, t, dt)
+            success, error_abs, error_rel, scale = self.step(0.0, t, dt)
 
-        return success, error, scale 
+        return success, error_abs, error_rel, scale 
 
 
     def integrate(self, 
@@ -244,7 +268,7 @@ class ExplicitSolver(Solver):
         while time < time_end + dt:
 
             #perform single timestep
-            success, error, scale = self.integrate_singlestep(time, dt)
+            success, error_abs, error_rel, scale = self.integrate_singlestep(time, dt)
 
             #check if timestep was successful
             if adaptive and not success:
@@ -269,15 +293,24 @@ class ImplicitSolver(Solver):
     Base class for implicit solver definition. 
 
     INPUTS : 
-        INPUTS : 
-        initial_value : (float or array) initial condition / integration constant
-        func          : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
-        jac           : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
-        tolerance_lte : (float) absolute tolerance for local truncation error (for solvers with error estimate)
+        initial_value     : (float or array) initial condition / integration constant
+        func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
+        jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
+        tolerance_lte_abs : (float) absolute tolerance for local truncation error (for solvers with error estimate)
+        tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
-        super().__init__(initial_value, func, jac, tolerance_lte)
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
+        super().__init__(initial_value, 
+                         func, 
+                         jac, 
+                         tolerance_lte_abs, 
+                         tolerance_lte_rel)
 
         #flag to identify implicit/explicit solvers
         self.is_explicit = False
@@ -339,12 +372,12 @@ class ImplicitSolver(Solver):
                 if success_sol: success_sol = False
             
             #perform explicit component of timestep
-            success, error, scale = self.step(0.0, t, dt)
+            success, error_abs, error_rel, scale = self.step(0.0, t, dt)
 
         #step successful in total
         success_total = success and success_sol
 
-        return success_total, error, scale 
+        return success_total, error_abs, error_rel, scale 
 
 
     def integrate(self, 
@@ -383,7 +416,7 @@ class ImplicitSolver(Solver):
         while time < time_end + dt:
 
             #integrate for single timestep
-            success, error, scale = self.integrate_singlestep(time, dt, tolerance_fpi, max_iterations)
+            success, error_abs, error_rel, scale = self.integrate_singlestep(time, dt, tolerance_fpi, max_iterations)
 
             #check if timestep was successful and adaptive
             if adaptive and not success:

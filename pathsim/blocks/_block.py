@@ -91,7 +91,7 @@ class Block:
 
     # methods for blocks with integration engines ---------------------------------------
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         """
         Initialize the numerical integration engine with local truncation error 
         tolerance if required.
@@ -209,5 +209,5 @@ class Block:
             scale   : (float) timestep rescale from adaptive integrators
         """
 
-        #by default no error estimate
-        return True, 0.0, 1.0
+        #by default no error estimate (abs and rel error -> 0.0, 0.0)
+        return True, 0.0, 0.0, 1.0

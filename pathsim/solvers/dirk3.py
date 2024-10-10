@@ -22,8 +22,17 @@ class DIRK3(ImplicitSolver):
     (from Wikipedia)
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
-        super().__init__(initial_value, func, jac, tolerance_lte)
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
+        super().__init__(initial_value, 
+                         func, 
+                         jac, 
+                         tolerance_lte_abs, 
+                         tolerance_lte_rel)
 
         #counter for runge kutta stages
         self.stage = 0
@@ -83,4 +92,4 @@ class DIRK3(ImplicitSolver):
         self.stage = (self.stage + 1) % 4
 
         #no error estimate available
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0

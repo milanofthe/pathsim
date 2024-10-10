@@ -128,16 +128,16 @@ class ChirpSource(Block):
         self.T = T
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
 
         #initialize the numerical integration engine with kernel
         def _f(x, u, t): return self.BW * (1 + triangle_wave(t, 1/self.T))/2
-        self.engine = Solver(self.f0, _f, None, tolerance_lte)
+        self.engine = Solver(self.f0, _f, None, **solver_args)
 
 
     def update(self, t):

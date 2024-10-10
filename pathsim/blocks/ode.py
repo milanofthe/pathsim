@@ -61,15 +61,15 @@ class ODE(Block):
         return 0
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
-        #change solver if already initialized
-        if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
-            return #quit early
-        #initialize the integration engine with right hand side
-        _jac = auto_jacobian(self.func) if self.jac is None else self.jac
-        self.engine = Solver(self.initial_value, self.func, _jac, tolerance_lte)
-
+    def set_solver(self, Solver, **solver_args):
+        if self.engine is None:
+            #initialize the integration engine with right hand side
+            _jac = auto_jacobian(self.func) if self.jac is None else self.jac
+            self.engine = Solver(self.initial_value, self.func, _jac, **solver_args)
+        else:
+            #change solver if already initialized
+            self.engine = self.engine.change(Solver, **solver_args)
+        
 
     def update(self, t):
         self.outputs = array_to_dict(self.engine.get())

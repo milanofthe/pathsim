@@ -100,11 +100,11 @@ class WienerHammersteinModel(Block):
         return int((np.any(self.D_1) and np.any(self.D_2)))
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
 
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
 
         #right hand side function for ODE
@@ -121,7 +121,7 @@ class WienerHammersteinModel(Block):
             return np.block([[self.A_1, J_12], [J_21, self.A_2]])
         
         #combined solver
-        self.engine = Solver(np.zeros(self.n_1+self.n_2), _f, _jac, tolerance_lte)
+        self.engine = Solver(np.zeros(self.n_1+self.n_2), _f, _jac, **solver_args)
 
 
     def update(self, t):
@@ -208,11 +208,11 @@ class HammersteinModel(Block):
         return int(np.any(self.D))
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
 
         #right hand side function for ODE
@@ -221,7 +221,7 @@ class HammersteinModel(Block):
         
         #solver
         n, _ = self.A.shape
-        self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
+        self.engine = Solver(np.zeros(n), _f, _jac, **solver_args)
 
 
     def update(self, t):
@@ -304,11 +304,11 @@ class WienerModel(Block):
         return int(np.any(self.D))
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
 
         #right hand side function for ODE
@@ -317,7 +317,7 @@ class WienerModel(Block):
 
         #solver
         n, _ = self.A.shape
-        self.engine = Solver(np.zeros(n), _f, _jac, tolerance_lte)
+        self.engine = Solver(np.zeros(n), _f, _jac, **solver_args)
 
 
     def update(self, t):

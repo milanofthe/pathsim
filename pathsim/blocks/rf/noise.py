@@ -82,16 +82,16 @@ class OneOverFNoise(Block):
         self.n_samples = 0
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
 
         #initialize the numerical integration engine with kernel
         def _f(x, u, t): return u
-        self.engine = Solver(0.0, _f, None, tolerance_lte)
+        self.engine = Solver(0.0, _f, None, **solver_args)
 
 
     def reset(self):
@@ -134,7 +134,7 @@ class OneOverFNoise(Block):
         self.engine.step(self.white_noise_value, t, dt)
 
         #no error control for noise source
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0
 
 
 class SinusoidalPhaseNoiseSource(Block):
@@ -158,16 +158,16 @@ class SinusoidalPhaseNoiseSource(Block):
         self.noise_2 = np.random.normal() 
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
 
         #initialize the numerical integration engine with kernel
         def _f(x, u, t): return u
-        self.engine = Solver(0.0, _f, None, tolerance_lte)
+        self.engine = Solver(0.0, _f, None, **solver_args)
 
 
     def reset(self):
@@ -215,4 +215,4 @@ class SinusoidalPhaseNoiseSource(Block):
         self.engine.step(self.noise_2, t, dt)
 
         #no error control for noise source
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0

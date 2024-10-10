@@ -46,7 +46,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=0.01, log=True, Solver=ESDIRK54, tolerance_lte=1e-6)
+Sim = Simulation(blocks, connections, dt=0.01, log=True, Solver=ESDIRK54, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-3)
 
 #run the simulation for some time
 Sim.run(2*T)

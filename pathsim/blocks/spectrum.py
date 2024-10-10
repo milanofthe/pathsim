@@ -83,7 +83,7 @@ class Spectrum(Block):
         return 0
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         
         if self.engine is None:
             
@@ -95,13 +95,13 @@ class Spectrum(Block):
                 return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
 
             #initialize depending on forgetting factor
-            if self.alpha == 0.0: self.engine = Solver(0.0, _f, None, tolerance_lte)
-            else: self.engine = Solver(0.0, _f_decay, None, tolerance_lte)
+            if self.alpha == 0.0: self.engine = Solver(0.0, _f, None, **solver_args)
+            else: self.engine = Solver(0.0, _f_decay, None, **solver_args)
 
         else:
 
             #change solver if already initialized
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
 
         
     def reset(self):
@@ -166,7 +166,7 @@ class Spectrum(Block):
             return self.engine.step(dict_to_array(self.inputs), _t, dt)
 
         #no error estimate
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0
 
 
     def plot(self, *args, **kwargs):
@@ -313,4 +313,4 @@ class RealtimeSpectrum(Spectrum):
             return self.engine.step(dict_to_array(self.inputs), _t, dt)
 
         #no error estimate
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0

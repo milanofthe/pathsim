@@ -212,24 +212,28 @@ class Subsystem(Block):
         """
 
         #initial timestep rescale and error estimate
-        success, max_error, scale = True, 0.0, 1.0
+        success, max_error_abs, max_error_rel, relevant_scales = True, 0.0, 0.0, []
 
         #step blocks and get error estimates if available
         for block in self.blocks:
-            ss, error, scl = block.step(t, dt)
+            ss, error_abs, error_rel, scl = block.step(t, dt)
             if not ss: success = False
-            if error > max_error:
-                max_error, scale = error, scl      
+            if error_abs > max_error_abs: max_error_abs = error_abs
+            if error_rel > max_error_rel: max_error_rel = error_rel
+            if scl not in [0.0, 1.0]: relevant_scales.append(scl)
 
-        return success, max_error, scale
+        #calculate real relevant timestep rescale
+        scale = 1.0 if not relevant_scales else min(relevant_scales)
+
+        return success, max_error_abs, max_error_rel, scale
 
 
     # methods for blocks with integration engines -------------------------------------------
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         """
         Initialize all blocks with solver for numerical integration
-        and tolerance for local truncation error 'tolerance_lte'.
+        and additional args for the solver such as tolerances, etc.
 
         If blocks already have solvers, change the numerical integrator
         to the 'Solver' class.
@@ -241,7 +245,7 @@ class Subsystem(Block):
 
         #iterate all blocks and set integration engines
         for block in self.blocks:
-            block.set_solver(Solver, tolerance_lte)
+            block.set_solver(Solver, **solver_args)
 
 
     def revert(self):

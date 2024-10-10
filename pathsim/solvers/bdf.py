@@ -21,8 +21,17 @@ class BDF2(ImplicitSolver):
     with order ramp up for the initial steps.
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
-        super().__init__(initial_value, func, jac, tolerance_lte)
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
+        super().__init__(initial_value, 
+                         func, 
+                         jac, 
+                         tolerance_lte_abs, 
+                         tolerance_lte_rel)
 
         #bdf coefficients
         self.K = {1:[1.0], 2:[-1/3, 4/3]}
@@ -85,7 +94,7 @@ class BDF2(ImplicitSolver):
         if len(self.B) > 2:
             self.B.pop(0)
 
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0
 
 
 class BDF3(ImplicitSolver):
@@ -94,8 +103,17 @@ class BDF3(ImplicitSolver):
     with order ramp up for the initial steps.
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
-        super().__init__(initial_value, func, jac, tolerance_lte)
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
+        super().__init__(initial_value, 
+                         func, 
+                         jac, 
+                         tolerance_lte_abs, 
+                         tolerance_lte_rel)
 
         #bdf coefficients
         self.K = {1:[1.0], 
@@ -161,7 +179,7 @@ class BDF3(ImplicitSolver):
         if len(self.B) > 3:
             self.B.pop(0)
 
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0
 
 
 class BDF4(ImplicitSolver):
@@ -170,8 +188,17 @@ class BDF4(ImplicitSolver):
     with order ramp up for the initial steps.
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
-        super().__init__(initial_value, func, jac, tolerance_lte)
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
+        super().__init__(initial_value, 
+                         func, 
+                         jac, 
+                         tolerance_lte_abs, 
+                         tolerance_lte_rel)
 
         #bdf coefficients
         self.K = {1:[1.0], 
@@ -237,4 +264,4 @@ class BDF4(ImplicitSolver):
         if len(self.B) > 4:
             self.B.pop(0)
 
-        return True, 0.0, 1.0
+        return True, 0.0, 0.0, 1.0

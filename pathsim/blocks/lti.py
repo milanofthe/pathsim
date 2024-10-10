@@ -73,7 +73,7 @@ class StateSpace(Block):
         return int(np.any(self.D))
 
     
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         
         if self.engine is None:
 
@@ -83,12 +83,12 @@ class StateSpace(Block):
                 return self.A
 
             #initialize the integration engine with right hand side
-            self.engine = Solver(self.initial_value, _f, _jac, tolerance_lte)
+            self.engine = Solver(self.initial_value, _f, _jac, **solver_args)
 
         else:
 
             #change solver if already initialized
-            self.engine = self.engine.change(Solver, tolerance_lte)        
+            self.engine = self.engine.change(Solver, **solver_args)        
 
 
     def update(self, t):

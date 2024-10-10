@@ -27,8 +27,17 @@ class RKF78(ExplicitSolver):
     conservation systems such as celestial dynamics, etc.
     """
 
-    def __init__(self, initial_value=0, func=lambda x, u, t: u, jac=None, tolerance_lte=1e-6):
-        super().__init__(initial_value, func, jac, tolerance_lte)
+    def __init__(self, 
+                 initial_value=0, 
+                 func=lambda x, u, t: u, 
+                 jac=None, 
+                 tolerance_lte_abs=1e-6, 
+                 tolerance_lte_rel=1e-3):
+        super().__init__(initial_value, 
+                         func, 
+                         jac, 
+                         tolerance_lte_abs, 
+                         tolerance_lte_rel)
 
         #counter for runge kutta stages
         self.stage = 0
@@ -67,24 +76,33 @@ class RKF78(ExplicitSolver):
         based on local truncation error estimate and returns both
         """
         if len(self.Ks)<len(self.TR): 
-            return True, 0.0, 1.0
+            return True, 0.0, 0.0, 1.0
 
         #compute local truncation error slope
         slope = 0.0
         for i, b in enumerate(self.TR):
             slope += self.Ks[i] * b
 
-        #compute and clip truncation error
-        truncation_error = np.max(np.clip(abs(dt*slope), 1e-18, None))
+        #compute and clip truncation error, error ratio abs
+        truncation_error_abs = np.max(np.clip(abs(dt*slope), 1e-18, None))
+        error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
+
+        #compute and clip truncation error, error ratio rel
+        if np.any(self.x == 0.0): 
+            truncation_error_rel = 1.0
+            error_ratio_rel = 0.0
+        else:
+            truncation_error_rel = np.max(np.clip(abs(dt*slope/self.x), 1e-18, None))
+            error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
         
-        #compute error ratio
-        error_ratio = self.tolerance_lte / truncation_error
+        #compute error ratio and success check
+        error_ratio = max(error_ratio_abs, error_ratio_rel)
         success = error_ratio >= 1.0
 
         #compute timestep scale
         timestep_rescale = 0.9 * (error_ratio)**(1/8)        
 
-        return success, truncation_error, timestep_rescale
+        return success, truncation_error_abs, truncation_error_rel, timestep_rescale
 
 
     def step(self, u, t, dt):
@@ -105,7 +123,7 @@ class RKF78(ExplicitSolver):
         #error and step size control
         if self.stage < 12:
             self.stage += 1
-            return True, 0.0, 1.0
+            return True, 0.0, 0.0, 1.0
         else: 
             self.stage = 0
             return self.error_controller(dt)

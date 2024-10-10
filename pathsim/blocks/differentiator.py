@@ -42,15 +42,15 @@ class Differentiator(Block):
         return 1
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
         #initialize the numerical integration engine with kernel
         def _f(x, u, t): return - self.f_max * (x - u) 
         def _jac(x, u, t): return - self.f_max
-        self.engine = Solver(0.0, _f, _jac, tolerance_lte)
+        self.engine = Solver(0.0, _f, _jac, **solver_args)
 
 
     def update(self, t):

@@ -66,8 +66,8 @@ blocks = [Src, Ns1, Ns2, Add, FLT, Sco, Spc]
 #the connections between the blocks
 connections = [
     Connection(Src, Add, Sco, Spc),
-    Connection(Ns1, Add[1], Sco[3]),
-    Connection(Ns2, Add[2], Sco[4]),
+    Connection(Ns1, Add[1], Sco[3], Spc[3]),
+    Connection(Ns2, Add[2], Sco[4], Spc[4]),
     Connection(Add, FLT, Sco[2], Spc[2]),
     Connection(FLT, Sco[1], Spc[1])
     ]

@@ -41,14 +41,14 @@ class Integrator(Block):
         return 0
 
 
-    def set_solver(self, Solver, tolerance_lte=1e-6):
+    def set_solver(self, Solver, **solver_args):
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, tolerance_lte)
+            self.engine = self.engine.change(Solver, **solver_args)
             return #quit early
         #initialize the integration engine
         def _f(x, u, t): return u
-        self.engine = Solver(self.initial_value, _f, None, tolerance_lte)
+        self.engine = Solver(self.initial_value, _f, None, **solver_args)
         
 
     def update(self, t):
