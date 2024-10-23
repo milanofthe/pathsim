@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                                MAIN SIMULATION ENGINE 
+##                     MAIN SIMULATION ENGINE FOR TRANSIENT ANALYSIS
 ##                                   (simulation.py)
 ##
 ##                 This module contains the simulation class that handles
@@ -20,7 +20,7 @@ from .utils.progresstracker import ProgressTracker
 from .solvers import SSPRK22
 
 
-# MAIN SIMULATION CLASS =================================================================
+# TRANSIENT SIMULATION CLASS ============================================================
 
 class Simulation:
     """

@@ -21,7 +21,7 @@ class SSPRK34(ExplicitSolver):
     Strong Stability Preserving (SSP) 3-rd order 4 stage 
     (3,4) Runge-Kutta method
     
-    This integrator has one stage more then SSPRK33 but is also
+    This integrator has one more stage then SSPRK33 but is also
     3-rd order. So in terms or accuracy, they are the same but 
     the 4-th stage gives quite a lot more stability. 
     The stability region includes the point -4 on the real axis 
@@ -70,11 +70,8 @@ class SSPRK34(ExplicitSolver):
         #buffer intermediate slope
         self.Ks[self.stage] = self.func(self.x, u, t)
         
-        #update state at stage
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
-        self.x = dt * slope + self.x_0
+        #compute slope and update state at stage
+        self.x = dt * sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage])) + self.x_0
 
         #wrap around stage counter
         self.stage = (self.stage + 1) % 4

@@ -65,10 +65,10 @@ class RKDP87(ExplicitSolver):
                    12:[14005451/335480064, 0, 0, 0, 0, -59238493/1068277825, 181606767/758867731, 561292985/797845732, -1041891430/1371343529, 760417239/1151165299, 118820643/751138087, -528747749/2220607170, 1/4]}
 
         #coefficients for lower order solution evaluation
-        self.bh = [13451932/455176623, 0, 0, 0, 0, -808719846/976000145, 1757004468/5645159321, 656045339/265891186, -3867574721/1518517206, 465885868/322736535, 53011238/667516719, 2/45, 0]
+        bh = [13451932/455176623, 0, 0, 0, 0, -808719846/976000145, 1757004468/5645159321, 656045339/265891186, -3867574721/1518517206, 465885868/322736535, 53011238/667516719, 2/45, 0]
 
-        #lower order solution
-        self.xh = None
+        #coefficients for truncation error
+        self.TR = [a-b for a, b in zip(self.BT[12], bh)]
 
 
     def error_controller(self, dt):
@@ -76,11 +76,14 @@ class RKDP87(ExplicitSolver):
         compute scaling factor for adaptive timestep 
         based on local truncation error estimate and returns both
         """
-        if self.xh is None: 
+        if len(self.Ks)<len(self.TR): 
             return True, 0.0, 0.0, 1.0
 
+        #compute local truncation error
+        tr = dt * sum(k*b for k, b in zip(self.Ks.values(), self.TR))
+
         #compute and clip truncation error, error ratio abs
-        truncation_error_abs = np.max(np.clip(abs(self.x-self.xh), 1e-18, None))
+        truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
         error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
 
         #compute and clip truncation error, error ratio rel
@@ -88,7 +91,7 @@ class RKDP87(ExplicitSolver):
             truncation_error_rel = 1.0
             error_ratio_rel = 0.0
         else:
-            truncation_error_rel = np.max(np.clip(abs((self.x-self.xh)/self.x), 1e-18, None))
+            truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
             error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
         
         #compute error ratio and success check
@@ -110,25 +113,14 @@ class RKDP87(ExplicitSolver):
         #buffer intermediate slope
         self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #update state at stage
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
-        self.x = dt * slope + self.x_0
-
+        #compute slope and update state at stage
+        self.x = dt * sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage])) + self.x_0
+        
         #error and step size control
-        if self.stage < 12:
+        if self.stage < 8:
             self.stage += 1
-            return True, 0.0, 0.0, 1.0        
-
+            return True, 0.0, 0.0, 1.0
         else: 
-
-            #lower order solution
-            slope = 0.0
-            for i, bh in enumerate( self.bh):
-                slope += self.Ks[i] * bh
-            self.xh = dt * slope + self.x_0
-
-            #reset stage counter
+            #last stage for error control
             self.stage = 0
             return self.error_controller(dt)

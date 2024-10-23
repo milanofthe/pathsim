@@ -58,10 +58,8 @@ class DIRK3(ImplicitSolver):
         #update timestep weighted slope 
         self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #update fixed-point equation
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
+        #compute slope and update fixed-point equation
+        slope = sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage]))
 
         #use the jacobian
         if self.jac is not None:

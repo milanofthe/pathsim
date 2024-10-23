@@ -26,7 +26,7 @@ beta = 0.1   # predator sucess rate
 delta = 0.5  # predator efficiency
 gamma = 1.2  # death rate of predators
 
-#functon for ODE
+#function for ODE
 def _f(x, u, t):
     x1, x2 = x
     return np.array([x1*(alpha - beta*x2), x2*(delta*x1 - gamma)])

@@ -77,13 +77,11 @@ class ESDIRK54(ImplicitSolver):
         if len(self.Ks)<len(self.TR): 
             return True, 0.0, 0.0, 1.0
 
-        #compute local truncation error slope
-        slope = 0.0
-        for i, b in enumerate(self.TR):
-            slope += self.Ks[i] * b
+        #compute local truncation error
+        tr = dt * sum(k*b for k, b in zip(self.Ks.values(), self.TR))
 
         #compute and clip truncation error, error ratio abs
-        truncation_error_abs = np.max(np.clip(abs(dt*slope), 1e-18, None))
+        truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
         error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
 
         #compute and clip truncation error, error ratio rel
@@ -91,7 +89,7 @@ class ESDIRK54(ImplicitSolver):
             truncation_error_rel = 1.0
             error_ratio_rel = 0.0
         else:
-            truncation_error_rel = np.max(np.clip(abs(dt*slope/self.x), 1e-18, None))
+            truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
             error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
         
         #compute error ratio and success check
@@ -116,10 +114,8 @@ class ESDIRK54(ImplicitSolver):
         #update timestep weighted slope 
         self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #update fixed-point equation
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
+        #compute slope and update fixed-point equation
+        slope = sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage]))
 
         #use the jacobian
         if self.jac is not None:

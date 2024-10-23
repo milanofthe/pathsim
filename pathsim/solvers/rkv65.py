@@ -60,8 +60,8 @@ class RKV65(ExplicitSolver):
                    7:[           11/144,      0,              0,          256/693,                0,   125/504, 125/528,        5/72], 
                    8:[           28/477,      0,              0,          212/441,   -312500/366177, 2125/1764,       0, -2105/35532, 2995/17766]}
 
-        #5-th order solution at stage 9
-        self.xh = None
+        #coefficients for truncation error
+        self.TR = [a-b for a, b in zip(self.BT[7], self.BT[8])]
 
 
     def error_controller(self, dt):
@@ -69,11 +69,15 @@ class RKV65(ExplicitSolver):
         compute scaling factor for adaptive timestep 
         based on local truncation error estimate and returns both
         """
-        if self.xh is None: 
+
+        if len(self.Ks)<len(self.TR): 
             return True, 0.0, 0.0, 1.0
 
+        #compute local truncation error
+        tr = dt * sum(k*b for k, b in zip(self.Ks.values(), self.TR))
+
         #compute and clip truncation error, error ratio abs
-        truncation_error_abs = np.max(np.clip(abs(self.x-self.xh), 1e-18, None))
+        truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
         error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
 
         #compute and clip truncation error, error ratio rel
@@ -81,7 +85,7 @@ class RKV65(ExplicitSolver):
             truncation_error_rel = 1.0
             error_ratio_rel = 0.0
         else:
-            truncation_error_rel = np.max(np.clip(abs((self.x-self.xh)/self.x), 1e-18, None))
+            truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
             error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
         
         #compute error ratio and success check
@@ -102,20 +106,14 @@ class RKV65(ExplicitSolver):
 
         #buffer intermediate slope
         self.Ks[self.stage] = self.func(self.x, u, t)
-        
-        #compute slope at stage
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
 
         #error and step size control
         if self.stage < 8:
-            #stepping with 6-th order solution
-            self.x = dt * slope + self.x_0
+            #stepping with 6-th order solution, compute slope and update state at stage
+            self.x = dt * sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage])) + self.x_0
             self.stage += 1
             return True, 0.0, 0.0, 1.0
         else: 
-            #save 5-th order solution for error control at last stage
-            self.xh = dt * slope + self.x_0
+            #last stage for error control
             self.stage = 0
             return self.error_controller(dt)

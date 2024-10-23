@@ -65,10 +65,8 @@ class DIRK2(ImplicitSolver):
         #update timestep weighted slope 
         self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #update fixed-point equation
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
+        #compute slope and update fixed-point equation
+        slope = sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage]))
 
         #use the jacobian
         if self.jac is not None:
@@ -96,7 +94,7 @@ class DIRK2(ImplicitSolver):
         if self.stage == 1:
             slope = 0.0
             for i, a in enumerate(self.A):
-                slope += self.Ks[i] * a 
+                slope = slope + self.Ks[i] * a 
             self.x = dt*slope + self.x_0
 
         #restart anderson accelerator 

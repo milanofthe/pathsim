@@ -11,17 +11,17 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection, Interface, Subsystem
 from pathsim.blocks import Integrator, Scope, Function
-from pathsim.solvers import ESDIRK54, ESDIRK85
+from pathsim.solvers import ESDIRK32, ESDIRK54
 
 
 # VAN DER POL OSCILLATOR INITIAL VALUE PROBLEM ==========================================
 
 #initial condition
-x1_0 = 2 
+x1_0 = 2
 x2_0 = 0
 
 #van der Pol parameter
-mu = 1000
+mu = 100
 
 #simulation timestep
 dt = 0.05

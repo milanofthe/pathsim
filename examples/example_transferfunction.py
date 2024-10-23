@@ -29,7 +29,7 @@ residues = [-0.2,      -0.2j,       0.2j,     0.3,     0.3]
 
 #blocks and connections
 Sr = Source(lambda t: int(t>=tau))
-TF  = TransferFunction(Poles=poles, Residues=residues, Const=const)
+TF = TransferFunction(Poles=poles, Residues=residues, Const=const)
 Sc = Scope(labels=["step", "response"])
 
 blocks = [Sr, TF, Sc]

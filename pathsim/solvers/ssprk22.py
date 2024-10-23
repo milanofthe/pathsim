@@ -58,11 +58,8 @@ class SSPRK22(ExplicitSolver):
         #buffer intermediate slope
         self.Ks[self.stage] = self.func(self.x, u, t)
         
-        #update state at stage
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
-        self.x = dt * slope + self.x_0
+        #compute slope and update state at stage
+        self.x = dt * sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage])) + self.x_0
         
         #wrap around stage counter
         self.stage = (self.stage + 1) % 2

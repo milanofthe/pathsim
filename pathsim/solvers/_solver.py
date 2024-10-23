@@ -1,6 +1,6 @@
 ########################################################################################
 ##
-##                             BASE NUMERICAL INTEGRATOR CLASS
+##                            BASE NUMERICAL INTEGRATOR CLASSES
 ##                                  (solvers/_solver.py)
 ##
 ##                                (c) Milan Rother 2023/24

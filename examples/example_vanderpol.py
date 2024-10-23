@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, ODE
-from pathsim.solvers import ESDIRK54, ESDIRK85
+from pathsim.solvers import ESDIRK32, ESDIRK54
 
 
 # VAN DER POL OSCILLATOR INITIAL VALUE PROBLEM ==========================================
@@ -30,7 +30,7 @@ def jac(x, u, t):
     return np.array([[0, 1], [-mu*2*x[0]*x[1]-1, mu*(1 - x[0]**2)]])
 
 #blocks that define the system
-VDP = ODE(func, x0)#, jac) #jacobian improves convergence but is not needed
+VDP = ODE(func, x0, jac) #jacobian improves convergence but is not needed
 Sco = Scope()
 
 blocks = [VDP, Sco]

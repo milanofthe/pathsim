@@ -10,15 +10,15 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope, Differentiator
-from pathsim.solvers import RKCK54, SSPRK33
+from pathsim.solvers import RKCK54, SSPRK33, DIRK3
 
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
 
 # System parameters
-K = 0.2  # System gain
-T = 2.0  # System time constant
-Kp = 1.5  # Proportional gain
+K = 0.2    # System gain
+T = 2.0    # System time constant
+Kp = 1.5   # Proportional gain
 Ki = 0.75  # Integral gain
 Kd = 0.05  # Derivative gain
 

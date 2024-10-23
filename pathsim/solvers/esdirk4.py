@@ -52,8 +52,6 @@ class ESDIRK4(ImplicitSolver):
                    5:[89/444, 89/804756, -27/364, -20000/171717, 843750/1140071, 1/4]}
 
 
-
-
     def solve(self, u, t, dt):
         """
         Solves the implicit update equation via anderson acceleration.
@@ -66,10 +64,8 @@ class ESDIRK4(ImplicitSolver):
         #update timestep weighted slope 
         self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #update fixed-point equation
-        slope = 0.0
-        for i, b in enumerate(self.BT[self.stage]):
-            slope += self.Ks[i] * b
+        #compute slope and update fixed-point equation
+        slope = sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage]))
 
         #use the jacobian
         if self.jac is not None:

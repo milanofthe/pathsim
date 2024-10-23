@@ -35,7 +35,7 @@ dt = 0.1
 x0, v0 = 0.0, 0.0
 
 #driving angular frequency and amplitude
-a, omega = 10.0, 2.0
+a, omega = 100.0, 2.0
 
 #parameters (mass, damping, linear stiffness, nonlienar stiffness)
 m, c, k, d = 1.0, 0.5, 1.0, 1.4
@@ -70,7 +70,7 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
 # Run the simulation
-Sim.run(duration=20)
+Sim.run(duration=50)
 
 # Plot the results directly from the scope
 Sc.plot()
