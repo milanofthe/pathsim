@@ -95,24 +95,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-10-23 13:52:16,470 - INFO - LOGGING enabled
-    2024-10-23 13:52:16,471 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 13:52:16,473 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 13:52:16,474 - INFO - RESET
-    2024-10-23 13:52:16,475 - INFO - RUN duration=50.0
-    2024-10-23 13:52:16,477 - INFO - STARTING progress tracker
-    2024-10-23 13:52:16,478 - INFO - progress=0%
-    2024-10-23 13:52:16,523 - INFO - progress=10%
-    2024-10-23 13:52:16,568 - INFO - progress=20%
-    2024-10-23 13:52:16,597 - INFO - progress=30%
-    2024-10-23 13:52:16,626 - INFO - progress=40%
-    2024-10-23 13:52:16,653 - INFO - progress=50%
-    2024-10-23 13:52:16,683 - INFO - progress=60%
-    2024-10-23 13:52:16,711 - INFO - progress=70%
-    2024-10-23 13:52:16,742 - INFO - progress=80%
-    2024-10-23 13:52:16,771 - INFO - progress=90%
-    2024-10-23 13:52:16,799 - INFO - progress=100%
-    2024-10-23 13:52:16,800 - INFO - FINISHED steps(total)=1001(1001) runtime=322.47ms
+    2024-10-23 14:06:09,237 - INFO - LOGGING enabled
+    2024-10-23 14:06:09,238 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 14:06:09,238 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 14:06:09,239 - INFO - RESET
+    2024-10-23 14:06:09,240 - INFO - RUN duration=50.0
+    2024-10-23 14:06:09,241 - INFO - STARTING progress tracker
+    2024-10-23 14:06:09,242 - INFO - progress=0%
+    2024-10-23 14:06:09,270 - INFO - progress=10%
+    2024-10-23 14:06:09,295 - INFO - progress=20%
+    2024-10-23 14:06:09,324 - INFO - progress=30%
+    2024-10-23 14:06:09,350 - INFO - progress=40%
+    2024-10-23 14:06:09,377 - INFO - progress=50%
+    2024-10-23 14:06:09,405 - INFO - progress=60%
+    2024-10-23 14:06:09,433 - INFO - progress=70%
+    2024-10-23 14:06:09,465 - INFO - progress=80%
+    2024-10-23 14:06:09,503 - INFO - progress=90%
+    2024-10-23 14:06:09,538 - INFO - progress=100%
+    2024-10-23 14:06:09,540 - INFO - FINISHED steps(total)=1001(1001) runtime=299.13ms
     
 
 
@@ -177,24 +177,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-10-23 13:52:18,777 - INFO - LOGGING enabled
-    2024-10-23 13:52:18,778 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 13:52:18,778 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 13:52:18,779 - INFO - RESET
-    2024-10-23 13:52:18,780 - INFO - RUN duration=12
-    2024-10-23 13:52:18,782 - INFO - STARTING progress tracker
-    2024-10-23 13:52:18,783 - INFO - progress=0%
-    2024-10-23 13:52:18,870 - INFO - progress=10%
-    2024-10-23 13:52:18,945 - INFO - progress=20%
-    2024-10-23 13:52:19,018 - INFO - progress=30%
-    2024-10-23 13:52:19,092 - INFO - progress=40%
-    2024-10-23 13:52:19,167 - INFO - progress=50%
-    2024-10-23 13:52:19,240 - INFO - progress=60%
-    2024-10-23 13:52:19,314 - INFO - progress=70%
-    2024-10-23 13:52:19,386 - INFO - progress=80%
-    2024-10-23 13:52:19,461 - INFO - progress=90%
-    2024-10-23 13:52:19,532 - INFO - progress=100%
-    2024-10-23 13:52:19,533 - INFO - FINISHED steps(total)=1201(1201) runtime=750.56ms
+    2024-10-23 14:06:12,213 - INFO - LOGGING enabled
+    2024-10-23 14:06:12,215 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 14:06:12,215 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 14:06:12,216 - INFO - RESET
+    2024-10-23 14:06:12,217 - INFO - RUN duration=12
+    2024-10-23 14:06:12,218 - INFO - STARTING progress tracker
+    2024-10-23 14:06:12,220 - INFO - progress=0%
+    2024-10-23 14:06:12,303 - INFO - progress=10%
+    2024-10-23 14:06:12,377 - INFO - progress=20%
+    2024-10-23 14:06:12,452 - INFO - progress=30%
+    2024-10-23 14:06:12,527 - INFO - progress=40%
+    2024-10-23 14:06:12,602 - INFO - progress=50%
+    2024-10-23 14:06:12,676 - INFO - progress=60%
+    2024-10-23 14:06:12,752 - INFO - progress=70%
+    2024-10-23 14:06:12,827 - INFO - progress=80%
+    2024-10-23 14:06:12,902 - INFO - progress=90%
+    2024-10-23 14:06:12,976 - INFO - progress=100%
+    2024-10-23 14:06:12,977 - INFO - FINISHED steps(total)=1201(1201) runtime=757.99ms
     
 
 
