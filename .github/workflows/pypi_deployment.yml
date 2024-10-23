@@ -2,14 +2,18 @@ name: Publish PathSim to PyPI
 
 on:
   release:
-    types: [published]
+    types: [published] 
+  workflow_dispatch: 
+
+permissions:
+  contents: read
 
 permissions:
   contents: read
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest    # Changed to ubuntu-latest since container actions require Linux
+    runs-on: ubuntu-latest  
     steps:
     - uses: actions/checkout@v4
     
