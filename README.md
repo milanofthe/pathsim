@@ -3,7 +3,7 @@
 
 ## Overview
 
-PathSim is a minimalistic and flexible block-based time-domain system simulation framework in Python. It provides a modular and intuitive approach to modeling and simulating complex dynamical systems using a directed computational graph. It is similar to Matlab Simulink in spirit but works very differently under the hood.
+PathSim is a minimalistic and flexible block-based time-domain system simulation framework in Python with basic automatic differentiation capabilities. It provides a modular and intuitive approach to modeling and simulating complex interconnected dynamical systems. It is similar to Matlab Simulink in spirit but works very differently under the hood.
 
 Key features of PathSim include:
 
@@ -15,6 +15,7 @@ Key features of PathSim include:
 - Fixed-point iteration approach with path length estimation to efficiently resolve algebraic loops.
 - Wide range of numerical solvers, including implicit and explicit multi-stage, and adaptive Runge-Kutta methods such as `RKDP54` or `ESDIRK54`.
 - Modular and hierarchical modeling with (nested) subsystems.
+- Automatic differentiation for differentiable system simulations.
 - Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, and more.
 - Easy extensibility, allowing users to define custom blocks by subclassing the base `Block` class and implementing just a handful of methods.
 
@@ -26,28 +27,27 @@ Version `0.2.0` of pathsim is pip installable
 $ pip install pathsim
 ```
 
-## Getting Started
+## Example Simulation - Harmonic Oscillator
 
-To get started with PathSim, you need to import the necessary modules and classes. The main components of the package are:
+Here's an example that demonstrates how to create a basic simulation. The main components of the package are:
 
 - `Simulation`: The main class that handles the blocks, connections, and the simulation loop.
 - `Connection`: The class that defines the connections between blocks.
 - Various block classes from the `blocks` module, such as `Integrator`, `Amplifier`, `Adder`, `Scope`, etc.
 
-Here's an example that demonstrates how to create a basic simulation. 
 In this example, we create a simulation of the harmonic oscillator (a spring mass damper 2nd order system) initial value problem. The ODE that defines it is give by
 
 $$
 \ddot{x} + \frac{c}{m} \dot{x} + \frac{k}{m} x = 0
 $$
 
-where $c$ is the damping, $k$ the spring constant and $m$ the mass.
+where $c$ is the damping, $k$ the spring constant and $m$ the mass. And initial conditions $x_0$ and $v_0$ for position and velocity.
 
-It can be translated to a block diagram using integrators, amplifiers and adders in the following way:
+The ODE above can be translated to a block diagram using integrators, amplifiers and adders in the following way:
 
 ![png](README_files/harmonic_oscillator_blockdiagram.png)
 
-The topology of the block diagram above can be directly defined as blocks and connections in the PathSim framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
+The topology of the block diagram above can be directly defined as blocks and connections in the `PathSim` framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
 
 
 
@@ -121,8 +121,122 @@ time, data = Sc.read()
     
 
 
-## Examples
-There are many examples of dynamical system simulations in the `examples` directory. They cover almost all the blocks currently available in PathSim as well as different solvers.
+## Example Differentiable Simulation
+
+PathSim also includes a rudimentary automatic differentiation framework based on a dual number system with overloaded operators. This makes the system simulation fully differentiable with respect to a predefined set of parameters. For now it only works with the explicit integrators. To demonstrate this lets consider the following linear feedback system.
+
+![png](README_files/linear_feedback_blockdiagram.png)
+
+
+The source term is a scaled unit step function (scaled by $A$). The parameters we want to differentiate the time domain response by are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $A$.
+
+
+```python
+from pathsim import Simulation, Connection
+from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
+
+#AD module
+from pathsim.diff import Parameter
+
+#parameters
+A  = Parameter(1)
+a  = Parameter(-1)
+x0 = Parameter(2)
+
+#simulation timestep
+dt = 0.01
+
+#step function
+tau = 3
+def s(t):
+    return A*int(t>tau)
+
+#blocks that define the system
+Src = Source(s)
+Int = Integrator(x0)
+Amp = Amplifier(a)
+Add = Adder()
+Sco = Scope(labels=["step", "response"])
+
+blocks = [Src, Int, Amp, Add, Sco]
+
+#the connections between the blocks
+connections = [
+    Connection(Src, Add[0], Sco[0]),
+    Connection(Amp, Add[1]),
+    Connection(Add, Int),
+    Connection(Int, Amp, Sco[1])
+    ]
+
+#initialize simulation with the blocks, connections, timestep and logging enabled
+Sim = Simulation(blocks, connections, dt=dt, log=True)
+    
+#run the simulation for some time
+Sim.run(4*tau)
+
+Sco.plot()
+```
+
+    2024-10-23 13:48:58,216 - INFO - LOGGING enabled
+    2024-10-23 13:48:58,217 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 13:48:58,217 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 13:48:58,218 - INFO - RESET
+    2024-10-23 13:48:58,219 - INFO - RUN duration=12
+    2024-10-23 13:48:58,220 - INFO - STARTING progress tracker
+    2024-10-23 13:48:58,221 - INFO - progress=0%
+    2024-10-23 13:48:58,300 - INFO - progress=10%
+    2024-10-23 13:48:58,377 - INFO - progress=20%
+    2024-10-23 13:48:58,451 - INFO - progress=30%
+    2024-10-23 13:48:58,525 - INFO - progress=40%
+    2024-10-23 13:48:58,599 - INFO - progress=50%
+    2024-10-23 13:48:58,671 - INFO - progress=60%
+    2024-10-23 13:48:58,745 - INFO - progress=70%
+    2024-10-23 13:48:58,821 - INFO - progress=80%
+    2024-10-23 13:48:58,896 - INFO - progress=90%
+    2024-10-23 13:48:58,969 - INFO - progress=100%
+    2024-10-23 13:48:58,971 - INFO - FINISHED steps(total)=1201(1201) runtime=750.59ms
+    
+
+
+    
+![png](README_files/README_6_1.png)
+    
+
+
+Now the recorded data is of type `Parameter` and we can evaluate the automatically computed partial derivatives at each timestep. For example 
+$\partial x(t) / \partial a$ the response with respect to the linear feedback parameter.
+
+
+```python
+import matplotlib.pyplot as plt
+
+#read data from the scope
+time, [step, data] = Sco.read()
+
+#evaluate partial derivatives
+dxda = list(map(lambda x: x.d(a), data))    # w.r.t. feedback
+dxdx0 = list(map(lambda x: x.d(x0), data))  # w.r.t. initial condition
+dxdA = list(map(lambda x: x.d(A), data))    # w.r.t. source amplitude
+
+fig, ax = plt.subplots(nrows=1, tight_layout=True, figsize=(8, 4), dpi=120)
+
+ax.plot(time, dxda, label="$dx/da$")
+ax.plot(time, dxdx0, label="$dx/dx_0$")
+ax.plot(time, dxdA, label="$dx/dA$")
+
+ax.set_xlabel("time [s]")
+ax.grid(True)
+ax.legend(fancybox=False);
+```
+
+
+    
+![png](README_files/README_8_0.png)
+    
+
+
+## More Examples
+There are many examples of dynamical system simulations in the `examples` directory. They cover almost all the blocks currently available in `PathSim` as well as different numerical integrators / solvers to experiment with.
 
 
 ```python
