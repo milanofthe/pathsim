@@ -72,7 +72,6 @@ ax.plot(time, [x.d(a) if isinstance(x, Value) else None for x in res], label="$d
 ax.plot(time, [x.d(b) if isinstance(x, Value) else None for x in res], label="dx/db")
 ax.plot(time, [x.d(z) if isinstance(x, Value) else None for x in res], label=r"$dx/dx_0$")
 
-
 ax.set_xlabel("time [s]")
 
 ax.grid(True)

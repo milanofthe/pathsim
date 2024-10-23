@@ -27,7 +27,7 @@ Version `0.2.0` of pathsim is pip installable
 $ pip install pathsim
 ```
 
-## Example Simulation - Harmonic Oscillator
+## Example - Harmonic Oscillator
 
 Here's an example that demonstrates how to create a basic simulation. The main components of the package are:
 
@@ -95,24 +95,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-09-06 19:24:12,431 - INFO - LOGGING enabled
-    2024-09-06 19:24:12,432 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-09-06 19:24:12,432 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-09-06 19:24:12,433 - INFO - RESET
-    2024-09-06 19:24:12,433 - INFO - RUN duration=50.0
-    2024-09-06 19:24:12,433 - INFO - STARTING progress tracker
-    2024-09-06 19:24:12,434 - INFO - progress=0%
-    2024-09-06 19:24:12,450 - INFO - progress=10%
-    2024-09-06 19:24:12,467 - INFO - progress=20%
-    2024-09-06 19:24:12,484 - INFO - progress=30%
-    2024-09-06 19:24:12,502 - INFO - progress=40%
-    2024-09-06 19:24:12,519 - INFO - progress=50%
-    2024-09-06 19:24:12,536 - INFO - progress=60%
-    2024-09-06 19:24:12,554 - INFO - progress=70%
-    2024-09-06 19:24:12,571 - INFO - progress=80%
-    2024-09-06 19:24:12,589 - INFO - progress=90%
-    2024-09-06 19:24:12,608 - INFO - progress=100%
-    2024-09-06 19:24:12,608 - INFO - FINISHED steps(total)=1001(1001) runtime=175.26ms
+    2024-10-23 13:52:16,470 - INFO - LOGGING enabled
+    2024-10-23 13:52:16,471 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 13:52:16,473 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 13:52:16,474 - INFO - RESET
+    2024-10-23 13:52:16,475 - INFO - RUN duration=50.0
+    2024-10-23 13:52:16,477 - INFO - STARTING progress tracker
+    2024-10-23 13:52:16,478 - INFO - progress=0%
+    2024-10-23 13:52:16,523 - INFO - progress=10%
+    2024-10-23 13:52:16,568 - INFO - progress=20%
+    2024-10-23 13:52:16,597 - INFO - progress=30%
+    2024-10-23 13:52:16,626 - INFO - progress=40%
+    2024-10-23 13:52:16,653 - INFO - progress=50%
+    2024-10-23 13:52:16,683 - INFO - progress=60%
+    2024-10-23 13:52:16,711 - INFO - progress=70%
+    2024-10-23 13:52:16,742 - INFO - progress=80%
+    2024-10-23 13:52:16,771 - INFO - progress=90%
+    2024-10-23 13:52:16,799 - INFO - progress=100%
+    2024-10-23 13:52:16,800 - INFO - FINISHED steps(total)=1001(1001) runtime=322.47ms
     
 
 
@@ -121,7 +121,7 @@ time, data = Sc.read()
     
 
 
-## Example Differentiable Simulation
+## Example - Differentiable Simulation
 
 PathSim also includes a rudimentary automatic differentiation framework based on a dual number system with overloaded operators. This makes the system simulation fully differentiable with respect to a predefined set of parameters. For now it only works with the explicit integrators. To demonstrate this lets consider the following linear feedback system.
 
@@ -177,24 +177,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-10-23 13:48:58,216 - INFO - LOGGING enabled
-    2024-10-23 13:48:58,217 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 13:48:58,217 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 13:48:58,218 - INFO - RESET
-    2024-10-23 13:48:58,219 - INFO - RUN duration=12
-    2024-10-23 13:48:58,220 - INFO - STARTING progress tracker
-    2024-10-23 13:48:58,221 - INFO - progress=0%
-    2024-10-23 13:48:58,300 - INFO - progress=10%
-    2024-10-23 13:48:58,377 - INFO - progress=20%
-    2024-10-23 13:48:58,451 - INFO - progress=30%
-    2024-10-23 13:48:58,525 - INFO - progress=40%
-    2024-10-23 13:48:58,599 - INFO - progress=50%
-    2024-10-23 13:48:58,671 - INFO - progress=60%
-    2024-10-23 13:48:58,745 - INFO - progress=70%
-    2024-10-23 13:48:58,821 - INFO - progress=80%
-    2024-10-23 13:48:58,896 - INFO - progress=90%
-    2024-10-23 13:48:58,969 - INFO - progress=100%
-    2024-10-23 13:48:58,971 - INFO - FINISHED steps(total)=1201(1201) runtime=750.59ms
+    2024-10-23 13:52:18,777 - INFO - LOGGING enabled
+    2024-10-23 13:52:18,778 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 13:52:18,778 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 13:52:18,779 - INFO - RESET
+    2024-10-23 13:52:18,780 - INFO - RUN duration=12
+    2024-10-23 13:52:18,782 - INFO - STARTING progress tracker
+    2024-10-23 13:52:18,783 - INFO - progress=0%
+    2024-10-23 13:52:18,870 - INFO - progress=10%
+    2024-10-23 13:52:18,945 - INFO - progress=20%
+    2024-10-23 13:52:19,018 - INFO - progress=30%
+    2024-10-23 13:52:19,092 - INFO - progress=40%
+    2024-10-23 13:52:19,167 - INFO - progress=50%
+    2024-10-23 13:52:19,240 - INFO - progress=60%
+    2024-10-23 13:52:19,314 - INFO - progress=70%
+    2024-10-23 13:52:19,386 - INFO - progress=80%
+    2024-10-23 13:52:19,461 - INFO - progress=90%
+    2024-10-23 13:52:19,532 - INFO - progress=100%
+    2024-10-23 13:52:19,533 - INFO - FINISHED steps(total)=1201(1201) runtime=750.56ms
     
 
 
