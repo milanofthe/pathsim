@@ -21,7 +21,7 @@ Key features of PathSim include:
 
 ## Installation
 
-Version `0.2.0` of pathsim is pip installable
+The latest release version of pathsim is installable via pip:
 
 ```console
 $ pip install pathsim
@@ -95,24 +95,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-10-23 14:06:09,237 - INFO - LOGGING enabled
-    2024-10-23 14:06:09,238 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 14:06:09,238 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 14:06:09,239 - INFO - RESET
-    2024-10-23 14:06:09,240 - INFO - RUN duration=50.0
-    2024-10-23 14:06:09,241 - INFO - STARTING progress tracker
-    2024-10-23 14:06:09,242 - INFO - progress=0%
-    2024-10-23 14:06:09,270 - INFO - progress=10%
-    2024-10-23 14:06:09,295 - INFO - progress=20%
-    2024-10-23 14:06:09,324 - INFO - progress=30%
-    2024-10-23 14:06:09,350 - INFO - progress=40%
-    2024-10-23 14:06:09,377 - INFO - progress=50%
-    2024-10-23 14:06:09,405 - INFO - progress=60%
-    2024-10-23 14:06:09,433 - INFO - progress=70%
-    2024-10-23 14:06:09,465 - INFO - progress=80%
-    2024-10-23 14:06:09,503 - INFO - progress=90%
-    2024-10-23 14:06:09,538 - INFO - progress=100%
-    2024-10-23 14:06:09,540 - INFO - FINISHED steps(total)=1001(1001) runtime=299.13ms
+    2024-10-23 15:38:58,943 - INFO - LOGGING enabled
+    2024-10-23 15:38:58,943 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 15:38:58,944 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 15:38:58,944 - INFO - RESET
+    2024-10-23 15:38:58,944 - INFO - RUN duration=50.0
+    2024-10-23 15:38:58,945 - INFO - STARTING progress tracker
+    2024-10-23 15:38:58,945 - INFO - progress=0%
+    2024-10-23 15:38:58,963 - INFO - progress=10%
+    2024-10-23 15:38:58,982 - INFO - progress=20%
+    2024-10-23 15:38:59,000 - INFO - progress=30%
+    2024-10-23 15:38:59,019 - INFO - progress=40%
+    2024-10-23 15:38:59,037 - INFO - progress=50%
+    2024-10-23 15:38:59,055 - INFO - progress=60%
+    2024-10-23 15:38:59,073 - INFO - progress=70%
+    2024-10-23 15:38:59,092 - INFO - progress=80%
+    2024-10-23 15:38:59,110 - INFO - progress=90%
+    2024-10-23 15:38:59,129 - INFO - progress=100%
+    2024-10-23 15:38:59,129 - INFO - FINISHED steps(total)=1001(1001) runtime=184.78ms
     
 
 
@@ -177,24 +177,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-10-23 14:06:12,213 - INFO - LOGGING enabled
-    2024-10-23 14:06:12,215 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 14:06:12,215 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 14:06:12,216 - INFO - RESET
-    2024-10-23 14:06:12,217 - INFO - RUN duration=12
-    2024-10-23 14:06:12,218 - INFO - STARTING progress tracker
-    2024-10-23 14:06:12,220 - INFO - progress=0%
-    2024-10-23 14:06:12,303 - INFO - progress=10%
-    2024-10-23 14:06:12,377 - INFO - progress=20%
-    2024-10-23 14:06:12,452 - INFO - progress=30%
-    2024-10-23 14:06:12,527 - INFO - progress=40%
-    2024-10-23 14:06:12,602 - INFO - progress=50%
-    2024-10-23 14:06:12,676 - INFO - progress=60%
-    2024-10-23 14:06:12,752 - INFO - progress=70%
-    2024-10-23 14:06:12,827 - INFO - progress=80%
-    2024-10-23 14:06:12,902 - INFO - progress=90%
-    2024-10-23 14:06:12,976 - INFO - progress=100%
-    2024-10-23 14:06:12,977 - INFO - FINISHED steps(total)=1201(1201) runtime=757.99ms
+    2024-10-23 15:39:02,206 - INFO - LOGGING enabled
+    2024-10-23 15:39:02,207 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 15:39:02,207 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 15:39:02,208 - INFO - RESET
+    2024-10-23 15:39:02,209 - INFO - RUN duration=12
+    2024-10-23 15:39:02,209 - INFO - STARTING progress tracker
+    2024-10-23 15:39:02,210 - INFO - progress=0%
+    2024-10-23 15:39:02,263 - INFO - progress=10%
+    2024-10-23 15:39:02,316 - INFO - progress=20%
+    2024-10-23 15:39:02,368 - INFO - progress=30%
+    2024-10-23 15:39:02,420 - INFO - progress=40%
+    2024-10-23 15:39:02,471 - INFO - progress=50%
+    2024-10-23 15:39:02,523 - INFO - progress=60%
+    2024-10-23 15:39:02,575 - INFO - progress=70%
+    2024-10-23 15:39:02,627 - INFO - progress=80%
+    2024-10-23 15:39:02,678 - INFO - progress=90%
+    2024-10-23 15:39:02,730 - INFO - progress=100%
+    2024-10-23 15:39:02,731 - INFO - FINISHED steps(total)=1201(1201) runtime=520.65ms
     
 
 
