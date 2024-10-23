@@ -8,9 +8,6 @@ on:
 permissions:
   contents: read
 
-permissions:
-  contents: read
-
 jobs:
   deploy:
     runs-on: ubuntu-latest  
