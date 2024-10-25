@@ -68,9 +68,9 @@ time, [_, res] = Sco.read()
 
 fig, ax = plt.subplots(nrows=1, tight_layout=True, dpi=120)
 
-ax.plot(time, [x.d(a) if isinstance(x, Value) else None for x in res], label="$dx/da$")
-ax.plot(time, [x.d(b) if isinstance(x, Value) else None for x in res], label="dx/db")
-ax.plot(time, [x.d(z) if isinstance(x, Value) else None for x in res], label=r"$dx/dx_0$")
+ax.plot(time, list(map(lambda x:x.d(a), res)), label="$dx/da$")
+ax.plot(time, list(map(lambda x:x.d(b), res)), label="$dx/db$")
+ax.plot(time, list(map(lambda x:x.d(z), res)), label="$dx/dx_0$")
 
 ax.set_xlabel("time [s]")
 
