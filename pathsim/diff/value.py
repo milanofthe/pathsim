@@ -19,41 +19,41 @@ FUNC_GRAD = {
     # Trigonometric functions
     np.sin     : lambda x: np.cos(x),
     np.cos     : lambda x: -np.sin(x),
-    np.tan     : lambda x: 1 / np.cos(x)**2,
-    np.arcsin  : lambda x: 1 / np.sqrt(1 - x**2),
-    np.arccos  : lambda x: -1 / np.sqrt(1 - x**2),
-    np.arctan  : lambda x: 1 / (1 + x**2),
+    np.tan     : lambda x: 1/np.cos(x)**2,
+    np.arcsin  : lambda x: 1/np.sqrt(1 - x**2),
+    np.arccos  : lambda x: -1/np.sqrt(1 - x**2),
+    np.arctan  : lambda x: 1/(1 + x**2),
     np.sinh    : lambda x: np.cosh(x),
     np.cosh    : lambda x: np.sinh(x),
     np.tanh    : lambda x: 1 - np.tanh(x)**2,
-    np.arcsinh : lambda x: 1 / np.sqrt(x**2 + 1),
-    np.arccosh : lambda x: 1 / (np.sqrt(x - 1) * np.sqrt(x + 1)),
-    np.arctanh : lambda x: 1 / (1 - x**2),
+    np.arcsinh : lambda x: 1/np.sqrt(x**2 + 1),
+    np.arccosh : lambda x: 1/(np.sqrt(x - 1)*np.sqrt(x + 1)),
+    np.arctanh : lambda x: 1/(1 - x**2),
 
     # Exponential and logarithmic functions
     np.exp     : lambda x: np.exp(x),
-    np.exp2    : lambda x: np.exp2(x) * np.log(2),
+    np.exp2    : lambda x: np.exp2(x)*np.log(2),
     np.log     : lambda x: 1/x,
-    np.log2    : lambda x: 1 / (x * np.log(2)),
-    np.log10   : lambda x: 1 / (x * np.log(10)),
-    np.log1p   : lambda x: 1 / (1 + x),
+    np.log2    : lambda x: 1/(x*np.log(2)),
+    np.log10   : lambda x: 1/(x*np.log(10)),
+    np.log1p   : lambda x: 1/(1 + x),
     np.expm1   : lambda x: np.exp(x),
 
     # Power functions
-    np.sqrt    : lambda x: 0.5 / np.sqrt(x),
+    np.sqrt    : lambda x: 0.5/np.sqrt(x),
     np.square  : lambda x: 2*x,
-    np.power   : lambda x, p: p * np.power(x, p-1),
-    np.cbrt    : lambda x: 1 / (3 * np.cbrt(x)**2),
+    np.power   : lambda x, p: p*np.power(x, p-1),
+    np.cbrt    : lambda x: 1/(3*np.cbrt(x)**2),
 
     # Complex functions
     np.real    : lambda x: np.real(x),
     np.imag    : lambda x: np.imag(x),
     np.conj    : lambda x: np.conj(x),
-    np.abs     : lambda x: x / np.abs(x),  
-    np.angle   : lambda x: -1j / x,
+    np.abs     : lambda x: x/np.abs(x),  
+    np.angle   : lambda x: -1j/x,
 
     # Statistical functions
-    np.sign    : lambda x: 0,
+    np.sign    : lambda x: 0.0,
 }
 
 
@@ -92,14 +92,11 @@ class Value:
     the partial derivatives with respect to the instance itself and other instances 
     of the value class. 
 
-    This is realized by a dictionary that handles the reference tracking via the unique 
-    identifiers of the 'Value' instances.
-
-    Includes a slim interface to numpy functions using '__array_ufunc__' and fallback 
-    using numerical gradients (central differences).
+    This is realized by a dictionary that handles the reference tracking via the id 
+    of the 'Value' instances.
     
     INPUTS : 
-        val : (float, int, complex) The numerical value.
+        val  : (float, int, complex) The numerical value.
         grad : (dict, optional) The gradient dictionary. If None, initializes with self derivative.
     """
 
@@ -210,28 +207,6 @@ class Value:
 
     # arithmetic operators ----------------------------------------------------------------------
 
-    def __truediv__(self, other):
-        if isinstance(other, Value):
-            new_grad = {k: (self.grad.get(k, 0) * other.val - self.val * other.grad.get(k, 0)) 
-                           / (other.val ** 2) 
-                        if other.val != 0.0 else 0.0 for k in set(self.grad) | set(other.grad)}
-            return Value(val=self.val / other.val, grad=new_grad)
-        if isinstance(other, np.ndarray):
-            return np.array([self / x for x in other])
-        else:
-            return Value(val=self.val / other, 
-                         grad={k: v / other for k, v in self.grad.items()})
-
-
-    def __rtruediv__(self, other):
-        if isinstance(other, Value):
-            return other / self
-        else:
-            return Value(val=other / self.val, 
-                         grad={k: -other * v / (self.val ** 2) if self.val != 0.0 else 0.0
-                               for k, v in self.grad.items()})
-
-
     def __add__(self, other):
         if isinstance(other, Value):
             new_grad = {k: self.grad.get(k, 0) + other.grad.get(k, 0) 
@@ -267,6 +242,10 @@ class Value:
         return self * other
 
 
+    def __imul__(self, other):
+        return self * other        
+
+
     def __sub__(self, other):
         if isinstance(other, Value):
             new_grad = {k: self.grad.get(k, 0) - other.grad.get(k, 0) 
@@ -284,6 +263,28 @@ class Value:
 
     def __isub__(self, other):
         return self - other
+
+
+    def __truediv__(self, other):
+        if isinstance(other, Value):
+            new_grad = {k: (self.grad.get(k, 0) * other.val - self.val * other.grad.get(k, 0)) 
+                           / (other.val ** 2) 
+                        if other.val != 0.0 else 0.0 for k in set(self.grad) | set(other.grad)}
+            return Value(val=self.val / other.val, grad=new_grad)
+        if isinstance(other, np.ndarray):
+            return np.array([self / x for x in other])
+        else:
+            return Value(val=self.val / other, 
+                         grad={k: v / other for k, v in self.grad.items()})
+
+
+    def __rtruediv__(self, other):
+        if isinstance(other, Value):
+            return other / self
+        else:
+            return Value(val=other / self.val, 
+                         grad={k: -other * v / (self.val ** 2) if self.val != 0.0 else 0.0
+                               for k, v in self.grad.items()})
 
 
     def __pow__(self, power):
@@ -326,7 +327,7 @@ if __name__ == "__main__":
 
     x, y = Value(0.6), Value(3)
 
-    z = np.arctan(y*x) / np.exp(1/x)
+    z = np.arctan(y*x) + np.exp(1/x)
     print(z.d(x), z.d(y)) 
 
     A = np.array([x, Value(3), Value(0.5)])
@@ -343,4 +344,10 @@ if __name__ == "__main__":
     B = y * A**2
     print(B)
 
-    # print(B[0].d(x))
+    b = np.linalg.norm(B)
+    print(b.d(x), b.d(y))
+
+    d = np.sign(np.sin(2*np.pi*x))
+
+    print(np.sign(d))
+

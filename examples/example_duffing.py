@@ -29,16 +29,17 @@ from pathsim.solvers import (
 # DUFFING OSCILLATOR ====================================================================
 
 #simulation timestep
-dt = 0.1
+dt = 0.05
 
 #initial position and velocity
 x0, v0 = 0.0, 0.0
 
 #driving angular frequency and amplitude
-a, omega = 100.0, 2.0
+a, omega = 10.0, 2.0
 
 #parameters (mass, damping, linear stiffness, nonlienar stiffness)
 m, c, k, d = 1.0, 0.5, 1.0, 1.4
+
 
 #blocks that define the system
 I1 = Integrator(v0)                      # integrator for velocity

@@ -31,14 +31,14 @@ dt = 0.1
 phi0, omega0 = 0.99*np.pi, 0
 
 #parameters (gravity, length)
-g, l = 9.81, 1 
+g, l = 9.81, 1
 
 #blocks that define the system
 In1 = Integrator(omega0) 
 In2 = Integrator(phi0) 
 Amp = Amplifier(-g/l) 
 Fnc = Function(np.sin) 
-Sco = Scope(labels=["angle", "angular velocity"])
+Sco = Scope(labels=["angular velocity", "angle"])
 
 blocks = [In1, In2, Amp, Fnc, Sco]
 
@@ -51,10 +51,10 @@ connections = [
     ]
 
 # Create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
+Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54, tolerance_lte_rel=1e-6)
 
 # Run the simulation for 25 seconds
-Sim.run(duration=20)
+Sim.run(duration=25)
 
 # Plot the results directly from the scope
 Sco.plot()

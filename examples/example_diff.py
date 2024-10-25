@@ -66,7 +66,7 @@ Sco.plot()
 
 time, [_, res] = Sco.read()
 
-fig, ax = plt.subplots(nrows=1, tight_layout=True, dpi=120)
+fig, ax = plt.subplots(nrows=1, figsize=(8, 4), tight_layout=True, dpi=120)
 
 ax.plot(time, list(map(lambda x:x.d(a), res)), label="$dx/da$")
 ax.plot(time, list(map(lambda x:x.d(b), res)), label="$dx/db$")
