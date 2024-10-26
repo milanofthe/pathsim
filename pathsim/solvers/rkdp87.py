@@ -117,7 +117,7 @@ class RKDP87(ExplicitSolver):
         self.x = dt * sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage])) + self.x_0
         
         #error and step size control
-        if self.stage < 8:
+        if self.stage < 12:
             self.stage += 1
             return True, 0.0, 0.0, 1.0
         else: 

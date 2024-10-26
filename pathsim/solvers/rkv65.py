@@ -60,8 +60,10 @@ class RKV65(ExplicitSolver):
                    7:[           11/144,      0,              0,          256/693,                0,   125/504, 125/528,        5/72], 
                    8:[           28/477,      0,              0,          212/441,   -312500/366177, 2125/1764,       0, -2105/35532, 2995/17766]}
 
-        #coefficients for truncation error
-        self.TR = [a-b for a, b in zip(self.BT[7], self.BT[8])]
+        #compute coefficients for truncation error
+        _A1 = [11/144, 0, 0, 256/693,              0,   125/504, 125/528,        5/72, 0]
+        _A2 = [28/477, 0, 0, 212/441, -312500/366177, 2125/1764,       0, -2105/35532, 2995/17766]        
+        self.TR = [a-b for a, b in zip(_A1, _A2)]
 
 
     def error_controller(self, dt):

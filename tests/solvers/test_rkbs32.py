@@ -14,35 +14,7 @@ import numpy as np
 
 from pathsim.solvers.rkbs32 import RKBS32
 
-
-# TEST PROBLEMS ========================================================================
-
-class Problem:
-    def __init__(self, name, func, jac, x0, solution):
-        self.name = name
-        self.func = func
-        self.jac = jac
-        self.x0 = x0
-        self.solution = solution
-
-
-#create some reference problems for testing
-reference_problems = [
-    Problem(name="linear_feedback", 
-            func=lambda x, u, t: -x, 
-            jac=lambda x, u, t: -1, 
-            x0=1.0, 
-            solution=lambda t: np.exp(-t)
-            ),
-    Problem(name="logistic", 
-            func=lambda x, u, t: x*(1-x), 
-            jac=lambda x, u, t: 1-2*x, 
-            x0=0.5, 
-            solution=lambda t: 1/(1 + np.exp(-t))
-            )
-]
-
-
+from ._referenceproblems import problems
 
 
 # TESTS ================================================================================
@@ -70,12 +42,14 @@ class TestRKBS32(unittest.TestCase):
         solver = RKBS32(initial_value=1, 
                         func=lambda x, u, t: -x, 
                         jac=lambda x, u, t: -1, 
-                        tolerance_lte=1e-6)
+                        tolerance_lte_rel=1e-3, 
+                        tolerance_lte_abs=1e-6)
 
         self.assertEqual(solver.func(2, 0, 0), -2)
         self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
-        self.assertEqual(solver.tolerance_lte, 1e-6)
+        self.assertEqual(solver.tolerance_lte_rel, 1e-3)
+        self.assertEqual(solver.tolerance_lte_abs, 1e-6)
 
 
     def test_stages(self):
@@ -97,16 +71,17 @@ class TestRKBS32(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err, scale = solver.step(0.0, t, 1)
+            success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
 
             #test if expected return at intermediate stages
             if i < len(solver.eval_stages)-1:
                 self.assertTrue(success)
-                self.assertEqual(err, 0.0)
+                self.assertEqual(err_rel, 0.0)
+                self.assertEqual(err_abs, 0.0)
                 self.assertEqual(scale, 1.0)
 
         #test if expected return at final stage
-        self.assertNotEqual(err, 0.0)
+        self.assertNotEqual(err_abs, 0.0)
         self.assertNotEqual(scale, 1.0)
 
 
@@ -116,7 +91,7 @@ class TestRKBS32(unittest.TestCase):
 
         timesteps = np.logspace(-0.4, 0, 20)
 
-        for problem in reference_problems:
+        for problem in problems:
 
             solver = RKBS32(problem.x0, problem.func, problem.jac)
             
@@ -141,19 +116,12 @@ class TestRKBS32(unittest.TestCase):
 
         #test the error control for each reference problem
 
-        for problem in reference_problems:
+        for problem in problems:
 
-            solver = RKBS32(problem.x0, problem.func, problem.jac, tolerance_lte=1e-6)
+            solver = RKBS32(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-7, tolerance_lte_abs=1e-6)
 
             time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=0.1, adaptive=True)
             error = np.linalg.norm(numerical_solution - problem.solution(time))
 
             #test if error control was successful (same OOM for global error -> < 1e-5)
-            self.assertLess(error, solver.tolerance_lte*10)
-
-
-
-# RUN TESTS LOCALLY ====================================================================
-
-if __name__ == '__main__':
-    unittest.main(verbosity=2)
+            self.assertLess(error, solver.tolerance_lte_abs*10)

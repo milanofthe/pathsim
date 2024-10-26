@@ -70,6 +70,9 @@ class ESDIRK4(ImplicitSolver):
         #use the jacobian
         if self.jac is not None:
 
+            #most recent butcher coefficient
+            b = self.BT[self.stage][self.stage]
+
             #compute jacobian of fixed-point equation
             jac_g = dt * b * self.jac(self.x, u, t)
 

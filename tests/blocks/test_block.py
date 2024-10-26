@@ -128,7 +128,7 @@ class TestBlock(unittest.TestCase):
         B = Block()
 
         #test default implementation 
-        self.assertEqual(B.step(None, None), (True, 0.0, 1.0))
+        self.assertEqual(B.step(None, None), (True, 0.0, 0.0, 1.0))
 
 
 

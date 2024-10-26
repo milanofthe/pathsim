@@ -46,6 +46,10 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+test_reports/
+*.pyc
+__pycache__/
+.pytest_cache/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -59,6 +63,9 @@ coverage.xml
 env/
 venv/
 ENV/
+
+# Shell
+*.bat
 
 # IDEs
 .vscode/

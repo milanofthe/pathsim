@@ -60,16 +60,18 @@ class TestIntegrator(unittest.TestCase):
         #test that no solver is initialized
         self.assertEqual(I.engine, None)
 
-        I.set_solver(Solver, tolerance_lte=1e-6)
+        I.set_solver(Solver, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-3)
 
         #test that solver is now available
         self.assertTrue(isinstance(I.engine, Solver))
-        self.assertEqual(I.engine.tolerance_lte, 1e-6)
+        self.assertEqual(I.engine.tolerance_lte_rel, 1e-3)
+        self.assertEqual(I.engine.tolerance_lte_abs, 1e-6)
 
-        I.set_solver(Solver, tolerance_lte=1e-3)
+        I.set_solver(Solver, tolerance_lte_abs=1e-4, tolerance_lte_rel=1e-2)
 
         #test that solver tolerance is changed
-        self.assertEqual(I.engine.tolerance_lte, 1e-3)
+        self.assertEqual(I.engine.tolerance_lte_rel, 1e-2)
+        self.assertEqual(I.engine.tolerance_lte_abs, 1e-4)
 
 
     def test_update(self):
