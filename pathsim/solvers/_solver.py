@@ -57,7 +57,7 @@ class Solver:
         self.is_adaptive = False
 
         #order of the integration scheme
-        self.n = None
+        self.n = 1
 
         #current evaluation stage for multistage solvers
         self.stage = 0

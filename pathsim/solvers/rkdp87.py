@@ -29,8 +29,9 @@ class RKDP87(ExplicitRungeKutta):
         #number of stages in RK scheme
         self.s = 13
 
-        #order of scheme
+        #order of scheme and embedded method
         self.n = 8
+        self.m = 7
 
         #flag adaptive timestep solver
         self.is_adaptive = True

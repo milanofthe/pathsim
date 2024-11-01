@@ -29,8 +29,12 @@ class ExplicitRungeKutta(ExplicitSolver):
     def __init__(self, *solver_args, **solver_kwargs):
         super().__init__(*solver_args, **solver_kwargs)
 
+        #order of the integration scheme and embedded method (if available)
+        self.n = 0
+        self.m = 0
+
         #number of stages in RK scheme
-        self.s = None
+        self.s = 0
 
         #slope coefficients for stages
         self.Ks = {}
@@ -76,8 +80,8 @@ class ExplicitRungeKutta(ExplicitSolver):
         error_ratio = max(error_ratio_abs, error_ratio_rel)
         success = error_ratio >= 1.0
 
-        #compute timestep scale
-        timestep_rescale = 0.9 * (error_ratio)**(1/self.n)        
+        #compute timestep scale factor using accuracy order of truncation error
+        timestep_rescale = 0.9 * (error_ratio)**(1/(min(self.m, self.n) + 1))     
 
         return success, truncation_error_abs, truncation_error_rel, timestep_rescale
 
@@ -135,8 +139,12 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
     def __init__(self, *solver_args, **solver_kwargs):
         super().__init__(*solver_args, **solver_kwargs)
 
+        #order of the integration scheme and embedded method (if available)
+        self.n = 0
+        self.m = 0
+
         #number of stages in RK scheme
-        self.s = None
+        self.s = 0
 
         #slope coefficients for stages
         self.Ks = {}
@@ -184,8 +192,8 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         error_ratio = max(error_ratio_abs, error_ratio_rel)
         success = error_ratio >= 1.0
 
-        #compute timestep scale
-        timestep_rescale = 0.9 * (error_ratio)**(1/self.n)
+        #compute timestep scale factor using accuracy order of truncation error
+        timestep_rescale = 0.9 * (error_ratio)**(1/(min(self.m, self.n) + 1))
 
         return success, truncation_error_abs, truncation_error_rel, timestep_rescale
 

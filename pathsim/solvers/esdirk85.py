@@ -36,8 +36,9 @@ class ESDIRK85(DiagonallyImplicitRungeKutta):
         #number of stages in RK scheme
         self.s = 16
 
-        #order of scheme
-        self.n = 6 #8
+        #order of scheme and embedded method
+        self.n = 8
+        self.m = 5
 
         #flag adaptive timestep solver
         self.is_adaptive = True

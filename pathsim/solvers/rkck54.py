@@ -35,8 +35,9 @@ class RKCK54(ExplicitRungeKutta):
         #number of stages in RK scheme
         self.s = 6
 
-        #order of scheme
+        #order of scheme and embedded method
         self.n = 5
+        self.m = 4
 
         #flag adaptive timestep solver
         self.is_adaptive = True

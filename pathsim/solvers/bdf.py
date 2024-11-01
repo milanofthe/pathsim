@@ -10,7 +10,6 @@
 # IMPORTS ==============================================================================
 
 from ._solver import ImplicitSolver
-from ..utils.funcs import numerical_jacobian
 
 
 # SOLVERS ==============================================================================
@@ -21,17 +20,11 @@ class BDF2(ImplicitSolver):
     with order ramp up for the initial steps.
     """
 
-    def __init__(self, 
-                 initial_value=0, 
-                 func=lambda x, u, t: u, 
-                 jac=None, 
-                 tolerance_lte_abs=1e-6, 
-                 tolerance_lte_rel=1e-3):
-        super().__init__(initial_value, 
-                         func, 
-                         jac, 
-                         tolerance_lte_abs, 
-                         tolerance_lte_rel)
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
+
+        #integration order (local)
+        self.n = 2
 
         #bdf coefficients
         self.K = {1:[1.0], 2:[-1/3, 4/3]}
@@ -103,17 +96,11 @@ class BDF3(ImplicitSolver):
     with order ramp up for the initial steps.
     """
 
-    def __init__(self, 
-                 initial_value=0, 
-                 func=lambda x, u, t: u, 
-                 jac=None, 
-                 tolerance_lte_abs=1e-6, 
-                 tolerance_lte_rel=1e-3):
-        super().__init__(initial_value, 
-                         func, 
-                         jac, 
-                         tolerance_lte_abs, 
-                         tolerance_lte_rel)
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
+
+        #integration order (local)
+        self.n = 3
 
         #bdf coefficients
         self.K = {1:[1.0], 
@@ -165,7 +152,6 @@ class BDF3(ImplicitSolver):
         return err
 
 
-
     def step(self, u, t, dt):
         """
         Performs the timestep by buffereing the previous state.
@@ -188,17 +174,11 @@ class BDF4(ImplicitSolver):
     with order ramp up for the initial steps.
     """
 
-    def __init__(self, 
-                 initial_value=0, 
-                 func=lambda x, u, t: u, 
-                 jac=None, 
-                 tolerance_lte_abs=1e-6, 
-                 tolerance_lte_rel=1e-3):
-        super().__init__(initial_value, 
-                         func, 
-                         jac, 
-                         tolerance_lte_abs, 
-                         tolerance_lte_rel)
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
+
+        #integration order (local)
+        self.n = 4
 
         #bdf coefficients
         self.K = {1:[1.0], 

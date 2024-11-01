@@ -31,8 +31,9 @@ class RKF78(ExplicitRungeKutta):
         #number of stages in RK scheme
         self.s = 13
 
-        #order of scheme
-        self.n = 8
+        #order of scheme and embedded method
+        self.n = 7
+        self.m = 8
 
         #flag adaptive timestep solver
         self.is_adaptive = True

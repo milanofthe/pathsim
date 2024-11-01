@@ -30,8 +30,9 @@ class RKBS32(ExplicitRungeKutta):
         #number of stages in RK scheme
         self.s = 4
 
-        #order of scheme
+        #order of scheme and embedded method
         self.n = 3
+        self.m = 2
 
         #flag adaptive timestep solver
         self.is_adaptive = True
