@@ -36,6 +36,9 @@ class ExplicitRungeKutta(ExplicitSolver):
         #number of stages in RK scheme
         self.s = 0
 
+        #safety factor for error controller (if available)
+        self.beta = 0.9
+
         #slope coefficients for stages
         self.Ks = {}
 
@@ -61,8 +64,11 @@ class ExplicitRungeKutta(ExplicitSolver):
         if self.TR is None or len(self.Ks) < len(self.TR): 
             return True, 0.0, 0.0, 1.0
 
-        #compute local truncation error
-        tr = dt * sum(k*b for k, b in zip(self.Ks.values(), self.TR))
+        #compute local truncation error slope (this is faster then 'sum' comprehension)
+        slope = 0.0
+        for i, b in enumerate(self.TR):
+            slope = slope + self.Ks[i] * b
+        tr = dt * slope
 
         #compute and clip truncation error, error ratio abs
         truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
@@ -81,7 +87,7 @@ class ExplicitRungeKutta(ExplicitSolver):
         success = error_ratio >= 1.0
 
         #compute timestep scale factor using accuracy order of truncation error
-        timestep_rescale = 0.9 * (error_ratio)**(1/(min(self.m, self.n) + 1))     
+        timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))     
 
         return success, truncation_error_abs, truncation_error_rel, timestep_rescale
 
@@ -99,9 +105,12 @@ class ExplicitRungeKutta(ExplicitSolver):
 
         #buffer intermediate slope
         self.Ks[self.stage] = self.func(self.x, u, t)
-        
-        #compute slope and update state at stage
-        self.x = dt * sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage])) + self.x_0
+
+        #compute slope and update state at stage (this is faster then 'sum' comprehension)
+        slope = 0.0
+        for i, b in enumerate(self.BT[self.stage]):
+            slope = slope + self.Ks[i] * b
+        self.x = self.x_0 + dt * slope
 
         #error and step size control
         if self.stage < self.s - 1:
@@ -125,7 +134,8 @@ class ExplicitRungeKutta(ExplicitSolver):
 class DiagonallyImplicitRungeKutta(ImplicitSolver):
     """
     Base class for diagonally implicit Runge-Kutta (DIRK) integrators 
-    which implements the timestepping at intermediate stages and the 
+    which implements the timestepping at intermediate stages, involving
+    the numerical solution of the implicit update equation and the 
     error control if the coefficients for the local truncation error 
     estimate are defined.
 
@@ -145,6 +155,9 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
 
         #number of stages in RK scheme
         self.s = 0
+
+        #safety factor for error controller (if available)
+        self.beta = 0.9
 
         #slope coefficients for stages
         self.Ks = {}
@@ -170,11 +183,15 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             dt : (float) integration timestep
         """
 
+        #early exit of not enough slopes or no error estimate at all
         if self.TR is None or len(self.Ks) < len(self.TR): 
             return True, 0.0, 0.0, 1.0
 
-        #compute local truncation error
-        tr = dt * sum(k*b for k, b in zip(self.Ks.values(), self.TR))
+        #compute local truncation error slope (this is faster then 'sum' comprehension)
+        slope = 0.0
+        for i, b in enumerate(self.TR):
+            slope = slope + self.Ks[i] * b
+        tr = dt * slope
 
         #compute and clip truncation error, error ratio abs
         truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
@@ -193,7 +210,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         success = error_ratio >= 1.0
 
         #compute timestep scale factor using accuracy order of truncation error
-        timestep_rescale = 0.9 * (error_ratio)**(1/(min(self.m, self.n) + 1))
+        timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))   
 
         return success, truncation_error_abs, truncation_error_rel, timestep_rescale
 
@@ -215,8 +232,10 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         #update timestep weighted slope 
         self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #compute slope and update fixed-point equation
-        slope = sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage]))
+        #compute slope (this is faster then 'sum' comprehension)
+        slope = 0.0
+        for i, a in enumerate(self.BT[self.stage]):
+            slope = slope + self.Ks[i] * a
 
         #use the jacobian
         if self.jac is not None:
@@ -269,7 +288,12 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
 
             #compute final output if not stiffly accurate
             if self.A is not None:
-                self.x = dt * sum(k*a for k, a in zip(self.Ks.values(), self.A)) + self.x_0
+
+                #compute slope (this is faster then 'sum' comprehension)
+                slope = 0.0
+                for i, a in enumerate(self.A):
+                    slope = slope + self.Ks[i] * a
+                self.x = self.x_0 + dt * slope
             
             #reset stage counter
             self.stage = 0
