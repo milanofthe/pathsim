@@ -13,6 +13,8 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Scope, TransferFunction
 from pathsim.solvers import RKCK54
 
+#optimization module
+from pathsim.diff import Parameter, Value
 
 # STEP RESPONSE OF A TRANSFER FUNCTION ==================================================
 

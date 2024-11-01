@@ -46,8 +46,6 @@ FUNC_GRAD = {
     np.cbrt    : lambda x: 1/(3*np.cbrt(x)**2),
 
     # Complex functions
-    np.real    : lambda x: np.real(x),
-    np.imag    : lambda x: np.imag(x),
     np.conj    : lambda x: np.conj(x),
     np.abs     : lambda x: x/np.abs(x),  
     np.angle   : lambda x: -1j/x,
@@ -116,6 +114,18 @@ class Value:
             float : The partial derivative value
         """
         return self.grad.get(other, 0.0)
+
+
+    @property
+    def real(self):
+        return Value(val=np.real(self.val), 
+                     grad={k: np.real(v) for k, v in self.grad.items()}) 
+
+
+    @property
+    def imag(self):
+        return Value(val=np.imag(self.val), 
+                     grad={k: np.imag(v) for k, v in self.grad.items()}) 
 
 
     def __hash__(self):
@@ -332,6 +342,9 @@ if __name__ == "__main__":
 
     A = np.array([x, Value(3), Value(0.5)])
 
+    C = np.array([[x, Value(3), Value(0.5)], 
+                  [Value(-1.09), y, Value(2.3)]])
+
     B = A**2 - y
     print(B[0].d(x))
 
@@ -347,7 +360,11 @@ if __name__ == "__main__":
     b = np.linalg.norm(B)
     print(b.d(x), b.d(y))
 
-    d = np.sign(np.sin(2*np.pi*x))
+    print(np.real(b))
 
-    print(np.sign(d))
+    c = np.dot(C, A)
+    print(c[0].d(x))
+
+    c = x + C
+    print(c[0, 0].d(x))
 

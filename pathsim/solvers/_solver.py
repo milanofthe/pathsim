@@ -56,6 +56,9 @@ class Solver:
         #flag to identify adaptive/fixed timestep solvers
         self.is_adaptive = False
 
+        #order of the integration scheme
+        self.n = None
+
         #current evaluation stage for multistage solvers
         self.stage = 0
 
@@ -186,7 +189,7 @@ class ExplicitSolver(Solver):
     """
     Base class for explicit solver definition.
 
-    INPUTS : 
+    INPUTS (*solver_args, **solver_kwargs) : 
         initial_value     : (float or array) initial condition / integration constant
         func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
         jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
@@ -194,17 +197,8 @@ class ExplicitSolver(Solver):
         tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
     """
 
-    def __init__(self, 
-                 initial_value=0, 
-                 func=lambda x, u, t: u, 
-                 jac=None, 
-                 tolerance_lte_abs=1e-6, 
-                 tolerance_lte_rel=1e-3):
-        super().__init__(initial_value, 
-                         func, 
-                         jac, 
-                         tolerance_lte_abs, 
-                         tolerance_lte_rel)
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
 
         #flag to identify implicit/explicit solvers
         self.is_explicit = True
@@ -292,7 +286,7 @@ class ImplicitSolver(Solver):
     """
     Base class for implicit solver definition. 
 
-    INPUTS : 
+    INPUTS (*solver_args, **solver_kwargs) :  
         initial_value     : (float or array) initial condition / integration constant
         func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
         jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
@@ -300,17 +294,8 @@ class ImplicitSolver(Solver):
         tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
     """
 
-    def __init__(self, 
-                 initial_value=0, 
-                 func=lambda x, u, t: u, 
-                 jac=None, 
-                 tolerance_lte_abs=1e-6, 
-                 tolerance_lte_rel=1e-3):
-        super().__init__(initial_value, 
-                         func, 
-                         jac, 
-                         tolerance_lte_abs, 
-                         tolerance_lte_rel)
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
 
         #flag to identify implicit/explicit solvers
         self.is_explicit = False

@@ -9,14 +9,12 @@
 
 # IMPORTS ==============================================================================
 
-# import numpy as np
-
-from ._solver import ExplicitSolver
+from ._rungekutta import ExplicitRungeKutta
 
 
 # SOLVERS ==============================================================================
 
-class SSPRK34(ExplicitSolver):
+class SSPRK34(ExplicitRungeKutta):
     """
     Strong Stability Preserving (SSP) 3-rd order 4 stage 
     (3,4) Runge-Kutta method
@@ -33,23 +31,14 @@ class SSPRK34(ExplicitSolver):
     choice.
     """
 
-    def __init__(self, 
-                 initial_value=0, 
-                 func=lambda x, u, t: u, 
-                 jac=None, 
-                 tolerance_lte_abs=1e-6, 
-                 tolerance_lte_rel=1e-3):
-        super().__init__(initial_value, 
-                         func, 
-                         jac, 
-                         tolerance_lte_abs, 
-                         tolerance_lte_rel)
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
 
-        #counter for runge kutta stages
-        self.stage = 0
+        #number of stages in RK scheme
+        self.s = 4
 
-        #slope coefficients for stages
-        self.Ks = {}
+        #order of scheme
+        self.n = 3
 
         #intermediate evaluation times
         self.eval_stages = [0.0, 1/2, 1, 1/2]
@@ -59,22 +48,3 @@ class SSPRK34(ExplicitSolver):
                    1:[1/2, 1/2],
                    2:[1/6, 1/6, 1/6],
                    3:[1/6, 1/6, 1/6, 1/2]}
-
-
-    def step(self, u, t, dt):
-        """
-        performs the (explicit) timestep for (t+dt) 
-        based on the state and input at (t)
-        """
-
-        #buffer intermediate slope
-        self.Ks[self.stage] = self.func(self.x, u, t)
-        
-        #compute slope and update state at stage
-        self.x = dt * sum(k*b for k, b in zip(self.Ks.values(), self.BT[self.stage])) + self.x_0
-
-        #wrap around stage counter
-        self.stage = (self.stage + 1) % 4
-
-        #no error estimate available
-        return True, 0.0, 0.0, 1.0

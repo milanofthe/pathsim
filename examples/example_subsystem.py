@@ -21,7 +21,7 @@ x1_0 = 2
 x2_0 = 0
 
 #van der Pol parameter
-mu = 100
+mu = 1000
 
 #simulation timestep
 dt = 0.05
