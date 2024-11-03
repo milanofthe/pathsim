@@ -43,7 +43,7 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
     Residues = np.atleast_1d(Residues)
 
     #check validity of args
-    if not len(Poles) or  not len(Residues):
+    if not len(Poles) or not len(Residues):
         raise ValueError("No 'Poles' and 'Residues' defined!")
 
     if len(Poles) != len(Residues):

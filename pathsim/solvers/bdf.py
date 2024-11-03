@@ -27,7 +27,8 @@ class BDF2(ImplicitSolver):
         self.n = 2
 
         #bdf coefficients
-        self.K = {1:[1.0], 2:[-1/3, 4/3]}
+        self.K = {1:[1.0], 
+                  2:[-1/3, 4/3]}
         self.F = {1:1.0, 2:2/3}
 
         #bdf solution buffer
@@ -217,7 +218,7 @@ class BDF4(ImplicitSolver):
         #use the jacobian
         if self.jac is not None:
 
-            #compute jacobian
+            #compute jacobian of implicit update equation
             jac_g = self.F[n] * dt * self.jac(self.x, u, t)
 
             #anderson acceleration step with local newton

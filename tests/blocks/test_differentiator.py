@@ -60,16 +60,18 @@ class TestDifferentiator(unittest.TestCase):
         #test that no solver is initialized
         self.assertEqual(D.engine, None)
 
-        D.set_solver(Solver, tolerance_lte=1e-6)
+        D.set_solver(Solver, tolerance_lte_rel=1e-3, tolerance_lte_abs=1e-6)
 
         #test that solver is now available
         self.assertTrue(isinstance(D.engine, Solver))
-        self.assertEqual(D.engine.tolerance_lte, 1e-6)
+        self.assertEqual(D.engine.tolerance_lte_rel, 1e-3)
+        self.assertEqual(D.engine.tolerance_lte_abs, 1e-6)
 
-        D.set_solver(Solver, tolerance_lte=1e-3)
+        D.set_solver(Solver, tolerance_lte_rel=1e-2, tolerance_lte_abs=1e-3)
 
         #test that solver tolerance is changed
-        self.assertEqual(D.engine.tolerance_lte, 1e-3)
+        self.assertEqual(D.engine.tolerance_lte_rel, 1e-2)
+        self.assertEqual(D.engine.tolerance_lte_abs, 1e-3)
 
 
     def test_update(self):

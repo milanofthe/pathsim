@@ -70,17 +70,19 @@ class TestSpectrum(unittest.TestCase):
         #test that no solver is initialized
         self.assertEqual(S.engine, None)
 
-        S.set_solver(Solver, tolerance_lte=1e-6)
+        S.set_solver(Solver, tolerance_lte_rel=1e-5, tolerance_lte_abs=1e-6)
 
         #test that solver is now available
         self.assertTrue(isinstance(S.engine, Solver))
-        self.assertEqual(S.engine.tolerance_lte, 1e-6)
+        self.assertEqual(S.engine.tolerance_lte_rel, 1e-5)
+        self.assertEqual(S.engine.tolerance_lte_abs, 1e-6)
         self.assertEqual(S.engine.initial_value, 0.0)
 
-        S.set_solver(Solver, tolerance_lte=1e-3)
+        S.set_solver(Solver, tolerance_lte_rel=1e-3, tolerance_lte_abs=1e-4)
 
         #test that solver tolerance is changed
-        self.assertEqual(S.engine.tolerance_lte, 1e-3)
+        self.assertEqual(S.engine.tolerance_lte_rel, 1e-3)
+        self.assertEqual(S.engine.tolerance_lte_abs, 1e-4)
 
 
     def test_read(self):

@@ -89,22 +89,24 @@ class TestStateSpace(unittest.TestCase):
         #test that no solver is initialized
         self.assertEqual(S.engine, None)
 
-        S.set_solver(Solver, tolerance_lte=1e-6)
+        S.set_solver(Solver, tolerance_lte_rel=1e-4, tolerance_lte_abs=1e-6)
 
         #test that solver is now available
         self.assertTrue(isinstance(S.engine, Solver))
 
         #test that solver parametes have been set
-        self.assertEqual(S.engine.tolerance_lte, 1e-6)
+        self.assertEqual(S.engine.tolerance_lte_rel, 1e-4)
+        self.assertEqual(S.engine.tolerance_lte_abs, 1e-6)
         self.assertEqual(S.engine.initial_value, 1.0)
 
         #test that jacobian has been generated correctly
         self.assertEqual(S.engine.jac(0, 0, 0), S.A)
 
-        S.set_solver(Solver, tolerance_lte=1e-3)
+        S.set_solver(Solver, tolerance_lte_rel=1e-2, tolerance_lte_abs=1e-3)
 
         #test that solver tolerance is changed
-        self.assertEqual(S.engine.tolerance_lte, 1e-3)
+        self.assertEqual(S.engine.tolerance_lte_rel, 1e-2)
+        self.assertEqual(S.engine.tolerance_lte_abs, 1e-3)
 
 
     def test_update(self):
@@ -125,7 +127,7 @@ class TestStateSpace(unittest.TestCase):
         self.assertAlmostEqual(S.get(0), 2.2, 8)
 
 
-class TtestTransferFunction(unittest.TestCase):
+class TestTransferFunction(unittest.TestCase):
     """
     Test the implementation of the 'TransferFunction' block class
 
