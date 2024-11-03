@@ -60,8 +60,8 @@ class ExplicitRungeKutta(ExplicitSolver):
             dt : (float) integration timestep
         """
 
-        #early exit of not enough slopes or no error estimate at all
-        if self.TR is None or len(self.Ks) < len(self.TR): 
+        #early exit if no error estimate avaliable
+        if self.TR is None: 
             return True, 0.0, 0.0, 1.0
 
         #compute local truncation error slope (this is faster then 'sum' comprehension)
@@ -106,7 +106,7 @@ class ExplicitRungeKutta(ExplicitSolver):
         #buffer intermediate slope
         self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #compute slope and update state at stage (this is faster then 'sum' comprehension)
+        #compute slope at stage, faster then 'sum' comprehension
         slope = 0.0
         for i, b in enumerate(self.BT[self.stage]):
             slope = slope + self.Ks[i] * b

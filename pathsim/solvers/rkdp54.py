@@ -34,7 +34,7 @@ class RKDP54(ExplicitRungeKutta):
         super().__init__(*solver_args, **solver_kwargs)
 
         #number of stages in RK scheme
-        self.s = 6
+        self.s = 7
 
         #order of scheme and embedded method
         self.n = 5
@@ -52,7 +52,8 @@ class RKDP54(ExplicitRungeKutta):
                    2:[     44/45,      -56/15,       32/9], 
                    3:[19372/6561, -25360/2187, 64448/6561, -212/729],
                    4:[ 9017/3168,     -355/33, 46732/5247,   49/176, -5103/18656],
-                   5:[    35/384,           0,   500/1113,  125/192,  -2187/6784, 11/84]}
+                   5:[    35/384,           0,   500/1113,  125/192,  -2187/6784, 11/84],
+                   6:[    35/384,           0,   500/1113,  125/192,  -2187/6784, 11/84]}
 
         #coefficients for local truncation error estimate
         self.TR = [71/57600, 0, - 71/16695, 71/1920, -17253/339200, 22/525, -1/40]
