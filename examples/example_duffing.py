@@ -25,6 +25,8 @@ from pathsim.solvers import (
     RKCK54,
     )
 
+from pathsim.diff import Value
+
 
 # DUFFING OSCILLATOR ====================================================================
 
@@ -37,9 +39,10 @@ x0, v0 = 0.0, 0.0
 #driving angular frequency and amplitude
 a, omega = 10.0, 2.0
 
+a = Value(a)
+
 #parameters (mass, damping, linear stiffness, nonlienar stiffness)
 m, c, k, d = 1.0, 0.5, 1.0, 1.4
-
 
 #blocks that define the system
 I1 = Integrator(v0)                      # integrator for velocity
@@ -76,6 +79,26 @@ Sim.run(duration=50)
 # Plot the results directly from the scope
 Sc.plot()
 
-plt.show()
 
-    
+
+
+
+
+#plot derivatives -----------------------------------------------------------------------
+
+time, [vel, pos] = Sc.read()
+
+fig, ax = plt.subplots(nrows=1, figsize=(8, 4), tight_layout=True, dpi=120)
+
+ax.plot(time, list(map(lambda x:x.d(a) if isinstance(x, Value) else None, pos)), label=r"$dx/da$")
+ax.plot(time, list(map(lambda x:x.d(a) if isinstance(x, Value) else None, vel)), label=r"$dv/da$")
+
+ax.set_xlabel("time [s]")
+
+ax.grid(True)
+ax.legend()
+
+
+
+
+plt.show()

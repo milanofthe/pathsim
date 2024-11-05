@@ -40,7 +40,8 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_max, None)
         self.assertEqual(str(Sim.Solver()), "SSPRK22")
         self.assertEqual(Sim.tolerance_fpi, 1e-12)
-        self.assertEqual(Sim.tolerance_lte, 1e-8)
+        self.assertEqual(Sim.tolerance_lte_rel, 1e-6)
+        self.assertEqual(Sim.tolerance_lte_abs, 1e-8)
         self.assertEqual(Sim.iterations_min, 1) # <-- determined from internal path length
         self.assertEqual(Sim.iterations_max, 200)
         self.assertFalse(Sim.log)
@@ -56,7 +57,8 @@ class TestSimulation(unittest.TestCase):
                          dt_min=0.001, 
                          dt_max=0.1, 
                          tolerance_fpi=1e-9, 
-                         tolerance_lte=1e-6, 
+                         tolerance_lte_rel=1e-4, 
+                         tolerance_lte_abs=1e-6, 
                          iterations_min=None, 
                          iterations_max=100, 
                          log=False)
@@ -66,7 +68,8 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_min, 0.001)
         self.assertEqual(Sim.dt_max, 0.1)
         self.assertEqual(Sim.tolerance_fpi, 1e-9)
-        self.assertEqual(Sim.tolerance_lte, 1e-6)
+        self.assertEqual(Sim.tolerance_lte_rel, 1e-4)
+        self.assertEqual(Sim.tolerance_lte_abs, 1e-6)
         self.assertEqual(Sim.iterations_min, 3) # <-- determined from internal path length
         self.assertEqual(Sim.iterations_max, 100)
 
@@ -194,9 +197,10 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(self.Int.get(0), self.Int.initial_value)
 
         #step using global timestep
-        success, err, scl, te, ts = self.Sim.step()
+        success, err_rel, err_abs, scl, te, ts = self.Sim.step()
         self.assertEqual(self.Sim.time, self.Sim.dt)
-        self.assertEqual(err, 0.0) #fixed solver
+        self.assertEqual(err_rel, 0.0) #fixed solver
+        self.assertEqual(err_abs, 0.0) #fixed solver
         self.assertEqual(scl, 1.0) #fixed solver
         self.assertEqual(ts, 0) #no implicit solver
         self.assertGreaterEqual(te, self.Sim.iterations_min)

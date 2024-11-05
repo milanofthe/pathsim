@@ -31,7 +31,6 @@ from pathsim.blocks.rf import (
 from pathsim.solvers import SSPRK33, RKCK54
 
 
-
 # FILTERING A SQUAREWAVE ================================================================
 
 #simulation timestep

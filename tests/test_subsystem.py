@@ -109,20 +109,20 @@ class TestSubsystem(unittest.TestCase):
 
         I1 = Interface()
         S = Subsystem(blocks=[I1],)
-        self.assertEqual(len(S), 1)
+        self.assertEqual(len(S), 0)
 
         B1 = Block()
         I1 = Interface()
         C1 = Connection(I1, B1)
         S = Subsystem(blocks=[I1, B1], connections=[C1])
-        self.assertEqual(len(S), 2)
+        self.assertEqual(len(S), 1)
 
         B1, B2 = Block(), Block()
         I1 = Interface()
         C1 = Connection(I1, B1)
         C2 = Connection(B1, B2)
         S = Subsystem(blocks=[I1, B1, B2], connections=[C1, C2])
-        self.assertEqual(len(S), 3)
+        self.assertEqual(len(S), 2)
 
         B1, B2, B3 = Block(), Block(), Block()
         I1 = Interface()
@@ -131,7 +131,7 @@ class TestSubsystem(unittest.TestCase):
         C3 = Connection(B2, B1[1], B3[1])
         C4 = Connection(B3, I1)
         S = Subsystem(blocks=[I1, B1, B2, B3], connections=[C1, C2, C3, C4])
-        self.assertEqual(len(S), 5)
+        self.assertEqual(len(S), 4)
 
 
     def test_set(self): 
