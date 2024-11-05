@@ -187,7 +187,9 @@ class Simulation:
 
         #check if block already in block list
         if block in self.blocks:
-            raise ValueError(f"block {block} already part of simulation")
+            _msg = f"block {block} already part of simulation"
+            self._logger_error(_msg)
+            raise ValueError(_msg)
 
         #initialize numerical integrator of block
         block.set_solver(self.Solver, 
@@ -208,7 +210,9 @@ class Simulation:
 
         #check if connection already in block list
         if connection in self.connections:
-            raise ValueError(f"{connection} already part of simulation")
+            _msg = f"{connection} already part of simulation"
+            self._logger_error(_msg)
+            raise ValueError(_msg)
 
         #check if connection overwrites existing connections
         for conn in self.connections:

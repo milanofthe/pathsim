@@ -66,8 +66,8 @@ class TestBaseSolver(unittest.TestCase):
         self.solver.buffer()
         self.assertEqual(self.solver.x_0, 2.0)
 
-    def test_change(self):
-        new_solver = self.solver.change(ExplicitSolver)
+    def test_cast(self):
+        new_solver = ExplicitSolver.cast(self.solver)
         self.assertIsInstance(new_solver, ExplicitSolver)
         self.assertEqual(new_solver.get(), self.solver.get())
 

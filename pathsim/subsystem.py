@@ -77,8 +77,16 @@ class Subsystem(Block):
 
         if blocks is not None:
             for block in blocks:
-                if isinstance(block, Interface): self.interface = block
-                else: self.blocks.append(block)
+                if isinstance(block, Interface): 
+                    
+                    if self.interface is not None:
+                        #interface block is already defined
+                        raise ValueError("Subsystem can only have one 'Interface' block!")
+                    
+                    self.interface = block
+                else: 
+                    #regular blocks
+                    self.blocks.append(block)
 
         #check if interface is defined
         if self.interface is None:

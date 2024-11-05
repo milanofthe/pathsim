@@ -40,7 +40,7 @@ class Solver:
                  tolerance_lte_abs=1e-6, 
                  tolerance_lte_rel=1e-3):
 
-        #set buffer, initial state and initial condition    
+        #set buffer, state and initial condition    
         self.x_0 = self.x = self.initial_value = initial_value
 
         #right hand side function for integration
@@ -127,21 +127,28 @@ class Solver:
         self.x_0 = self.x
 
 
-    def change(self, Sol, **solver_args):
+    @classmethod
+    def cast(cls, other, **solver_args):
         """
-        Change the integration engine to a new type and initialize 
+        Cast the integration engine to the new type and initialize 
         with previous solver arguments so it can continue from where 
         the 'old' solver stopped.
         """
 
-        #create new engine from self
-        engine = Sol(initial_value=self.initial_value, 
-                     func=self.func, 
-                     jac=self.jac, 
-                     **solver_args)
+        if not isinstance(other, Solver):
+            raise ValueError("'other' must be instance of 'Solver' or child")
+
+
+        #create new solver instance
+        engine = cls(initial_value=other.initial_value, 
+                     func=other.func, 
+                     jac=other.jac, 
+                     tolerance_lte_rel=solver_args.get("tolerance_lte_rel", other.tolerance_lte_rel),
+                     tolerance_lte_abs=solver_args.get("tolerance_lte_abs", other.tolerance_lte_abs)
+                     )
         
-        #set internal state of new engine from self
-        engine.set(self.get())
+        #set internal state of new engine from other
+        engine.set(other.get())
 
         return engine
 
