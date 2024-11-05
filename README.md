@@ -21,7 +21,7 @@ Key features of PathSim include:
 
 ## Installation
 
-The latest release version of pathsim is installable via pip:
+The latest release version of pathsim available on [PyPi](https://pypi.org/project/pathsim/)  and installable via pip:
 
 ```console
 $ pip install pathsim
@@ -48,6 +48,9 @@ The ODE above can be translated to a block diagram using integrators, amplifiers
 ![png](README_files/harmonic_oscillator_blockdiagram.png)
 
 The topology of the block diagram above can be directly defined as blocks and connections in the `PathSim` framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
+
+
+![](https://github.com/milanofthe/pathsim/blob/master/README_files/README_8_0.png)
 
 
 
@@ -95,29 +98,29 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-10-23 15:38:58,943 - INFO - LOGGING enabled
-    2024-10-23 15:38:58,943 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 15:38:58,944 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 15:38:58,944 - INFO - RESET
-    2024-10-23 15:38:58,944 - INFO - RUN duration=50.0
-    2024-10-23 15:38:58,945 - INFO - STARTING progress tracker
-    2024-10-23 15:38:58,945 - INFO - progress=0%
-    2024-10-23 15:38:58,963 - INFO - progress=10%
-    2024-10-23 15:38:58,982 - INFO - progress=20%
-    2024-10-23 15:38:59,000 - INFO - progress=30%
-    2024-10-23 15:38:59,019 - INFO - progress=40%
-    2024-10-23 15:38:59,037 - INFO - progress=50%
-    2024-10-23 15:38:59,055 - INFO - progress=60%
-    2024-10-23 15:38:59,073 - INFO - progress=70%
-    2024-10-23 15:38:59,092 - INFO - progress=80%
-    2024-10-23 15:38:59,110 - INFO - progress=90%
-    2024-10-23 15:38:59,129 - INFO - progress=100%
-    2024-10-23 15:38:59,129 - INFO - FINISHED steps(total)=1001(1001) runtime=184.78ms
+    2024-10-23 15:41:42,988 - INFO - LOGGING enabled
+    2024-10-23 15:41:42,989 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 15:41:42,990 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 15:41:42,990 - INFO - RESET
+    2024-10-23 15:41:42,991 - INFO - RUN duration=50.0
+    2024-10-23 15:41:42,992 - INFO - STARTING progress tracker
+    2024-10-23 15:41:42,992 - INFO - progress=0%
+    2024-10-23 15:41:43,010 - INFO - progress=10%
+    2024-10-23 15:41:43,029 - INFO - progress=20%
+    2024-10-23 15:41:43,047 - INFO - progress=30%
+    2024-10-23 15:41:43,065 - INFO - progress=40%
+    2024-10-23 15:41:43,084 - INFO - progress=50%
+    2024-10-23 15:41:43,103 - INFO - progress=60%
+    2024-10-23 15:41:43,123 - INFO - progress=70%
+    2024-10-23 15:41:43,142 - INFO - progress=80%
+    2024-10-23 15:41:43,160 - INFO - progress=90%
+    2024-10-23 15:41:43,179 - INFO - progress=100%
+    2024-10-23 15:41:43,180 - INFO - FINISHED steps(total)=1001(1001) runtime=186.96ms
     
 
 
     
-![png](README_files/README_4_1.png)
+![png](README_files/README_5_1.png)
     
 
 
@@ -177,29 +180,29 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-10-23 15:39:02,206 - INFO - LOGGING enabled
-    2024-10-23 15:39:02,207 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 15:39:02,207 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 15:39:02,208 - INFO - RESET
-    2024-10-23 15:39:02,209 - INFO - RUN duration=12
-    2024-10-23 15:39:02,209 - INFO - STARTING progress tracker
-    2024-10-23 15:39:02,210 - INFO - progress=0%
-    2024-10-23 15:39:02,263 - INFO - progress=10%
-    2024-10-23 15:39:02,316 - INFO - progress=20%
-    2024-10-23 15:39:02,368 - INFO - progress=30%
-    2024-10-23 15:39:02,420 - INFO - progress=40%
-    2024-10-23 15:39:02,471 - INFO - progress=50%
-    2024-10-23 15:39:02,523 - INFO - progress=60%
-    2024-10-23 15:39:02,575 - INFO - progress=70%
-    2024-10-23 15:39:02,627 - INFO - progress=80%
-    2024-10-23 15:39:02,678 - INFO - progress=90%
-    2024-10-23 15:39:02,730 - INFO - progress=100%
-    2024-10-23 15:39:02,731 - INFO - FINISHED steps(total)=1201(1201) runtime=520.65ms
+    2024-10-23 15:41:43,581 - INFO - LOGGING enabled
+    2024-10-23 15:41:43,582 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-10-23 15:41:43,582 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-10-23 15:41:43,582 - INFO - RESET
+    2024-10-23 15:41:43,583 - INFO - RUN duration=12
+    2024-10-23 15:41:43,584 - INFO - STARTING progress tracker
+    2024-10-23 15:41:43,585 - INFO - progress=0%
+    2024-10-23 15:41:43,636 - INFO - progress=10%
+    2024-10-23 15:41:43,690 - INFO - progress=20%
+    2024-10-23 15:41:43,741 - INFO - progress=30%
+    2024-10-23 15:41:43,793 - INFO - progress=40%
+    2024-10-23 15:41:43,846 - INFO - progress=50%
+    2024-10-23 15:41:43,898 - INFO - progress=60%
+    2024-10-23 15:41:43,950 - INFO - progress=70%
+    2024-10-23 15:41:44,002 - INFO - progress=80%
+    2024-10-23 15:41:44,054 - INFO - progress=90%
+    2024-10-23 15:41:44,104 - INFO - progress=100%
+    2024-10-23 15:41:44,105 - INFO - FINISHED steps(total)=1201(1201) runtime=521.08ms
     
 
 
     
-![png](README_files/README_6_1.png)
+![png](README_files/README_7_1.png)
     
 
 
@@ -231,14 +234,9 @@ ax.legend(fancybox=False);
 
 
     
-![png](README_files/README_8_0.png)
+![png](README_files/README_9_0.png)
     
 
 
 ## More Examples
 There are many examples of dynamical system simulations in the `examples` directory. They cover almost all the blocks currently available in `PathSim` as well as different numerical integrators / solvers to experiment with.
-
-
-```python
-
-```
