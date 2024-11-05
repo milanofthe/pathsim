@@ -50,9 +50,6 @@ The ODE above can be translated to a block diagram using integrators, amplifiers
 The topology of the block diagram above can be directly defined as blocks and connections in the `PathSim` framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
 
 
-![](https://github.com/milanofthe/pathsim/blob/master/README_files/README_8_0.png)
-
-
 
 ```python
 from pathsim import Simulation
@@ -98,24 +95,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-10-23 15:41:42,988 - INFO - LOGGING enabled
-    2024-10-23 15:41:42,989 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 15:41:42,990 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 15:41:42,990 - INFO - RESET
-    2024-10-23 15:41:42,991 - INFO - RUN duration=50.0
-    2024-10-23 15:41:42,992 - INFO - STARTING progress tracker
-    2024-10-23 15:41:42,992 - INFO - progress=0%
-    2024-10-23 15:41:43,010 - INFO - progress=10%
-    2024-10-23 15:41:43,029 - INFO - progress=20%
-    2024-10-23 15:41:43,047 - INFO - progress=30%
-    2024-10-23 15:41:43,065 - INFO - progress=40%
-    2024-10-23 15:41:43,084 - INFO - progress=50%
-    2024-10-23 15:41:43,103 - INFO - progress=60%
-    2024-10-23 15:41:43,123 - INFO - progress=70%
-    2024-10-23 15:41:43,142 - INFO - progress=80%
-    2024-10-23 15:41:43,160 - INFO - progress=90%
-    2024-10-23 15:41:43,179 - INFO - progress=100%
-    2024-10-23 15:41:43,180 - INFO - FINISHED steps(total)=1001(1001) runtime=186.96ms
+    2024-11-05 19:26:16,906 - INFO - LOGGING enabled
+    2024-11-05 19:26:16,908 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-05 19:26:16,908 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-11-05 19:26:16,909 - INFO - RESET
+    2024-11-05 19:26:16,909 - INFO - RUN duration=50.0
+    2024-11-05 19:26:16,909 - INFO - STARTING progress tracker
+    2024-11-05 19:26:16,910 - INFO - progress=0%
+    2024-11-05 19:26:16,928 - INFO - progress=10%
+    2024-11-05 19:26:16,945 - INFO - progress=20%
+    2024-11-05 19:26:16,963 - INFO - progress=30%
+    2024-11-05 19:26:16,981 - INFO - progress=40%
+    2024-11-05 19:26:16,998 - INFO - progress=50%
+    2024-11-05 19:26:17,017 - INFO - progress=60%
+    2024-11-05 19:26:17,035 - INFO - progress=70%
+    2024-11-05 19:26:17,053 - INFO - progress=80%
+    2024-11-05 19:26:17,070 - INFO - progress=90%
+    2024-11-05 19:26:17,087 - INFO - progress=100%
+    2024-11-05 19:26:17,088 - INFO - FINISHED steps(total)=1001(1001) runtime=177.52ms
     
 
 
@@ -180,24 +177,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-10-23 15:41:43,581 - INFO - LOGGING enabled
-    2024-10-23 15:41:43,582 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-10-23 15:41:43,582 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-10-23 15:41:43,582 - INFO - RESET
-    2024-10-23 15:41:43,583 - INFO - RUN duration=12
-    2024-10-23 15:41:43,584 - INFO - STARTING progress tracker
-    2024-10-23 15:41:43,585 - INFO - progress=0%
-    2024-10-23 15:41:43,636 - INFO - progress=10%
-    2024-10-23 15:41:43,690 - INFO - progress=20%
-    2024-10-23 15:41:43,741 - INFO - progress=30%
-    2024-10-23 15:41:43,793 - INFO - progress=40%
-    2024-10-23 15:41:43,846 - INFO - progress=50%
-    2024-10-23 15:41:43,898 - INFO - progress=60%
-    2024-10-23 15:41:43,950 - INFO - progress=70%
-    2024-10-23 15:41:44,002 - INFO - progress=80%
-    2024-10-23 15:41:44,054 - INFO - progress=90%
-    2024-10-23 15:41:44,104 - INFO - progress=100%
-    2024-10-23 15:41:44,105 - INFO - FINISHED steps(total)=1201(1201) runtime=521.08ms
+    2024-11-05 19:26:17,251 - INFO - LOGGING enabled
+    2024-11-05 19:26:17,252 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-05 19:26:17,253 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-11-05 19:26:17,253 - INFO - RESET
+    2024-11-05 19:26:17,254 - INFO - RUN duration=12
+    2024-11-05 19:26:17,254 - INFO - STARTING progress tracker
+    2024-11-05 19:26:17,255 - INFO - progress=0%
+    2024-11-05 19:26:17,309 - INFO - progress=10%
+    2024-11-05 19:26:17,363 - INFO - progress=20%
+    2024-11-05 19:26:17,414 - INFO - progress=30%
+    2024-11-05 19:26:17,466 - INFO - progress=40%
+    2024-11-05 19:26:17,518 - INFO - progress=50%
+    2024-11-05 19:26:17,569 - INFO - progress=60%
+    2024-11-05 19:26:17,620 - INFO - progress=70%
+    2024-11-05 19:26:17,671 - INFO - progress=80%
+    2024-11-05 19:26:17,723 - INFO - progress=90%
+    2024-11-05 19:26:17,776 - INFO - progress=100%
+    2024-11-05 19:26:17,776 - INFO - FINISHED steps(total)=1201(1201) runtime=520.83ms
     
 
 
