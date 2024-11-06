@@ -10,7 +10,6 @@
 # IMPORTS ==============================================================================
 
 from ._solver import ExplicitSolver, ImplicitSolver
-from ..utils.funcs import numerical_jacobian
 
 
 # SOLVERS ==============================================================================

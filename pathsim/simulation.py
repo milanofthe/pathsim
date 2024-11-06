@@ -47,18 +47,17 @@ class Simulation:
     implicit integrators are also available.
 
     INPUTS:
-        blocks             : (list of 'Block' objects) blocks that make up the system
-        connections        : (list of 'Connection' objects) connections that connect the blocks
-        dt                 : (float) transient simulation timestep in time units
-        dt_min             : (float) lower bound for timestep, default '0.0'
-        dt_max             : (float) upper bound for timestep, default 'None'
-        Solver             : ('Solver' class) solver for numerical integration from pathsim.solvers
-        tolerance_fpi      : (float) absolute tolerance for convergence of fixed-point iterations
-        tolerance_lte_abs  : (float) absolute tolerance for local truncation error (integrator error controller)
-        tolerance_lte_rel  : (float) relative tolerance for local truncation error (integrator error controller)
-        iterations_min     : (int) minimum number of fixed-point iterations for system function evaluation
-        iterations_max     : (int) maximum allowed number of fixed-point iterations for system function evaluation
-        log                : (bool, string) flag to enable logging (alternatively a path can be specified)
+        blocks         : (list of 'Block' objects) blocks that make up the system
+        connections    : (list of 'Connection' objects) connections that connect the blocks
+        dt             : (float) transient simulation timestep in time units
+        dt_min         : (float) lower bound for timestep, default '0.0'
+        dt_max         : (float) upper bound for timestep, default 'None'
+        Solver         : ('Solver' class) solver for numerical integration from pathsim.solvers
+        tolerance_fpi  : (float) absolute tolerance for convergence of fixed-point iterations
+        iterations_min : (int) minimum number of fixed-point iterations for system function evaluation
+        iterations_max : (int) maximum allowed number of fixed-point iterations for system function evaluation
+        log            : (bool, string) flag to enable logging (alternatively a path can be specified)
+        solver_args    : (dict) additional parameters for numerical solvers such as abs and rel tolerance
     """
 
     def __init__(self, 
@@ -69,11 +68,11 @@ class Simulation:
                  dt_max=None, 
                  Solver=SSPRK22, 
                  tolerance_fpi=1e-12, 
-                 tolerance_lte_abs=1e-8, 
-                 tolerance_lte_rel=1e-6, 
                  iterations_min=None, 
                  iterations_max=200, 
-                 log=True):
+                 log=True,
+                 **solver_args
+                 ):
 
         #system definition
         self.blocks = [] if blocks is None else blocks
@@ -93,9 +92,8 @@ class Simulation:
         #error tolerance for fixed point loop and implicit solver
         self.tolerance_fpi = tolerance_fpi
 
-        #error tolerances for local truncation error for integrators
-        self.tolerance_lte_abs = tolerance_lte_abs
-        self.tolerance_lte_rel = tolerance_lte_rel
+        #additional solver parameters
+        self.solver_args = solver_args
 
         #iterations for fixed-point loop
         self.iterations_min = iterations_min
@@ -192,9 +190,7 @@ class Simulation:
             raise ValueError(_msg)
 
         #initialize numerical integrator of block
-        block.set_solver(self.Solver, 
-                         tolerance_lte_abs=self.tolerance_lte_abs, 
-                         tolerance_lte_rel=self.tolerance_lte_rel)
+        block.set_solver(self.Solver, **self.solver_args)
 
         #add block to global blocklist
         self.blocks.append(block)
@@ -284,7 +280,7 @@ class Simulation:
 
     # solver management -----------------------------------------------------------
 
-    def _set_solver(self, Solver=None, tolerance_lte_abs=None, tolerance_lte_rel=None):
+    def _set_solver(self, Solver=None, **solver_args):
         """
         Initialize all blocks with solver for numerical integration
         and tolerance for local truncation error 'tolerance_lte'.
@@ -293,36 +289,27 @@ class Simulation:
         to the 'Solver' class.
 
         INPUTS:
-            Solver : ('Solver' class) numerical solver definition
-            tolerance_lte_abs : (float) absolute tolerance for local truncation error
-            tolerance_lte_rel : (float) relative tolerance for local truncation error
+            Solver      : ('Solver' class) numerical solver definition
+            solver_args : (dict) additional parameters for numerical solvers such as abs and rel tolerance
         """
 
         #update global solver class
         if Solver is not None: 
             self.Solver = Solver
 
-        #update tolerances for local truncation error
-        if tolerance_lte_abs is not None: 
-            self.tolerance_lte_abs = tolerance_lte_abs
-        if tolerance_lte_rel is not None: 
-            self.tolerance_lte_rel = tolerance_lte_rel
+        #update solver parmeters
+        for k, v in solver_args.items():
+            self.solver_args[k] = v
 
         #initialize dummy engine to get solver attributes
         self.engine = self.Solver()
 
-        #flag for adaptive and explicit solver selection
-        self.is_adaptive = self.engine.is_adaptive
-        self.is_explicit = self.engine.is_explicit
-
         #iterate all blocks and set integration engines with tolerances
         for block in self.blocks:
-            block.set_solver(self.Solver, 
-                             tolerance_lte_abs=self.tolerance_lte_abs, 
-                             tolerance_lte_rel=self.tolerance_lte_rel)
+            block.set_solver(self.Solver, **self.solver_args)
 
         #logging message
-        self._logger_info(f"SOLVER {self.engine} adaptive={self.is_adaptive} implicit={not self.is_explicit}")
+        self._logger_info(f"SOLVER {self.engine} adaptive={self.engine.is_adaptive} implicit={not self.engine.is_explicit}")
 
 
     # resetting -------------------------------------------------------------------
@@ -565,7 +552,7 @@ class Simulation:
         for time in self.engine.stages(self.time, dt):
 
             #explicit or implicit solver stepping loop
-            if self.is_explicit:
+            if self.engine.is_explicit:
 
                 #evaluate system equation by fixed-point iteration
                 evaluations = self._update(time) 
@@ -655,14 +642,14 @@ class Simulation:
                 _dt = end_time - self.time
 
             #advance the simulation by one (effective) timestep '_dt'
-            success, error_abs, error_rel, scale, evaluations, solver_iterations = self.step(_dt, self.is_adaptive)
+            success, _1, _2, scale, evaluations, solver_iterations = self.step(_dt, self.engine.is_adaptive)
 
             #update evaluation and iteration counters
             total_evaluations += evaluations
             total_solver_iterations += solver_iterations
 
             #rescale the timestep for error control if adaptive solver 
-            if self.is_adaptive:
+            if self.engine.is_adaptive:
 
                 #apply bounds to timestep
                 _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
