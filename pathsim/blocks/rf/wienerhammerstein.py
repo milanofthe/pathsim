@@ -13,10 +13,10 @@ import numpy as np
 
 from .._block import Block
 
-from ...utils.funcs import (
-    max_error_dicts,
+from ...utils.utils import (
+    max_error_dicts, 
     dict_to_array, 
-    array_to_dict,
+    array_to_dict, 
     auto_jacobian
     )
 

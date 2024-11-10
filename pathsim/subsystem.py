@@ -13,7 +13,7 @@
 # IMPORTS ===============================================================================
 
 from .blocks._block import Block
-from .utils.funcs import path_length_dfs
+from .utils.utils import path_length_dfs
 
 
 # IO CLASS ==============================================================================
@@ -108,7 +108,7 @@ class Subsystem(Block):
         Basically the same as in the 'Simulation' class.
         """
         max_path_length = 0
-        for block in self.blocks:
+        for block in [self.interface, *self.blocks]:
             path_length = path_length_dfs(self.connections, block)
             if path_length > max_path_length:
                 max_path_length = path_length

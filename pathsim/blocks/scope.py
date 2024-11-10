@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from ._block import Block
-from ..utils.funcs import dict_to_array
+from ..utils.utils import dict_to_array
 from ..utils.realtimeplotter import RealtimePlotter
 
 

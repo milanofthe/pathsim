@@ -15,7 +15,7 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.funcs import (
+from ..utils.utils import (
     dict_to_array, 
     array_to_dict
     )

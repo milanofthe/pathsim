@@ -14,7 +14,7 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.funcs import dict_to_array
+from ..utils.utils import dict_to_array
 
 
 # MISO BLOCKS ===========================================================================

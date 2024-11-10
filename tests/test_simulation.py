@@ -40,8 +40,6 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_max, None)
         self.assertEqual(str(Sim.Solver()), "SSPRK22")
         self.assertEqual(Sim.tolerance_fpi, 1e-12)
-        self.assertEqual(Sim.tolerance_lte_rel, 1e-6)
-        self.assertEqual(Sim.tolerance_lte_abs, 1e-8)
         self.assertEqual(Sim.iterations_min, 1) # <-- determined from internal path length
         self.assertEqual(Sim.iterations_max, 200)
         self.assertFalse(Sim.log)
@@ -68,8 +66,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_min, 0.001)
         self.assertEqual(Sim.dt_max, 0.1)
         self.assertEqual(Sim.tolerance_fpi, 1e-9)
-        self.assertEqual(Sim.tolerance_lte_rel, 1e-4)
-        self.assertEqual(Sim.tolerance_lte_abs, 1e-6)
+        self.assertEqual(Sim.solver_args, {"tolerance_lte_rel":1e-4, "tolerance_lte_abs":1e-6})
         self.assertEqual(Sim.iterations_min, 3) # <-- determined from internal path length
         self.assertEqual(Sim.iterations_max, 100)
 
@@ -177,8 +174,8 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(self.Sim.dt, 0.02)
         self.assertEqual(self.Sim.iterations_min, 2)
         self.assertTrue(isinstance(self.Sim.engine, SSPRK22))
-        self.assertTrue(self.Sim.is_explicit)
-        self.assertFalse(self.Sim.is_adaptive)
+        self.assertTrue(self.Sim.engine.is_explicit)
+        self.assertFalse(self.Sim.engine.is_adaptive)
 
         #test if engine setup was correct
         self.assertTrue(isinstance(self.Int.engine, SSPRK22)) # <-- only the Integrator needs an engine

@@ -15,7 +15,7 @@
 import numpy as np
 import logging
 
-from .utils.funcs import path_length_dfs
+from .utils.utils import path_length_dfs
 from .utils.progresstracker import ProgressTracker
 from .solvers import SSPRK22
 

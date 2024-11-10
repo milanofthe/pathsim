@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                                 UTILITY FUNCTIONS  
-##                                  (utils/funcs.py)
+##                                  (utils/utils.py)
 ##
 ##                                Milan Rother 2023/24
 ##
@@ -166,14 +166,17 @@ def auto_jacobian(func):
 
 # PATH ESTIMATION ======================================================================
 
-def path_length_dfs(connections, starting_block, visited=set()):
+def path_length_dfs(connections, starting_block, visited=None):
     """
     Recursively compute the longest path (depth first search) 
     in a directed graph from a starting node / block.
     """
 
+    if visited is None:
+        visited = set()
+
     #node already visited -> break cycles
-    if starting_block in visited:   
+    if starting_block in visited:
         return 0
 
     #block without instant time component -> break cycles

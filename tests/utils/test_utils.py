@@ -1,6 +1,6 @@
 ########################################################################################
 ##
-##                              TESTS FOR 'utils/funcs.py'
+##                              TESTS FOR 'utils/utils.py'
 ##
 ##                                Milan Rother 2023/24
 ##
@@ -11,7 +11,7 @@
 import unittest
 import numpy as np
 
-from pathsim.utils.funcs import (
+from pathsim.utils.utils import (
     dict_to_array, 
     array_to_dict, 
     abs_error,
