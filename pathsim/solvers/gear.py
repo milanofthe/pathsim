@@ -25,39 +25,35 @@ def compute_bdf_coefficients(order, timesteps):
         sum(alpha_i * x_i; i=n-m,...,n) = h_n * f_n(x_n, t_n)
 
     INPUTS : 
-        order          : (int) order of the integration scheme
-        past_timesteps : (list[float]) timestep buffer (h_{n-j}; j=1,...,order-1)
-        timestep       : (float) current timestep (h_n)
-
+        order     : (int) order of the integration scheme
+        timesteps : (list[float]) timestep buffer (h_{n-j}; j=0,...,order-1)
     """
 
     #check if valid order
     if order < 1:
         raise RuntimeError("BDF coefficients of order 0 not possible!")
 
-    #split timesteps into past and current
-    timestep, *past_timesteps = timesteps
+    #aux value
+    order_p1 = order + 1
 
     #quit early for no buffer (euler backward)
-    if not past_timesteps:
+    if len(timesteps) < 2:
         return 1.0, [1.0]
 
-    # Compute timestep ratios rho_j = h_{n-j} / h_n for j = 1 to order-1
-    rho = np.asarray(past_timesteps) / timestep
+    # Compute timestep ratios rho_j = h_{n-j} / h_n
+    rho = np.array(timesteps[1:]) / timesteps[0]
 
     # Compute normalized time differences theta_j
-    theta = np.zeros(order + 1)
-    theta[1] = -1 
-    for j in range(2, order + 1):
-        theta[j] = -(1 + sum(rho[:j - 1]))
+    theta = -np.ones(order_p1)
+    theta[0] = 0
+    for j in range(2, order_p1):
+        theta[j] -= sum(rho[:j - 1])
 
     # Set up the linear system (p + 1 equations)
-    A = np.zeros((order + 1, order + 1))
-    b = np.zeros(order + 1)
-
-    # Build system
+    A = np.zeros((order_p1, order_p1))
+    b = np.zeros(order_p1)
     b[1] = 1 
-    for m in range(order + 1):
+    for m in range(order_p1):
         A[m, :] = theta ** m 
 
     # Solve the linear system A * alpha = b
@@ -147,6 +143,11 @@ class GEAR32(ImplicitSolver):
             self.B.pop()
             self.T.pop()
 
+        #precompute coefficients here, where buffers are available
+        self.F, self.K = {}, {}
+        for n in range(1, min(self.n, len(self.T))+1):
+            self.F[n], self.K[n] = compute_bdf_coefficients(n, self.T)
+
 
     # methods for adaptive timestep solvers --------------------------------------------
 
@@ -221,21 +222,18 @@ class GEAR32(ImplicitSolver):
         """
 
         #order of scheme for current step
-        _n = min(self.n if self.stage == 1 else self.m, len(self.B))
-
-        #compute integrator weights
-        F, K = compute_bdf_coefficients(_n, self.T)
+        n = min(self.n if self.stage == 1 else self.m, len(self.B))
         
         #fixed-point function update (faster then sum comprehension)
-        g = F * dt * self.func(self.x, u, t) 
-        for b, k in zip(self.B, K):
+        g = self.F[n] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[n]):
             g = g + b*k
 
         #use the jacobian
         if self.jac is not None:
 
             #compute jacobian
-            jac_g = F * dt * self.jac(self.x, u, t)
+            jac_g = self.F[n] * dt * self.jac(self.x, u, t)
 
             #anderson acceleration step with local newton
             self.x, err = self.acc.step(self.x, g, jac_g)
@@ -275,7 +273,6 @@ class GEAR32(ImplicitSolver):
 
             #no error estimate after first stage
             return True, 0.0, 0.0, 1.0
-
 
 
 class GEAR43(ImplicitSolver):
@@ -356,6 +353,11 @@ class GEAR43(ImplicitSolver):
             self.B.pop()
             self.T.pop()
 
+        #precompute coefficients here, where buffers are available
+        self.F, self.K = {}, {}
+        for n in range(1, min(self.n, len(self.T))+1):
+            self.F[n], self.K[n] = compute_bdf_coefficients(n, self.T)
+
 
     # methods for adaptive timestep solvers --------------------------------------------
 
@@ -430,21 +432,18 @@ class GEAR43(ImplicitSolver):
         """
 
         #order of scheme for current step
-        _n = min(self.n if self.stage == 1 else self.m, len(self.B))
-
-        #compute integrator weights
-        F, K = compute_bdf_coefficients(_n, self.T)
+        n = min(self.n if self.stage == 1 else self.m, len(self.B))
         
         #fixed-point function update (faster then sum comprehension)
-        g = F * dt * self.func(self.x, u, t) 
-        for b, k in zip(self.B, K):
+        g = self.F[n] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[n]):
             g = g + b*k
 
         #use the jacobian
         if self.jac is not None:
 
             #compute jacobian
-            jac_g = F * dt * self.jac(self.x, u, t)
+            jac_g = self.F[n] * dt * self.jac(self.x, u, t)
 
             #anderson acceleration step with local newton
             self.x, err = self.acc.step(self.x, g, jac_g)
