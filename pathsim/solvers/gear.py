@@ -128,7 +128,9 @@ class GEAR32(ImplicitSolver):
 
     def buffer(self, dt):
         """
-        buffer the state for the multistep method
+        Buffer the state and timestep. Dynamically precompute the 
+        variable timestep BDF coefficients on the fly for 
+        the current timestep.
         """
             
         #buffer state directly
@@ -216,9 +218,6 @@ class GEAR32(ImplicitSolver):
     def solve(self, u, t, dt):
         """
         Solves the implicit update equation via anderson acceleration.
-
-        Dynamically compute the BDF coefficients on the fly for 
-        variable timesteps.
         """
 
         #order of scheme for current step
@@ -338,7 +337,9 @@ class GEAR43(ImplicitSolver):
 
     def buffer(self, dt):
         """
-        buffer the state for the multistep method
+        Buffer the state and timestep. Dynamically precompute the 
+        variable timestep BDF coefficients on the fly for 
+        the current timestep.
         """
             
         #buffer state directly
@@ -426,9 +427,6 @@ class GEAR43(ImplicitSolver):
     def solve(self, u, t, dt):
         """
         Solves the implicit update equation via anderson acceleration.
-
-        Dynamically compute the BDF coefficients on the fly for 
-        variable timesteps.
         """
 
         #order of scheme for current step
