@@ -112,14 +112,15 @@ class Block:
             self.engine.revert()
 
 
-    def buffer(self):
+    def buffer(self, dt):
         """
-        Buffer current internal state of the block, if the block has 
-        a solver instance (is stateful).
-        This is required for multistage and implicit solvers.
+        Buffer current internal state of the block and the current timestep
+        if the block has a solver instance (is stateful).
+
+        This is required for multistage, multistep and adaptive integrators.
         """
         if self.engine is not None:
-            self.engine.buffer()
+            self.engine.buffer(dt)
     
 
     # methods for sampling data ---------------------------------------------------------

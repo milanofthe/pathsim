@@ -69,6 +69,9 @@ class TestBDF2(unittest.TestCase):
         #perform some steps
         for k in range(10):
 
+            #buffer state
+            solver.buffer(0)
+
             #test bdf buffer length
             buffer_length = len(solver.B)
             self.assertEqual(buffer_length, k+1 if k < 2 else 2)
@@ -174,6 +177,9 @@ class TestBDF3(unittest.TestCase):
         #perform some steps
         for k in range(10):
 
+            #buffer state
+            solver.buffer(0)
+
             #test bdf buffer length
             buffer_length = len(solver.B)
             self.assertEqual(buffer_length, k+1 if k < 3 else 3)
@@ -278,6 +284,9 @@ class TestBDF4(unittest.TestCase):
 
         #perform some steps
         for k in range(10):
+
+            #buffer state
+            solver.buffer(0)
 
             #test bdf buffer length
             buffer_length = len(solver.B)

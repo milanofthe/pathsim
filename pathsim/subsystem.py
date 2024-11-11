@@ -265,10 +265,10 @@ class Subsystem(Block):
             block.revert()
 
 
-    def buffer(self):
+    def buffer(self, dt):
         """
         buffer internal states of blocks with 
         internal integration engines 
         """
         for block in self.blocks:
-            block.buffer()
+            block.buffer(dt)

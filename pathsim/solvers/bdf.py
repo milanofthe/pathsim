@@ -10,6 +10,7 @@
 # IMPORTS ==============================================================================
 
 from ._solver import ImplicitSolver
+from .gear import compute_bdf_coefficients
 
 
 # SOLVERS ==============================================================================
@@ -32,7 +33,7 @@ class BDF2(ImplicitSolver):
         self.F = {1:1.0, 2:2/3}
 
         #bdf solution buffer
-        self.B = [self.initial_value]
+        self.B = []
 
 
     def reset(self):
@@ -40,11 +41,27 @@ class BDF2(ImplicitSolver):
         Resets integration engine to initial state.
         """
 
-        #reset buffer state with initial value
-        self.B = [self.initial_value]
+        #clear buffer
+        self.B = []
 
         #overwrite state with initial value
         self.x = self.x_0 = self.initial_value
+
+
+    def buffer(self, dt):
+        """
+        buffer the state for the multistep method
+        """
+            
+        #buffer state directly
+        self.x_0 = self.x
+
+        #add to buffer
+        self.B.append(self.x)
+
+        #truncate buffer if too long
+        if len(self.B) > 2:
+            self.B.pop(0)
 
 
     def solve(self, u, t, dt):
@@ -53,10 +70,12 @@ class BDF2(ImplicitSolver):
         """
 
         #buffer length for BDF order selection
-        n = len(self.B)
+        n = min(len(self.B), self.n)
 
         #fixed-point function update
-        g = self.F[n] * dt * self.func(self.x, u, t) + sum(b*k for b, k in zip(self.B, self.K[n]))
+        g = self.F[n] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[n]):
+            g = g + b*k
 
         #use the jacobian
         if self.jac is not None:
@@ -83,11 +102,7 @@ class BDF2(ImplicitSolver):
         #reset anderson accelerator
         self.acc.reset()
 
-        #add to buffer
-        self.B.append(self.x)
-        if len(self.B) > 2:
-            self.B.pop(0)
-
+        #no error control
         return True, 0.0, 0.0, 1.0
 
 
@@ -110,7 +125,7 @@ class BDF3(ImplicitSolver):
         self.F = {1:1.0, 2:2/3, 3:6/11}
 
         #bdf solution buffer
-        self.B = [self.initial_value]
+        self.B = []
 
 
     def reset(self):
@@ -118,11 +133,27 @@ class BDF3(ImplicitSolver):
         Resets integration engine to initial state.
         """
 
-        #reset buffer state with initial value
-        self.B = [self.initial_value]
+        #clear buffer
+        self.B = []
 
         #overwrite state with initial value
         self.x = self.x_0 = self.initial_value
+
+
+    def buffer(self, dt):
+        """
+        buffer the state for the multistep method
+        """
+            
+        #buffer state directly
+        self.x_0 = self.x
+
+        #add to buffer
+        self.B.append(self.x)
+
+        #truncate buffer if too long
+        if len(self.B) > 3:
+            self.B.pop(0)
 
 
     def solve(self, u, t, dt):
@@ -131,10 +162,12 @@ class BDF3(ImplicitSolver):
         """
 
         #buffer length for BDF order selection
-        n = len(self.B)
+        n = min(len(self.B), self.n)
 
         #fixed-point function update
-        g = self.F[n] * dt * self.func(self.x, u, t) + sum(b*k for b, k in zip(self.B, self.K[n]))
+        g = self.F[n] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[n]):
+            g = g + b*k
 
         #use the jacobian
         if self.jac is not None:
@@ -161,11 +194,7 @@ class BDF3(ImplicitSolver):
         #reset anderson accelerator
         self.acc.reset()
 
-        #add to buffer
-        self.B.append(self.x)
-        if len(self.B) > 3:
-            self.B.pop(0)
-
+        #no error control
         return True, 0.0, 0.0, 1.0
 
 
@@ -189,7 +218,7 @@ class BDF4(ImplicitSolver):
         self.F = {1:1.0, 2:2/3, 3:6/11, 4:12/25}
 
         #bdf solution buffer
-        self.B = [self.initial_value]
+        self.B = []
 
 
     def reset(self):
@@ -197,11 +226,27 @@ class BDF4(ImplicitSolver):
         Resets integration engine to initial state.
         """
 
-        #reset buffer state with initial value
-        self.B = [self.initial_value]
+        #clear buffer
+        self.B = []
 
         #overwrite state with initial value
         self.x = self.x_0 = self.initial_value
+
+
+    def buffer(self, dt):
+        """
+        buffer the state for the multistep method
+        """
+            
+        #buffer state directly
+        self.x_0 = self.x
+
+        #add to buffer
+        self.B.append(self.x)
+
+        #truncate buffer if too long
+        if len(self.B) > 4:
+            self.B.pop(0)
 
 
     def solve(self, u, t, dt):
@@ -210,10 +255,12 @@ class BDF4(ImplicitSolver):
         """
 
         #buffer length for BDF order selection
-        n = len(self.B)
+        n = min(len(self.B), self.n)
 
         #fixed-point function update
-        g = self.F[n] * dt * self.func(self.x, u, t) + sum(b*k for b, k in zip(self.B, self.K[n]))
+        g = self.F[n] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[n]):
+            g = g + b*k
 
         #use the jacobian
         if self.jac is not None:
@@ -240,9 +287,5 @@ class BDF4(ImplicitSolver):
         #reset anderson accelerator
         self.acc.reset()
 
-        #add to buffer
-        self.B.append(self.x)
-        if len(self.B) > 4:
-            self.B.pop(0)
-
+        #no error control
         return True, 0.0, 0.0, 1.0

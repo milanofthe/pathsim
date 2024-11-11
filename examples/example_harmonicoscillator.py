@@ -21,6 +21,9 @@ from pathsim.blocks import (
 from pathsim.solvers import (
     SSPRK33,
     RKCK54,
+    GEAR32,
+    BDF3,
+    BDF4
     )
 
 
@@ -57,7 +60,7 @@ connections = [
     ]
 
 # Create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
+Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=GEAR32)
 
 # Run the simulation for 25 seconds
 Sim.run(duration=25)

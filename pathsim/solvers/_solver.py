@@ -119,10 +119,13 @@ class Solver:
         self.stage = 0
 
 
-    def buffer(self):
+    def buffer(self, dt):
         """
-        Saves the current state to an internal state buffer, which is 
-        especially relevant for multistage and implicit solvers.
+        Saves the current state to an internal state buffer which 
+        is especially relevant for multistage and implicit solvers.
+
+        Multistep solver implement rolling buffers for the states 
+        and timesteps.
         """
         self.x_0 = self.x
 
@@ -228,7 +231,7 @@ class ExplicitSolver(Solver):
         """
 
         #buffer current state
-        self.buffer()
+        self.buffer(dt)
 
         #iterate solver stages (explicit updates)
         for t in self.stages(time, dt):
@@ -345,7 +348,7 @@ class ImplicitSolver(Solver):
         """
 
         #buffer current state
-        self.buffer()
+        self.buffer(dt)
 
         #flag for solver success
         success_sol = True

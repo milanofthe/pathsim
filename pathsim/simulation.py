@@ -540,7 +540,7 @@ class Simulation:
 
         #buffer internal states
         for block in self.blocks:
-            block.buffer()
+            block.buffer(dt)
 
         #total function evaluations of system equation
         total_evaluations = 0

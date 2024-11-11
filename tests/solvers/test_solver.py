@@ -63,7 +63,7 @@ class TestBaseSolver(unittest.TestCase):
 
     def test_buffer(self):
         self.solver.x = 2.0
-        self.solver.buffer()
+        self.solver.buffer(0)
         self.assertEqual(self.solver.x_0, 2.0)
 
     def test_cast(self):
