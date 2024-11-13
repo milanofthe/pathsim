@@ -103,7 +103,7 @@ class BDF2(ImplicitSolver):
         self.acc.reset()
 
         #no error control
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
 
 
 class BDF3(ImplicitSolver):
@@ -195,7 +195,7 @@ class BDF3(ImplicitSolver):
         self.acc.reset()
 
         #no error control
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
 
 
 class BDF4(ImplicitSolver):
@@ -288,4 +288,4 @@ class BDF4(ImplicitSolver):
         self.acc.reset()
 
         #no error control
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0

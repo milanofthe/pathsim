@@ -84,10 +84,9 @@ class ExplicitSolverTest(unittest.TestCase):
         self.assertFalse(self.solver.is_implicit)
 
     def test_integrate_singlestep(self):
-        success, err_rel, err_abs, scale = self.solver.integrate_singlestep(time=0, dt=0.1)
+        success, err, scale = self.solver.integrate_singlestep(time=0, dt=0.1)
         self.assertTrue(success)
-        self.assertEqual(err_rel, 0.0)
-        self.assertEqual(err_abs, 0.0)
+        self.assertEqual(err, 0.0)
         self.assertEqual(scale, 1.0)
 
     def test_integrate(self):

@@ -166,7 +166,7 @@ class Spectrum(Block):
             return self.engine.step(dict_to_array(self.inputs), _t, dt)
 
         #no error estimate
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
 
 
     def plot(self, *args, **kwargs):
@@ -313,4 +313,4 @@ class RealtimeSpectrum(Spectrum):
             return self.engine.step(dict_to_array(self.inputs), _t, dt)
 
         #no error estimate
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0

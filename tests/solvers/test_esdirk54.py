@@ -72,17 +72,16 @@ class TestESDIRK54(unittest.TestCase):
             self.assertEqual(solver.stage, i)
 
             _ = solver.solve(0.0, t, 1) #needed for implicit solvers to get slope
-            success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, t, 1)
 
             #test if expected return at intermediate stages
             if i < len(solver.eval_stages)-1:
                 self.assertTrue(success)
-                self.assertEqual(err_rel, 0.0)
-                self.assertEqual(err_abs, 0.0)
+                self.assertEqual(err, 0.0)
                 self.assertEqual(scale, 1.0)
 
         #test if expected return at final stage
-        self.assertNotEqual(err_abs, 0.0)
+        self.assertNotEqual(err, 0.0)
         self.assertNotEqual(scale, 1.0)
 
 

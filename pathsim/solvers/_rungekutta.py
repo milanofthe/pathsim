@@ -49,6 +49,49 @@ class ExplicitRungeKutta(ExplicitSolver):
         self.TR = None
 
 
+    # def error_controller(self, dt):
+    #     """
+    #     compute scaling factor for adaptive timestep based on 
+    #     absolute and relative local truncation error estimate, 
+    #     also checks if the error tolerance is achieved and returns 
+    #     a success metric.
+
+    #     INPUTS:
+    #         dt : (float) integration timestep
+    #     """
+
+    #     #early exit if no error estimate avaliable
+    #     if self.TR is None: 
+    #         return True, 0.0, 0.0, 1.0
+
+    #     #compute local truncation error slope (this is faster then 'sum' comprehension)
+    #     slope = 0.0
+    #     for i, b in enumerate(self.TR):
+    #         slope = slope + self.Ks[i] * b
+    #     tr = dt * slope
+
+    #     #compute and clip truncation error, error ratio abs
+    #     truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
+    #     error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
+
+    #     #compute and clip truncation error, error ratio rel
+    #     if np.any(self.x == 0.0): 
+    #         truncation_error_rel = 1.0
+    #         error_ratio_rel = 0.0
+    #     else:
+    #         truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
+    #         error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
+        
+    #     #compute error ratio and success check
+    #     error_ratio = max(error_ratio_abs, error_ratio_rel)
+    #     success = error_ratio >= 1.0
+
+    #     #compute timestep scale factor using accuracy order of truncation error
+    #     timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))     
+
+    #     return success, truncation_error_abs, truncation_error_rel, timestep_rescale
+
+
     def error_controller(self, dt):
         """
         compute scaling factor for adaptive timestep based on 
@@ -61,35 +104,33 @@ class ExplicitRungeKutta(ExplicitSolver):
         """
 
         #early exit if no error estimate avaliable
-        if self.TR is None: 
-            return True, 0.0, 0.0, 1.0
+        if self.TR is None or len(self.Ks) < len(self.TR): 
+            return True, 0.0, 1.0
 
-        #compute local truncation error slope (this is faster then 'sum' comprehension)
+        #local truncation error slope (this is faster then 'sum' comprehension)
         slope = 0.0
         for i, b in enumerate(self.TR):
             slope = slope + self.Ks[i] * b
-        tr = dt * slope
 
-        #compute and clip truncation error, error ratio abs
-        truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
-        error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
+        #compute scaling factors (avoid division by zero)
+        scale = self.tolerance_lte_abs + self.tolerance_lte_rel * np.abs(self.x)
 
-        #compute and clip truncation error, error ratio rel
-        if np.any(self.x == 0.0): 
-            truncation_error_rel = 1.0
-            error_ratio_rel = 0.0
-        else:
-            truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
-            error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
-        
-        #compute error ratio and success check
-        error_ratio = max(error_ratio_abs, error_ratio_rel)
-        success = error_ratio >= 1.0
+        #compute scaled truncation error (element-wise)
+        scaled_error = np.abs(dt * slope) / scale
+
+        #compute the error norm and clip it
+        error_norm = np.clip(float(np.max(scaled_error)), 1e-18, None)
+
+        #determine if the error is acceptable
+        success = error_norm <= 1.0
 
         #compute timestep scale factor using accuracy order of truncation error
-        timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))     
+        timestep_rescale = self.beta / error_norm ** (1/(min(self.m, self.n) + 1)) 
 
-        return success, truncation_error_abs, truncation_error_rel, timestep_rescale
+        #clip the rescale factor to a reasonable range
+        timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+
+        return success, error_norm, timestep_rescale
 
 
     def step(self, u, t, dt):
@@ -119,7 +160,7 @@ class ExplicitRungeKutta(ExplicitSolver):
             self.stage += 1
 
             #no error control for intermediate stages
-            return True, 0.0, 0.0, 1.0
+            return True, 0.0, 1.0
         
         else: 
 
@@ -172,6 +213,49 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         self.TR = None
 
 
+    # def error_controller(self, dt):
+    #     """
+    #     compute scaling factor for adaptive timestep based on 
+    #     absolute and relative local truncation error estimate, 
+    #     also checks if the error tolerance is achieved and returns 
+    #     a success metric.
+
+    #     INPUTS:
+    #         dt : (float) integration timestep
+    #     """
+
+    #     #early exit of not enough slopes or no error estimate at all
+    #     if self.TR is None or len(self.Ks) < len(self.TR): 
+    #         return True, 0.0, 0.0, 1.0
+
+    #     #compute local truncation error slope (this is faster then 'sum' comprehension)
+    #     slope = 0.0
+    #     for i, b in enumerate(self.TR):
+    #         slope = slope + self.Ks[i] * b
+    #     tr = dt * slope
+
+    #     #compute and clip truncation error, error ratio abs
+    #     truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
+    #     error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
+
+    #     #compute and clip truncation error, error ratio rel
+    #     if np.any(self.x == 0.0): 
+    #         truncation_error_rel = 1.0
+    #         error_ratio_rel = 0.0
+    #     else:
+    #         truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
+    #         error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
+        
+    #     #compute error ratio and success check
+    #     error_ratio = max(error_ratio_abs, error_ratio_rel)
+    #     success = error_ratio >= 1.0
+
+    #     #compute timestep scale factor using accuracy order of truncation error
+    #     timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))   
+
+    #     return success, truncation_error_abs, truncation_error_rel, timestep_rescale
+
+
     def error_controller(self, dt):
         """
         compute scaling factor for adaptive timestep based on 
@@ -183,36 +267,34 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             dt : (float) integration timestep
         """
 
-        #early exit of not enough slopes or no error estimate at all
+        #early exit if no error estimate avaliable
         if self.TR is None or len(self.Ks) < len(self.TR): 
-            return True, 0.0, 0.0, 1.0
+            return True, 0.0, 1.0
 
-        #compute local truncation error slope (this is faster then 'sum' comprehension)
+        #local truncation error slope (this is faster then 'sum' comprehension)
         slope = 0.0
         for i, b in enumerate(self.TR):
             slope = slope + self.Ks[i] * b
-        tr = dt * slope
 
-        #compute and clip truncation error, error ratio abs
-        truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
-        error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
+        #compute scaling factors (avoid division by zero)
+        scale = self.tolerance_lte_abs + self.tolerance_lte_rel * np.abs(self.x)
 
-        #compute and clip truncation error, error ratio rel
-        if np.any(self.x == 0.0): 
-            truncation_error_rel = 1.0
-            error_ratio_rel = 0.0
-        else:
-            truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
-            error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
-        
-        #compute error ratio and success check
-        error_ratio = max(error_ratio_abs, error_ratio_rel)
-        success = error_ratio >= 1.0
+        #compute scaled truncation error (element-wise)
+        scaled_error = np.abs(dt * slope) / scale
+
+        #compute the error norm and clip it#compute the error norm and clip it
+        error_norm = np.clip(float(np.max(scaled_error)), 1e-18, None)
+
+        #determine if the error is acceptable
+        success = error_norm <= 1.0
 
         #compute timestep scale factor using accuracy order of truncation error
-        timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))   
+        timestep_rescale = self.beta / error_norm ** (1/(min(self.m, self.n) + 1)) 
 
-        return success, truncation_error_abs, truncation_error_rel, timestep_rescale
+        #clip the rescale factor to a reasonable range
+        timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+
+        return success, error_norm, timestep_rescale
 
 
     def solve(self, u, t, dt):
@@ -282,7 +364,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             self.stage += 1
 
             #no error estimate for intermediate stages
-            return True, 0.0, 0.0, 1.0
+            return True, 0.0, 1.0
 
         else: 
 

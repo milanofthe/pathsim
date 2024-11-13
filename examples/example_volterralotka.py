@@ -55,7 +55,7 @@ for r in np.linspace(3, 12, 10):
         ]
 
     #initialize simulation with the blocks, connections, timestep and logging enabled
-    Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
+    Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54, tolerance_lte_rel=1e-6)
         
     #run the simulation
     Sim.run(50)

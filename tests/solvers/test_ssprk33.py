@@ -71,12 +71,11 @@ class TestSSPRK33(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, t, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
-            self.assertEqual(err_rel, 0.0)
-            self.assertEqual(err_abs, 0.0)
+            self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
 
 

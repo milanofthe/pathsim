@@ -78,7 +78,7 @@ class TestBDF2(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, t, 1)
 
 
     def test_step(self):
@@ -90,12 +90,11 @@ class TestBDF2(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, t, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
-            self.assertEqual(err_rel, 0.0)
-            self.assertEqual(err_abs, 0.0)
+            self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
 
 
@@ -186,7 +185,7 @@ class TestBDF3(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, t, 1)
 
 
     def test_step(self):
@@ -198,12 +197,11 @@ class TestBDF3(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, t, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
-            self.assertEqual(err_rel, 0.0)
-            self.assertEqual(err_abs, 0.0)
+            self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
 
 
@@ -294,7 +292,7 @@ class TestBDF4(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, t, 1)
 
 
     def test_step(self):
@@ -306,12 +304,11 @@ class TestBDF4(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, t, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
-            self.assertEqual(err_rel, 0.0)
-            self.assertEqual(err_abs, 0.0)
+            self.assertEqual(err, 0.0)
             self.assertEqual(scale, 1.0)
 
 

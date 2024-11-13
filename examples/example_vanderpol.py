@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, ODE
-from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR43
+from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR32, GEAR43, GEAR54
 
 
 # VAN DER POL OSCILLATOR INITIAL VALUE PROBLEM ==========================================

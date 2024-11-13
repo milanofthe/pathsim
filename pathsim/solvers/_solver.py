@@ -37,8 +37,8 @@ class Solver:
                  initial_value=0, 
                  func=lambda x, u, t: u, 
                  jac=None, 
-                 tolerance_lte_abs=1e-6, 
-                 tolerance_lte_rel=1e-3):
+                 tolerance_lte_abs=1e-8, 
+                 tolerance_lte_rel=1e-5):
 
         #set buffer, state and initial condition    
         self.x_0 = self.x = self.initial_value = initial_value
@@ -163,7 +163,7 @@ class Solver:
         Returns the estimated local truncation error (abs and rel) and scaling factor 
         for the timestep, only relevant for adaptive timestepping methods.
         """
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
 
 
     def revert(self):
@@ -190,7 +190,7 @@ class Solver:
         returns the local truncation error estimate and the 
         rescale factor for the timestep if the solver is adaptive.
         """
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
 
 
 # EXTENDED BASE SOLVER CLASSES =========================================================
@@ -235,9 +235,9 @@ class ExplicitSolver(Solver):
 
         #iterate solver stages (explicit updates)
         for t in self.stages(time, dt):
-            success, error_abs, error_rel, scale = self.step(0.0, t, dt)
+            success, error_norm, scale = self.step(0.0, t, dt)
 
-        return success, error_abs, error_rel, scale 
+        return success, error_norm, scale
 
 
     def integrate(self, 
@@ -272,7 +272,7 @@ class ExplicitSolver(Solver):
         while time < time_end + dt:
 
             #perform single timestep
-            success, error_abs, error_rel, scale = self.integrate_singlestep(time, dt)
+            success, error_norm, scale = self.integrate_singlestep(time, dt)
 
             #check if timestep was successful
             if adaptive and not success:
@@ -367,12 +367,12 @@ class ImplicitSolver(Solver):
                 if success_sol: success_sol = False
             
             #perform explicit component of timestep
-            success, error_abs, error_rel, scale = self.step(0.0, t, dt)
+            success, error_norm, scale = self.step(0.0, t, dt)
 
         #step successful in total
         success_total = success and success_sol
 
-        return success_total, error_abs, error_rel, scale 
+        return success, error_norm, scale 
 
 
     def integrate(self, 
@@ -411,7 +411,7 @@ class ImplicitSolver(Solver):
         while time < time_end + dt:
 
             #integrate for single timestep
-            success, error_abs, error_rel, scale = self.integrate_singlestep(time, dt, tolerance_fpi, max_iterations)
+            success, error_norm, scale = self.integrate_singlestep(time, dt, tolerance_fpi, max_iterations)
 
             #check if timestep was successful and adaptive
             if adaptive and not success:

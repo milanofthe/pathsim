@@ -220,20 +220,19 @@ class Subsystem(Block):
         """
 
         #initial timestep rescale and error estimate
-        success, max_error_abs, max_error_rel, relevant_scales = True, 0.0, 0.0, []
+        success, max_error_norm, relevant_scales = True, 0.0, []
 
         #step blocks and get error estimates if available
         for block in self.blocks:
-            ss, error_abs, error_rel, scl = block.step(t, dt)
+            ss, err, scl = block.step(t, dt)
             if not ss: success = False
-            if error_abs > max_error_abs: max_error_abs = error_abs
-            if error_rel > max_error_rel: max_error_rel = error_rel
+            if err > max_error_norm: max_error_norm = err
             if scl not in [0.0, 1.0]: relevant_scales.append(scl)
 
         #calculate real relevant timestep rescale
         scale = 1.0 if not relevant_scales else min(relevant_scales)
 
-        return success, max_error_abs, max_error_rel, scale
+        return success, max_error_norm, scale
 
 
     # methods for blocks with integration engines -------------------------------------------

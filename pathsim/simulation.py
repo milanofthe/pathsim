@@ -490,18 +490,17 @@ class Simulation:
         """
 
         #initial timestep rescale and error estimate
-        success, max_error_abs, max_error_rel, relevant_scales = True, 0.0, 0.0, []
+        success, max_error_norm, relevant_scales = True, 0.0, []
 
         #step blocks and get error estimates if available
         for block in self.blocks:
-            ss, error_abs, error_rel, scl = block.step(t, dt)
+            ss, err_norm, scl = block.step(t, dt)
             
             #check stepping success
             if not ss: success = False
 
-            #update errors for error tracking
-            if error_abs > max_error_abs: max_error_abs = error_abs
-            if error_rel > max_error_rel: max_error_rel = error_rel
+            #update error tracking
+            if err_norm > max_error_norm: max_error_norm = err_norm
             
             #update timestep rescale if relevant
             if scl not in [0.0, 1.0]: relevant_scales.append(scl)
@@ -509,7 +508,7 @@ class Simulation:
         #calculate real relevant timestep rescale
         scale = 1.0 if not relevant_scales else min(relevant_scales)
 
-        return success, max_error_abs, max_error_rel, scale
+        return success, max_error_norm, scale
 
 
     def step(self, dt=None, adaptive=False):
@@ -565,7 +564,7 @@ class Simulation:
 
                 #if solver did not converge -> quit early (adaptive only)
                 if adaptive and not success:
-                    error_abs, error_rel, scale = 0.0, 0.0, 0.5
+                    error_norm, scale = 0.0, 0.5
                     break
 
             #count iterations and function evaluations
@@ -573,12 +572,12 @@ class Simulation:
             total_solver_iterations += iterations_sol
 
             #timestep for dynamical blocks (with internal states)
-            success, error_abs, error_rel, scale = self._step(time, dt)
+            success, error_norm, scale = self._step(time, dt)
 
         #if step not successful and adaptive -> quit early
         if adaptive and not success:
             self._revert()
-            return success, error_abs, error_rel, scale, total_evaluations, total_solver_iterations
+            return success, error_norm, scale, total_evaluations, total_solver_iterations
         
         #increment global time and continue simulation
         self.time += dt 
@@ -590,7 +589,7 @@ class Simulation:
         self._sample(self.time)
 
         #max local truncation error, timestep rescale, successful step
-        return success, error_abs, error_rel, scale, total_evaluations, total_solver_iterations
+        return success, error_norm, scale, total_evaluations, total_solver_iterations
 
 
     def run(self, duration=10, reset=True):
@@ -642,7 +641,7 @@ class Simulation:
                 _dt = end_time - self.time
 
             #advance the simulation by one (effective) timestep '_dt'
-            success, _1, _2, scale, evaluations, solver_iterations = self.step(_dt, self.engine.is_adaptive)
+            success, _, scale, evaluations, solver_iterations = self.step(_dt, self.engine.is_adaptive)
 
             #update evaluation and iteration counters
             total_evaluations += evaluations

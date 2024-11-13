@@ -33,7 +33,7 @@ class EUF(ExplicitSolver):
         self.x = self.x_0 + dt * self.func(self.x, u, t)
 
         #no error estimate available
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
 
 
 class EUB(ImplicitSolver):
@@ -77,4 +77,4 @@ class EUB(ImplicitSolver):
         self.acc.reset()
 
         #no error estimate available
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0

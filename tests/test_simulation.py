@@ -194,10 +194,9 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(self.Int.get(0), self.Int.initial_value)
 
         #step using global timestep
-        success, err_rel, err_abs, scl, te, ts = self.Sim.step()
+        success, err, scl, te, ts = self.Sim.step()
         self.assertEqual(self.Sim.time, self.Sim.dt)
-        self.assertEqual(err_rel, 0.0) #fixed solver
-        self.assertEqual(err_abs, 0.0) #fixed solver
+        self.assertEqual(err, 0.0) #fixed solver
         self.assertEqual(scl, 1.0) #fixed solver
         self.assertEqual(ts, 0) #no implicit solver
         self.assertGreaterEqual(te, self.Sim.iterations_min)

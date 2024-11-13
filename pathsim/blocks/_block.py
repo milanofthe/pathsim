@@ -210,5 +210,5 @@ class Block:
             scale   : (float) timestep rescale from adaptive integrators
         """
 
-        #by default no error estimate (abs and rel error -> 0.0, 0.0)
-        return True, 0.0, 0.0, 1.0
+        #by default no error estimate (error norm -> 0.0)
+        return True, 0.0, 1.0

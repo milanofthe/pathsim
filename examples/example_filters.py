@@ -12,12 +12,12 @@ import numpy as np
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope
 from pathsim.blocks.rf import SquareWaveSource, ButterworthLowpassFilter
-from pathsim.solvers import SSPRK33, GEAR43, ESDIRK43
+from pathsim.solvers import SSPRK33
 
 
 # FILTERING A SQUAREWAVE ================================================================
 
-dt = 0.01
+dt = 0.02
 
 #filter bandwidth, order and signal frequency
 B, n, f = 2, 6, 1
@@ -36,7 +36,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=ESDIRK43)
+Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 
 #run the simulation 
 Sim.run(10)

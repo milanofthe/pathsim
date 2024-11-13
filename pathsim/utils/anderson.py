@@ -10,8 +10,8 @@
 # IMPORTS ==============================================================================
 
 import numpy as np
-import matplotlib.pyplot as plt
 
+from collections import deque
 
 # CLASS ================================================================================
 
@@ -42,7 +42,7 @@ class AndersonAcceleration:
 
         #rolling buffers
         self.x_buffer = []
-        self.f_buffer = []
+        self.r_buffer = []
 
         #iteration counter for debugging
         self.counter = 0
@@ -55,7 +55,7 @@ class AndersonAcceleration:
 
         #clear buffers
         self.x_buffer = []
-        self.f_buffer = []
+        self.r_buffer = []
 
         #reset iteration counter
         self.counter = 0
@@ -74,11 +74,11 @@ class AndersonAcceleration:
         self.counter += 1
 
         #residual (this gets minimized)
-        f = g - x
+        res = g - x
         
         #fallback to regular fpi if 'm == 0'
         if self.m == 0:
-            return g, np.linalg.norm(f)
+            return g, np.linalg.norm(res)
 
         #make x vectorial if g is vector
         if np.isscalar(x) and not np.isscalar(g):
@@ -86,47 +86,47 @@ class AndersonAcceleration:
     
         #append to buffer
         self.x_buffer.append(x)
-        self.f_buffer.append(f)
+        self.r_buffer.append(res)
 
         #total buffer length
-        k = len(self.f_buffer)
+        k = len(self.r_buffer)
 
         #if no buffer, regular fixed-point update
         if k == 1:
-            return g, np.linalg.norm(f)
+            return g, np.linalg.norm(res)
 
         #if buffer size 'm' reached, restart or truncate
         elif self.m is not None and k > self.m + 1:
             if self.restart:
                 self.x_buffer = []
-                self.f_buffer = []
-                return g, np.linalg.norm(f)
+                self.r_buffer = []
+                return g, np.linalg.norm(res)
             else:
                 self.x_buffer.pop(0)
-                self.f_buffer.pop(0)
+                self.r_buffer.pop(0)
 
         #get deltas 
         dX = np.diff(self.x_buffer, axis=0)
-        dF = np.diff(self.f_buffer, axis=0)
+        dR = np.diff(self.r_buffer, axis=0)
 
         #exit for scalar values
-        if np.isscalar(f):
+        if np.isscalar(res):
 
             #delta squared norm
-            dF2 = np.linalg.norm(dF)**2
+            dR2 = np.dot(dR, dR)
 
             #catch division by zero
-            if dF2 <= 1e-14:
-                return g, abs(f)
+            if dR2 <= 1e-14:
+                return g, abs(res)
 
             #new solution and residual
-            return x - f * sum(dF * dX) / dF2, abs(f)
+            return x - res * sum(dR * dX) / dR2, abs(res)
 
         #compute coefficients from least squares problem
-        C, *_ = np.linalg.lstsq(dF.T, f, rcond=None)
+        C, *_ = np.linalg.lstsq(dR.T, res, rcond=None)
 
-        #new solution and residual
-        return x - C @ dX, np.linalg.norm(f)
+        #new solution and residual norm
+        return x - C @ dX, np.linalg.norm(res)
 
 
 
@@ -147,15 +147,15 @@ class NewtonAndersonAcceleration(AndersonAcceleration):
         """
 
         #compute residual
-        f = g - x
+        res = g - x
 
         #early exit for scalar or purely vectorial values
-        if np.isscalar(f) or np.ndim(jac) == 1:
-            return x - f / (jac - 1.0), abs(f)
+        if np.isscalar(res) or np.ndim(jac) == 1:
+            return x - res / (jac - 1.0), abs(res)
 
         #vectorial values (newton raphson)
-        jac_f = jac - np.eye(len(f))
-        return x - np.linalg.solve(jac_f, f), np.linalg.norm(f)
+        jac_f = jac - np.eye(len(res))
+        return x - np.linalg.solve(jac_f, res), np.linalg.norm(res)
 
 
     def step(self, x, g, jac=None):
@@ -172,9 +172,9 @@ class NewtonAndersonAcceleration(AndersonAcceleration):
             return super().step(x, g)
         else: 
             #newton step with residual
-            _x, res = self._newton(x, g, jac)
+            _x, res_norm = self._newton(x, g, jac)
 
             #anderson step with no residual
             y, _ = super().step(_x, g)
 
-            return y, res
+            return y, res_norm

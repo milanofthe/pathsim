@@ -73,17 +73,16 @@ class TestESDIRK32(unittest.TestCase):
             self.assertEqual(solver.stage, i)
 
             _ = solver.solve(0.0, t, 1) #needed for implicit solvers to get slope
-            success, err_rel, err_abs, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, t, 1)
 
             #test if expected return at intermediate stages
             if i < len(solver.eval_stages)-1:
                 self.assertTrue(success)
-                self.assertEqual(err_rel, 0.0)
-                self.assertEqual(err_abs, 0.0)
+                self.assertEqual(err, 0.0)
                 self.assertEqual(scale, 1.0)
 
         #test if expected return at final stage
-        self.assertNotEqual(err_abs, 0.0)
+        self.assertNotEqual(err, 0.0)
         self.assertNotEqual(scale, 1.0)
 
 
@@ -120,7 +119,7 @@ class TestESDIRK32(unittest.TestCase):
 
         for problem in problems:
 
-            solver = ESDIRK32(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-7, tolerance_lte_abs=1e-6)
+            solver = ESDIRK32(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-12, tolerance_lte_abs=1e-6)
 
             time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1, adaptive=True)
             error = np.linalg.norm(numerical_solution - problem.solution(time))

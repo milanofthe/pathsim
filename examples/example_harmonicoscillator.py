@@ -18,13 +18,7 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import (
-    SSPRK33,
-    RKCK54,
-    GEAR32,
-    BDF3,
-    BDF4
-    )
+from pathsim.solvers import SSPRK33
 
 
 # HARMONIC OSCILLATOR INITIAL VALUE PROBLEM =============================================
@@ -60,7 +54,7 @@ connections = [
     ]
 
 # Create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=GEAR32)
+Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 
 # Run the simulation for 25 seconds
 Sim.run(duration=25)

@@ -134,7 +134,7 @@ class OneOverFNoise(Block):
         self.engine.step(self.white_noise_value, t, dt)
 
         #no error control for noise source
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
 
 
 class SinusoidalPhaseNoiseSource(Block):
@@ -215,4 +215,4 @@ class SinusoidalPhaseNoiseSource(Block):
         self.engine.step(self.noise_2, t, dt)
 
         #no error control for noise source
-        return True, 0.0, 0.0, 1.0
+        return True, 0.0, 1.0
