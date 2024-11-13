@@ -40,12 +40,13 @@ class AndersonAcceleration:
         #restart after buffer length is reached?
         self.restart = restart
 
-        #rolling buffers
-        self.x_buffer = []
-        self.r_buffer = []
+        #rolling difference buffers
+        self.dx_buffer = deque(maxlen=self.m)
+        self.dr_buffer = deque(maxlen=self.m)
 
-        #iteration counter for debugging
-        self.counter = 0
+        #prvious values
+        self.x_prev = None
+        self.r_prev = None
 
 
     def reset(self):
@@ -53,12 +54,13 @@ class AndersonAcceleration:
         reset the anderson accelerator
         """
 
-        #clear buffers
-        self.x_buffer = []
-        self.r_buffer = []
+        #clear difference buffers
+        self.dx_buffer.clear()
+        self.dr_buffer.clear()
 
-        #reset iteration counter
-        self.counter = 0
+        #clear previous values
+        self.x_prev = None
+        self.r_prev = None
 
 
     def step(self, x, g):
@@ -69,9 +71,6 @@ class AndersonAcceleration:
             x : (float or array) current solution
             g : (float or array) current evaluation of g(x)
         """
-
-        #increment counter
-        self.counter += 1
 
         #residual (this gets minimized)
         res = g - x
@@ -84,30 +83,31 @@ class AndersonAcceleration:
         if np.isscalar(x) and not np.isscalar(g):
             x *= np.ones_like(g)
     
-        #append to buffer
-        self.x_buffer.append(x)
-        self.r_buffer.append(res)
-
-        #total buffer length
-        k = len(self.r_buffer)
-
         #if no buffer, regular fixed-point update
-        if k == 1:
+        if self.x_prev is None:
+
+            #save values for next iteration
+            self.x_prev = x
+            self.r_prev = res
+
             return g, np.linalg.norm(res)
 
-        #if buffer size 'm' reached, restart or truncate
-        elif self.m is not None and k > self.m + 1:
-            if self.restart:
-                self.x_buffer = []
-                self.r_buffer = []
-                return g, np.linalg.norm(res)
-            else:
-                self.x_buffer.pop(0)
-                self.r_buffer.pop(0)
+        #append to difference buffer
+        self.dx_buffer.append(x - self.x_prev)
+        self.dr_buffer.append(res - self.r_prev)
+        
+        #save values for next iteration
+        self.x_prev = x
+        self.r_prev = res
 
-        #get deltas 
-        dX = np.diff(self.x_buffer, axis=0)
-        dR = np.diff(self.r_buffer, axis=0)
+        #if buffer size 'm' reached, restart
+        if self.restart and len(self.x_buffer) >= self.m:
+            self.reset()
+            return g, np.linalg.norm(res)
+        
+        #get difference matrices 
+        dX = np.array(self.dx_buffer)
+        dR = np.array(self.dr_buffer)
 
         #exit for scalar values
         if np.isscalar(res):
@@ -120,7 +120,7 @@ class AndersonAcceleration:
                 return g, abs(res)
 
             #new solution and residual
-            return x - res * sum(dR * dX) / dR2, abs(res)
+            return x - res * np.dot(dR, dX) / dR2, abs(res)        
 
         #compute coefficients from least squares problem
         C, *_ = np.linalg.lstsq(dR.T, res, rcond=None)
