@@ -267,10 +267,21 @@ class GEAR(ImplicitSolver):
         return self.error_controller(x_m)
 
 
-
-
-
 # SOLVERS ==============================================================================
+
+class GEAR21(GEAR):
+    """
+    Adaptive GEAR integrator with 2-nd order BDF for timestepping 
+    and 1-st order BDF (euler backward) for truncation error estimation.
+    """
+
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
+
+        #integration order and order of secondary method
+        self.n = 2
+        self.m = 1
+
 
 class GEAR32(GEAR):
     """
