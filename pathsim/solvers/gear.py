@@ -19,8 +19,7 @@ import numpy as np
 def compute_bdf_coefficients(order, timesteps):
     """
     Computes the coefficients for backward differentiation formulas for a given order.
-    The timesteps can be specified if the coefficients are for variable timestep BDF 
-    methods. 
+    The timesteps can be specified for variable timestep BDF methods. 
 
     For m-th order BDF we have for the n-th timestep:
         sum(alpha_i * x_i; i=n-m,...,n) = h_n * f_n(x_n, t_n)
@@ -190,8 +189,8 @@ class GEAR(ImplicitSolver):
         #compute timestep scale factor using accuracy order of truncation error
         timestep_rescale = self.beta / error_norm ** (1/self.n)
 
-        #clip the rescale factor to a reasonable range
-        timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+        # #clip the rescale factor to a reasonable range
+        # timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
 
         return success, error_norm, timestep_rescale
 
@@ -391,36 +390,23 @@ class GEAR52A(GEAR):
 
         #compute the error norm and clip it
         error_norm_m = np.clip(float(np.max(scaled_error_m)), 1e-18, None)
-        error_norm_p = np.clip(float(np.max(scaled_error_p)), 1e-18, None)        
+        error_norm_p = np.clip(float(np.max(scaled_error_p)), 1e-18, None)      
 
-        #decrease the order if smaller order is more accurate
+        #success metric (use lower order estimate)
+        success = error_norm_m <= 1.0
+
+        #compute timestep scale factor using accuracy order of truncation error
+        timestep_rescale = self.beta / error_norm_m ** (1/self.n)  
+
+        #decrease the order if smaller order is more accurate (stability)
         if error_norm_m < error_norm_p:
-
-            #success metric
-            success = error_norm_m <= 1.0
-
-            #compute timestep scale factor using accuracy order of truncation error
-            timestep_rescale = self.beta / error_norm_m ** (1/self.n)
-            timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
-
-            #decrease method order by one
             self.n = max(self.n-1, self.n_min)
-    
-            return success, error_norm_m, timestep_rescale
-
+        
+        #increase the order if larger order is more accurate (accuracy -> larger steps)
         else:
-            
-            #success metric
-            success = error_norm_p <= 1.0
-
-            #compute timestep scale factor using accuracy order of truncation error
-            timestep_rescale = self.beta / error_norm_p ** (1/(self.n + 1))
-            timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
-
-            #increase method order by one
             self.n = min(self.n+1, self.n_max)
 
-            return success, error_norm_p, timestep_rescale
+        return success, error_norm_p, timestep_rescale
 
 
     # methods for timestepping ---------------------------------------------------------
