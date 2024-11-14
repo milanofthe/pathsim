@@ -46,7 +46,6 @@ Sim = Simulation(blocks, connections, dt=5, log=True, Solver=GEAR52A, tolerance_
 
 Sim.run(3*mu)
 
-
 #plotting
 Sco.plot(".-")
 

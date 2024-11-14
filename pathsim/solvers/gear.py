@@ -1,6 +1,6 @@
 ########################################################################################
 ##
-##                             GEARS INTEGRATION METHODS 
+##                            GEAR-type INTEGRATION METHODS 
 ##                                 (solvers/gear.py)
 ##
 ##                                 Milan Rother 2024
@@ -18,20 +18,27 @@ import numpy as np
 
 def compute_bdf_coefficients(order, timesteps):
     """
-    Computes the BDF coefficients for a given order and list of timesteps.
-    
-    For m-th order BDF we have for the n-th timestep:
+    Computes the coefficients for backward differentiation formulas for a given order.
+    The timesteps can be specified if the coefficients are for variable timestep BDF 
+    methods. 
 
+    For m-th order BDF we have for the n-th timestep:
         sum(alpha_i * x_i; i=n-m,...,n) = h_n * f_n(x_n, t_n)
+    or 
+        x_n = beta * h_n * f_n(x_n, t_n) - sum(alpha_j * x_{n-1-j}; j=0,...,order-1)
 
     INPUTS : 
         order     : (int) order of the integration scheme
         timesteps : (list[float]) timestep buffer (h_{n-j}; j=0,...,order-1)
+
+    OUTPUTS : 
+        beta  : (float) weight for function
+        alpha : (array[float]) weights for previous solutions
     """
 
     #check if valid order
     if order < 1:
-        raise RuntimeError("BDF coefficients of order 0 not possible!")
+        raise RuntimeError(f"BDF coefficients of order '{order}' not possible!")
 
     #quit early for no buffer (euler backward)
     if len(timesteps) < 2:
@@ -60,20 +67,18 @@ def compute_bdf_coefficients(order, timesteps):
     return 1/alphas[0], -alphas[1:]/alphas[0]
 
 
-
-
-
 # BASE GEAR SOLVER =====================================================================
 
-class GearBase(ImplicitSolver):
+class GEAR(ImplicitSolver):
     """
-    Base class for GEAR-type integrators that defines the specific methods.
+    Base class for GEAR-type integrators that defines the universal methods.
 
     Numerical integration method based on BDFs (linear multistep methods). 
-    Uses n-th and m-th (n-1) order BDFs in two separate stages for adaptive 
-    timestep control. The timestep adaption is handled by a buffer for 
-    the past timesteps. The adaptive timestep BDF weights are dynamically 
-    computed at each timestep.
+    Uses n-th order BDF for timestepping and (n-1)-th order BDF coefficients 
+    to estimate a lower ordersolutuin for error control. 
+
+    The adaptive timestep BDF coefficients are dynamically computed at the 
+    beginning of each timestep from the buffered previous timsteps.
 
     NOTE:
         Not to be used directly!!!
@@ -179,7 +184,7 @@ class GearBase(ImplicitSolver):
     def error_controller(self, x_m):
         """
         compute scaling factor for adaptive timestep based on absolute and 
-        relative local truncation error estimate, also checks if the error 
+        relative tolerances for local truncation error. Checks if the error 
         tolerance is achieved and returns a success metric.
 
         INPUTS:
@@ -241,7 +246,9 @@ class GearBase(ImplicitSolver):
 
     def step(self, u, t, dt):
         """
-        Performs the timestep by buffering the previous state.
+        Finalizes the timestep by resetting the solver for the implicit 
+        update equation and computing the lower order estimate of the 
+        solution for error control.
         """
 
         #reset anderson accelerator
@@ -265,10 +272,10 @@ class GearBase(ImplicitSolver):
 
 # SOLVERS ==============================================================================
 
-class GEAR32(GearBase):
+class GEAR32(GEAR):
     """
     Adaptive GEAR integrator with 3-rd order BDF for timestepping 
-    and internal 2-nd order BDF for truncation error estimation.
+    and 2-nd order BDF for truncation error estimation.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -279,10 +286,10 @@ class GEAR32(GearBase):
         self.m = 2
 
 
-class GEAR43(GearBase):
+class GEAR43(GEAR):
     """
     Adaptive GEAR integrator with 4-th order BDF for timestepping 
-    and internal 3-rd order BDF for truncation error estimation.
+    and 3-rd order BDF for truncation error estimation.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -293,10 +300,10 @@ class GEAR43(GearBase):
         self.m = 3
 
 
-class GEAR54(GearBase):
+class GEAR54(GEAR):
     """
     Adaptive GEAR integrator with 5-th order BDF for timestepping 
-    and internal 4-th order BDF for truncation error estimation.
+    and 4-th order BDF for truncation error estimation.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -307,12 +314,27 @@ class GEAR54(GearBase):
         self.m = 4
 
 
-
-
-
-class GEAR52A(GearBase):
+class GEAR52A(GEAR):
     """
-    Adaptive order adaptive stepsize GEAR integrator.
+    Adaptive order adaptive stepsize GEAR integrator. Adaptively selects the order 
+    (BDF coefficients) for timestepping between 2 and 5 depending on which method 
+    yields the lower truncation error. This balances the stability of the lower 
+    order methods with the accuracy of higher order methods. 
+
+    Previous solutions and the vadiable timestep BDF coefficients are used 
+    to estimate a lower and a higher order solution from the solution of the 
+    timestepping method. This gives two separate estimates for the local 
+    tuncation error.
+
+    If the error is dominated by stability (lte of lower order method is lower), 
+    the order of the stepping method is decreased for the next timestep. 
+
+    If the error is dominated by the accuracy of the method (higher order error 
+    is lower), the order of the stepping method is increased for the next timestep.
+    
+    This means the integrator can take larger steps in regions where the solution 
+    is smooth using a higher order method and use more stable lower order methods 
+    in regions where the system exhibits stiffness or discontinuities.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -327,9 +349,8 @@ class GEAR52A(GearBase):
 
     def buffer(self, dt):
         """
-        Buffer the state and timestep. Dynamically precompute the 
-        variable timestep BDF coefficients on the fly for 
-        the current timestep.
+        Buffer the state and timestep. Dynamically precompute the variable 
+        timestep BDF coefficients on the fly for the current timestep.
         """
             
         #buffer state directly
@@ -352,9 +373,14 @@ class GEAR52A(GearBase):
 
     def error_controller(self, x_m, x_p):
         """
-        compute scaling factor for adaptive timestep based on absolute and 
-        relative local truncation error estimate, also checks if the error 
-        tolerance is achieved and returns a success metric.
+        Compute scaling factor for adaptive timestep based on absolute and relative 
+        tolerances of the local truncation error estimate obtained from esimated 
+        lower and higher order solution. 
+
+        Checks if the error tolerance is achieved and returns a success metric.
+
+        Adapts the stepping order such that the normalized error is minimized and 
+        larger steps can be taken by the integrator.
 
         INPUTS:
             x_m : (array[float]) lower order solution estimate
@@ -406,7 +432,9 @@ class GEAR52A(GearBase):
 
     def step(self, u, t, dt):
         """
-        Performs the timestep by buffering the previous state.
+        Finalizes the timestep by resetting the solver for the implicit 
+        update equation and computing the lower and higher order estimate 
+        of the solution. Then calls the error controller.
         """
 
         #reset anderson accelerator

@@ -26,8 +26,6 @@ mu = 1000
 #simulation timestep
 dt = 0.01
 
-#blocks that define the system
-Sco = Scope()
 
 # subsystem for modeling ode function ---------------------------------------------------
 
@@ -75,6 +73,8 @@ VDP = Subsystem(vdp_blocks, vdp_connections)
 
 
 # top level system ----------------------------------------------------------------------
+
+Sco = Scope()
 
 #blocks of the main system
 blocks = [VDP, Sco]
