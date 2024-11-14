@@ -31,9 +31,8 @@ class TestAndersonAcceleration(unittest.TestCase):
         # test initialization
         self.assertEqual(aa.m, m)
         self.assertTrue(aa.restart)
-        self.assertEqual(len(aa.x_buffer), 0)
-        self.assertEqual(len(aa.f_buffer), 0)
-        self.assertEqual(aa.counter, 0)
+        self.assertEqual(len(aa.dx_buffer), 0)
+        self.assertEqual(len(aa.dr_buffer), 0)
 
     def test_reset(self):
         aa = AndersonAcceleration(5)
@@ -42,9 +41,8 @@ class TestAndersonAcceleration(unittest.TestCase):
         aa.counter = 10
         aa.reset()
         # test reset
-        self.assertEqual(len(aa.x_buffer), 0)
-        self.assertEqual(len(aa.f_buffer), 0)
-        self.assertEqual(aa.counter, 0)
+        self.assertEqual(len(aa.dx_buffer), 0)
+        self.assertEqual(len(aa.dr_buffer), 0)
 
     def test_step_scalar(self):
         aa = AndersonAcceleration(2)
@@ -100,9 +98,8 @@ class TestNewtonAndersonAcceleration(unittest.TestCase):
         # test initialization
         self.assertEqual(naa.m, m)
         self.assertTrue(naa.restart)
-        self.assertEqual(len(naa.x_buffer), 0)
-        self.assertEqual(len(naa.f_buffer), 0)
-        self.assertEqual(naa.counter, 0)
+        self.assertEqual(len(naa.dx_buffer), 0)
+        self.assertEqual(len(naa.dr_buffer), 0)
 
     def test_step_no_jacobian(self):
         naa = NewtonAndersonAcceleration(2)

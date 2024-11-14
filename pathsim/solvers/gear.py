@@ -119,22 +119,6 @@ class GEAR(ImplicitSolver):
         #overwrite state with initial value
         self.x = self.x_0 = self.initial_value
 
-    
-    def set(self, x):
-        """
-        Sets the internal state of the integration engine and buffer 
-        for the multistep method. 
-
-        This method is required for event based simulations, and to 
-        handle discontinuities in state variables.
-        """
-
-        #overwrite internal state with value
-        self.x = self.x_0 = x
-
-        #reset stage counter
-        self.stage = 0
-
 
     def buffer(self, dt):
         """

@@ -101,7 +101,7 @@ class AndersonAcceleration:
         self.r_prev = res
 
         #if buffer size 'm' reached, restart
-        if self.restart and len(self.x_buffer) >= self.m:
+        if self.restart and len(self.dx_buffer) >= self.m:
             self.reset()
             return g, np.linalg.norm(res)
         
