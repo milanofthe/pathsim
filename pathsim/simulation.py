@@ -437,18 +437,18 @@ class Simulation:
 
         RETURNS: 
             success                 : (bool) indicator if the timestep was successful
-            total_evaluations       : (int) total number of system evaluations
-            total_solver_iterations : (int) total number of implicit solver iterations
+            total_evals       : (int) total number of system evaluations
+            total_solver_its : (int) total number of implicit solver iterations
         """
 
         #total evaluations of system equation
-        total_evaluations = 0
+        total_evals = 0
 
         #perform fixed-point iterations to solve implicit update equation
         for iteration in range(self.iterations_max):
 
             #evaluate system equation (this is a fixed point loop)
-            total_evaluations += self._update(t)
+            total_evals += self._update(t)
 
             #advance solution of implicit solver
             max_error = 0.0
@@ -459,10 +459,10 @@ class Simulation:
 
             #check for convergence (only error)
             if max_error <= self.tolerance_fpi:
-                return True, total_evaluations, iteration + 1
+                return True, total_evals, iteration + 1
 
         #not converged in 'self.iterations_max' steps
-        return False, total_evaluations, iteration + 1
+        return False, total_evals, iteration + 1
 
 
     def _step(self, t, dt):
@@ -496,17 +496,21 @@ class Simulation:
         for block in self.blocks:
             ss, err_norm, scl = block.step(t, dt)
             
-            #check stepping success
-            if not ss: success = False
+            #check solver stepping success
+            if not ss: 
+                success = False
 
             #update error tracking
-            if err_norm > max_error_norm: max_error_norm = err_norm
+            if err_norm > max_error_norm: 
+                max_error_norm = err_norm
             
             #update timestep rescale if relevant
-            if scl not in [0.0, 1.0]: relevant_scales.append(scl)
+            if scl not in [0.0, 1.0]: 
+                relevant_scales.append(scl)
 
         #calculate real relevant timestep rescale
-        scale = 1.0 if not relevant_scales else min(relevant_scales)
+        if not relevant_scales: scale = 1.0  
+        else: scale = min(relevant_scales)
 
         return success, max_error_norm, scale
 
@@ -529,8 +533,8 @@ class Simulation:
             success                 : (bool) indicator if the timestep was successful
             max_error               : (float) maximum local truncation error from integration
             scale                   : (float) rescale factor for timestep
-            total_evaluations       : (int) total number of system evaluations
-            total_solver_iterations : (int) total number of implicit solver iterations
+            total_evals       : (int) total number of system evaluations
+            total_solver_its : (int) total number of implicit solver iterations
         """
 
         #default global timestep as local timestep
@@ -541,35 +545,32 @@ class Simulation:
         for block in self.blocks:
             block.buffer(dt)
 
-        #total function evaluations of system equation
-        total_evaluations = 0
-
-        #total number of implicit solver iterations
-        total_solver_iterations = 0
+        #total function evaluations and implicit solver iterations
+        total_evals, total_solver_its = 0, 0
 
         #iterate explicit solver stages with evaluation time (generator)
         for time in self.engine.stages(self.time, dt):
 
-            #explicit or implicit solver stepping loop
+            #explicit solver stepping loop
             if self.engine.is_explicit:
 
                 #evaluate system equation by fixed-point iteration
-                evaluations = self._update(time) 
-                iterations_sol = 0
+                total_evals += self._update(time) 
 
+            #implicit solver stepping loop
             else:
 
                 #solve implicit update equation and get iteration count
-                success, evaluations, iterations_sol = self._solve(time, dt)
+                success, evals, solver_its = self._solve(time, dt)
+
+                #count solver iterations and function evaluations
+                total_solver_its += solver_its
+                total_evals += evals
 
                 #if solver did not converge -> quit early (adaptive only)
                 if adaptive and not success:
                     error_norm, scale = 0.0, 0.5
-                    break
-
-            #count iterations and function evaluations
-            total_evaluations += evaluations
-            total_solver_iterations += iterations_sol
+                    break    
 
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time, dt)
@@ -577,19 +578,19 @@ class Simulation:
         #if step not successful and adaptive -> quit early
         if adaptive and not success:
             self._revert()
-            return success, error_norm, scale, total_evaluations, total_solver_iterations
+            return success, error_norm, scale, total_evals, total_solver_its
         
         #increment global time and continue simulation
         self.time += dt 
         
         #evaluate system equation before recording state
-        total_evaluations += self._update(self.time) 
+        total_evals += self._update(self.time) 
 
         #sample data after successful timestep
         self._sample(self.time)
 
         #max local truncation error, timestep rescale, successful step
-        return success, error_norm, scale, total_evaluations, total_solver_iterations
+        return success, error_norm, scale, total_evals, total_solver_its
 
 
     def run(self, duration=10, reset=True):
@@ -602,8 +603,8 @@ class Simulation:
 
         RETURN:
             steps                   : (int) total number of simulation timesteps
-            total_evaluations       : (int) total number of system evaluations
-            total_solver_iterations : (int) total number of implicit solver iterations
+            total_evals       : (int) total number of system evaluations
+            total_solver_its : (int) total number of implicit solver iterations
         """
 
         #reset the simulation before running it
@@ -614,8 +615,7 @@ class Simulation:
         self._logger_info(f"RUN duration={duration}")
 
         #simulation start and end time
-        start_time = self.time
-        end_time = self.time + duration
+        start_time, end_time = self.time, self.time + duration
 
         #effective timestep for duration
         _dt = self.dt
@@ -624,11 +624,10 @@ class Simulation:
         tracker = ProgressTracker(logger=self.logger, log_interval=10)
 
         #count the number of function evaluations and solver iterations
-        total_evaluations = 0
-        total_solver_iterations = 0
+        total_evals, total_solver_its = 0, 0
         
         #initial system function evaluation 
-        total_evaluations += self._update(self.time)
+        total_evals += self._update(self.time)
 
         #sampling states and inputs at 'self.time == starting_time' 
         self._sample(self.time)
@@ -641,11 +640,11 @@ class Simulation:
                 _dt = end_time - self.time
 
             #advance the simulation by one (effective) timestep '_dt'
-            success, _, scale, evaluations, solver_iterations = self.step(_dt, self.engine.is_adaptive)
+            success, _, scale, evals, solver_its = self.step(_dt, self.engine.is_adaptive)
 
             #update evaluation and iteration counters
-            total_evaluations += evaluations
-            total_solver_iterations += solver_iterations
+            total_evals += evals
+            total_solver_its += solver_its
 
             #rescale the timestep for error control if adaptive solver 
             if self.engine.is_adaptive:
@@ -657,4 +656,4 @@ class Simulation:
             progress = (self.time - start_time)/duration
             tracker.check(progress, success)
 
-        return tracker.steps, total_evaluations, total_solver_iterations
+        return tracker.steps, total_evals, total_solver_its

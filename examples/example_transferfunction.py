@@ -11,7 +11,7 @@ import numpy as np
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Scope, TransferFunction
-from pathsim.solvers import RKCK54
+from pathsim.solvers import RKCK54, GEAR52A
 
 
 # STEP RESPONSE OF A TRANSFER FUNCTION ==================================================

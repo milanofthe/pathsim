@@ -17,7 +17,7 @@ from pathsim.solvers import SSPRK33
 
 # FILTERING A SQUAREWAVE ================================================================
 
-dt = 0.02
+dt = 0.01
 
 #filter bandwidth, order and signal frequency
 B, n, f = 2, 6, 1

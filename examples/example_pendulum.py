@@ -19,7 +19,7 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import RKCK54
+from pathsim.solvers import RKCK54, GEAR52A
 
 
 # MATHEMATICAL PENDULUM =================================================================

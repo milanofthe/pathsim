@@ -19,8 +19,6 @@ from ._referenceproblems import problems
 
 # TESTS ================================================================================
 
-
-
 class TestComputeBDFCoefficients(unittest.TestCase):
     """
     Test the implementation of 'compute_bdf_coefficients'
@@ -108,14 +106,6 @@ class TestComputeBDFCoefficients(unittest.TestCase):
         self.assertAlmostEqual(_F, F, 7)
         for _k, k in zip(_K, K[::-1]):
             self.assertAlmostEqual(_k, k, 7)
-
-
-
-
-
-
-
-
 
 
 class TestGEAR32(unittest.TestCase):

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope, Differentiator
-from pathsim.solvers import RKCK54, SSPRK33, DIRK3
+from pathsim.solvers import RKCK54
 
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
