@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, ODE, Scope
-from pathsim.solvers import ESDIRK43, GEAR43
+from pathsim.solvers import ESDIRK43, GEAR43, GEAR52A
 
 
 # SIMULATING THE STICK-SLIP EFFECT ======================================================
@@ -29,7 +29,7 @@ T = 50.0    # excitation period
 def _f(x, u, t):
     v_rel = x[1] - u[0] #relative velocity
     F_c = mu*m*g*np.tanh(1000*v_rel) #coulomb friction force magnitude
-    return np.array([ x[1], -(k*x[0] + d*x[1] + F_c)/m])
+    return np.array([x[1], -(k*x[0] + d*x[1] + F_c)/m])
 
 #blocks that define the system
 Sr = Source(lambda t: v*np.sin(2*np.pi*t/T)) #this is the velocity of the belt
@@ -46,7 +46,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=0.01, log=True, Solver=GEAR43, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-4)
+Sim = Simulation(blocks, connections, dt=0.01, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-3)
 
 #run the simulation for some time
 Sim.run(2*T)

@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                             GEARS INTEGRATION METHODS 
-##                                (solvers/gear32.py)
+##                                 (solvers/gear.py)
 ##
 ##                                 Milan Rother 2024
 ##
@@ -33,27 +33,24 @@ def compute_bdf_coefficients(order, timesteps):
     if order < 1:
         raise RuntimeError("BDF coefficients of order 0 not possible!")
 
-    #aux value
-    order_p1 = order + 1
-
     #quit early for no buffer (euler backward)
     if len(timesteps) < 2:
         return 1.0, [1.0]
 
     # Compute timestep ratios rho_j = h_{n-j} / h_n
-    rho = np.array(timesteps[1:]) / timesteps[0]
+    rho = np.array(timesteps[1:])/timesteps[0]
 
     # Compute normalized time differences theta_j
-    theta = -np.ones(order_p1)
+    theta = -np.ones(order+1)
     theta[0] = 0
-    for j in range(2, order_p1):
-        theta[j] -= sum(rho[:j - 1])
+    for j in range(2, order+1):
+        theta[j] -= sum(rho[:j-1])
 
     # Set up the linear system (p + 1 equations)
-    A = np.zeros((order_p1, order_p1))
-    b = np.zeros(order_p1)
+    A = np.zeros((order+1, order+1))
+    b = np.zeros(order+1)
     b[1] = 1 
-    for m in range(order_p1):
+    for m in range(order+1):
         A[m, :] = theta ** m 
 
     # Solve the linear system A * alpha = b
@@ -61,6 +58,8 @@ def compute_bdf_coefficients(order, timesteps):
 
     #return function and buffer weights
     return 1/alphas[0], -alphas[1:]/alphas[0]
+
+
 
 
 
@@ -99,8 +98,8 @@ class GearBase(ImplicitSolver):
         #flag adaptive timestep solver
         self.is_adaptive = True
 
-        #intermediate evaluation times (two multistep methods)
-        self.eval_stages = [1.0, 1.0]
+        #intermediate evaluation 
+        self.eval_stages = [1.0]
 
 
     def reset(self):
@@ -177,69 +176,21 @@ class GearBase(ImplicitSolver):
         self.stage = 0   
 
 
-    # def error_controller(self, dt):
-    #     """
-    #     compute scaling factor for adaptive timestep based on absolute and 
-    #     relative local truncation error estimate, also checks if the error 
-    #     tolerance is achieved and returns a success metric.
-
-    #     INPUTS:
-    #         dt : (float) integration timestep
-    #     """
-
-    #     #early exit if buffer not long enough for two solutions
-    #     if len(self.B) < self.n:
-    #         return True, 0.0, 0.0, 1.0
-
-    #     #compute local truncation error as difference of two internal schemes
-    #     tr = self.x - self.x_m
-
-    #     #compute and clip truncation error, error ratio abs
-    #     truncation_error_abs = float(np.max(abs(tr)))
-    #     error_ratio_abs = self.tolerance_lte_abs / np.clip(truncation_error_abs, 1e-18, None)
-
-    #     #compute and clip truncation error, error ratio rel
-    #     if np.any(self.x == 0.0): 
-    #         truncation_error_rel = 1.0
-    #         error_ratio_rel = 0.0
-    #     else:
-    #         truncation_error_rel = float(np.max(abs(tr/self.x)))
-    #         error_ratio_rel = self.tolerance_lte_rel / np.clip(truncation_error_rel, 1e-18, None)
-        
-    #     #compute error ratio and success check
-    #     error_ratio = max(error_ratio_abs, error_ratio_rel)
-    #     success = error_ratio >= 1.0
-
-    #     #compute timestep scale factor using accuracy order of truncation error
-    #     timestep_rescale = self.beta * error_ratio**(1/(self.m + 1))
-
-    #     #clip the rescale factor to a reasonable range
-    #     timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
-
-    #     return success, truncation_error_abs, truncation_error_rel, timestep_rescale
-
-
-
-
-    def error_controller(self, dt):
+    def error_controller(self, x_m):
         """
         compute scaling factor for adaptive timestep based on absolute and 
         relative local truncation error estimate, also checks if the error 
         tolerance is achieved and returns a success metric.
 
         INPUTS:
-            dt : (float) integration timestep
+            x_m : (array[float]) lower order solution 
         """
-
-        #early exit if buffer not long enough for two solutions
-        if len(self.B) < self.n:
-            return True, 0.0, 1.0
 
         #compute scaling factors (avoid division by zero)
         scale = self.tolerance_lte_abs + self.tolerance_lte_rel * np.abs(self.x)
 
         #compute scaled truncation error (element-wise)
-        scaled_error = np.abs(self.x - self.x_m) / scale
+        scaled_error = np.abs(self.x - x_m) / scale
 
         #compute the error norm and clip it
         error_norm = np.clip(float(np.max(scaled_error)), 1e-18, None)
@@ -248,7 +199,7 @@ class GearBase(ImplicitSolver):
         success = error_norm <= 1.0
 
         #compute timestep scale factor using accuracy order of truncation error
-        timestep_rescale = self.beta / error_norm ** (1/(self.m + 1))
+        timestep_rescale = self.beta / error_norm ** (1/self.n)
 
         #clip the rescale factor to a reasonable range
         timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
@@ -264,7 +215,7 @@ class GearBase(ImplicitSolver):
         """
 
         #order of scheme for current step
-        n = min(self.n if self.stage == 1 else self.m, len(self.B))
+        n = min(self.n, len(self.B))
         
         #fixed-point function update (faster then sum comprehension)
         g = self.F[n] * dt * self.func(self.x, u, t) 
@@ -296,25 +247,20 @@ class GearBase(ImplicitSolver):
         #reset anderson accelerator
         self.acc.reset()
 
-        #add to buffer
-        if self.stage == 1:
-
-            #reset stage counter
-            self.stage = 0
-
-            #error estimate after last stage
-            return self.error_controller(dt)
-
-        else:
-
-            #save lower order solution
-            self.x_m = self.x
-
-            #increment stage counter
-            self.stage = 1
-
-            #no error estimate after first stage
+        #early exit if buffer not long enough for two solutions
+        if len(self.B) < self.n:
             return True, 0.0, 1.0
+
+        #estimate lower order solution
+        x_m = self.F[self.m] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[self.m]):
+            x_m = x_m + b*k
+
+        #error control
+        return self.error_controller(x_m)
+
+
+
 
 
 # SOLVERS ==============================================================================
@@ -332,21 +278,6 @@ class GEAR32(GearBase):
         self.n = 3
         self.m = 2
 
-        #safety factor for error controller (if available)
-        self.beta = 0.9
-
-        #bdf solution buffer
-        self.B = []
-
-        #gear timestep buffer
-        self.T = []
-
-        #flag adaptive timestep solver
-        self.is_adaptive = True
-
-        #intermediate evaluation times (two multistep methods)
-        self.eval_stages = [1.0, 1.0]
-
 
 class GEAR43(GearBase):
     """
@@ -360,21 +291,6 @@ class GEAR43(GearBase):
         #integration order and order of secondary method
         self.n = 4
         self.m = 3
-
-        #safety factor for error controller (if available)
-        self.beta = 0.9
-
-        #bdf solution buffer
-        self.B = []
-
-        #gear timestep buffer
-        self.T = []
-
-        #flag adaptive timestep solver
-        self.is_adaptive = True
-
-        #intermediate evaluation times (two multistep methods)
-        self.eval_stages = [1.0, 1.0]
 
 
 class GEAR54(GearBase):
@@ -390,18 +306,125 @@ class GEAR54(GearBase):
         self.n = 5
         self.m = 4
 
-        #safety factor for error controller (if available)
-        self.beta = 0.9
 
-        #bdf solution buffer
-        self.B = []
 
-        #gear timestep buffer
-        self.T = []
 
-        #flag adaptive timestep solver
-        self.is_adaptive = True
 
-        #intermediate evaluation times (two multistep methods)
-        self.eval_stages = [1.0, 1.0]
+class GEAR52A(GearBase):
+    """
+    Adaptive order adaptive stepsize GEAR integrator.
+    """
 
+    def __init__(self, *solver_args, **solver_kwargs):
+        super().__init__(*solver_args, **solver_kwargs)
+
+        #initial integration order
+        self.n = 2
+
+        #minimum and maximum BDF order to select
+        self.n_min, self.n_max = 2, 5
+
+
+    def buffer(self, dt):
+        """
+        Buffer the state and timestep. Dynamically precompute the 
+        variable timestep BDF coefficients on the fly for 
+        the current timestep.
+        """
+            
+        #buffer state directly
+        self.x_0 = self.x
+
+        #add to buffers
+        self.B.insert(0, self.x)
+        self.T.insert(0, dt)
+
+        #truncate buffers if too long
+        if len(self.B) > self.n_max + 1:
+            self.B.pop()
+            self.T.pop()
+
+        #precompute coefficients here, where buffers are available
+        self.F, self.K = {}, {}
+        for n in range(1, len(self.T)+1):
+            self.F[n], self.K[n] = compute_bdf_coefficients(n, self.T)
+
+
+    def error_controller(self, x_m, x_p):
+        """
+        compute scaling factor for adaptive timestep based on absolute and 
+        relative local truncation error estimate, also checks if the error 
+        tolerance is achieved and returns a success metric.
+
+        INPUTS:
+            x_m : (array[float]) lower order solution estimate
+            x_p : (array[float]) higher order solution estimate
+        """
+
+        #compute scaling factors (avoid division by zero)
+        scale = self.tolerance_lte_abs + self.tolerance_lte_rel * np.abs(self.x)
+
+        #compute scaled truncation error (element-wise)
+        scaled_error_m = np.abs(self.x - x_m) / scale
+        scaled_error_p = np.abs(self.x - x_p) / scale
+
+        #compute the error norm and clip it
+        error_norm_m = np.clip(float(np.max(scaled_error_m)), 1e-18, None)
+        error_norm_p = np.clip(float(np.max(scaled_error_p)), 1e-18, None)        
+
+        #decrease the order if smaller order is more accurate
+        if error_norm_m < error_norm_p:
+
+            #success metric
+            success = error_norm_m <= 1.0
+
+            #compute timestep scale factor using accuracy order of truncation error
+            timestep_rescale = self.beta / error_norm_m ** (1/self.n)
+            timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+
+            #decrease method order by one
+            self.n = max(self.n-1, self.n_min)
+    
+            return success, error_norm_m, timestep_rescale
+
+        else:
+            
+            #success metric
+            success = error_norm_p <= 1.0
+
+            #compute timestep scale factor using accuracy order of truncation error
+            timestep_rescale = self.beta / error_norm_p ** (1/(self.n + 1))
+            timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+
+            #increase method order by one
+            self.n = min(self.n+1, self.n_max)
+
+            return success, error_norm_p, timestep_rescale
+
+
+    # methods for timestepping ---------------------------------------------------------
+
+    def step(self, u, t, dt):
+        """
+        Performs the timestep by buffering the previous state.
+        """
+
+        #reset anderson accelerator
+        self.acc.reset()
+
+        #early exit if buffer not long enough for two solutions
+        if len(self.B) < self.n + 1:
+            return True, 0.0, 1.0
+
+        #estimate lower order solution
+        x_m = self.F[self.n-1] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[self.n-1]):
+            x_m = x_m + b*k
+
+        #estimate higher order solution
+        x_p = self.F[self.n+1] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[self.n+1]):
+            x_p = x_p + b*k
+
+        #error estimate after last stage
+        return self.error_controller(x_m, x_p)
