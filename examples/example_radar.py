@@ -63,7 +63,7 @@ connections = [
 ]
 
 #initialize simulation
-Sim = Simulation(blocks, connections, dt, log=True)
+Sim = Simulation(blocks, connections, dt=dt, log=True)
 
 #run simulation for one up chirp period
 Sim.run(T/2)

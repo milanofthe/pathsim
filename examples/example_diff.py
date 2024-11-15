@@ -20,15 +20,15 @@ from pathsim.blocks import (
     )
 
 #optimization module
-from pathsim.diff import Parameter, Value
+from pathsim.diff import Value, der
 
 
 # 1st ORDER FEEDBACK SYSTEM =============================================================
 
 #parameters
-a = Parameter(-1)
-z = Parameter(2)
-b = Parameter(1)
+a = Value(-1)
+z = Value(2)
+b = Value(1)
 
 #simulation timestep
 dt = 0.01
@@ -68,9 +68,9 @@ time, [_, res] = Sco.read()
 
 fig, ax = plt.subplots(nrows=1, figsize=(8, 4), tight_layout=True, dpi=120)
 
-ax.plot(time, list(map(lambda x:x.d(a), res)), label="$dx/da$")
-ax.plot(time, list(map(lambda x:x.d(b), res)), label="$dx/db$")
-ax.plot(time, list(map(lambda x:x.d(z), res)), label="$dx/dx_0$")
+ax.plot(time, der(res, a), label="$dx/da$")
+ax.plot(time, der(res, b), label="$dx/db$")
+ax.plot(time, der(res, z), label="$dx/dx_0$")
 
 ax.set_xlabel("time [s]")
 

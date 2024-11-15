@@ -13,6 +13,22 @@ import numpy as np
 import functools
 
 
+# HELPER FUNCTIONS ======================================================================
+
+def der(array, val):
+    """
+    Compute the derivative of an array of 'Value' objects 
+    with respect to 'val', fallback to scalar case and 
+    non-'Value' objects
+    
+    INPUTS : 
+        array : (array[Value]) array or list of Values
+        val   : (Value) dual number value for AD
+    """
+    if np.isscalar(array): return array.d(val) if isinstance(array, Value) else 0.0
+    else: return [a.d(val) if isinstance(a, Value) else 0.0 for a in array]
+
+
 # FUNCTION GRADIENTS ====================================================================
 
 FUNC_GRAD = {
@@ -314,57 +330,3 @@ class Value:
         new_val = base ** self.val
         new_grad = {k: new_val * np.log(base) * v for k, v in self.grad.items()}
         return Value(val=new_val, grad=new_grad)
-
-
-class Parameter(Value):
-    """
-    Class that enhances the 'Value' class by some additional parameters and 
-    methods that make it suitable to be used within an optimization framework.
-    """
-
-    def __init__(self, val=0.0, min_val=0, max_val=1, grad=None):
-        super().__init__(val, grad)
-        self.min_val = min_val
-        self.max_val = max_val
-
-    def shuffle(self):
-        self.val = self.min_val + (self.max_val - self.min_val) * np.random.rand()
-
-
-# local testing -----------------------------------------------------------
-
-if __name__ == "__main__":
-
-    x, y = Value(0.6), Value(3)
-
-    z = np.arctan(y*x) + np.exp(1/x)
-    print(z.d(x), z.d(y)) 
-
-    A = np.array([x, Value(3), Value(0.5)])
-
-    C = np.array([[x, Value(3), Value(0.5)], 
-                  [Value(-1.09), y, Value(2.3)]])
-
-    B = A**2 - y
-    print(B[0].d(x))
-
-    B = x - A**2
-    print(B[0].d(x))
-
-    B =  A**2 * x
-    print(B)
-
-    B = y * A**2
-    print(B)
-
-    b = np.linalg.norm(B)
-    print(b.d(x), b.d(y))
-
-    print(np.real(b))
-
-    c = np.dot(C, A)
-    print(c[0].d(x))
-
-    c = x + C
-    print(c[0, 0].d(x))
-

@@ -45,14 +45,19 @@ class Simulation:
     (SSPRK22) method which is quite fast and has ok accuracy, especially if you are forced to 
     take small steps to cover the behaviour of forcing functions. Adaptive timestepping and 
     implicit integrators are also available.
+Manages an event handling system based on zero crossing detection. Uses 'Event' objects 
+    to monitor solver states of stateful blocks and applys transformations on the state in 
+    case an event is detected. 
+
 
     INPUTS:
-        blocks         : (list of 'Block' objects) blocks that make up the system
-        connections    : (list of 'Connection' objects) connections that connect the blocks
+        blocks         : (list[Block]) blocks that make up the system
+        connections    : (list[Connection]) connections that connect the blocks
+        events         : (list[Event]) list of event trackers (zero crossing detection)
         dt             : (float) transient simulation timestep in time units
         dt_min         : (float) lower bound for timestep, default '0.0'
         dt_max         : (float) upper bound for timestep, default 'None'
-        Solver         : ('Solver' class) solver for numerical integration from pathsim.solvers
+        Solver         : (Solver) solver for numerical integration from pathsim.solvers
         tolerance_fpi  : (float) absolute tolerance for convergence of fixed-point iterations
         iterations_min : (int) minimum number of fixed-point iterations for system function evaluation
         iterations_max : (int) maximum allowed number of fixed-point iterations for system function evaluation
@@ -63,6 +68,7 @@ class Simulation:
     def __init__(self, 
                  blocks=None, 
                  connections=None, 
+                 events=None,
                  dt=0.01, 
                  dt_min=0.0, 
                  dt_max=None, 
@@ -75,8 +81,11 @@ class Simulation:
                  ):
 
         #system definition
-        self.blocks = [] if blocks is None else blocks
+        self.blocks      = [] if blocks      is None else blocks
         self.connections = [] if connections is None else connections
+
+        #events (zero crossing detection)
+        self.events = [] if events is None else events
 
         #simulation timestep and bounds
         self.dt = dt
@@ -333,6 +342,10 @@ class Simulation:
         for block in self.blocks:
             block.reset()
 
+        #reset the event managers
+        for event in self.events:
+            event.reset()
+
         #evaluate system function
         self._update(0.0)
 
@@ -436,8 +449,8 @@ class Simulation:
             dt : (float) timestep
 
         RETURNS: 
-            success                 : (bool) indicator if the timestep was successful
-            total_evals       : (int) total number of system evaluations
+            success          : (bool) indicator if the timestep was successful
+            total_evals      : (int) total number of system evaluations
             total_solver_its : (int) total number of implicit solver iterations
         """
 
@@ -463,6 +476,30 @@ class Simulation:
 
         #not converged in 'self.iterations_max' steps
         return False, total_evals, iteration + 1
+
+
+    def _buffer(self, dt):
+        """
+        Buffer internal states of blocks and buffer states for event 
+        monitoring before the timestep is taken. This is required for 
+        runge-kutta integrators but also for the zero crossing detection 
+        of the event handling system.
+    
+        The timesteps are also buffered because some integrators such as 
+        GEAR-type methods need a history of the timesteps.
+
+        INPUTS : 
+            dt : (float) timestep
+        """
+
+        #buffer internal states of stateful blocks
+        for block in self.blocks:
+            block.buffer(dt)
+
+        #buffer states for zero crossing detection
+        for event in self.events:
+            event.buffer()
+
 
 
     def _step(self, t, dt):
@@ -509,8 +546,10 @@ class Simulation:
                 relevant_scales.append(scl)
 
         #calculate real relevant timestep rescale
-        if not relevant_scales: scale = 1.0  
-        else: scale = min(relevant_scales)
+        if not relevant_scales: 
+            scale = 1.0  
+        else: 
+            scale = min(relevant_scales)
 
         return success, max_error_norm, scale
 
@@ -530,10 +569,10 @@ class Simulation:
             adaptive : (bool) use adaptive timestepping (if available)
 
         RETURNS:
-            success                 : (bool) indicator if the timestep was successful
-            max_error               : (float) maximum local truncation error from integration
-            scale                   : (float) rescale factor for timestep
-            total_evals       : (int) total number of system evaluations
+            success          : (bool) indicator if the timestep was successful
+            max_error        : (float) maximum local truncation error from integration
+            scale            : (float) rescale factor for timestep
+            total_evals      : (int) total number of system evaluations
             total_solver_its : (int) total number of implicit solver iterations
         """
 
@@ -542,8 +581,7 @@ class Simulation:
             dt = self.dt
 
         #buffer internal states
-        for block in self.blocks:
-            block.buffer(dt)
+        self._buffer(dt)
 
         #total function evaluations and implicit solver iterations
         total_evals, total_solver_its = 0, 0
@@ -578,8 +616,38 @@ class Simulation:
         #if step not successful and adaptive -> quit early
         if adaptive and not success:
             self._revert()
-            return success, error_norm, scale, total_evals, total_solver_its
-        
+            return False, error_norm, scale, total_evals, total_solver_its
+
+        #otherwise detect events after successful timestep
+        for event in self.events:
+            
+            #check if an event is detected
+            detected, close, ratio = event.detect()
+
+            #event was detected during the timestep
+            if detected: 
+
+                #adaptive solver can approach event to some tolerance
+                if adaptive:
+                    
+                    #close enough to event -> resolve it
+                    if close:                 
+                        time_event = self.time + ratio * dt
+                        event.resolve(time_event)
+                    
+                    #not close enough to actual event -> revert simulation
+                    else:                         
+                        self._revert()
+                        return False, error_norm, ratio, total_evals, total_solver_its 
+
+                #fixed timestep -> resolve events directly
+                else:
+                    time_event = self.time + ratio * dt
+                    event.resolve(time_event)               
+                
+                #one event per timestep
+                break
+
         #increment global time and continue simulation
         self.time += dt 
         

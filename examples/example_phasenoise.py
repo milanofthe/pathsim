@@ -37,7 +37,7 @@ connections = [
     Connection(sr4, sco[3], spc[3])
     ]
 
-Sim = Simulation(blocks, connections, dt, log=True)
+Sim = Simulation(blocks, connections, dt=dt, log=True)
 
 Sim.run(100/f)
 

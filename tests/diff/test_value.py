@@ -12,7 +12,7 @@
 import unittest
 import numpy as np
 
-from pathsim.diff.value import Value, Parameter
+from pathsim.diff.value import Value
 
 
 # TESTS ================================================================================
@@ -268,72 +268,6 @@ class TestValue(unittest.TestCase):
         # Test gradient
         for zi, a in zip(z, arr):
             self.assertEqual(zi.d(v), a)
-   
-   
-class TestParameter(unittest.TestCase):
-    """
-    Test the implementation of the 'Parameter' class that 
-    inherits from the 'Value' class but adds ranges and 
-    randomizer for optimization.
-    """
-
-    def test_init(self):
-        # Test default initialization
-        p = Parameter()
-        self.assertEqual(p.val, 0.0)
-        self.assertEqual(p.min_val, 0)
-        self.assertEqual(p.max_val, 1)
-        self.assertEqual(p.grad, {p: 1.0})
-
-        # Test initialization with specific values
-        p = Parameter(val=5.0, min_val=1.0, max_val=10.0)
-        self.assertEqual(p.val, 5.0)
-        self.assertEqual(p.min_val, 1.0)
-        self.assertEqual(p.max_val, 10.0)
-
-    def test_shuffle(self):
-        p = Parameter(val=5.0, min_val=1.0, max_val=10.0)
-
-        # Shuffle the parameter multiple times and check if it stays within bounds
-        for _ in range(100):
-            p.shuffle()
-            self.assertGreaterEqual(p.val, p.min_val)
-            self.assertLessEqual(p.val, p.max_val)
-
-    def test_inheritance(self):
-        # Test that Parameter behaves like Value
-        p = Parameter(2)
-        w = Value(3)
-
-        z = p + w
-        self.assertEqual(z.val, 5)
-        self.assertEqual(z.d(p), 1.0)
-        self.assertEqual(z.d(w), 1.0)
-
-        z = p * w
-        self.assertEqual(z.val, 6)
-        self.assertEqual(z.d(p), 3)
-        self.assertEqual(z.d(w), 2)
-
-    def test_gradient(self):
-        # Test gradient propagation through Parameter
-        p = Parameter(2)
-        z = p ** 2
-        self.assertEqual(z.val, 4)
-        self.assertEqual(z.d(p), 4)
-
-    def test_bounds(self):
-        # Test that min_val and max_val are attributes and can be used
-        p = Parameter(5, min_val=0, max_val=10)
-        self.assertEqual(p.min_val, 0)
-        self.assertEqual(p.max_val, 10)
-
-        # Test that shuffle respects new bounds
-        p.min_val = -5
-        p.max_val = 5
-        p.shuffle()
-        self.assertGreaterEqual(p.val, -5)
-        self.assertLessEqual(p.val, 5)
 
 
 # RUN TESTS LOCALLY ====================================================================
