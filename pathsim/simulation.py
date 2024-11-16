@@ -45,7 +45,8 @@ class Simulation:
     (SSPRK22) method which is quite fast and has ok accuracy, especially if you are forced to 
     take small steps to cover the behaviour of forcing functions. Adaptive timestepping and 
     implicit integrators are also available.
-Manages an event handling system based on zero crossing detection. Uses 'Event' objects 
+    
+    Manages an event handling system based on zero crossing detection. Uses 'Event' objects 
     to monitor solver states of stateful blocks and applys transformations on the state in 
     case an event is detected. 
 
@@ -627,20 +628,23 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time, dt)
 
-        #otherwise handle events chronologically
+        #evaluate system equation before sampling and event check (+dt)
+        total_evals += self._update(self.time + dt) 
+
+        #handle events chronologically
         for event, _, ratio in self._events():
 
             #fixed timestep -> resolve event directly
-            event.resolve(self.time + ratio * dt)                       
+            event.resolve(self.time + ratio * dt)  
+
+            #after resolve, evaluate system equation again -> propagate event
+            total_evals += self._update(self.time + dt)      
+
+        #sample data after successful timestep (+dt)
+        self._sample(self.time + dt)
  
         #increment global time and continue simulation
         self.time += dt 
-        
-        #evaluate system equation before recording state
-        total_evals += self._update(self.time) 
-
-        #sample data after successful timestep
-        self._sample(self.time)
 
         #max local truncation error, timestep rescale, successful step
         return success, error_norm, scale, total_evals, total_solver_its
@@ -720,26 +724,29 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
             self._revert()
             return False, error_norm, scale, total_evals, total_solver_its
 
+        #evaluate system equation before sampling and event check (+dt)
+        total_evals += self._update(self.time + dt) 
+
         #otherwise handle events chronologically
         for event, close, ratio in self._events():
 
             #close enough to event -> resolve it
             if close:
                 event.resolve(self.time + ratio * dt)
-            
+
+                #after resolve, evaluate system equation again -> propagate event
+                total_evals += self._update(self.time + dt) 
+    
             #not close enough -> roll back timestep (secant step)
             else:
                 self._revert()
                 return False, error_norm, ratio, total_evals, total_solver_its 
         
-        #increment global time and continue simulation
-        self.time += dt 
-        
-        #evaluate system equation before recording state
-        total_evals += self._update(self.time) 
+        #sample data after successful timestep (+dt)
+        self._sample(self.time + dt)
 
-        #sample data after successful timestep
-        self._sample(self.time)
+        #increment global time and continue simulation
+        self.time += dt    
 
         #max local truncation error, timestep rescale, successful step
         return success, error_norm, scale, total_evals, total_solver_its

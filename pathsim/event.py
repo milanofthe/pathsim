@@ -27,23 +27,27 @@ class Event:
     resolution. This is required for adaptive timestep solvers to approach the event 
     and only resolve it when the event tolerance ('tolerance') is satisfied.
 
+    If action function 'f' is not specified, the event will only be detected but other 
+    than that, no transformation will be applied. For general state monitoring.
+
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
         g         : (callable) event function, where zeros are events
         f         : (callable) state transform function to apply at events
         tolerance : (float) tolerance to check if detection is close to actual event
-    
     """
 
-    def __init__(self, blocks, g, f, tolerance=1e-4):
+    def __init__(self, blocks, g=None, f=None, callback=None, tolerance=1e-4):
         
         #blocks to monitor for events
         self.blocks = blocks 
     
         #event detection function
-        self.g = g    
+        if not callable(g): 
+            raise ValueError("function 'g' needs to be callable")
+        self.g = g
 
-        #event action function
+        #event action function (must not be callable)
         self.f = f
 
         #tolerance for checking if close to actual event
@@ -56,34 +60,54 @@ class Event:
 
 
     def __iter__(self):
-        #just return the times at which events have been detected
+        """
+        The '__iter__' method yields the recorded times at which events 
+        are detected.
+        """
         for t in self._times:
             yield t
+
+
+    def __bool__(self):
+        """
+        The '__bool__' method is a proxy for the 'detect' method but only 
+        returns wheather an the event was triggered. 
+        """
+        event, *_ = self.detect()
+        return event
+
 
 
     # internal methods ------------------------------------------------------------------
 
     def _get_states(self):
+        """
+        Collect the states of the solvers (engines) of the blocks. 
 
-        #collect states from the blocks
-        states = []
-        for block in self.blocks:
-            if block.engine is None: 
-                raise ValueError(f"'{block}' has no engine!")
-            states.append(block.engine.get())
-
-        return states
+        If the block doesnt have an engine, it falls back to the block 
+        outputs. This enables monitoring of block outputs as well as 
+        solver states.
+        """
+        return [b() if b.engine is None else b.engine() for b in self.blocks]
 
 
     def _set_states(self, states):
-
-        #set block states
+        """
+        Sets the states of the solvers (engines) of the blocks. 
+        
+        If the block doesnt have an engine, it is skipped! Things like 
+        this can be handled by the standard algebraic block interactions 
+        and dont need to be handled by the event system! 
+        """
         for state, block in zip(states, self.blocks):
-            block.engine.set(state)
-
+            if block.engine is not None:
+                block.engine.set(state)
+            
     
     def _evaluate(self):
-        #evaluate the event function
+        """
+        Evaluate the event function and return its value after casting it to float.
+        """
         return float(self.g(*self._get_states()))
 
 
@@ -113,25 +137,33 @@ class Event:
         result = self._evaluate()
         
         #check for zero crossing (sign change)
-        event = np.sign(result * self._history) < 0
+        is_event = np.sign(self._history) != np.sign(result)
+                
+        #no event detected -> quit early
+        if not is_event:
+            return False, False, 0.0
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
-        ratio = self._history / np.clip(self._history - result, 1e-18, None)
+        ratio = abs(self._history) / np.clip(abs(self._history - result), 1e-18, None)        
         
         #are we close to the actual event?
         close = abs(result) < self.tolerance
 
-        return event, close, ratio
+        return True, close, ratio
 
 
     def resolve(self, time=None):
         """
         Resolve the event and record the time at which it occurs. Transforms 
-        the monitored states using the function 'f'.
+        the monitored states using the function 'f' if it is defined. Otherwise 
+        this just marks the location of the event.
+        
+        If a callback function for the event is provided, it is also called here.
         """
 
         #save the time of event resolution
         self._times.append(time)
 
-        #transform states
-        self._set_states(self.f(*self._get_states()))
+        #transform states if transform available
+        if self.f is not None:    
+            self._set_states(self.f(*self._get_states()))

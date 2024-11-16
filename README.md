@@ -95,24 +95,24 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-    2024-11-16 10:57:53,712 - INFO - LOGGING enabled
-    2024-11-16 10:57:53,713 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-16 10:57:53,714 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-11-16 10:57:53,714 - INFO - RESET
-    2024-11-16 10:57:53,714 - INFO - RUN duration=50.0
-    2024-11-16 10:57:53,715 - INFO - STARTING progress tracker
-    2024-11-16 10:57:53,715 - INFO - progress=0%
-    2024-11-16 10:57:53,732 - INFO - progress=10%
-    2024-11-16 10:57:53,750 - INFO - progress=20%
-    2024-11-16 10:57:53,767 - INFO - progress=30%
-    2024-11-16 10:57:53,785 - INFO - progress=40%
-    2024-11-16 10:57:53,803 - INFO - progress=50%
-    2024-11-16 10:57:53,821 - INFO - progress=60%
-    2024-11-16 10:57:53,838 - INFO - progress=70%
-    2024-11-16 10:57:53,857 - INFO - progress=80%
-    2024-11-16 10:57:53,875 - INFO - progress=90%
-    2024-11-16 10:57:53,892 - INFO - progress=100%
-    2024-11-16 10:57:53,893 - INFO - FINISHED steps(total)=1001(1001) runtime=177.91ms
+    2024-11-16 11:08:37,339 - INFO - LOGGING enabled
+    2024-11-16 11:08:37,341 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-16 11:08:37,343 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-11-16 11:08:37,346 - INFO - RESET
+    2024-11-16 11:08:37,352 - INFO - RUN duration=50.0
+    2024-11-16 11:08:37,354 - INFO - STARTING progress tracker
+    2024-11-16 11:08:37,355 - INFO - progress=0%
+    2024-11-16 11:08:37,378 - INFO - progress=10%
+    2024-11-16 11:08:37,396 - INFO - progress=20%
+    2024-11-16 11:08:37,414 - INFO - progress=30%
+    2024-11-16 11:08:37,432 - INFO - progress=40%
+    2024-11-16 11:08:37,452 - INFO - progress=50%
+    2024-11-16 11:08:37,471 - INFO - progress=60%
+    2024-11-16 11:08:37,489 - INFO - progress=70%
+    2024-11-16 11:08:37,507 - INFO - progress=80%
+    2024-11-16 11:08:37,524 - INFO - progress=90%
+    2024-11-16 11:08:37,543 - INFO - progress=100%
+    2024-11-16 11:08:37,543 - INFO - FINISHED steps(total)=1001(1001) runtime=187.95ms
     
 
 
@@ -177,24 +177,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-11-16 10:58:01,638 - INFO - LOGGING enabled
-    2024-11-16 10:58:01,639 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-16 10:58:01,639 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-11-16 10:58:01,640 - INFO - RESET
-    2024-11-16 10:58:01,640 - INFO - RUN duration=12
-    2024-11-16 10:58:01,641 - INFO - STARTING progress tracker
-    2024-11-16 10:58:01,642 - INFO - progress=0%
-    2024-11-16 10:58:01,695 - INFO - progress=10%
-    2024-11-16 10:58:01,747 - INFO - progress=20%
-    2024-11-16 10:58:01,799 - INFO - progress=30%
-    2024-11-16 10:58:01,849 - INFO - progress=40%
-    2024-11-16 10:58:01,900 - INFO - progress=50%
-    2024-11-16 10:58:01,951 - INFO - progress=60%
-    2024-11-16 10:58:02,001 - INFO - progress=70%
-    2024-11-16 10:58:02,052 - INFO - progress=80%
-    2024-11-16 10:58:02,105 - INFO - progress=90%
-    2024-11-16 10:58:02,156 - INFO - progress=100%
-    2024-11-16 10:58:02,157 - INFO - FINISHED steps(total)=1201(1201) runtime=515.32ms
+    2024-11-16 11:08:37,697 - INFO - LOGGING enabled
+    2024-11-16 11:08:37,698 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-16 11:08:37,698 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-11-16 11:08:37,699 - INFO - RESET
+    2024-11-16 11:08:37,700 - INFO - RUN duration=12
+    2024-11-16 11:08:37,700 - INFO - STARTING progress tracker
+    2024-11-16 11:08:37,701 - INFO - progress=0%
+    2024-11-16 11:08:37,752 - INFO - progress=10%
+    2024-11-16 11:08:37,800 - INFO - progress=20%
+    2024-11-16 11:08:37,852 - INFO - progress=30%
+    2024-11-16 11:08:37,904 - INFO - progress=40%
+    2024-11-16 11:08:37,956 - INFO - progress=50%
+    2024-11-16 11:08:38,009 - INFO - progress=60%
+    2024-11-16 11:08:38,062 - INFO - progress=70%
+    2024-11-16 11:08:38,115 - INFO - progress=80%
+    2024-11-16 11:08:38,168 - INFO - progress=90%
+    2024-11-16 11:08:38,220 - INFO - progress=100%
+    2024-11-16 11:08:38,221 - INFO - FINISHED steps(total)=1201(1201) runtime=520.23ms
     
 
 
@@ -238,7 +238,7 @@ Recently I added an event handling system to PathSim that implements zero-crossi
 
 ```python
 from pathsim import Simulation, Connection, Event
-from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
+from pathsim.blocks import Integrator, Constant, Scope
 from pathsim.solvers import RKBS32 #using an adaptive timestep solver
 
 #initial values
@@ -270,7 +270,7 @@ E1 = Event(
 events = [E1]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, events, dt=0.01, log=True, Solver=RKBS32, dt_max=0.1)
+Sim = Simulation(blocks, connections, events, dt=0.1, log=True, Solver=RKBS32, dt_max=0.1)
 
 #run the simulation
 Sim.run(15)
@@ -279,24 +279,24 @@ Sim.run(15)
 Sc.plot();
 ```
 
-    2024-11-16 11:05:23,538 - INFO - LOGGING enabled
-    2024-11-16 11:05:23,539 - INFO - SOLVER RKBS32 adaptive=True implicit=False
-    2024-11-16 11:05:23,539 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
-    2024-11-16 11:05:23,540 - INFO - RESET
-    2024-11-16 11:05:23,540 - INFO - RUN duration=15
-    2024-11-16 11:05:23,541 - INFO - STARTING progress tracker
-    2024-11-16 11:05:23,541 - INFO - progress=0%
-    2024-11-16 11:05:23,545 - INFO - progress=10%
-    2024-11-16 11:05:23,551 - INFO - progress=20%
-    2024-11-16 11:05:23,557 - INFO - progress=30%
-    2024-11-16 11:05:23,563 - INFO - progress=40%
-    2024-11-16 11:05:23,567 - INFO - progress=50%
-    2024-11-16 11:05:23,573 - INFO - progress=60%
-    2024-11-16 11:05:23,582 - INFO - progress=70%
-    2024-11-16 11:05:23,588 - INFO - progress=80%
-    2024-11-16 11:05:23,595 - INFO - progress=90%
-    2024-11-16 11:05:23,604 - INFO - progress=100%
-    2024-11-16 11:05:23,604 - INFO - FINISHED steps(total)=243(285) runtime=62.67ms
+    2024-11-16 11:08:38,716 - INFO - LOGGING enabled
+    2024-11-16 11:08:38,717 - INFO - SOLVER RKBS32 adaptive=True implicit=False
+    2024-11-16 11:08:38,717 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
+    2024-11-16 11:08:38,717 - INFO - RESET
+    2024-11-16 11:08:38,718 - INFO - RUN duration=15
+    2024-11-16 11:08:38,718 - INFO - STARTING progress tracker
+    2024-11-16 11:08:38,719 - INFO - progress=0%
+    2024-11-16 11:08:38,723 - INFO - progress=10%
+    2024-11-16 11:08:38,729 - INFO - progress=20%
+    2024-11-16 11:08:38,735 - INFO - progress=30%
+    2024-11-16 11:08:38,741 - INFO - progress=40%
+    2024-11-16 11:08:38,744 - INFO - progress=50%
+    2024-11-16 11:08:38,751 - INFO - progress=60%
+    2024-11-16 11:08:38,759 - INFO - progress=70%
+    2024-11-16 11:08:38,766 - INFO - progress=80%
+    2024-11-16 11:08:38,772 - INFO - progress=90%
+    2024-11-16 11:08:38,781 - INFO - progress=100%
+    2024-11-16 11:08:38,781 - INFO - FINISHED steps(total)=243(286) runtime=63.02ms
     
 
 

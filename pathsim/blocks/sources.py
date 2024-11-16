@@ -46,7 +46,6 @@ class Constant(Block):
         pass        
 
 
-
 class Source(Block):
     """
     Generator, or source that produces an arbitrary time 

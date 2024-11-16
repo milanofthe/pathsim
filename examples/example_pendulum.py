@@ -19,7 +19,7 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import RKCK54
+from pathsim.solvers import RKCK54, SSPRK33
 
 
 # MATHEMATICAL PENDULUM =================================================================
@@ -28,7 +28,7 @@ from pathsim.solvers import RKCK54
 dt = 0.1
 
 #initial angle and angular velocity
-phi0, omega0 = 0.99*np.pi, 0
+phi0, omega0 = 0.9*np.pi, 0
 
 #parameters (gravity, length)
 g, l = 9.81, 1
@@ -57,6 +57,6 @@ Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54, tolerance_
 Sim.run(duration=25)
 
 # Plot the results directly from the scope
-Sco.plot()
+Sco.plot(".-")
 
 plt.show()

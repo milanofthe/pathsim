@@ -62,7 +62,7 @@ class Solver:
         #current evaluation stage for multistage solvers
         self.stage = 0
 
-        #intermediate evaluation times for multistage solvers as ratios between [t, t+dt]
+        #intermediate evaluation times as ratios between [t, t+dt]
         self.eval_stages = [0.0]
 
 
@@ -75,6 +75,14 @@ class Solver:
         return the size of the internal state, i.e. the order
         """
         return len(self.x)
+
+
+    def __call__(self):
+        """
+        The '__call__' method returns the internal state of 
+        the solver as a proxy to the 'get' method.
+        """
+        return self.get()
 
 
     def stages(self, t, dt):

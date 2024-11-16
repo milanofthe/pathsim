@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection, Event
 from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
-from pathsim.solvers import RKBS32
+from pathsim.solvers import RKBS32, SSPRK33
 from pathsim.diff import Value, der
 
 
@@ -20,22 +20,28 @@ from pathsim.diff import Value, der
 #simulation timestep
 dt = 0.01
 
-#friction coefficient and mass
-k, m = Value(0.2), 1
+#gravitational acceleration
+g = Value(9.81)
+
+#elasticity of bounce
+b = Value(0.9)
+
+#mass normalized friction coefficientand
+k = Value(0.4)
 
 #initial values
 x0, v0 = Value(1), Value(10)
 
 #newton friction
 def fric(v): 
-    return -k/m * np.sign(v) * v**2
+    return -k * np.sign(v) * v**2
 
 #blocks that define the system
 Ix = Integrator(x0)     # v -> x
 Iv = Integrator(v0)     # a -> v 
 Fr = Function(fric)     # newton friction
 Ad = Adder()
-Cn = Constant(-9.81)    # gravitational acceleration
+Cn = Constant(-g)       # gravitational acceleration
 Sc = Scope(labels=["x", "v"])
 
 blocks = [Ix, Iv, Fr, Ad, Cn, Sc]
@@ -45,17 +51,16 @@ connections = [
     Connection(Cn, Ad[0]),
     Connection(Fr, Ad[1]),
     Connection(Ad, Iv),
-    # Connection(Iv, Ix, Fr, Sc[1]),
     Connection(Iv, Ix, Fr),
     Connection(Ix, Sc[0])
     ]
 
 #events (zero crossings)
 E1 = Event(
-    blocks=[Ix, Iv],                  # blocks to watch states of
-    g=lambda x, y: x,                 # event function for zero crossing detection
-    f=lambda x, y: [abs(x), -0.97*y], # action function for state transformation
-    tolerance=1e-4
+    blocks=[Ix, Iv],               # blocks to watch states of
+    g=lambda x, y: x,              # event function for zero crossing detection
+    f=lambda x, y: [abs(x), -b*y], # action function for state transformation
+    tolerance=1e-3
     )
 
 events = [E1]
@@ -68,15 +73,14 @@ Sim = Simulation(
     dt=dt, 
     log=True, 
     Solver=RKBS32, 
-    tolerance_lte_rel=1e-4, 
-    tolerance_lte_abs=1e-6
+    tolerance_lte_rel=0.0, 
+    tolerance_lte_abs=1e-4
     )
 
 #run the simulation
-Sim.run(8)
+Sim.run(5)
 
 #read the recordings from the scope
-# time, [x, v] = Sc.read()
 time, [x] = Sc.read()
 
 #plot the recordings from the scope
@@ -107,6 +111,8 @@ fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 for t in E1: ax.axvline(t, ls="--", c="k")
 
 ax.plot(time, der(x, k), lw=2, label="$dx/dk$")
+ax.plot(time, der(x, g), lw=2, label="$dx/dg$")
+ax.plot(time, der(x, b), lw=2, label="$dx/db$")
 ax.plot(time, der(x, v0), lw=2, label="$dx/dv_0$")
 ax.plot(time, der(x, x0), lw=2, label="$dx/dx_0$")
 

@@ -13,7 +13,7 @@
 
 # IMPORTS ===============================================================================
 
-#no dependencies
+from ..utils.utils import dict_to_array
 
 
 # BASE BLOCK CLASS ======================================================================
@@ -49,30 +49,30 @@ class Block:
     def __len__(self):
         """
         The '__len__' method of the block is used to compute the length of the 
-        pass-throuh path of the block. For instant time blocks or blocks with 
-        pass-through components (adders, amplifiers, etc.) it returns 1, 
-        otherwise (integrator, buffer, etc.) it returns 0.
+        algebraic path of the block. For instant time blocks or blocks with 
+        purely algenbraic components (adders, amplifiers, etc.) it returns 1, 
+        otherwise (integrator, delay, etc.) it returns 0.
         """
         return 1
 
 
     def __getitem__(self, key):
         """
-        This method is intended to make connection creation more convenient 
-        and therefore just returns the block itself and the key directly after 
-        doing some basic checks.
+        The '__getitem__' method is intended to make connection creation more 
+        convenient and therefore just returns the block itself and the key directly 
+        after doing some basic checks.
         """
         if not isinstance(key, int):
             raise ValueError(f"Port has to be of type 'int' but is '{type(key)}'!")
         return (self, key)
         
 
-    def get_metadata(self):
+    def __call__(self):
         """
-        Create a dict representation of the block with all its metadata 
-        for netlist generation
+        The '__call__' method returns the block outputs as an array for use outside. 
+        Either for monitoring, postprocessing or event detection.
         """
-        return {"type" : self.__class__}
+        return dict_to_array(self.outputs)
 
 
     def reset(self):
