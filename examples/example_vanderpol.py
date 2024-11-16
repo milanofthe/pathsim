@@ -20,7 +20,7 @@ from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR21, GEAR32, GEAR43, GEAR54, 
 x0 = np.array([2, 0])
 
 #van der Pol parameter
-mu = 1000
+mu = 10000
 
 def func(x, u, t):
     return np.array([x[1], mu*(1 - x[0]**2)*x[1] - x[0]])
@@ -42,7 +42,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=1, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-4)
+Sim = Simulation(blocks, connections, dt=0.1, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-4)
 
 Sim.run(3*mu)
 

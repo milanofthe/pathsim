@@ -501,6 +501,26 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
             event.buffer()
 
 
+    def _events(self):
+        """
+        Check for possible events and return them chronologically, sorted 
+        by their timestep ratios (closest to the initial point in time).
+        """
+
+        #iterate all event managers
+        detected_events = []
+        for event in self.events:
+            
+            #check if an event is detected
+            detected, close, ratio = event.detect()
+
+            #event was detected during the timestep 
+            if detected:
+                detected_events.append([event, close, ratio])
+
+        #return detected events sorted by ratio
+        return sorted(detected_events, key=lambda e: e[-1])
+
 
     def _step(self, t, dt):
         """
@@ -545,28 +565,110 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
             if scl not in [0.0, 1.0]: 
                 relevant_scales.append(scl)
 
-        #calculate real relevant timestep rescale
+        #no relevant timestep rescale -> quit early
         if not relevant_scales: 
-            scale = 1.0  
-        else: 
-            scale = min(relevant_scales)
+            return success, max_error_norm, 1.0
 
-        return success, max_error_norm, scale
+        #compute real timestep rescale
+        return success, max_error_norm, min(relevant_scales)
 
 
-    def step(self, dt=None, adaptive=False):
+    def step_fixed(self, dt=None):
         """
-        Advances the simulation by one timestep 'dt'. 
+        Advances the simulation by one timestep 'dt' for fixed step solvers.
 
-        If the 'adaptive' flag is set to 'True' and the selected solver 
-        supports adaptive timestepping ('self.is_adaptive'), and the 
-        local truncation error or the solver error exceeds the tolerance 
-        'tolerance_lte', simulation state is reverted ('revert') to the 
-        state before the 'step' method was called.
+        Selects between implicit and explicit solvers. Implicit solvers have 
+        an additional loop for solving the implicit update equation in each 
+        timestep.
+
+        If discrete events are detected, they are resolved immediately within 
+        the timestep.
 
         INPUTS: 
-            dt       : (float) timestep
-            adaptive : (bool) use adaptive timestepping (if available)
+            dt : (float) timestep
+
+        RETURNS:
+            success          : (bool) indicator if the timestep was successful
+            max_error        : (float) maximum local truncation error from integration
+            scale            : (float) rescale factor for timestep
+            total_evals      : (int) total number of system evaluations
+            total_solver_its : (int) total number of implicit solver iterations
+        """
+
+        #default global timestep as local timestep
+        if dt is None: 
+            dt = self.dt
+
+        #buffer internal states
+        self._buffer(dt)
+
+        #total function evaluations and implicit solver iterations
+        total_evals, total_solver_its = 0, 0
+
+        #iterate explicit solver stages with evaluation time (generator)
+        for time in self.engine.stages(self.time, dt):
+
+            #explicit solver stepping loop
+            if self.engine.is_explicit:
+
+                #evaluate system equation by fixed-point iteration
+                total_evals += self._update(time) 
+
+            #implicit solver stepping loop
+            else:
+
+                #solve implicit update equation and get iteration count
+                success, evals, solver_its = self._solve(time, dt)
+
+                #count solver iterations and function evaluations
+                total_solver_its += solver_its
+                total_evals += evals
+
+            #timestep for dynamical blocks (with internal states)
+            success, error_norm, scale = self._step(time, dt)
+
+        #otherwise handle events chronologically
+        for event, _, ratio in self._events():
+
+            #fixed timestep -> resolve event directly
+            event.resolve(self.time)                       
+ 
+        #increment global time and continue simulation
+        self.time += dt 
+        
+        #evaluate system equation before recording state
+        total_evals += self._update(self.time) 
+
+        #sample data after successful timestep
+        self._sample(self.time)
+
+        #max local truncation error, timestep rescale, successful step
+        return success, error_norm, scale, total_evals, total_solver_its
+
+
+    def step_adaptive(self, dt=None):
+        """
+        Advances the simulation by one timestep 'dt' for adaptive solvers.
+
+        Selects between implicit and explicit solvers. Implicit solvers have an 
+        additional loop for solving the implicit update equation in each timestep.
+    
+        If the local truncation error of the solver exceeds the tolerances
+        set in the 'solver_args', simulation state is reverted to the state 
+        before the 'step' method was called. 
+
+        If the solver is implicit and the solution of the implicit update 
+        equation in 'solve' doesnt converge, the timestep is also considered 
+        unsuccessful. Then it is reverted and the timestep is halfed.
+
+        If discrete events are detected, the chronologically first event is 
+        handled only. The event location (in time) is approached adaptively 
+        by reverting the step and adjusting the stepsize (this is equivalent 
+        to the secant method for finding zeros of the event function) until 
+        the tolerance of the event is satisfied (close==True).
+
+        INPUTS: 
+            dt : (float) timestep
 
         RETURNS:
             success          : (bool) indicator if the timestep was successful
@@ -606,48 +708,30 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
                 total_evals += evals
 
                 #if solver did not converge -> quit early (adaptive only)
-                if adaptive and not success:
+                if not success:
                     error_norm, scale = 0.0, 0.5
                     break    
 
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time, dt)
 
-        #if step not successful and adaptive -> quit early
-        if adaptive and not success:
+        #if step not successful and adaptive -> roll back timestep
+        if not success:
             self._revert()
             return False, error_norm, scale, total_evals, total_solver_its
 
-        #otherwise detect events after successful timestep
-        for event in self.events:
+        #otherwise handle events chronologically
+        for event, close, ratio in self._events():
+
+            #close enough to event -> resolve it
+            if close:                 
+                event.resolve(self.time)
             
-            #check if an event is detected
-            detected, close, ratio = event.detect()
-
-            #event was detected during the timestep
-            if detected: 
-
-                #adaptive solver can approach event to some tolerance
-                if adaptive:
-                    
-                    #close enough to event -> resolve it
-                    if close:                 
-                        time_event = self.time + ratio * dt
-                        event.resolve(time_event)
-                    
-                    #not close enough to actual event -> revert simulation
-                    else:                         
-                        self._revert()
-                        return False, error_norm, ratio, total_evals, total_solver_its 
-
-                #fixed timestep -> resolve events directly
-                else:
-                    time_event = self.time + ratio * dt
-                    event.resolve(time_event)               
-                
-                #one event per timestep
-                break
-
+            #not close enough -> roll back timestep (secant step)
+            else:                         
+                self._revert()
+                return False, error_norm, ratio, total_evals, total_solver_its 
+        
         #increment global time and continue simulation
         self.time += dt 
         
@@ -661,23 +745,48 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
         return success, error_norm, scale, total_evals, total_solver_its
 
 
-    def run(self, duration=10, reset=True):
+    def step(self, dt=None, adaptive=False):
         """
-        Perform multiple simulation timesteps for a given 'duration' in seconds.
+        Advances the simulation by one timestep 'dt'. 
+        
+        Wraps the 'step_fixed' and 'step_adaptive' methods
+        and can be called from the outside in case the simulation
+        should be advanced one step at a time.
+        """
+
+        if adaptive: return self.step_adaptive(dt)
+        else: return self.step_fixed(dt)
+
+
+    def run(self, duration=10, reset=True, adaptive=True):
+        """
+        Perform multiple simulation timesteps for a given 'duration'.
+        Tracks the total number of block evaluations (proxy for function 
+        calls, although larger, since one function call of the system equation 
+        consists of many block evaluations) and the total number of solver
+        iterations for implicit solvers.
+
+        Additionally the progress of the simulation is tracked by a custom
+        'ProgressTracker' class that is a dynamic generator and  interfaces 
+        the logging system.
 
         INPUTS: 
             duration : (float) simulation time (in time units)
             reset    : (bool) reset the simulation before running
+            adaptive : (bool) use adaptive timesteps if solver is adaptive
 
         RETURN:
-            steps                   : (int) total number of simulation timesteps
-            total_evals       : (int) total number of system evaluations
+            steps            : (int) total number of simulation timesteps
+            total_evals      : (int) total number of system evaluations
             total_solver_its : (int) total number of implicit solver iterations
         """
 
         #reset the simulation before running it
         if reset:
             self.reset()
+
+        #select simulation stepping method
+        adaptive = adaptive and self.engine.is_adaptive
 
         #log message solver selection
         self._logger_info(f"RUN duration={duration}")
@@ -688,9 +797,6 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
         #effective timestep for duration
         _dt = self.dt
 
-        #initialize progress tracker
-        tracker = ProgressTracker(logger=self.logger, log_interval=10)
-
         #count the number of function evaluations and solver iterations
         total_evals, total_solver_its = 0, 0
         
@@ -700,6 +806,9 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
         #sampling states and inputs at 'self.time == starting_time' 
         self._sample(self.time)
 
+        #initialize progress tracker
+        tracker = ProgressTracker(logger=self.logger, log_interval=10)
+
         #iterate progress tracker generator until 'progress >= 1.0' is reached
         for _ in tracker:
 
@@ -707,18 +816,24 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
             if self.time + _dt > end_time:
                 _dt = end_time - self.time
 
-            #advance the simulation by one (effective) timestep '_dt'
-            success, _, scale, evals, solver_its = self.step(_dt, self.engine.is_adaptive)
+            #perform adaptive timestep including rescale
+            if adaptive:
+
+                #advance the simulation by one (effective) timestep '_dt'
+                success, _, scale, evals, solver_its = self.step_adaptive(_dt)
+
+                #apply bounds to timestep after rescale
+                _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
+
+            #perform fixed timestep
+            else:
+
+                #advance the simulation by one (effective) timestep '_dt'
+                success, _, scale, evals, solver_its = self.step_fixed(_dt)
 
             #update evaluation and iteration counters
             total_evals += evals
             total_solver_its += solver_its
-
-            #rescale the timestep for error control if adaptive solver 
-            if self.engine.is_adaptive:
-
-                #apply bounds to timestep
-                _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
 
             #calculate progress and update progress tracker
             progress = (self.time - start_time)/duration
