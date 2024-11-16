@@ -3,21 +3,23 @@
 
 ## Overview
 
-PathSim is a minimalistic and flexible block-based time-domain system simulation framework in Python with basic automatic differentiation capabilities. It provides a modular and intuitive approach to modeling and simulating complex interconnected dynamical systems. It is similar to Matlab Simulink in spirit but works very differently under the hood.
+PathSim is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems similar to Matlab Simulink but in Python!
 
 Key features of PathSim include:
 
-- Decentralized architecture where each dynamical block has their own numerical integration engine.
-- The system is solved directly on the computational graph instead of compiling a unified differential algebraic system.
-- This has some advantages such as hot-swappable blocks during simulation and reading simulation results directly from the scopes.
-- The block execution is decoupled from the data transfer, which enables parallelization (future) and linear computational complexity scaling for sparsely connected systems.
-- Support for MIMO (Multiple Input, Multiple Output) blocks, enabling the creation of complex interconnected system topologies.
-- Fixed-point iteration approach with path length estimation to efficiently resolve algebraic loops.
-- Wide range of numerical solvers, including implicit and explicit multi-stage, and adaptive Runge-Kutta methods such as `RKDP54` or `ESDIRK54`.
-- Modular and hierarchical modeling with (nested) subsystems.
-- Automatic differentiation for differentiable system simulations.
-- Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, and more.
-- Easy extensibility, allowing users to define custom blocks by subclassing the base `Block` class and implementing just a handful of methods.
+- Natural handling of algebraic loops
+- Hot-swappable blocks and solvers during simulation
+- Blocks are inherently MIMO (Multiple Input, Multiple Output) capable
+- Blocks are "physicalized" and manage their own state, i.e. reading from the scope is just scope.read()
+- Scales linearly with the number of blocks and connections
+- Wide range of numerical solvers, including implicit and explicit very high order Runge-Kutta and multistep methods
+- Modular and hierarchical modeling with (nested) subsystems
+- Event handling system that can detect and resolve discrete events (zero-crossing detection)
+- Automatic differentiation for fully differentiable system simulations (even through events) for sensitivity analysis and optimization
+- Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, etc.
+- Easy extensibility, subclassing the base `Block` class with just a handful of methods
+
+All features are demonstrated for benchmark problems in the `example` directory.
 
 ## Installation
 
@@ -92,32 +94,109 @@ Sim.run(duration=50.0)
 Sc.plot()
 
 # Read the results from the scope for further processing
-time, data = Sc.read()
+time, data = Sc.read();
 ```
 
-    2024-11-16 11:08:37,339 - INFO - LOGGING enabled
-    2024-11-16 11:08:37,341 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-16 11:08:37,343 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-11-16 11:08:37,346 - INFO - RESET
-    2024-11-16 11:08:37,352 - INFO - RUN duration=50.0
-    2024-11-16 11:08:37,354 - INFO - STARTING progress tracker
-    2024-11-16 11:08:37,355 - INFO - progress=0%
-    2024-11-16 11:08:37,378 - INFO - progress=10%
-    2024-11-16 11:08:37,396 - INFO - progress=20%
-    2024-11-16 11:08:37,414 - INFO - progress=30%
-    2024-11-16 11:08:37,432 - INFO - progress=40%
-    2024-11-16 11:08:37,452 - INFO - progress=50%
-    2024-11-16 11:08:37,471 - INFO - progress=60%
-    2024-11-16 11:08:37,489 - INFO - progress=70%
-    2024-11-16 11:08:37,507 - INFO - progress=80%
-    2024-11-16 11:08:37,524 - INFO - progress=90%
-    2024-11-16 11:08:37,543 - INFO - progress=100%
-    2024-11-16 11:08:37,543 - INFO - FINISHED steps(total)=1001(1001) runtime=187.95ms
+    2024-11-16 18:51:32,101 - INFO - LOGGING enabled
+    2024-11-16 18:51:32,103 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-16 18:51:32,103 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-11-16 18:51:32,104 - INFO - RESET
+    2024-11-16 18:51:32,104 - INFO - RUN duration=50.0
+    2024-11-16 18:51:32,105 - INFO - STARTING progress tracker
+    2024-11-16 18:51:32,106 - INFO - progress=0%
+    2024-11-16 18:51:32,124 - INFO - progress=10%
+    2024-11-16 18:51:32,141 - INFO - progress=20%
+    2024-11-16 18:51:32,160 - INFO - progress=30%
+    2024-11-16 18:51:32,179 - INFO - progress=40%
+    2024-11-16 18:51:32,197 - INFO - progress=50%
+    2024-11-16 18:51:32,216 - INFO - progress=60%
+    2024-11-16 18:51:32,234 - INFO - progress=70%
+    2024-11-16 18:51:32,253 - INFO - progress=80%
+    2024-11-16 18:51:32,273 - INFO - progress=90%
+    2024-11-16 18:51:32,290 - INFO - progress=100%
+    2024-11-16 18:51:32,291 - INFO - FINISHED steps(total)=1001(1001) runtime=186.12ms
     
 
 
     
 ![png](README_files/README_4_1.png)
+    
+
+
+## Stiff Systems
+
+PathSim implements a large variety of implicit integrators such as diagonally implicit runge-kutta (`DIRK2`, `ESDIRK43`, etc.) and multistep (`BDF2`, `GEAR52A`, etc.) methods. This enables the simulation of very stiff systems where the timestep is limited by stability and not accuracy of the method.
+
+A common example for a stiff system is the Van der Pol oscillator where the parameter $\mu$ "controls" the severity of the stiffness. It is defined by the following second order ODE:
+
+$$
+\ddot{x} + \mu (1 - x^2) \dot{x} + x = 0
+$$
+
+Below, the Van der Pol system is built with two discrete `Integrator` blocks and a `Function` block. The parameter is set to $\mu = 1000$ which means severe stiffness. 
+
+
+```python
+from pathsim import Simulation, Connection
+from pathsim.blocks import Integrator, Scope, Function
+
+#implicit adaptive timestep adaptive order solver 
+from pathsim.solvers import GEAR52A
+
+#initial conditions
+x1, x2 = 2, 0
+
+#van der Pol parameter (1000 is very stiff)
+mu = 1000
+
+#blocks that define the system
+Sc = Scope(labels=["$x_1(t)$"])
+I1 = Integrator(x1)
+I2 = Integrator(x2)
+Fn = Function(lambda x1, x2: mu*(1 - x1**2)*x2 - x1)
+
+blocks = [I1, I2, Fn, Sc]
+
+#the connections between the blocks
+connections = [
+    Connection(I2, I1, Fn[1]), 
+    Connection(I1, Fn, Sc), 
+    Connection(Fn, I2)
+    ]
+
+#initialize simulation with the blocks, connections, timestep and logging enabled
+Sim = Simulation(blocks, connections, dt=0.05, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-4)
+
+#run simulation for some number of seconds
+Sim.run(3*mu)
+
+#plot the results directly (steps highlighted)
+Sc.plot(".-");
+```
+
+    2024-11-16 18:51:32,449 - INFO - LOGGING enabled
+    2024-11-16 18:51:32,450 - INFO - SOLVER GEAR52A adaptive=True implicit=True
+    2024-11-16 18:51:32,450 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
+    2024-11-16 18:51:32,450 - INFO - RESET
+    2024-11-16 18:51:32,451 - INFO - RUN duration=3000
+    2024-11-16 18:51:32,451 - INFO - STARTING progress tracker
+    2024-11-16 18:51:32,474 - INFO - progress=0%
+    2024-11-16 18:51:32,887 - INFO - progress=13%
+    2024-11-16 18:51:32,933 - INFO - progress=21%
+    2024-11-16 18:51:33,550 - INFO - progress=30%
+    2024-11-16 18:51:33,579 - INFO - progress=43%
+    2024-11-16 18:51:33,635 - INFO - progress=50%
+    2024-11-16 18:51:34,250 - INFO - progress=61%
+    2024-11-16 18:51:34,273 - INFO - progress=70%
+    2024-11-16 18:51:34,396 - INFO - progress=80%
+    2024-11-16 18:51:34,937 - INFO - progress=92%
+    2024-11-16 18:51:34,966 - INFO - progress=100%
+    2024-11-16 18:51:34,967 - INFO - FINISHED steps(total)=682(880) runtime=2515.31ms
+    
+
+
+    
+![png](README_files/README_6_1.png)
     
 
 
@@ -177,29 +256,29 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-11-16 11:08:37,697 - INFO - LOGGING enabled
-    2024-11-16 11:08:37,698 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-16 11:08:37,698 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
-    2024-11-16 11:08:37,699 - INFO - RESET
-    2024-11-16 11:08:37,700 - INFO - RUN duration=12
-    2024-11-16 11:08:37,700 - INFO - STARTING progress tracker
-    2024-11-16 11:08:37,701 - INFO - progress=0%
-    2024-11-16 11:08:37,752 - INFO - progress=10%
-    2024-11-16 11:08:37,800 - INFO - progress=20%
-    2024-11-16 11:08:37,852 - INFO - progress=30%
-    2024-11-16 11:08:37,904 - INFO - progress=40%
-    2024-11-16 11:08:37,956 - INFO - progress=50%
-    2024-11-16 11:08:38,009 - INFO - progress=60%
-    2024-11-16 11:08:38,062 - INFO - progress=70%
-    2024-11-16 11:08:38,115 - INFO - progress=80%
-    2024-11-16 11:08:38,168 - INFO - progress=90%
-    2024-11-16 11:08:38,220 - INFO - progress=100%
-    2024-11-16 11:08:38,221 - INFO - FINISHED steps(total)=1201(1201) runtime=520.23ms
+    2024-11-16 18:51:35,229 - INFO - LOGGING enabled
+    2024-11-16 18:51:35,230 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-16 18:51:35,230 - INFO - PATH LENGTH ESTIMATE 2, 'iterations_min' set to 2
+    2024-11-16 18:51:35,231 - INFO - RESET
+    2024-11-16 18:51:35,232 - INFO - RUN duration=12
+    2024-11-16 18:51:35,232 - INFO - STARTING progress tracker
+    2024-11-16 18:51:35,233 - INFO - progress=0%
+    2024-11-16 18:51:35,285 - INFO - progress=10%
+    2024-11-16 18:51:35,339 - INFO - progress=20%
+    2024-11-16 18:51:35,394 - INFO - progress=30%
+    2024-11-16 18:51:35,447 - INFO - progress=40%
+    2024-11-16 18:51:35,499 - INFO - progress=50%
+    2024-11-16 18:51:35,551 - INFO - progress=60%
+    2024-11-16 18:51:35,604 - INFO - progress=70%
+    2024-11-16 18:51:35,656 - INFO - progress=80%
+    2024-11-16 18:51:35,707 - INFO - progress=90%
+    2024-11-16 18:51:35,759 - INFO - progress=100%
+    2024-11-16 18:51:35,760 - INFO - FINISHED steps(total)=1201(1201) runtime=527.42ms
     
 
 
     
-![png](README_files/README_6_1.png)
+![png](README_files/README_8_1.png)
     
 
 
@@ -227,7 +306,7 @@ ax.legend(fancybox=False);
 
 
     
-![png](README_files/README_8_0.png)
+![png](README_files/README_10_0.png)
     
 
 
@@ -279,29 +358,29 @@ Sim.run(15)
 Sc.plot();
 ```
 
-    2024-11-16 11:08:38,716 - INFO - LOGGING enabled
-    2024-11-16 11:08:38,717 - INFO - SOLVER RKBS32 adaptive=True implicit=False
-    2024-11-16 11:08:38,717 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
-    2024-11-16 11:08:38,717 - INFO - RESET
-    2024-11-16 11:08:38,718 - INFO - RUN duration=15
-    2024-11-16 11:08:38,718 - INFO - STARTING progress tracker
-    2024-11-16 11:08:38,719 - INFO - progress=0%
-    2024-11-16 11:08:38,723 - INFO - progress=10%
-    2024-11-16 11:08:38,729 - INFO - progress=20%
-    2024-11-16 11:08:38,735 - INFO - progress=30%
-    2024-11-16 11:08:38,741 - INFO - progress=40%
-    2024-11-16 11:08:38,744 - INFO - progress=50%
-    2024-11-16 11:08:38,751 - INFO - progress=60%
-    2024-11-16 11:08:38,759 - INFO - progress=70%
-    2024-11-16 11:08:38,766 - INFO - progress=80%
-    2024-11-16 11:08:38,772 - INFO - progress=90%
-    2024-11-16 11:08:38,781 - INFO - progress=100%
-    2024-11-16 11:08:38,781 - INFO - FINISHED steps(total)=243(286) runtime=63.02ms
+    2024-11-16 18:51:36,116 - INFO - LOGGING enabled
+    2024-11-16 18:51:36,117 - INFO - SOLVER RKBS32 adaptive=True implicit=False
+    2024-11-16 18:51:36,117 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
+    2024-11-16 18:51:36,118 - INFO - RESET
+    2024-11-16 18:51:36,118 - INFO - RUN duration=15
+    2024-11-16 18:51:36,118 - INFO - STARTING progress tracker
+    2024-11-16 18:51:36,120 - INFO - progress=0%
+    2024-11-16 18:51:36,124 - INFO - progress=10%
+    2024-11-16 18:51:36,130 - INFO - progress=20%
+    2024-11-16 18:51:36,137 - INFO - progress=30%
+    2024-11-16 18:51:36,143 - INFO - progress=40%
+    2024-11-16 18:51:36,146 - INFO - progress=50%
+    2024-11-16 18:51:36,153 - INFO - progress=60%
+    2024-11-16 18:51:36,161 - INFO - progress=70%
+    2024-11-16 18:51:36,168 - INFO - progress=80%
+    2024-11-16 18:51:36,175 - INFO - progress=90%
+    2024-11-16 18:51:36,184 - INFO - progress=100%
+    2024-11-16 18:51:36,184 - INFO - FINISHED steps(total)=243(286) runtime=65.02ms
     
 
 
     
-![png](README_files/README_10_1.png)
+![png](README_files/README_12_1.png)
     
 
 
@@ -329,7 +408,7 @@ ax.grid(True)
 
 
     
-![png](README_files/README_12_0.png)
+![png](README_files/README_14_0.png)
     
 
 

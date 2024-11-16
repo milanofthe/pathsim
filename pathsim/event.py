@@ -37,7 +37,7 @@ class Event:
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
-    def __init__(self, blocks, g=None, f=None, callback=None, tolerance=1e-4):
+    def __init__(self, blocks, g=None, f=None, tolerance=1e-4):
         
         #blocks to monitor for events
         self.blocks = blocks 
