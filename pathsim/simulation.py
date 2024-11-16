@@ -631,7 +631,7 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
         for event, _, ratio in self._events():
 
             #fixed timestep -> resolve event directly
-            event.resolve(self.time)                       
+            event.resolve(self.time + ratio * dt)                       
  
         #increment global time and continue simulation
         self.time += dt 
@@ -724,11 +724,11 @@ Manages an event handling system based on zero crossing detection. Uses 'Event' 
         for event, close, ratio in self._events():
 
             #close enough to event -> resolve it
-            if close:                 
-                event.resolve(self.time)
+            if close:
+                event.resolve(self.time + ratio * dt)
             
             #not close enough -> roll back timestep (secant step)
-            else:                         
+            else:
                 self._revert()
                 return False, error_norm, ratio, total_evals, total_solver_its 
         

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection, Event
 from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
-from pathsim.solvers import RKBS32, RKCK54
+from pathsim.solvers import RKBS32
 from pathsim.diff import Value, der
 
 
@@ -45,7 +45,8 @@ connections = [
     Connection(Cn, Ad[0]),
     Connection(Fr, Ad[1]),
     Connection(Ad, Iv),
-    Connection(Iv, Ix, Fr, Sc[1]),
+    # Connection(Iv, Ix, Fr, Sc[1]),
+    Connection(Iv, Ix, Fr),
     Connection(Ix, Sc[0])
     ]
 
@@ -53,7 +54,7 @@ connections = [
 E1 = Event(
     blocks=[Ix, Iv],                  # blocks to watch states of
     g=lambda x, y: x,                 # event function for zero crossing detection
-    f=lambda x, y: [abs(x), -0.95*y], # action function for state transformation
+    f=lambda x, y: [abs(x), -0.97*y], # action function for state transformation
     tolerance=1e-4
     )
 
@@ -67,18 +68,19 @@ Sim = Simulation(
     dt=dt, 
     log=True, 
     Solver=RKBS32, 
-    tolerance_lte_rel=0.0, 
-    tolerance_lte_abs=1e-5
+    tolerance_lte_rel=1e-4, 
+    tolerance_lte_abs=1e-6
     )
 
 #run the simulation
-Sim.run(6)
+Sim.run(8)
 
 #read the recordings from the scope
-time, [x, v] = Sc.read()
+# time, [x, v] = Sc.read()
+time, [x] = Sc.read()
 
 #plot the recordings from the scope
-Sc.plot("-", lw=2)
+Sc.plot(".-", lw=2)
 
 #add detected events to scope plot
 for t in E1: Sc.ax.axvline(t, ls="--", c="k")
