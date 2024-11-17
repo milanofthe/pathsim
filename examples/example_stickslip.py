@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, ODE, Scope
-from pathsim.solvers import ESDIRK43, GEAR43, GEAR52A
+from pathsim.solvers import SSPRK33, RKCK54, ESDIRK43, GEAR43, GEAR52A
 
 
 # SIMULATING THE STICK-SLIP EFFECT ======================================================
@@ -46,7 +46,15 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=0.01, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-5, tolerance_lte_rel=1e-4)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=0.01, 
+    log=True, 
+    Solver=GEAR43, 
+    tolerance_lte_abs=1e-6, 
+    tolerance_lte_rel=1e-4
+    )
 
 #run the simulation for some time
 Sim.run(2*T)

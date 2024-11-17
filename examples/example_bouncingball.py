@@ -9,9 +9,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pathsim import Simulation, Connection, Event
+from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
 from pathsim.solvers import RKBS32, SSPRK33
+
+from pathsim.events import ZeroCrossing
 from pathsim.diff import Value, der
 
 
@@ -55,8 +57,8 @@ connections = [
     Connection(Ix, Sc[0])
     ]
 
-#events (zero crossings)
-E1 = Event(
+#events (zero crossing)
+E1 = ZeroCrossing(
     blocks=[Ix, Iv],               # blocks to watch states of
     g=lambda x, y: x,              # event function for zero crossing detection
     f=lambda x, y: [abs(x), -b*y], # action function for state transformation

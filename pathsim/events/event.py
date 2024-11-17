@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                         EVENT MANAGER CLASS FOR EVENT DETECTION
-##                                      (event.py)
+##                                   (events/event.py)
 ##
 ##                                   Milan Rother 2024
 ##
@@ -16,28 +16,35 @@ import numpy as np
 
 class Event:
     """
-    This is the heart of the event handling system based on zero crossing detection.  
-    Monitors states of solvers of stateful blocks, by evaluating an event function (g) 
-    with scalar output and testing for zero crossings (sign changes). If an event is 
-    detected, some action (f) is performed on the states of the blocks.
+    This is the base class of the event handling system.
+    Monitors states of solvers of stateful blocks or outputs of algebraic blocks and 
+    sources by evaluating an event function (g) with scalar output.
+    
 
-        g(states) == 0 -> event -> states = f(states)
+    If an event is detected, some action (f) is performed on the states of the blocks.
+
+        event -> states = f(states)
+
+    Or if specified, a callback function (h) is called on the states.
+
+        event -> h(states)
 
     The methods are structured such that event detection can be separated from event 
     resolution. This is required for adaptive timestep solvers to approach the event 
     and only resolve it when the event tolerance ('tolerance') is satisfied.
 
-    If action function 'f' is not specified, the event will only be detected but other 
-    than that, no transformation will be applied. For general state monitoring.
+    If no action functions 'f', 'h' are specified, the event will only be detected but 
+    other than that, no transformation will be applied. For general state monitoring.
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
         g         : (callable) event function, where zeros are events
         f         : (callable) state transform function to apply at events
+        h         : (callable) general callaback function at event detection
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
-    def __init__(self, blocks, g=None, f=None, tolerance=1e-4):
+    def __init__(self, blocks, g=None, f=None, h=None, tolerance=1e-4):
         
         #blocks to monitor for events
         self.blocks = blocks 
@@ -47,8 +54,11 @@ class Event:
             raise ValueError("function 'g' needs to be callable")
         self.g = g
 
-        #event action function (must not be callable)
+        #event action function -> state transform (must not be callable)
         self.f = f
+
+        #event action function -> general callback (must not be callable)
+        self.h = h
 
         #tolerance for checking if close to actual event
         self.tolerance = tolerance
@@ -56,6 +66,7 @@ class Event:
         #event function evaluation history
         self._history = None
 
+        #recording the event times
         self._times = []
 
 
@@ -130,27 +141,21 @@ class Event:
 
     def detect(self):
         """
-        Evaluate the event function and check for zero-cross
+        Evaluate the event function and decide if an event has occured. 
+        Can also use the history of the event function evaluation from 
+        before the timestep.
+
+        NOTE : 
+            This does nothing and needs to be implemented for specific events!!!
+        
+        RETURNS : 
+            detected : (bool) was an event detected?
+            close    : (bool) are we close to the event?
+            ratio    : (float) interpolated event location ratio in timestep
         """
-        
-        #evaluate event function
-        result = self._evaluate()
-        
-        #check for zero crossing (sign change)
-        is_event = np.sign(self._history) != np.sign(result)
-                
-        #no event detected -> quit early
-        if not is_event:
-            return False, False, 0.0
-        
-        #linear interpolation to find event time ratio (secant crosses x-axis)
-        ratio = abs(self._history) / np.clip(abs(self._history - result), 1e-18, None)        
-        
-        #are we close to the actual event?
-        close = abs(result) < self.tolerance
 
-        return True, close, ratio
-
+        return False, False, 1.0
+        
 
     def resolve(self, time=None):
         """
@@ -165,5 +170,9 @@ class Event:
         self._times.append(time)
 
         #transform states if transform available
-        if self.f is not None:    
+        if self.f is not None:
             self._set_states(self.f(*self._get_states()))
+
+        #general callback function
+        if self.h is not None:
+            self.h(*self._get_states())
