@@ -11,10 +11,9 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
-from pathsim.solvers import RKBS32, SSPRK33
+from pathsim.solvers import RKBS32
 
-from pathsim.events import ZeroCrossing
-from pathsim.diff import Value, der
+from pathsim.events import ZeroCrossing, Condition
 
 
 # BOUNCING BALL SYSTEM ==================================================================
@@ -23,16 +22,16 @@ from pathsim.diff import Value, der
 dt = 0.01
 
 #gravitational acceleration
-g = Value(9.81)
+g = 9.81
 
 #elasticity of bounce
-b = Value(0.95)
+b = 0.95
 
 #mass normalized friction coefficientand
-k = Value(0.2)
+k = 0.2
 
 #initial values
-x0, v0 = Value(1), Value(5)
+x0, v0 = 1, 10
 
 #newton friction
 def fric(v): 
@@ -53,7 +52,7 @@ connections = [
     Connection(Cn, Ad[0]),
     Connection(Fr, Ad[1]),
     Connection(Ad, Iv),
-    Connection(Iv, Ix, Fr),
+    Connection(Iv, Ix, Fr, Sc[1]),
     Connection(Ix, Sc[0])
     ]
 
@@ -73,20 +72,9 @@ E2 = ZeroCrossing(
     tolerance=1e-4
     )
 
-#tracking of 'E2' off initially
-E2.off()
-
-#callback function for 'E3' switches event tracking
-def switch(x, y):
-    E1.off()
-    E2.on()
-    E3.off()
-
-E3 = ZeroCrossing(
-    blocks=[Ix, Iv],                # blocks to watch states of
-    g=lambda x, y: x + y**2 - 0.1,  # energy thresholding 
-    h=switch ,                      # callback
-    tolerance=1e-3
+E3 = Condition(
+    g=lambda: len(E1) >= 13,       # number of events 'E1' (bounces)
+    h=lambda: [E1.off(), E3.off()] # callback switches event tracking
     )
 
 events = [E1, E2, E3]
@@ -99,15 +87,13 @@ Sim = Simulation(
     dt=dt, 
     log=True, 
     Solver=RKBS32, 
-    tolerance_lte_rel=1e-4, 
+    tolerance_lte_rel=1e-3, 
     tolerance_lte_abs=1e-5
     )
 
 #run the simulation
 Sim.run(15)
 
-#read the recordings from the scope
-time, [x] = Sc.read()
 
 #plot the recordings from the scope
 Sc.plot(".-", lw=2)
@@ -116,39 +102,5 @@ Sc.plot(".-", lw=2)
 for t in E1: Sc.ax.axvline(t, ls="--", c="k")
 for t in E2: Sc.ax.axvline(t, ls="-.", c="k")
 for t in E3: Sc.ax.axvline(t, ls="-", c="k", lw=3)
-
-# timesteps -----------------------------------------------------------------------------
-
-fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
-
-for t in E1: ax.axvline(t, ls="--", c="k")
-for t in E2: ax.axvline(t, ls="-.", c="k")
-for t in E3: ax.axvline(t, ls="-", c="k", lw=3)
-
-ax.plot(time[:-1], np.diff(time), lw=2)
-
-ax.set_yscale("log")
-ax.set_ylabel("dt [s]")
-ax.set_xlabel("time [s]")
-ax.grid(True)
-
-
-# derivatives ---------------------------------------------------------------------------
-
-fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
-
-for t in E1: ax.axvline(t, ls="--", c="k")
-for t in E2: ax.axvline(t, ls="-.", c="k")
-for t in E3: ax.axvline(t, ls="-", c="k", lw=3)
-
-ax.plot(time, der(x, k), lw=2, label="$dx/dk$")
-ax.plot(time, der(x, g), lw=2, label="$dx/dg$")
-ax.plot(time, der(x, b), lw=2, label="$dx/db$")
-ax.plot(time, der(x, v0), lw=2, label="$dx/dv_0$")
-ax.plot(time, der(x, x0), lw=2, label="$dx/dx_0$")
-
-ax.set_xlabel("time [s]")
-ax.legend()
-ax.grid(True)
 
 plt.show()

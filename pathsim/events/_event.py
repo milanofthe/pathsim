@@ -46,10 +46,10 @@ class Event:
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
-    def __init__(self, blocks, g=None, f=None, h=None, tolerance=1e-4):
+    def __init__(self, blocks=None, g=None, f=None, h=None, tolerance=1e-4):
         
         #blocks to monitor for events
-        self.blocks = blocks 
+        self.blocks = [] if blocks is None else blocks
     
         #event detection function
         if not callable(g): 
@@ -79,10 +79,16 @@ class Event:
         return self.__class__.__name__
 
 
+    def __len__(self):
+        """
+        Return the number of detected (or rather resolved) events.
+        """
+        return len(self._times)
+
+
     def __iter__(self):
         """
-        The '__iter__' method yields the recorded times at which events 
-        are detected.
+        Yields the recorded times at which events are detected.
         """
         for t in self._times:
             yield t
@@ -90,8 +96,7 @@ class Event:
 
     def __bool__(self):
         """
-        The '__bool__' method is a proxy for the 'detect' method but only 
-        returns wheather an the event was triggered. 
+        Proxy for the 'detect' method but only returns if the event was triggered. 
         """
         event, *_ = self.detect()
         return event
@@ -132,9 +137,9 @@ class Event:
 
     # external methods ------------------------------------------------------------------
 
-
     def on(self): self._active = True
     def off(self): self._active = False
+
 
     def reset(self):
         """
