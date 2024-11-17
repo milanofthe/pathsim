@@ -33,8 +33,8 @@ connections = [
 #events (zero crossings)
 E1 = ZeroCrossing(
     blocks=[I1], 
-    g=lambda x: x - 3, 
-    f=lambda x: [x - 1]
+    g=lambda _, x: x[0] - 3, 
+    f=lambda x: [x[0] - 1]
     )
 
 events = [E1]

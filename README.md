@@ -312,7 +312,7 @@ ax.legend(fancybox=False);
 
 ## Event Detection
 
-PathSim has an event handling system that watches states of dynamic blocks or outputs of static blocks and can trigger callbacks or state teansformations. etection. This enables the simulation of hybrid continuous time systems with discrete events. Probably the most popular example for this is the bouncing ball where discrete events occur whenever the ball touches the floor.
+PathSim has an event handling system that watches states of dynamic blocks or outputs of static blocks and can trigger callbacks or state transformations. This enables the simulation of hybrid continuous time systems with discrete events. Probably the most popular example for this is the bouncing ball where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
 
 
 ```python
@@ -344,9 +344,8 @@ connections = [
 #events (zero-crossings) -> ball makes contact
 E1 = ZeroCrossing(
     blocks=[Ix, Iv],                  # blocks to watch states of
-    g=lambda x, y: x,                 # event function for zero crossing detection
-    f=lambda x, y: [abs(x), -0.9*y],  # action function for state transformation
-    tolerance=1e-4
+    g=lambda _, x: x[0],              # event function for zero crossing detection
+    f=lambda x: [abs(x[0]), -0.9*x[1]], # action function for state transformation
     )
 
 events = [E1]
@@ -361,24 +360,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2024-11-17 11:17:53,524 - INFO - LOGGING enabled
-    2024-11-17 11:17:53,524 - INFO - SOLVER RKBS32 adaptive=True implicit=False
-    2024-11-17 11:17:53,525 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
-    2024-11-17 11:17:53,525 - INFO - RESET
-    2024-11-17 11:17:53,526 - INFO - RUN duration=20
-    2024-11-17 11:17:53,526 - INFO - STARTING progress tracker
-    2024-11-17 11:17:53,527 - INFO - progress=0%
-    2024-11-17 11:17:53,532 - INFO - progress=10%
-    2024-11-17 11:17:53,539 - INFO - progress=20%
-    2024-11-17 11:17:53,548 - INFO - progress=30%
-    2024-11-17 11:17:53,558 - INFO - progress=40%
-    2024-11-17 11:17:53,565 - INFO - progress=50%
-    2024-11-17 11:17:53,575 - INFO - progress=60%
-    2024-11-17 11:17:53,585 - INFO - progress=70%
-    2024-11-17 11:17:53,598 - INFO - progress=80%
-    2024-11-17 11:17:53,610 - INFO - progress=90%
-    2024-11-17 11:17:53,632 - INFO - progress=100%
-    2024-11-17 11:17:53,633 - INFO - FINISHED steps(total)=395(496) runtime=106.76ms
+    2024-11-17 22:06:50,125 - INFO - LOGGING enabled
+    2024-11-17 22:06:50,126 - INFO - SOLVER RKBS32 adaptive=True implicit=False
+    2024-11-17 22:06:50,126 - INFO - PATH LENGTH ESTIMATE 1, 'iterations_min' set to 1
+    2024-11-17 22:06:50,127 - INFO - RESET
+    2024-11-17 22:06:50,127 - INFO - RUN duration=20
+    2024-11-17 22:06:50,128 - INFO - STARTING progress tracker
+    2024-11-17 22:06:50,128 - INFO - progress=0%
+    2024-11-17 22:06:50,133 - INFO - progress=10%
+    2024-11-17 22:06:50,141 - INFO - progress=20%
+    2024-11-17 22:06:50,150 - INFO - progress=30%
+    2024-11-17 22:06:50,157 - INFO - progress=40%
+    2024-11-17 22:06:50,164 - INFO - progress=50%
+    2024-11-17 22:06:50,174 - INFO - progress=60%
+    2024-11-17 22:06:50,183 - INFO - progress=70%
+    2024-11-17 22:06:50,197 - INFO - progress=80%
+    2024-11-17 22:06:50,210 - INFO - progress=90%
+    2024-11-17 22:06:50,232 - INFO - progress=100%
+    2024-11-17 22:06:50,232 - INFO - FINISHED steps(total)=395(496) runtime=104.10ms
     
 
 
@@ -392,6 +391,7 @@ During the event handling, the simulator approaches the event until the event to
 
 ```python
 import numpy as np
+import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 
@@ -415,11 +415,6 @@ ax.grid(True)
     
 
 
-
-```python
-
-```
-
 ## Contributing and Future
 
 There are some things I want to explore with PathSim eventually, and your help is highly appreciated! If you want to contribute, send me a message and we can discuss how!
@@ -429,8 +424,3 @@ Some of the possible directions for future features are:
 - include discrete time blocks and integrate them into the event handling mechanism
 - more extensive testing and validation (as always)
 
-
-
-```python
-
-```

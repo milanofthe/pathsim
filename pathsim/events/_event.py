@@ -104,15 +104,17 @@ class Event:
 
     # internal methods ------------------------------------------------------------------
 
-    def _get_states(self):
+    def _get(self):
         """
-        Collect the states of the solvers (engines) of the blocks. 
+        Collect the outputs of the blocks and the states of the solvers 
+        (engines) of the blocks as tuples.
 
-        If the block doesnt have an engine, it falls back to the block 
-        outputs. This enables monitoring of block outputs as well as 
+            (outputs, states), ...
+
+        This enables monitoring of block outputs as well as 
         solver states.
         """
-        return [b() if b.engine is None else b.engine() for b in self.blocks]
+        return zip(*[block() for block in self.blocks])
 
 
     def _set_states(self, states):
@@ -124,15 +126,14 @@ class Event:
         and dont need to be handled by the event system! 
         """
         for state, block in zip(states, self.blocks):
-            if block.engine is not None:
-                block.engine.set(state)
+            if block.engine: block.engine.set(state)
             
     
     def _evaluate(self):
         """
         Evaluate the event function and return its value after casting it to float.
         """
-        return float(self.g(*self._get_states()))
+        return float(self.g(*self._get()))
 
 
     # external methods ------------------------------------------------------------------
@@ -188,8 +189,10 @@ class Event:
 
         #transform states if transform available
         if self.f is not None:
-            self._set_states(self.f(*self._get_states()))
+            _, states = self._get()
+            self._set_states(self.f(states))
 
-        #general callback function
+        #general callback function 
         if self.h is not None:
-            self.h(*self._get_states())
+            self.h(*self._get())
+

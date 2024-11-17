@@ -190,7 +190,7 @@ class Simulation:
         Adds a new block to an existing 'Simulation' instance and initializes the solver.
 
         INPUTS:
-            block : ('Block' instance) block to add to the simulation
+            block : (Block) block to add to the simulation
         """
 
         #check if block already in block list
@@ -211,7 +211,7 @@ class Simulation:
         Adds a new connection to an existing 'Simulation' instance.
 
         INPUTS:
-            connection : ('Connection' instance) connection to add to the simulation
+            connection : (Connection) connection to add to the simulation
         """
 
         #check if connection already in block list
@@ -299,8 +299,8 @@ class Simulation:
         to the 'Solver' class.
 
         INPUTS:
-            Solver      : ('Solver' class) numerical solver definition
-            solver_args : (dict) additional parameters for numerical solvers such as abs and rel tolerance
+            Solver      : (Solver) numerical solver definition
+            solver_args : (dict) additional parameters for numerical solvers
         """
 
         #update global solver class
@@ -445,11 +445,11 @@ class Simulation:
         for the convergence via the max residual norm of the fixed point 
         equation of the previous solution.
 
-        INPUTS: 
+        INPUTS : 
             t  : (float) evaluation time of dynamical timestepping
             dt : (float) timestep
 
-        RETURNS: 
+        RETURNS : 
             success          : (bool) indicator if the timestep was successful
             total_evals      : (int) total number of system evaluations
             total_solver_its : (int) total number of implicit solver iterations

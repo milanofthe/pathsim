@@ -77,12 +77,8 @@ class Solver:
         return len(self.x)
 
 
-    def __call__(self):
-        """
-        The '__call__' method returns the internal state of 
-        the solver as a proxy to the 'get' method.
-        """
-        return self.get()
+    def __bool__(self):
+        return True
 
 
     def stages(self, t, dt):

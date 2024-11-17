@@ -69,10 +69,13 @@ class Block:
 
     def __call__(self):
         """
-        The '__call__' method returns the block outputs as an array for use outside. 
-        Either for monitoring, postprocessing or event detection.
+        The '__call__' method returns the current block outputs and internal states 
+        of engines (if available) as an array for use outside. Either for monitoring, 
+        postprocessing or event detection.
         """
-        return dict_to_array(self.outputs)
+        _outputs = dict_to_array(self.outputs)
+        _states = self.engine.get() if self.engine else []
+        return _outputs, _states
 
 
     def reset(self):
@@ -85,8 +88,7 @@ class Block:
         self.outputs = {k:0.0 for k in sorted(self.outputs.keys())}
 
         #reset engine if block has solver
-        if self.engine is not None:
-            self.engine.reset()
+        if self.engine: self.engine.reset()
 
 
     # methods for blocks with integration engines ---------------------------------------
@@ -108,8 +110,7 @@ class Block:
         This is required for adaptive solvers to revert the state to the 
         previous timestep.
         """
-        if self.engine is not None:
-            self.engine.revert()
+        if self.engine: self.engine.revert()
 
 
     def buffer(self, dt):
@@ -119,8 +120,7 @@ class Block:
 
         This is required for multistage, multistep and adaptive integrators.
         """
-        if self.engine is not None:
-            self.engine.buffer(dt)
+        if self.engine: self.engine.buffer(dt)
     
 
     # methods for sampling data ---------------------------------------------------------

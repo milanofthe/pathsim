@@ -12,8 +12,10 @@
 
 # IMPORTS ===============================================================================
 
+import numpy as np
+
 from .blocks._block import Block
-from .utils.utils import path_length_dfs
+from .utils.utils import path_length_dfs, dict_to_array
 
 
 # IO CLASS ==============================================================================
@@ -62,8 +64,8 @@ class Subsystem(Block):
     implicit update equation for implicit solvers. 
 
     INPUTS : 
-        blocks      : (list of 'Block' objects) internal blocks of the subsystem
-        connections : (list of 'Connection' objects) internal connections of the subsystem
+        blocks      : (list[Block] internal blocks of the subsystem
+        connections : (list[Connection]) internal connections of the subsystem
     """
 
     def __init__(self, blocks=None, connections=None):
@@ -115,6 +117,20 @@ class Subsystem(Block):
         return max_path_length
 
 
+    def __call__(self):
+        """
+        Recursively get the subsystems outputs and internal states of 
+        engines (if available) of internal blocks as an array for use 
+        outside. Either for monitoring, postprocessing or event detection.
+        """
+        _states = []
+        for block in self.blocks:
+            _, sta = block()
+            _states.append(sta)
+        _outputs = dict_to_array(self.interface.inputs)
+        return _outputs, np.hstack(_states)
+
+
     def _check_connections(self):
         """
         Check if connections are valid and if there is no input port that recieves 
@@ -149,6 +165,10 @@ class Subsystem(Block):
         """
         The 'set' method of the 'Subsystem' sets the output 
         values of the 'Interface' block.
+
+        INPUTS : 
+            port  : (int) input port to set value to
+            value : (numeric) value to set at input port (of subsystem)
         """
         self.interface.set_output(port, value)
 
@@ -157,6 +177,9 @@ class Subsystem(Block):
         """
         The 'get' method of the 'Subsystem' retrieves the input 
         values of the 'Interface' block.
+
+        INPUTS : 
+            port : (int) output port (of subsystem) to retrieve value from
         """
         return self.interface.get_input(port)
 
@@ -168,6 +191,9 @@ class Subsystem(Block):
         """
         Update the internal connections again and sample data from 
         the internal blocks that implement the 'sample' method.
+
+        INPUTS : 
+            t  : (float) evaluation time 
         """
 
         #update internal connenctions (data transfer)
@@ -185,6 +211,12 @@ class Subsystem(Block):
         """
         Update the instant time components of the internal blocks 
         to evaluate the (distributed) system equation.
+
+        INPUTS : 
+            t  : (float) evaluation time 
+
+        RETURNS : 
+            max_error : (float) error tolerance of system equation convergence
         """
 
         #update internal connections (data transfer)
@@ -205,6 +237,13 @@ class Subsystem(Block):
     def solve(self, t, dt):
         """
         Advance solution of implicit update equation for internal blocks.
+
+        INPUTS : 
+            t  : (float) evaluation time 
+            dt : (float) timestep
+
+        RETURNS : 
+            max_error : (float) maximum error of implicit update equaiton
         """
         max_error = 0.0
         for block in self.blocks:
@@ -217,6 +256,19 @@ class Subsystem(Block):
     def step(self, t, dt):
         """
         Explicit component of timestep for internal blocks including error propagation.
+
+        NOTE : 
+            This is pretty much an exact copy of the '_step' method 
+            from the 'Simulation' class.
+
+        INPUTS : 
+            t  : (float) evaluation time 
+            dt : (float) timestep
+
+        RETURNS : 
+            success   : (bool) indicator if the timestep was successful
+            max_error : (float) maximum local truncation error from integration
+            scale     : (float) rescale factor for timestep
         """
 
         #initial timestep rescale and error estimate
@@ -224,15 +276,26 @@ class Subsystem(Block):
 
         #step blocks and get error estimates if available
         for block in self.blocks:
-            ss, err, scl = block.step(t, dt)
-            if not ss: success = False
-            if err > max_error_norm: max_error_norm = err
-            if scl not in [0.0, 1.0]: relevant_scales.append(scl)
+            ss, err_norm, scl = block.step(t, dt)
+            
+            #check solver stepping success
+            if not ss: 
+                success = False
 
-        #calculate real relevant timestep rescale
-        scale = 1.0 if not relevant_scales else min(relevant_scales)
+            #update error tracking
+            if err_norm > max_error_norm: 
+                max_error_norm = err_norm
+            
+            #update timestep rescale if relevant
+            if scl not in [0.0, 1.0]: 
+                relevant_scales.append(scl)
 
-        return success, max_error_norm, scale
+        #no relevant timestep rescale -> quit early
+        if not relevant_scales: 
+            return success, max_error_norm, 1.0
+
+        #compute real timestep rescale
+        return success, max_error_norm, min(relevant_scales)
 
 
     # methods for blocks with integration engines -------------------------------------------
@@ -245,9 +308,9 @@ class Subsystem(Block):
         If blocks already have solvers, change the numerical integrator
         to the 'Solver' class.
         
-        INPUTS:
-            Solver : ('Solver' class) numerical solver definition
-            tolerance_lte : (float) tolerance for local truncation error
+        INPUTS :
+            Solver      : ('Solver' class) numerical solver definition
+            solver_args : (dict) args to initialize solver with 
         """
 
         #iterate all blocks and set integration engines

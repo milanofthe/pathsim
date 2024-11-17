@@ -21,25 +21,24 @@ class ZeroCrossing(Event):
     Subclass of base 'Event' that triggers if the event function crosses zero. 
     This is a bidirectional zero-crossing detector. 
     
-    Monitors states of solvers of stateful blocks or outputs of algebraic blocks 
-    and sources by evaluating an event function (g) with scalar output and testing 
-    for zero crossings (sign changes). 
+    Monitors states of solvers of stateful blocks and block outputs by evaluating an 
+    event function (g) with scalar output and testing for zero crossings (sign changes). 
 
-        g(states) -> event?
+        g(outputs, states) -> event?
 
     If an event is detected, some action (f) is performed on the states of the blocks.
 
-        g(states) == 0 -> event -> states = f(states)
+        g(outputs, states) == 0 -> event -> states = f(states)
 
     If a callback function (h) is defined, it is called with the states as args.
 
-        g(states) == 0 -> event -> h(states)
+        g(outputs, states) == 0 -> event -> h(outputs, states)
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        g         : (callable) event function, where zeros are events
-        f         : (callable) state transform function to apply for event resolution 
-        h         : (callable) general callaback function at event resolution
+        g         : (callable: outputs, states -> float) event function, where zeros are events
+        f         : (callable: states -> states) state transform function to apply for event resolution 
+        h         : (callable: outputs, states -> None) general callaback function at event resolution
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 

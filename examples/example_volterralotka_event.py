@@ -49,13 +49,13 @@ connections = [
 #events to detect
 E1 = ZeroCrossingUp(
     blocks=[VL],
-    g=lambda x: x[1] - 4,
+    g=lambda _, x: x[0][1] - 4,
     tolerance=1e-4
     )
 
 E2 = ZeroCrossingUp(
     blocks=[VL],
-    g=lambda x: x[0] - 4,
+    g=lambda _, x: x[0][0] - 4,
     tolerance=1e-4
     )
 

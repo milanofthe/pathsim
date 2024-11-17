@@ -20,7 +20,7 @@ from pathsim.solvers import SSPRK33, RKCK54
 dt = 0.01
 
 #filter bandwidth, order and signal frequency
-B, n, f = 2, 6, 1
+B, n, f = 2, 4, 1
 
 #blocks that define the system
 Src = SquareWaveSource(frequency=f)

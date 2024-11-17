@@ -60,9 +60,9 @@ connections = [
 
 #events (zero crossing)
 E1 = ZeroCrossing(
-    blocks=[Ix, Iv],               # blocks to watch states of
-    g=lambda x, y: x,              # event function for zero crossing detection
-    f=lambda x, y: [abs(x), -b*y], # action function for state transformation
+    blocks=[Ix, Iv],                  # blocks to watch states of
+    g=lambda _, x: x[0],              # event function for zero crossing detection
+    f=lambda x: [abs(x[0]), -b*x[1]], # action function for state transformation
     tolerance=1e-4
     )
 
@@ -77,12 +77,12 @@ Sim = Simulation(
     dt=dt, 
     log=True, 
     Solver=RKBS32, 
-    tolerance_lte_rel=1e-4, 
+    tolerance_lte_rel=1e-3, 
     tolerance_lte_abs=1e-5
     )
 
 #run the simulation
-Sim.run(10)
+Sim.run(7)
 
 #read the recordings from the scope
 time, [x] = Sc.read()
