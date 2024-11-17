@@ -66,8 +66,30 @@ E1 = ZeroCrossing(
     tolerance=1e-4
     )
 
+E2 = ZeroCrossing(
+    blocks=[Ix, Iv],                       # blocks to watch states of
+    g=lambda x, y: x + 3,                  # event function for zero crossing detection
+    f=lambda x, y: [abs(x + 3) - 3, -b*y], # action function for state transformation
+    tolerance=1e-4
+    )
 
-events = [E1]
+#tracking of 'E2' off initially
+E2.off()
+
+#callback function for 'E3' switches event tracking
+def switch(x, y):
+    E1.off()
+    E2.on()
+    E3.off()
+
+E3 = ZeroCrossing(
+    blocks=[Ix, Iv],                # blocks to watch states of
+    g=lambda x, y: x + y**2 - 0.1,  # energy thresholding 
+    h=switch ,                      # callback
+    tolerance=1e-3
+    )
+
+events = [E1, E2, E3]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(
@@ -82,7 +104,7 @@ Sim = Simulation(
     )
 
 #run the simulation
-Sim.run(10)
+Sim.run(15)
 
 #read the recordings from the scope
 time, [x] = Sc.read()
@@ -92,12 +114,16 @@ Sc.plot(".-", lw=2)
 
 #add detected events to scope plot
 for t in E1: Sc.ax.axvline(t, ls="--", c="k")
+for t in E2: Sc.ax.axvline(t, ls="-.", c="k")
+for t in E3: Sc.ax.axvline(t, ls="-", c="k", lw=3)
 
 # timesteps -----------------------------------------------------------------------------
 
 fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 
 for t in E1: ax.axvline(t, ls="--", c="k")
+for t in E2: ax.axvline(t, ls="-.", c="k")
+for t in E3: ax.axvline(t, ls="-", c="k", lw=3)
 
 ax.plot(time[:-1], np.diff(time), lw=2)
 
@@ -112,6 +138,8 @@ ax.grid(True)
 fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 
 for t in E1: ax.axvline(t, ls="--", c="k")
+for t in E2: ax.axvline(t, ls="-.", c="k")
+for t in E3: ax.axvline(t, ls="-", c="k", lw=3)
 
 ax.plot(time, der(x, k), lw=2, label="$dx/dk$")
 ax.plot(time, der(x, g), lw=2, label="$dx/dg$")

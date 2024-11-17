@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, ODE
 from pathsim.solvers import RKBS32
-from pathsim.events import ZeroCrossing
+from pathsim.events import ZeroCrossingUp, ZeroCrossingDown
 
 
 # VOLTERRA-LOTKA SYSTEM =================================================================
@@ -47,17 +47,15 @@ connections = [
     ]
 
 #events to detect
-E1 = ZeroCrossing(
+E1 = ZeroCrossingUp(
     blocks=[VL],
     g=lambda x: x[1] - 4,
-    direction=-1,
     tolerance=1e-4
     )
 
-E2 = ZeroCrossing(
+E2 = ZeroCrossingUp(
     blocks=[VL],
     g=lambda x: x[0] - 4,
-    direction=-1,
     tolerance=1e-4
     )
 

@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                         EVENT MANAGER CLASS FOR EVENT DETECTION
-##                                   (events/event.py)
+##                                   (events/_event.py)
 ##
 ##                                   Milan Rother 2024
 ##
@@ -17,15 +17,17 @@ import numpy as np
 class Event:
     """
     This is the base class of the event handling system.
+
     Monitors states of solvers of stateful blocks or outputs of algebraic blocks and 
     sources by evaluating an event function (g) with scalar output.
-    
 
+        g(states) -> event?
+    
     If an event is detected, some action (f) is performed on the states of the blocks.
 
         event -> states = f(states)
 
-    Or if specified, a callback function (h) is called on the states.
+    If a callback function (h) is defined, it is called with the states as args.
 
         event -> h(states)
 
@@ -38,9 +40,9 @@ class Event:
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        g         : (callable) event function, where zeros are events
-        f         : (callable) state transform function to apply at events
-        h         : (callable) general callaback function at event detection
+        g         : (callable) event function, gets evaluated for event detection
+        f         : (callable) state transform function to apply for event resolution 
+        h         : (callable) general callaback function at event resolution
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
@@ -69,6 +71,13 @@ class Event:
         #recording the event times
         self._times = []
 
+        #flag for active event checking
+        self._active = True
+
+
+    def __str__(self):
+        return self.__class__.__name__
+
 
     def __iter__(self):
         """
@@ -86,7 +95,6 @@ class Event:
         """
         event, *_ = self.detect()
         return event
-
 
 
     # internal methods ------------------------------------------------------------------
@@ -123,6 +131,10 @@ class Event:
 
 
     # external methods ------------------------------------------------------------------
+
+
+    def on(self): self._active = True
+    def off(self): self._active = False
 
     def reset(self):
         """
