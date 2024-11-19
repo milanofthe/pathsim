@@ -23,27 +23,27 @@ class Condition(Event):
     This is a bidirectional zero-crossing detector. 
     
     Monitors states of solvers of stateful blocks or outputs of algebraic blocks 
-    and sources by evaluating an event function (g) with boolean output.
+    and sources by evaluating an event function (func_evt) with boolean output.
 
-        g(states) -> event?
+        func_evt(outputs, states, time) -> event?
 
-    If an event is detected, some action (f) is performed on the states of the blocks.
+    If an event is detected, some action (func_act) is performed on the states of the blocks.
 
-        g(states) == True -> event -> states = f(states)
+        func_evt(outputs, states, time) == True -> event -> states = func_act(outputs, states, time)
 
-    If a callback function (h) is defined, it is called with the states as args.
+    If a callback function (func_cbk) is defined, it is called with the states as args.
 
-        g(states) == True -> event -> h(states)
+        func_evt(outputs, states, time) == True -> event -> func_cbk(outputs, states, time)
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        g         : (callable) event function, where zeros are events
-        f         : (callable) state transform function to apply for event resolution 
-        h         : (callable) general callaback function at event resolution
+        func_evt  : (callable) event function, where zeros are events
+        func_act  : (callable) state transform function to apply for event resolution 
+        func_cbk  : (callable) general callaback function at event resolution
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
-    def detect(self):
+    def detect(self, t):
         """
         Evaluate the event function and check if condition 'g' is satisfied. 
 
@@ -56,7 +56,7 @@ class Condition(Event):
             return False, False, 1.0
 
         #evaluate event function
-        is_event = self._evaluate()
+        is_event = self._evaluate(t)
 
         #discrete condition -> no interpolation (always resolve directly)
         return is_event, is_event, 1.0

@@ -60,9 +60,9 @@ connections = [
 
 #events (zero crossing)
 E1 = ZeroCrossing(
-    blocks=[Ix, Iv],                  # blocks to watch states of
-    g=lambda _, x: x[0],              # event function for zero crossing detection
-    f=lambda x: [abs(x[0]), -b*x[1]], # action function for state transformation
+    blocks=[Ix, Iv],                               # blocks to watch states of
+    func_evt=lambda y, x, t: x[0],                 # event function for zero crossing detection
+    func_act=lambda y, x, t: [abs(x[0]), -b*x[1]], # action function for state transformation
     tolerance=1e-4
     )
 

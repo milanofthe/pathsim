@@ -59,22 +59,22 @@ connections = [
 
 #events (zero crossing)
 E1 = ZeroCrossing(
-    blocks=[Ix, Iv],                  # blocks to watch states of
-    g=lambda _, x: x[0],              # event function for zero crossing detection
-    f=lambda x: [abs(x[0]), -b*x[1]], # action function for state transformation
+    blocks=[Ix, Iv],                               # blocks to watch states of
+    func_evt=lambda y, x, t: x[0],                 # event function for zero crossing detection
+    func_act=lambda y, x, t: [abs(x[0]), -b*x[1]], # action function for state transformation
     tolerance=1e-4
     )
 
 E2 = ZeroCrossing(
-    blocks=[Ix, Iv],                      # blocks to watch states of
-    g=lambda _, x: x[0]+3,                # event function for zero crossing detection
-    f=lambda x: [abs(x[0]+3)-3, -b*x[1]], # action function for state transformation
+    blocks=[Ix, Iv],                                   # blocks to watch states of
+    func_evt=lambda y, x, t: x[0]+3,                   # event function for zero crossing detection
+    func_act=lambda y, x, t: [abs(x[0]+3)-3, -b*x[1]], # action function for state transformation
     tolerance=1e-4
     )
 
 E3 = Condition(
-    g=lambda: len(E1) >= 13,       # number of events 'E1' (bounces)
-    h=lambda: [E1.off(), E3.off()] # callback switches event tracking
+    func_evt=lambda *_: len(E1) >= 13,       # number of events 'E1' (bounces)
+    func_cbk=lambda *_: [E1.off(), E3.off()] # callback switches event tracking
     )
 
 events = [E1, E2, E3]
@@ -93,7 +93,6 @@ Sim = Simulation(
 
 #run the simulation
 Sim.run(15)
-
 
 #plot the recordings from the scope
 Sc.plot(".-", lw=2)

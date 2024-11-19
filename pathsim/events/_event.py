@@ -19,53 +19,58 @@ class Event:
     This is the base class of the event handling system.
 
     Monitors states of solvers of stateful blocks or outputs of algebraic blocks and 
-    sources by evaluating an event function (g) with scalar output.
+    sources by evaluating an event function (func_evt) with scalar output.
 
-        g(states) -> event?
-    
-    If an event is detected, some action (f) is performed on the states of the blocks.
+        func_evt(outputs, states, time) -> event?
 
-        event -> states = f(states)
+    If an event is detected, some action (func_act) is performed on the states of the blocks.
 
-    If a callback function (h) is defined, it is called with the states as args.
+        func_evt(outputs, states, time) == True -> event -> states = func_act(outputs, states, time)
 
-        event -> h(states)
+    If a callback function (func_cbk) is defined, it is called with the states as args.
+
+        func_evt(outputs, states, time) == True -> event -> func_cbk(outputs, states, time)
 
     The methods are structured such that event detection can be separated from event 
     resolution. This is required for adaptive timestep solvers to approach the event 
     and only resolve it when the event tolerance ('tolerance') is satisfied.
 
-    If no action functions 'f', 'h' are specified, the event will only be detected but 
-    other than that, no transformation will be applied. For general state monitoring.
+    If no action function (func_act), or callback (func_cbk) are specified, the event will only be 
+    detected but other than that, no transformation will be applied. For general state monitoring.    
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        g         : (callable) event function, gets evaluated for event detection
-        f         : (callable) state transform function to apply for event resolution 
-        h         : (callable) general callaback function at event resolution
+        func_evt  : (callable) event function, where zeros are events
+        func_act  : (callable) state transform function to apply for event resolution 
+        func_cbk  : (callable) general callaback function at event resolution
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
-    def __init__(self, blocks=None, g=None, f=None, h=None, tolerance=1e-4):
+    def __init__(self, 
+                 blocks=None, 
+                 func_evt=None, 
+                 func_act=None, 
+                 func_cbk=None, 
+                 tolerance=1e-4):
         
         #blocks to monitor for events
         self.blocks = [] if blocks is None else blocks
     
         #event detection function
-        if not callable(g): 
-            raise ValueError("function 'g' needs to be callable")
-        self.g = g
+        if not callable(func_evt): 
+            raise ValueError("function 'func_evt' needs to be callable")
+        self.func_evt = func_evt
 
         #event action function -> state transform (must not be callable)
-        self.f = f
+        self.func_act = func_act
 
         #event action function -> general callback (must not be callable)
-        self.h = h
+        self.func_cbk = func_cbk
 
         #tolerance for checking if close to actual event
         self.tolerance = tolerance
 
-        #event function evaluation history
+        #event function evaluation and evaluation time history (eval, time)
         self._history = None
 
         #recording the event times
@@ -111,9 +116,15 @@ class Event:
 
             (outputs, states), ...
 
-        This enables monitoring of block outputs as well as 
-        solver states.
+        This enables monitoring of block outputs as well as solver states.
+
+        RETURNS : 
+            outputs : (list[array, float]) outputs of the blocks
+            states  : (list[array, float]) internal states of the blocks
         """
+
+        #no blocks to watch -> no states and outputs
+        if not self.blocks: return [], []
         return zip(*[block() for block in self.blocks])
 
 
@@ -124,16 +135,23 @@ class Event:
         If the block doesnt have an engine, it is skipped! Things like 
         this can be handled by the standard algebraic block interactions 
         and dont need to be handled by the event system! 
+
+        INPUTS :
+            states : (list[array, float]) new internal states of the blocks 
         """
         for state, block in zip(states, self.blocks):
             if block.engine: block.engine.set(state)
             
     
-    def _evaluate(self):
+    def _evaluate(self, t):
         """
-        Evaluate the event function and return its value after casting it to float.
+        Evaluate the event function and return its value.
+
+        INPUTS :
+            t : (float) evaluation time for event function
         """
-        return float(self.g(*self._get()))
+        outputs, states = self._get()
+        return self.func_evt(outputs, states, t)
 
 
     # external methods ------------------------------------------------------------------
@@ -150,18 +168,24 @@ class Event:
         self._times = []
 
 
-    def buffer(self):
+    def buffer(self, t):
         """
-        Buffer the event function evaluation before the timestep is taken. 
+        Buffer the event function evaluation before the timestep is taken and the evaluation time. 
+        
+        INPUTS :
+            t : (float) evaluation time for buffering history
         """
-        self._history = self._evaluate()
+        self._history = (self._evaluate(t), t)
 
 
-    def detect(self):
+    def detect(self, t):
         """
         Evaluate the event function and decide if an event has occured. 
         Can also use the history of the event function evaluation from 
         before the timestep.
+
+        INPUTS :
+            t : (float) evaluation time for detection 
 
         NOTE : 
             This does nothing and needs to be implemented for specific events!!!
@@ -175,24 +199,28 @@ class Event:
         return False, False, 1.0
         
 
-    def resolve(self, time=None):
+    def resolve(self, t):
         """
-        Resolve the event and record the time at which it occurs. Transforms 
-        the monitored states using the function 'f' if it is defined. Otherwise 
-        this just marks the location of the event.
+        Resolve the event and record the time (t) at which it occurs. Transforms 
+        the monitored states using the action function (func_act) if it is defined. 
+        Otherwise this just marks the location of the event in time.
         
-        If a callback function for the event is provided, it is also called here.
+        If a callback function (func_cbk) for the event is provided, it is also called here.
+
+        INPUTS :
+            t : (float) evaluation time for event resolution
         """
 
         #save the time of event resolution
-        self._times.append(time)
+        self._times.append(t)
 
         #transform states if transform available
-        if self.f is not None:
-            _, states = self._get()
-            self._set_states(self.f(states))
+        if self.func_act is not None:
+            outputs, states = self._get()
+            self._set_states(self.func_act(outputs, states, t))
 
         #general callback function 
-        if self.h is not None:
-            self.h(*self._get())
+        if self.func_cbk is not None:
+            outputs, states = self._get()
+            self.func_cbk(outputs, states, t)
 

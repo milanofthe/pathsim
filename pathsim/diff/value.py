@@ -12,6 +12,7 @@
 import numpy as np
 import functools
 
+import weakref
 
 # HELPER FUNCTIONS ======================================================================
 
@@ -113,6 +114,9 @@ class Value:
         val  : (float, int, complex) The numerical value.
         grad : (dict, optional) The gradient dictionary. If None, initializes with self derivative.
     """
+
+    #restrict attributes, makes access faster
+    __slots__ = ["val", "grad"] 
 
     def __init__(self, val=0.0, grad=None):
         self.val = val

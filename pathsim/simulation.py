@@ -351,6 +351,32 @@ class Simulation:
         self._update(0.0)
 
 
+    # event system ----------------------------------------------------------------
+
+    def _events(self, t):
+        """
+        Check for possible events and return them chronologically, sorted 
+        by their timestep ratios (closest to the initial point in time).
+
+        INPUTS : 
+            t : (float) evaluation time for event function
+        """
+
+        #iterate all event managers
+        detected_events = []
+        for event in self.events:
+            
+            #check if an event is detected
+            detected, close, ratio = event.detect(t)
+
+            #event was detected during the timestep 
+            if detected:
+                detected_events.append([event, close, ratio])
+
+        #return detected events sorted by ratio
+        return sorted(detected_events, key=lambda e: e[-1])
+
+
     # timestepping ----------------------------------------------------------------
 
     def _revert(self):
@@ -479,7 +505,7 @@ class Simulation:
         return False, total_evals, iteration + 1
 
 
-    def _buffer(self, dt):
+    def _buffer(self, t, dt):
         """
         Buffer internal states of blocks and buffer states for event 
         monitoring before the timestep is taken. This is required for 
@@ -490,6 +516,7 @@ class Simulation:
         GEAR-type methods need a history of the timesteps.
 
         INPUTS : 
+            t  : (float) evaluation time for buffering
             dt : (float) timestep
         """
 
@@ -497,30 +524,9 @@ class Simulation:
         for block in self.blocks:
             block.buffer(dt)
 
-        #buffer states for zero crossing detection
+        #buffer states for event detection (with timestamp)
         for event in self.events:
-            event.buffer()
-
-
-    def _events(self):
-        """
-        Check for possible events and return them chronologically, sorted 
-        by their timestep ratios (closest to the initial point in time).
-        """
-
-        #iterate all event managers
-        detected_events = []
-        for event in self.events:
-            
-            #check if an event is detected
-            detected, close, ratio = event.detect()
-
-            #event was detected during the timestep 
-            if detected:
-                detected_events.append([event, close, ratio])
-
-        #return detected events sorted by ratio
-        return sorted(detected_events, key=lambda e: e[-1])
+            event.buffer(t)
 
 
     def _step(self, t, dt):
@@ -600,8 +606,8 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #buffer internal states
-        self._buffer(dt)
+        #buffer internal states for solvers and event system
+        self._buffer(self.time, dt)
 
         #total function evaluations and implicit solver iterations
         total_evals, total_solver_its = 0, 0
@@ -631,8 +637,8 @@ class Simulation:
         #evaluate system equation before sampling and event check (+dt)
         total_evals += self._update(self.time + dt) 
 
-        #handle events chronologically
-        for event, _, ratio in self._events():
+        #handle events chronologically after timestep (+dt)
+        for event, _, ratio in self._events(self.time + dt):
 
             #fixed timestep -> resolve event directly
             event.resolve(self.time + ratio * dt)  
@@ -686,8 +692,8 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #buffer internal states
-        self._buffer(dt)
+        #buffer internal states for solvers and event system
+        self._buffer(self.time, dt)
 
         #total function evaluations and implicit solver iterations
         total_evals, total_solver_its = 0, 0
@@ -727,8 +733,8 @@ class Simulation:
         #evaluate system equation before sampling and event check (+dt)
         total_evals += self._update(self.time + dt) 
 
-        #otherwise handle events chronologically
-        for event, close, ratio in self._events():
+        #handle events chronologically after timestep (+dt)
+        for event, close, ratio in self._events(self.time + dt):
 
             #close enough to event -> resolve it
             if close:

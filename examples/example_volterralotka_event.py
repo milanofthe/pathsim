@@ -49,13 +49,13 @@ connections = [
 #events to detect
 E1 = ZeroCrossingUp(
     blocks=[VL],
-    g=lambda _, x: x[0][1] - 4,
+    func_evt=lambda y, x, t: x[0][1] - 4,
     tolerance=1e-4
     )
 
 E2 = ZeroCrossingUp(
     blocks=[VL],
-    g=lambda _, x: x[0][0] - 4,
+    func_evt=lambda y, x, t: x[0][0] - 4,
     tolerance=1e-4
     )
 
@@ -79,21 +79,6 @@ Sc.plot(".-")
 #add detected events to scope plot
 for e in E1: Sc.ax.axvline(e, ls="--", c="k")
 for e in E2: Sc.ax.axvline(e, ls=":", c="k")
-
-#read the data from the scope
-time, data = Sc.read()
-
-#plot the phase diagram
-fig, ax = plt.subplots(tight_layout=True)
-ax.plot(*data, label=f"{x0}")
-ax.set_xlabel("predator population")
-ax.set_ylabel("prey population")
-ax.legend()
-
-
-
-
-
 
 plt.show()
 
