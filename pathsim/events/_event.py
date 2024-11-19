@@ -40,9 +40,9 @@ class Event:
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        func_evt  : (callable) event function, where zeros are events
-        func_act  : (callable) state transform function to apply for event resolution 
-        func_cbk  : (callable) general callaback function at event resolution
+        func_evt  : (callable: outputs, states, time -> float) event function, where zeros are events
+        func_act  : (callable: outputs, states, time -> states) state transform function to apply for event resolution 
+        func_cbk  : (callable: outputs, states, time -> None) general callaback function at event resolution
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 

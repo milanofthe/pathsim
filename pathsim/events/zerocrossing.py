@@ -36,9 +36,9 @@ class ZeroCrossing(Event):
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        g         : (callable: outputs, states -> float) event function, where zeros are events
-        f         : (callable: states -> states) state transform function to apply for event resolution 
-        h         : (callable: outputs, states -> None) general callaback function at event resolution
+        func_evt  : (callable: outputs, states, time -> float) event function, where zeros are events
+        func_act  : (callable: outputs, states, time -> states) state transform function to apply for event resolution 
+        func_cbk  : (callable: outputs, states, time -> None) general callaback function at event resolution
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
@@ -78,13 +78,6 @@ class ZeroCrossingUp(Event):
     Modification of standard 'ZeroCrossing' event where events are only triggered 
     if the event function changes sign from negative to positive (up). Also called
     unidirectional zero-crossing.
-
-    INPUTS : 
-        blocks    : (list[block]) list of stateful blocks to monitor
-        g         : (callable) event function, where zeros are events
-        f         : (callable) state transform function to apply for event resolution 
-        h         : (callable) general callaback function at event resolution
-        tolerance : (float) tolerance to check if detection is close to actual event
     """
 
     def detect(self, t):
@@ -123,13 +116,6 @@ class ZeroCrossingDown(Event):
     Modification of standard 'ZeroCrossing' event where events are only triggered 
     if the event function changes sign from positive to negative (down). Also called
     unidirectional zero-crossing.
-
-    INPUTS : 
-        blocks    : (list[block]) list of stateful blocks to monitor
-        g         : (callable) event function, where zeros are events
-        f         : (callable) state transform function to apply for event resolution 
-        h         : (callable) general callaback function at event resolution
-        tolerance : (float) tolerance to check if detection is close to actual event
     """
 
     def detect(self, t):
