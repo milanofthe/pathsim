@@ -99,14 +99,6 @@ class Event:
             yield t
 
 
-    def __bool__(self):
-        """
-        Proxy for the 'detect' method but only returns if the event was triggered. 
-        """
-        event, *_ = self.detect()
-        return event
-
-
     # internal methods ------------------------------------------------------------------
 
     def _get(self):
