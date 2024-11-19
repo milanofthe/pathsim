@@ -93,6 +93,7 @@ Sc.plot(".-", lw=2)
 #add detected events to scope plot
 for t in E1: Sc.ax.axvline(t, ls="--", c="k")
 
+
 # timesteps -----------------------------------------------------------------------------
 
 fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
