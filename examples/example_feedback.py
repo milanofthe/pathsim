@@ -44,7 +44,6 @@ connections = [
     Connection(Int, Amp, Sco[1])
     ]
 
-
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True)
     

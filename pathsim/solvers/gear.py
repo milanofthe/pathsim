@@ -160,9 +160,6 @@ class GEAR(ImplicitSolver):
         self.B.pop(0)
         self.T.pop(0)
 
-        #reset stage counter
-        self.stage = 0   
-
 
     def error_controller(self, x_m):
         """

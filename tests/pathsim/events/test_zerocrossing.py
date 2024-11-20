@@ -18,8 +18,6 @@ from pathsim.events.zerocrossing import (
     ZeroCrossingDown
     )
 
-from pathsim.blocks._block import Block
-
 
 # TESTS ================================================================================
 
@@ -191,7 +189,6 @@ class TestZeroCrossingUp(unittest.TestCase):
         self.assertEqual(ra, 1)
 
 
-
 class TestZeroCrossingDown(unittest.TestCase):
     """
     Test the implementation of the 'ZeroCrossingDown' event class.
@@ -261,10 +258,6 @@ class TestZeroCrossingDown(unittest.TestCase):
         self.assertFalse(de)
         self.assertFalse(cl)
         self.assertEqual(ra, 1)
-
-
-
-  
 
 
 # RUN TESTS LOCALLY ====================================================================

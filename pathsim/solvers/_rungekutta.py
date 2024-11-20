@@ -49,49 +49,6 @@ class ExplicitRungeKutta(ExplicitSolver):
         self.TR = None
 
 
-    # def error_controller(self, dt):
-    #     """
-    #     compute scaling factor for adaptive timestep based on 
-    #     absolute and relative local truncation error estimate, 
-    #     also checks if the error tolerance is achieved and returns 
-    #     a success metric.
-
-    #     INPUTS:
-    #         dt : (float) integration timestep
-    #     """
-
-    #     #early exit if no error estimate avaliable
-    #     if self.TR is None: 
-    #         return True, 0.0, 0.0, 1.0
-
-    #     #compute local truncation error slope (this is faster then 'sum' comprehension)
-    #     slope = 0.0
-    #     for i, b in enumerate(self.TR):
-    #         slope = slope + self.Ks[i] * b
-    #     tr = dt * slope
-
-    #     #compute and clip truncation error, error ratio abs
-    #     truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
-    #     error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
-
-    #     #compute and clip truncation error, error ratio rel
-    #     if np.any(self.x == 0.0): 
-    #         truncation_error_rel = 1.0
-    #         error_ratio_rel = 0.0
-    #     else:
-    #         truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
-    #         error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
-        
-    #     #compute error ratio and success check
-    #     error_ratio = max(error_ratio_abs, error_ratio_rel)
-    #     success = error_ratio >= 1.0
-
-    #     #compute timestep scale factor using accuracy order of truncation error
-    #     timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))     
-
-    #     return success, truncation_error_abs, truncation_error_rel, timestep_rescale
-
-
     def error_controller(self, dt):
         """
         compute scaling factor for adaptive timestep based on 
@@ -103,8 +60,8 @@ class ExplicitRungeKutta(ExplicitSolver):
             dt : (float) integration timestep
         """
 
-        #early exit if no error estimate avaliable
-        if self.TR is None or len(self.Ks) < len(self.TR): 
+        #no error estimate or not last stage -> early exit
+        if self.TR is None or self.stage < self.s: 
             return True, 0.0, 1.0
 
         #local truncation error slope (this is faster then 'sum' comprehension)
@@ -153,23 +110,11 @@ class ExplicitRungeKutta(ExplicitSolver):
             slope = slope + self.Ks[i] * b
         self.x = self.x_0 + dt * slope
 
-        #error and step size control
-        if self.stage < self.s - 1:
+        #increment stage counter
+        self.stage += 1
 
-            #increment stage counter
-            self.stage += 1
-
-            #no error control for intermediate stages
-            return True, 0.0, 1.0
-        
-        else: 
-
-            #reset stage counter
-            self.stage = 0
-
-            #compute truncation error estimate in final stage
-            return self.error_controller(dt)
-
+        #compute truncation error estimate
+        return self.error_controller(dt)
 
 
 class DiagonallyImplicitRungeKutta(ImplicitSolver):
@@ -213,49 +158,6 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         self.TR = None
 
 
-    # def error_controller(self, dt):
-    #     """
-    #     compute scaling factor for adaptive timestep based on 
-    #     absolute and relative local truncation error estimate, 
-    #     also checks if the error tolerance is achieved and returns 
-    #     a success metric.
-
-    #     INPUTS:
-    #         dt : (float) integration timestep
-    #     """
-
-    #     #early exit of not enough slopes or no error estimate at all
-    #     if self.TR is None or len(self.Ks) < len(self.TR): 
-    #         return True, 0.0, 0.0, 1.0
-
-    #     #compute local truncation error slope (this is faster then 'sum' comprehension)
-    #     slope = 0.0
-    #     for i, b in enumerate(self.TR):
-    #         slope = slope + self.Ks[i] * b
-    #     tr = dt * slope
-
-    #     #compute and clip truncation error, error ratio abs
-    #     truncation_error_abs = float(np.max(np.clip(abs(tr), 1e-18, None)))
-    #     error_ratio_abs = self.tolerance_lte_abs / truncation_error_abs
-
-    #     #compute and clip truncation error, error ratio rel
-    #     if np.any(self.x == 0.0): 
-    #         truncation_error_rel = 1.0
-    #         error_ratio_rel = 0.0
-    #     else:
-    #         truncation_error_rel = float(np.max(np.clip(abs(tr/self.x), 1e-18, None)))
-    #         error_ratio_rel = self.tolerance_lte_rel / truncation_error_rel
-        
-    #     #compute error ratio and success check
-    #     error_ratio = max(error_ratio_abs, error_ratio_rel)
-    #     success = error_ratio >= 1.0
-
-    #     #compute timestep scale factor using accuracy order of truncation error
-    #     timestep_rescale = self.beta * error_ratio**(1/(min(self.m, self.n) + 1))   
-
-    #     return success, truncation_error_abs, truncation_error_rel, timestep_rescale
-
-
     def error_controller(self, dt):
         """
         compute scaling factor for adaptive timestep based on 
@@ -267,8 +169,8 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             dt : (float) integration timestep
         """
 
-        #early exit if no error estimate avaliable
-        if self.TR is None or len(self.Ks) < len(self.TR): 
+        #no error estimate or not last stage -> early exit
+        if self.TR is None or self.stage < self.s: 
             return True, 0.0, 1.0
 
         #local truncation error slope (this is faster then 'sum' comprehension)
@@ -357,28 +259,17 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         #restart anderson accelerator 
         self.acc.reset()
 
-        #error and step size control
-        if self.stage < self.s - 1:
+        #increment stage counter
+        self.stage += 1
 
-            #increment stage counter
-            self.stage += 1
+        #compute final output if not stiffly accurate
+        if self.A is not None and self.stage == self.s:
 
-            #no error estimate for intermediate stages
-            return True, 0.0, 1.0
+            #compute slope (this is faster then 'sum' comprehension)
+            slope = 0.0
+            for i, a in enumerate(self.A):
+                slope = slope + self.Ks[i] * a
+            self.x = self.x_0 + dt * slope    
 
-        else: 
-
-            #compute final output if not stiffly accurate
-            if self.A is not None:
-
-                #compute slope (this is faster then 'sum' comprehension)
-                slope = 0.0
-                for i, a in enumerate(self.A):
-                    slope = slope + self.Ks[i] * a
-                self.x = self.x_0 + dt * slope
-            
-            #reset stage counter
-            self.stage = 0
-
-            #compute truncation error estimate in final stage
-            return self.error_controller(dt)
+        #compute truncation error estimate in final stage
+        return self.error_controller(dt)

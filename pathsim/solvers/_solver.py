@@ -130,8 +130,15 @@ class Solver:
 
         Multistep solver implement rolling buffers for the states 
         and timesteps.
+
+        Resets the stage counter.
         """
+
+        #buffer internal state
         self.x_0 = self.x
+
+        #reset stage counter
+        self.stage = 0
 
 
     @classmethod
