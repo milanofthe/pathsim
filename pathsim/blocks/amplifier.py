@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                              IDEAL AMPLIFIER BLOCK 
+##                                 AMPLIFIER BLOCK 
 ##                              (blocks/amplifier.py)
 ##
 ##                                Milan Rother 2024

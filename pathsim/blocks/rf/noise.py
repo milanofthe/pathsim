@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                             SPECIAL RF NOISE SOURCES 
-##                                (blocks/rf/noise.py)
+##                               (blocks/rf/noise.py)
 ##
 ##            this module implements some noise sources for RF simulations
 ##
@@ -57,84 +57,68 @@ class WhiteNoise(Block):
             self.n_samples += 1
 
 
-class OneOverFNoise(Block):
+class PinkNoise(Block):
     """
-    1/f noise source that is realized by integrating white noise using a 
-    numerical integrator. Samples from distribution with 'sampling_rate' 
-    and holds noise values constant for time bins.
-
-    If no 'sampling_rate' (None) is specified, every simulation timestep 
-    gets a new noise values. This is the default setting.
+    Pink noise (1/f) source using the Voss-McCartney algorithm.
+    Samples from distribution with 'sampling_rate' and generates noise
+    with a power spectral density inversely proportional to frequency.
 
     INPUTS : 
-        spectral_density : (float) noise spectral density
-        sampling_rate     : (float or None) frequency with which the noise is sampled 
+        spectral_density : (float) Desired noise spectral density
+        num_octaves      : (int) Number of octaves (levels of randomness)
+        sampling_rate    : (float or None) Frequency with which the noise is sampled 
     """
 
-    def __init__(self, spectral_density=1, sampling_rate=None):
+    def __init__(self, spectral_density=1, num_octaves=16, sampling_rate=None):
         super().__init__()
 
-        #parameters of noise signal
         self.spectral_density = spectral_density
-        self.sampling_rate = sampling_rate 
-        self.sigma = np.sqrt(spectral_density)
-        self.white_noise_value = 0.0
+        self.num_octaves = num_octaves
+        self.sampling_rate = sampling_rate
         self.n_samples = 0
 
+        # Calculate the normalization factor sigma
+        self.sigma = np.sqrt(spectral_density/num_octaves)
 
-    def set_solver(self, Solver, **solver_args):
-        
-        #change solver if already initialized
-        if self.engine is not None:
-            self.engine = self.engine.change(Solver, **solver_args)
-            return #quit early
-
-        #initialize the numerical integration engine with kernel
-        def _f(x, u, t): return u
-        self.engine = Solver(0.0, _f, None, **solver_args)
-
+        # Initialize the random values for each octave
+        self.octave_values = np.random.normal(0, 1, self.num_octaves)
 
     def reset(self):
-        #reset inputs and outputs
-        self.inputs  = {0:0.0}  
-        self.outputs = {0:0.0}
+        # Reset inputs and outputs
+        self.inputs  = {0: 0.0}  
+        self.outputs = {0: 0.0}
 
-        #reset noise samples
-        self.white_noise_value = 0.0
+        # Reset counters and octave values
         self.n_samples = 0
-
-        #reset engine
-        self.engine.reset()
-
-
-    def update(self, t):
-        #set outputs
-        self.outputs[0] = self.engine.get()
-        return 0.0
-
+        self.octave_values = np.random.normal(0, 1, self.num_octaves)
 
     def sample(self, t):
         """
-        Sample from a normal distribution after successful timestep.
+        Generate a new pink noise sample using the Voss-McCartney algorithm.
         """
         if (self.sampling_rate is None or 
             self.n_samples < t * self.sampling_rate):
-            self.white_noise_value = np.random.normal(scale=self.sigma) 
+
+            # Increment the counter
             self.n_samples += 1
 
+            # Use bitwise operations to determine which octaves to update
+            mask, idx = self.n_samples, 0
+            while mask & 1 == 0 and idx < self.num_octaves:
+                mask >>= 1
+                idx += 1
 
-    def solve(self, t, dt):
-        #advance solution of implicit update equation
-        self.engine.solve(self.white_noise_value, t, dt)
-        return 0.0
+            # Update the selected octave with a new random value
+            if idx < self.num_octaves:    
+                self.octave_values[idx] = np.random.normal(0, 1)
 
+            # Sum the octave values to produce the pink noise sample
+            pink_sample = np.sum(self.octave_values)
 
-    def step(self, t, dt):
-        #compute update step with integration engine
-        self.engine.step(self.white_noise_value, t, dt)
+            # Normalize by sigma to maintain consistent amplitude
+            self.outputs[0] = pink_sample * self.sigma
 
-        #no error control for noise source
-        return True, 0.0, 1.0
+            
 
 
 class SinusoidalPhaseNoiseSource(Block):

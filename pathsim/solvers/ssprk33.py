@@ -41,3 +41,15 @@ class SSPRK33(ExplicitRungeKutta):
         self.BT = {0:[1.0],
                    1:[1/4, 1/4],
                    2:[1/6, 1/6, 2/3]}
+
+    def interpolate(self, r, dt):
+        """
+        b₁(θ) = θ(1-θ)²/2
+        b₂(θ) = θ²(3-2θ)/2
+        b₃(θ) = θ³
+
+        y(t₀ + θh) = y₀ + h(b₁(θ) * k₁ + b₂(θ) * k₂ + b₃(θ) * k₃)
+        """
+        k1, k2, k3 = self.K[0], self.K[1], self.K[2]
+        b1, b2, b3 = r*(2-r)**2/2, r**2*(3-2*r)/2, r**3
+        return self.x_0 + dt*(b1 * k1 + b2 * k2 + b3 * k3)

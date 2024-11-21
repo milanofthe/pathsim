@@ -1,6 +1,7 @@
 #########################################################################################
 ##
-##                        DIFFERENTIATOR BLOCK (blocks/differentiator.py)
+##                               DIFFERENTIATOR BLOCK 
+##                            (blocks/differentiator.py)
 ##
 ##                                Milan Rother 2024
 ##
@@ -37,6 +38,7 @@ class Differentiator(Block):
 
         #maximum frequency for differentiator approximation
         self.f_max = f_max
+
 
     def __len__(self):
         return 1

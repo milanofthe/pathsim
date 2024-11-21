@@ -76,4 +76,11 @@ ax.set_xlabel("time [s]")
 ax.grid(True)
 ax.legend()
 
+
+
+print(res[20])
+
+
+
+
 plt.show()

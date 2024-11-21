@@ -1,8 +1,7 @@
 #########################################################################################
 ##
-##                          REDUCTION BLOCKS (blocks/adder.py)
-##
-##                       This module defines static 'Adder' block 
+##                                      ADDER BLOCK 
+##                                   (blocks/adder.py)
 ##
 ##                                   Milan Rother 2024
 ##

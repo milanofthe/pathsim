@@ -190,18 +190,33 @@ class Solver:
         #reset stage counter
         self.stage = 0   
 
-    
+
     # methods for timestepping ---------------------------------------------------------
 
     def step(self, u, t, dt):
         """
-        performs the explicit timestep for (t+dt) based 
-        on the state and input at (t)
+        Performs the explicit timestep for (t+dt) based 
+        on the state and input at (t).
 
-        returns the local truncation error estimate and the 
+        Returns the local truncation error estimate and the 
         rescale factor for the timestep if the solver is adaptive.
         """
         return True, 0.0, 1.0
+
+
+    # methods for interpolation --------------------------------------------------------
+
+    def interpolate(self, r, dt):
+        """
+        Interpolate solution after successful timestep as a ratio 
+        in the interval [t, t+dt].
+
+        This is especially relevant for Runge-Kutta solvers that 
+        have a higher order interpolant. Otherwise this is just 
+        linear interpolation using the buffered state.
+        """
+        _r = np.clip(r, 0.0, 1.0)
+        return _r * self.x + (1.0 - _r) * self.x_0
 
 
 # EXTENDED BASE SOLVER CLASSES =========================================================

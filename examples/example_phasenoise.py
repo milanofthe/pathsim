@@ -9,7 +9,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pathsim import Simulation, Connection, Subsystem, Interface
+from pathsim import Simulation
 from pathsim.blocks import Scope, Spectrum
 from pathsim.blocks.rf import SinusoidalPhaseNoiseSource
 
@@ -43,5 +43,6 @@ Sim.run(100/f)
 
 sco.plot()
 spc.plot()
+
 
 plt.show()

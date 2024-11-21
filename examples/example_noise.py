@@ -22,13 +22,10 @@ from pathsim.blocks import (
 #special blocks (for example from 'rf' module) are imported like this
 from pathsim.blocks.rf import (
     ButterworthBandpassFilter,
-    ButterworthLowpassFilter,
     SquareWaveSource, 
     WhiteNoise,
-    OneOverFNoise
+    PinkNoise
     )
-
-from pathsim.solvers import SSPRK33, RKCK54
 
 
 # FILTERING A SQUAREWAVE ================================================================
@@ -39,26 +36,24 @@ dt = 0.02
 #fundamental frequency of square wave
 f = 0.5
 
+
 #blocks that define the system
 Src = SquareWaveSource(frequency=f)
-Ns1 = OneOverFNoise(spectral_density=0.1, sampling_rate=5)
-Ns2 = WhiteNoise(spectral_density=0.05, sampling_rate=5)
-FLT = ButterworthBandpassFilter((f-f/4, f+f/4), 4)
-# FLT = ButterworthLowpassFilter(1.3*f+f/4, 2)
-# FLT = Amplifier()
+Ns1 = PinkNoise(spectral_density=0.05)
+Ns2 = WhiteNoise(spectral_density=0.02)
+FLT = ButterworthBandpassFilter((f-f/10, f+f/10), 4)
 Add = Adder()
 Sco = Scope(labels=["squarewave", 
                     "filter", 
                     "adder", 
-                    "1/f noise", 
+                    "pink noise", 
                     "white noise"])
-Spc = Spectrum(freq=np.linspace(0, 5, 500), 
+Spc = Spectrum(freq=np.linspace(0, 5, 5000), 
                labels=["squarewave", 
                        "filter", 
                        "adder", 
-                       "1/f noise", 
+                       "pink noise", 
                        "white noise"])
-
 
 blocks = [Src, Ns1, Ns2, Add, FLT, Sco, Spc]
 
@@ -72,10 +67,10 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
+Sim = Simulation(blocks, connections, dt=dt, log=True)
 
 #run the simulation for some time
-Sim.run(30/f)
+Sim.run(200/f)
 
 Sco.plot()
 

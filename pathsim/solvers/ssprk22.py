@@ -38,3 +38,15 @@ class SSPRK22(ExplicitRungeKutta):
         #butcher table
         self.BT = {0:[1.0],
                    1:[1/2, 1/2]}
+
+
+    def interpolate(self, r, dt):
+        """
+        b₁(θ) = θ(2-θ)/2
+        b₂(θ) = θ²/2
+
+        y(t₀ + θh) = y₀ + h(b₁(θ) * k₁ + b₂(θ) * k₂)
+        """
+        k1, k2 = self.K[0], self.K[1]
+        b1, b2 = r*(2-r)/2, r**2/2
+        return self.x_0 + dt*(b1 * k1 + b2 * k2)
