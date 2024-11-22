@@ -9,33 +9,7 @@
 
 # IMPORTS ==============================================================================
 
-from time import perf_counter
-
 import numpy as np
-
-
-# HELPERS ==============================================================================
-
-def timer(func):
-    """
-    shows the execution time in milliseconds of the 
-    function object passed for debugging purposes
-    """
-    def wrap_func(*args, **kwargs):
-        t1 = perf_counter()
-        result = func(*args, **kwargs)
-        t2 = perf_counter()
-        print(f"Function '{func.__name__!r}' executed in {(t2 - t1)*1e3:.2f}ms")
-        return result
-    return wrap_func
-
-
-def dB(x):
-    """
-    Compute clipped decibel value (for signals) where 
-    the minimum value is '-360dB'.
-    """
-    return 20.0*np.log10(np.clip(abs(x), 1e-18, None))
 
 
 # HELPERS FOR SIMULATION ===============================================================

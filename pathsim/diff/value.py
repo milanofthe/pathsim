@@ -12,22 +12,20 @@
 import numpy as np
 import functools
 
-import weakref
 
 # HELPER FUNCTIONS ======================================================================
 
 def der(array, val):
     """
-    Compute the derivative of an array of 'Value' objects 
-    with respect to 'val', fallback to scalar case and 
-    non-'Value' objects
+    Compute the derivative of an array of 'Value' objects with respect 
+    to 'val', fallback to scalar case and non-'Value' objects
     
     INPUTS : 
         array : (array[Value]) array or list of Values
         val   : (Value) dual number value for AD
     """
     if np.isscalar(array): return array.d(val) if isinstance(array, Value) else 0.0
-    else: return [a.d(val) if isinstance(a, Value) else 0.0 for a in array]
+    else: return np.array([a.d(val) if isinstance(a, Value) else 0.0 for a in array])
 
 
 # FUNCTION GRADIENTS ====================================================================
@@ -116,11 +114,19 @@ class Value:
     """
 
     #restrict attributes, makes access faster
-    __slots__ = ["val", "grad"] 
+    __slots__ = ["val", "grad", "_id"] 
+    _id_counter = 0
+
 
     def __init__(self, val=0.0, grad=None):
         self.val = val
-        self.grad = {self:1.0} if grad is None else grad
+        if grad is None:
+            self._id = Value._id_counter
+            self.grad = {self._id:1.0} 
+            Value._id_counter += 1
+        else:
+            self.grad = grad
+            self._id = None
 
 
     def d(self, other):
@@ -133,19 +139,23 @@ class Value:
         RETURNS :
             float : The partial derivative value
         """
-        return self.grad.get(other, 0.0)
+        return self.grad.get(other._id, 0.0)
 
 
     @property
     def real(self):
-        return Value(val=np.real(self.val), 
-                     grad={k: np.real(v) for k, v in self.grad.items()}) 
+        return Value(
+            val=np.real(self.val), 
+            grad={k: np.real(v) for k, v in self.grad.items()}
+            ) 
 
 
     @property
     def imag(self):
-        return Value(val=np.imag(self.val), 
-                     grad={k: np.imag(v) for k, v in self.grad.items()}) 
+        return Value(
+            val=np.imag(self.val), 
+            grad={k: np.imag(v) for k, v in self.grad.items()}
+            ) 
 
 
     def __hash__(self):
@@ -225,27 +235,35 @@ class Value:
 
 
     def __neg__(self):
-        return Value(val=-self.val, 
-                     grad={k: -v for k, v in self.grad.items()})
+        return Value(
+            val=-self.val, 
+            grad={k: -v for k, v in self.grad.items()}
+            )
 
 
     def __abs__(self):
-        return Value(val=abs(self.val), 
-                     grad={k: v * np.sign(self.val) 
-                           for k, v in self.grad.items()})
+        return Value(
+            val=abs(self.val), 
+            grad={k: v * np.sign(self.val) for k, v in self.grad.items()}
+            )
 
 
     # arithmetic operators ----------------------------------------------------------------------
 
     def __add__(self, other):
         if isinstance(other, Value):
-            new_grad = {k: self.grad.get(k, 0) + other.grad.get(k, 0) 
-                        for k in set(self.grad) | set(other.grad)}
-            return Value(val=self.val + other.val, grad=new_grad)
+            return Value(
+                val=self.val + other.val, 
+                grad={k: self.grad.get(k, 0) + other.grad.get(k, 0) 
+                      for k in range(Value._id_counter)}
+                )
         elif isinstance(other, np.ndarray):
             return np.array([self + x for x in other])
         else:
-            return Value(val=self.val + other, grad=self.grad)
+            return Value(
+                val=self.val + other, 
+                grad=self.grad
+                )
 
 
     def __radd__(self, other):
@@ -258,14 +276,18 @@ class Value:
 
     def __mul__(self, other):
         if isinstance(other, Value):
-            new_grad = {k: self.grad.get(k, 0) * other.val + self.val * other.grad.get(k, 0) 
-                        for k in set(self.grad) | set(other.grad)}
-            return Value(val=self.val * other.val, grad=new_grad)
-        elif isinstance(other,  np.ndarray):
+            return Value(
+                val=self.val * other.val, 
+                grad={k: self.grad.get(k, 0) * other.val + self.val * other.grad.get(k, 0) 
+                      for k in range(Value._id_counter)}
+                )
+        elif isinstance(other, np.ndarray):
             return np.array([self * x for x in other])
         else:
-            return Value(val=self.val * other, 
-                         grad={k: v * other for k, v in self.grad.items()})
+            return Value(
+                val=self.val * other, 
+                grad={k: v * other for k, v in self.grad.items()}
+                )
 
 
     def __rmul__(self, other):
@@ -278,13 +300,18 @@ class Value:
 
     def __sub__(self, other):
         if isinstance(other, Value):
-            new_grad = {k: self.grad.get(k, 0) - other.grad.get(k, 0) 
-                        for k in set(self.grad) | set(other.grad)}
-            return Value(val=self.val - other.val, grad=new_grad)
+            return Value(
+                val=self.val - other.val, 
+                grad={k: self.grad.get(k, 0) - other.grad.get(k, 0) 
+                      for k in range(Value._id_counter)}
+                )
         elif isinstance(other, np.ndarray):
             return np.array([self - x for x in other])
         else:
-            return Value(val=self.val - other, grad=self.grad)
+            return Value(
+                val=self.val - other, 
+                grad=self.grad
+                )
 
 
     def __rsub__(self, other):
@@ -297,40 +324,47 @@ class Value:
 
     def __truediv__(self, other):
         if isinstance(other, Value):
-            new_grad = {k: (self.grad.get(k, 0) * other.val - self.val * other.grad.get(k, 0)) 
-                           / (other.val ** 2) 
-                        if other.val != 0.0 else 0.0 for k in set(self.grad) | set(other.grad)}
-            return Value(val=self.val / other.val, grad=new_grad)
+            return Value(
+                val=self.val / other.val, 
+                grad={k: (self.grad.get(k, 0) * other.val - self.val * other.grad.get(k, 0)) / (other.val ** 2) 
+                      if other.val != 0.0 else 0.0 for k in range(Value._id_counter)}
+                )
         if isinstance(other, np.ndarray):
             return np.array([self / x for x in other])
         else:
-            return Value(val=self.val / other, 
-                         grad={k: v / other for k, v in self.grad.items()})
+            return Value(
+                val=self.val / other, 
+                grad={k: v / other for k, v in self.grad.items()}
+                )
 
 
     def __rtruediv__(self, other):
         if isinstance(other, Value):
             return other / self
         else:
-            return Value(val=other / self.val, 
-                         grad={k: -other * v / (self.val ** 2) if self.val != 0.0 else 0.0
-                               for k, v in self.grad.items()})
+            return Value(
+                val=other / self.val, 
+                grad={k: -other * v / (self.val ** 2) if self.val != 0.0 else 0.0
+                      for k, v in self.grad.items()}
+                )
 
 
     def __pow__(self, power):
         if isinstance(power, Value):
-            new_val = self.val ** power.val
-            new_grad = {k: new_val * (power.val * self.grad.get(k, 0) / self.val 
-                           + np.log(self.val) * power.grad.get(k, 0))
-                        for k in set(self.grad) | set(power.grad)}
-            return Value(val=new_val, grad=new_grad)
+            return Value(
+                val=self.val ** power.val, 
+                grad={k: new_val * (power.val * self.grad.get(k, 0) / self.val + np.log(self.val) * power.grad.get(k, 0))
+                      for k in range(Value._id_counter)}
+                )
         else:
-            return Value(val=self.val ** power, 
-                         grad={k: power * (self.val ** (power - 1)) * v 
-                               for k, v in self.grad.items()})
+            return Value(
+                val=self.val ** power, 
+                grad={k: power * (self.val ** (power - 1)) * v for k, v in self.grad.items()}
+                )
 
 
     def __rpow__(self, base):
-        new_val = base ** self.val
-        new_grad = {k: new_val * np.log(base) * v for k, v in self.grad.items()}
-        return Value(val=new_val, grad=new_grad)
+        return Value(
+            val=base ** self.val, 
+            grad={k: new_val * np.log(base) * v for k, v in self.grad.items()}
+            )

@@ -53,7 +53,7 @@ class WhiteNoise(Block):
         """
         if (self.sampling_rate is None or 
             self.n_samples < t * self.sampling_rate):
-            self.outputs[0] = np.random.normal(scale=self.sigma) 
+            self.outputs[0] = np.random.normal(0, 1)* self.sigma 
             self.n_samples += 1
 
 
