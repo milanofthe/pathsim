@@ -84,10 +84,25 @@ class Connection:
         #assign target blocks and ports
         self.targets = [trg if isinstance(trg, (list, tuple)) else (trg, 0) for trg in targets]
 
+        #flag to set connection active
+        self._active = True
+
 
     def __str__(self):
         src, prt = self.source
         return f"Connection from ({src}, {prt}) to " + ", ".join([ f"({trg}, {prt})" for trg, prt in self.targets])
+
+
+    def __bool__(self):
+        return self._active
+
+
+    def on(self):
+        self._active = True
+
+
+    def off(self):
+        self._active = False
 
 
     def overwrites(self, other):
@@ -109,7 +124,7 @@ class Connection:
             if trg in other.targets:
                 return True
 
-        return False
+        return False 
 
 
     def update(self):

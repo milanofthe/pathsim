@@ -99,6 +99,10 @@ class Event:
             yield t
 
 
+    def __bool__(self):
+        return self._active
+
+
     # internal methods ------------------------------------------------------------------
 
     def _get(self):

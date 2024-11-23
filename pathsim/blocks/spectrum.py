@@ -116,17 +116,20 @@ class Spectrum(Block):
 
 
     def read(self):
-
-        #just return 'None' if no engine initialized
+        #just return zeros if no engine initialized
         if self.engine is None:
-            return self.freq, np.zeros_like(self.freq)
+            return self.freq, [np.zeros_like(self.freq)]*len(self.inputs)
+
+        #catch case where time is still zero
+        if self.time == 0.0:
+            return self.freq, [np.zeros_like(self.freq)]*len(self.inputs)
 
         #get state from engine
         state = self.engine.get()
 
         #catch case where state has not been updated
         if np.all(state == self.engine.initial_value):
-            return self.freq, np.zeros_like(self.freq)
+            return self.freq, [np.zeros_like(self.freq)]*len(self.inputs)
 
         #reshape state into spectra
         spec = np.reshape(state, (-1, len(self.freq)))

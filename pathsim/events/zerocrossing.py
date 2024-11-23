@@ -47,10 +47,6 @@ class ZeroCrossing(Event):
         Evaluate the event function and check for zero-crossings
         """
 
-        #inactive -> quit early
-        if not self._active: 
-            return False, False, 1.0
-
         #evaluate event function
         result = self._evaluate(t)
             
@@ -85,10 +81,6 @@ class ZeroCrossingUp(Event):
         Evaluate the event function and check for zero-crossings
         """
             
-        #inactive -> quit early
-        if not self._active: 
-            return False, False, 1.0
-
         #evaluate event function
         result = self._evaluate(t)
             
@@ -122,11 +114,7 @@ class ZeroCrossingDown(Event):
         """
         Evaluate the event function and check for zero-crossings
         """
-            
-        #inactive -> quit early
-        if not self._active: 
-            return False, False, 1.0
-
+        
         #evaluate event function
         result = self._evaluate(t)
             

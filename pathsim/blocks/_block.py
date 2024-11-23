@@ -41,6 +41,9 @@ class Block:
         #initialize integration engine as 'None' by default
         self.engine = None
 
+        #flag to set block active
+        self._active = True
+
 
     def __str__(self):
         return self.__class__.__name__
@@ -76,6 +79,18 @@ class Block:
         _outputs = dict_to_array(self.outputs)
         _states = self.engine.get() if self.engine else []
         return _outputs, _states
+
+
+    def __bool__(self):
+        return self._active
+
+
+    def on(self):
+        self._active = True
+
+
+    def off(self):
+        self._active = False
 
 
     def reset(self):

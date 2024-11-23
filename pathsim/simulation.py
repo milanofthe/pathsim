@@ -146,6 +146,9 @@ class Simulation:
         #compute the length of the longest path in the system
         self._estimate_path_length()
 
+        #collect active system components
+        self._assemble_active()
+
 
     # logger methods --------------------------------------------------------------
 
@@ -287,6 +290,20 @@ class Simulation:
             #logging message
             self._logger_info(f"PATH LENGTH ESTIMATE {max_path_length}")
 
+    # block management ------------------------------------------------------------
+
+    def _assemble_active(self):
+        """
+        Assemble lists of internal active blocks, connections and events. 
+        'active' means that their internal flag is set and they should be 
+        updated by the 'Simulation' class. 
+
+        Otherwise they are ignored in the simulation loop.
+        """
+        self._active_blocks      = [blk for blk in self.blocks      if blk]
+        self._active_connections = [con for con in self.connections if con]
+        self._active_events      = [evt for evt in self.events      if evt]
+
 
     # solver management -----------------------------------------------------------
 
@@ -339,11 +356,11 @@ class Simulation:
         #reset simulation time
         self.time = 0.0
 
-        #reset blocks to initial state
+        #reset all blocks to initial state
         for block in self.blocks:
             block.reset()
 
-        #reset the event managers
+        #reset all event managers
         for event in self.events:
             event.reset()
 
@@ -355,8 +372,8 @@ class Simulation:
 
     def _events(self, t):
         """
-        Check for possible events and return them chronologically, sorted 
-        by their timestep ratios (closest to the initial point in time).
+        Check for possible (active) events and return them chronologically, 
+        sorted by their timestep ratios (closest to the initial point in time).
 
         INPUTS : 
             t : (float) evaluation time for event function
@@ -364,7 +381,7 @@ class Simulation:
 
         #iterate all event managers
         detected_events = []
-        for event in self.events:
+        for event in self._active_events:
             
             #check if an event is detected
             detected, close, ratio = event.detect(t)
@@ -385,7 +402,7 @@ class Simulation:
         when local truncation error is too large and timestep has to be 
         retaken with smaller timestep.
         """
-        for block in self.blocks:
+        for block in self._active_blocks:
             block.revert()
 
 
@@ -398,7 +415,7 @@ class Simulation:
         INPUTS:
             t : (float) time where to sample
         """
-        for block in self.blocks:
+        for block in self._active_blocks:
             block.sample(t)
 
 
@@ -428,23 +445,23 @@ class Simulation:
         for _iteration in range(self.iterations_min):
                         
             #update connenctions (data transfer)
-            for connection in self.connections:
+            for connection in self._active_connections:
                 connection.update()
 
             #update all blocks
-            for block in self.blocks:
+            for block in self._active_blocks:
                 block.update(t)
 
         #perform fixed-point iterations until convergence with error checking
         for iteration in range(self.iterations_min, self.iterations_max):
                         
             #update connenctions (data transfer)
-            for connection in self.connections:
+            for connection in self._active_connections:
                 connection.update()
 
             #update instant time blocks
             max_error = 0.0
-            for block in self.blocks:
+            for block in self._active_blocks:
                 error = block.update(t)
                 if error > max_error:
                     max_error = error
@@ -492,7 +509,7 @@ class Simulation:
 
             #advance solution of implicit solver
             max_error = 0.0
-            for block in self.blocks:
+            for block in self._active_blocks:
                 error = block.solve(t, dt)
                 if error > max_error:
                     max_error = error
@@ -521,11 +538,11 @@ class Simulation:
         """
 
         #buffer internal states of stateful blocks
-        for block in self.blocks:
+        for block in self._active_blocks:
             block.buffer(dt)
 
         #buffer states for event detection (with timestamp)
-        for event in self.events:
+        for event in self._active_events:
             event.buffer(t)
 
 
@@ -557,7 +574,7 @@ class Simulation:
         success, max_error_norm, relevant_scales = True, 0.0, []
 
         #step blocks and get error estimates if available
-        for block in self.blocks:
+        for block in self._active_blocks:
             ss, err_norm, scl = block.step(t, dt)
             
             #check solver stepping success
@@ -605,6 +622,9 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
+
+        #assemble lists of active system components
+        self._assemble_active()
 
         #buffer internal states for solvers and event system
         self._buffer(self.time, dt)
@@ -692,6 +712,9 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
+        #assemble lists of active system components
+        self._assemble_active()
+
         #buffer internal states for solvers and event system
         self._buffer(self.time, dt)
 
@@ -766,7 +789,6 @@ class Simulation:
         and can be called from the outside in case the simulation
         should be advanced one step at a time.
         """
-
         if adaptive: return self.step_adaptive(dt)
         else: return self.step_fixed(dt)
 

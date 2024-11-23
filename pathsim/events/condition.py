@@ -51,10 +51,6 @@ class Condition(Event):
         within the current timestep
         """
 
-        #inactive -> quit early
-        if not self._active: 
-            return False, False, 1.0
-
         #evaluate event function
         is_event = self._evaluate(t)
 
