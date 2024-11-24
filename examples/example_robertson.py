@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                        PathSim Van der Pol System Example 
+##                        PathSim Robertson ODE Example 
 ##
 #########################################################################################
 
@@ -11,48 +11,46 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, ODE
-from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR21, GEAR32, GEAR43, GEAR54, GEAR52A
+from pathsim.solvers import ESDIRK43
 
 
-# VAN DER POL OSCILLATOR INITIAL VALUE PROBLEM ==========================================
+# ROBERTSON ODE INITIAL VALUE PROBLEM ===================================================
 
 #initial condition
-x0 = np.array([2, 0])
-
-#van der Pol parameter
-mu = 1000
+x0 = np.array([1, 0, 0])
 
 def func(x, u, t):
-    return np.array([x[1], mu*(1 - x[0]**2)*x[1] - x[0]])
-
-#analytical jacobian (optional)
-def jac(x, u, t):
-    return np.array([[0, 1], [-mu*2*x[0]*x[1]-1, mu*(1 - x[0]**2)]])
+    return np.array([
+        -0.04*x[0] + 1e4*x[1]*x[2],
+        0.04*x[0] - 1e4*x[1]*x[2] - 3e7*x[1]**2,
+        3e7*x[1]**2
+    ])
 
 #blocks that define the system
-VDP = ODE(func, x0, jac) #jacobian improves convergence but is not needed
-Sco = Scope()
+VDP = ODE(func, x0)
+Sco = Scope(labels=["x", "y", "z"])
 
 blocks = [VDP, Sco]
 
 #the connections between the blocks
 connections = [
     Connection(VDP, Sco),
-    Connection(VDP[1], Sco[1])
+    Connection(VDP[1], Sco[1]),
+    Connection(VDP[2], Sco[2])
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=0.1, 
+    dt=0.01, 
     log=True, 
-    Solver=GEAR52A, 
-    tolerance_lte_abs=1e-6, 
-    tolerance_lte_rel=1e-4
+    Solver=ESDIRK43, 
+    tolerance_lte_abs=1e-8, 
+    tolerance_lte_rel=1e-6
     )
 
-Sim.run(3*mu)
+Sim.run(3)
 
 #plotting
 Sco.plot(".-")
