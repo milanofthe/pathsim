@@ -50,6 +50,22 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(str(B), "Block")
 
 
+    def test_on_off_bool(self):
+        
+        B = Block()
+
+        #default active
+        self.assertTrue(B)
+
+        #deactivate block
+        B.off()
+        self.assertFalse(B)
+
+        #activate block
+        B.on()
+        self.assertTrue(B)
+
+
     def test_getitem(self):
 
         B = Block()

@@ -30,7 +30,6 @@ class TestEvent(unittest.TestCase):
         with self.assertRaises(ValueError):
             e = Event()
 
-
         #test default initialization (with event function)
         e = Event(func_evt=lambda *_: None)
         self.assertEqual(e.blocks, [])
@@ -53,6 +52,20 @@ class TestEvent(unittest.TestCase):
 
         e.on()
         self.assertTrue(e._active)
+
+
+    def test_bool(self):
+
+        e = Event(func_evt=lambda *_: None)
+        self.assertTrue(e)
+
+        #turn off
+        e.off()
+        self.assertFalse(e)
+
+        #turn on again
+        e.on()
+        self.assertTrue(e)
 
 
     def test_len(self):

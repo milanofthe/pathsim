@@ -92,32 +92,6 @@ class TestZeroCrossing(unittest.TestCase):
         self.assertEqual(ra, 1)
 
 
-    def test_detect_on_off(self):
-
-        e = ZeroCrossing(func_evt=lambda y, x, t: t-2)
-
-        #reference
-        e.buffer(1)
-        de, cl, ra = e.detect(3)
-        self.assertTrue(de)
-        self.assertFalse(cl)
-        self.assertEqual(ra, 1/2)
-
-        #turn off
-        e.off()
-        de, cl, ra = e.detect(3)
-        self.assertFalse(de)
-        self.assertFalse(cl)
-        self.assertEqual(ra, 1)
-
-        #turn on again
-        e.on()
-        de, cl, ra = e.detect(3)
-        self.assertTrue(de)
-        self.assertFalse(cl)
-        self.assertEqual(ra, 1/2)
-
-
 class TestZeroCrossingUp(unittest.TestCase):
     """
     Test the implementation of the 'ZeroCrossingUp' event class.

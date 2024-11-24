@@ -28,12 +28,12 @@ class TestValue(unittest.TestCase):
         #test default initialization
         v = Value()
         self.assertEqual(v.val, 0.0)
-        self.assertEqual(v.grad, {v: 1.0})
+        self.assertEqual(v.grad, {v._id: 1.0})
 
         #test special initialization
         v = Value(3.2)
         self.assertEqual(v.val, 3.2)
-        self.assertEqual(v.grad, {v: 1.0})
+        self.assertEqual(v.grad, {v._id: 1.0})
 
 
     def test_d(self):

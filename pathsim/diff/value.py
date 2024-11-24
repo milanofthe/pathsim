@@ -351,8 +351,9 @@ class Value:
 
     def __pow__(self, power):
         if isinstance(power, Value):
+            new_val = self.val ** power.val
             return Value(
-                val=self.val ** power.val, 
+                val=new_val, 
                 grad={k: new_val * (power.val * self.grad.get(k, 0) / self.val + np.log(self.val) * power.grad.get(k, 0))
                       for k in range(Value._id_counter)}
                 )
@@ -364,7 +365,8 @@ class Value:
 
 
     def __rpow__(self, base):
+        new_val = base ** self.val
         return Value(
-            val=base ** self.val, 
+            val=new_val, 
             grad={k: new_val * np.log(base) * v for k, v in self.grad.items()}
             )

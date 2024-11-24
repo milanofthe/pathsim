@@ -23,6 +23,13 @@ class TestConnection(unittest.TestCase):
     Test the implementation of the 'Connection' class
     """
 
+    def test_init_none(self):
+        
+        #default
+        with self.assertRaises(TypeError):
+            C = Connection()
+
+
     def test_init_single(self):
 
         B1, B2 = Block(), Block()
@@ -168,6 +175,25 @@ class TestConnection(unittest.TestCase):
         C.update()
         self.assertEqual(B2.inputs[2], 3)
         self.assertEqual(B3.inputs[1], 3)
+
+
+    def test_on_off_bool(self):
+        
+        B1, B2 = Block(), Block()
+
+        #default
+        C = Connection(B1, B2)
+
+        #default active
+        self.assertTrue(C)
+
+        #deactivate
+        C.off()
+        self.assertFalse(C)
+
+        #activate
+        C.on()
+        self.assertTrue(C)
 
 
 # RUN TESTS LOCALLY ====================================================================

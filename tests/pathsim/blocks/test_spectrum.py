@@ -90,7 +90,7 @@ class TestSpectrum(unittest.TestCase):
         #test read for no engine and default initialization
         S = Spectrum()
 
-        freq, spec = S.read()
+        freq, [spec] = S.read()
         
         self.assertEqual(len(freq), 0)
         self.assertEqual(len(spec), 0)
