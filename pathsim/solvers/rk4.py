@@ -39,14 +39,6 @@ class RK4(ExplicitRungeKutta):
 
 
     def interpolate(self, r, dt):
-        """
-        b₁(θ) = θ(1 - θ)²/6
-        b₂(θ) = θ²(2 - 3θ)/2
-        b₃(θ) = θ²(3θ - 4)/2
-        b₄(θ) = θ³/6
-
-        y(t₀ + θh) = y₀ + h(b₁(θ) * k₁ + b₂(θ) * k₂ + b₃(θ) * k₃ + b₄(θ) * k₄)
-        """
         k1, k2, k3, k4 = self.K[0], self.K[1], self.K[2], self.K[3]
         b1, b2, b3, b4 = r*(1-r)**2/6, r**2*(2-3*r)/2, r**2*(3*r-4)/2, r**3/6
         return self.x_0 + dt*(b1 * k1 + b2 * k2 + b3 * k3 + b4 * k4)
