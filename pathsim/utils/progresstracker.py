@@ -21,7 +21,7 @@ class ProgressTracker:
     interface that runs until an external condition is satisfied.
     """
 
-    def __init__(self, logger=None, log_interval=10):
+    def __init__(self, logger=None, log_interval=10, **kwargs):
 
         #set logger
         self.logger = logger or logging.getLogger(__name__)
@@ -32,6 +32,20 @@ class ProgressTracker:
         #step counter
         self.steps = 0
         self.successful_steps = 0
+
+        #tracker stats
+        self.stats = {
+            "total_steps"          : 0,
+            "successful_steps"     : 0,
+            "function_evaluations" : 0,
+            "solver_iterations"    : 0,
+            "runtime"              : 0
+        }
+
+        #update initial stats 
+        for k, v in kwargs.items():
+            if k in self.stats:
+                self.stats[k] += v
 
         #for progress display in percent
         self.display_percentages = list(range(0, 101, log_interval))
@@ -48,17 +62,27 @@ class ProgressTracker:
 
         #generate as long as 'self.condition' is 'True'
         while self.condition: 
+
+            #count total steps
+            self.stats["total_steps"] += 1
             yield 
 
-        #compute tracker runtime
+        #compute tracker runtime and save it to stats
         runtime = perf_counter() - starting_time
+        self.stats["runtime"] = runtime*1e3 #in ms
 
         #log the runtime
         if self.logger:
-            self.logger.info(f"FINISHED steps(total)={self.successful_steps}({self.steps}) runtime={runtime*1e3:.2f}ms")
+            self.logger.info(
+                "FINISHED steps(total)={}({}) runtime={}ms".format(
+                    self.stats["successful_steps"],
+                    self.stats["total_steps"],
+                    round(self.stats["runtime"], 2)
+                    )
+                )
 
 
-    def check(self, progress, success=False, msg=""):
+    def check(self, progress, success=False, **kwargs):
         """
         Update the progress of the generator. 
 
@@ -68,17 +92,18 @@ class ProgressTracker:
         INPUTS :
             progress : (float) progress number between 0 and 1
             success  : (bool) was the update step successful?
-            msg      : (string) additional logging message
         """
 
         #compute progress in percent (round to integer)
         percentage = int(100 * progress)
 
         #count successful steps
-        self.successful_steps += int(success)
-        
-        #count total steps
-        self.steps += 1
+        self.stats["successful_steps"] += int(success)         
+
+        #update stats (track evaluations, etc.)
+        for k, v in kwargs.items():
+            if k in self.stats:
+                self.stats[k] += v
 
         #generation condition is progress less then 1
         self.condition = progress < 1.0
@@ -87,4 +112,4 @@ class ProgressTracker:
         if percentage >= self.display_percentages[0]:
             self.display_percentages.pop(0)
             if self.logger:
-                self.logger.info(f"progress={percentage:.0f}%"+msg)
+                self.logger.info(f"progress={percentage:.0f}%")

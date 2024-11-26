@@ -59,6 +59,9 @@ class Solver:
         #order of the integration scheme
         self.n = 1
 
+        #number of stages
+        self.s = 1
+
         #current evaluation stage for multistage solvers
         self.stage = 0
 

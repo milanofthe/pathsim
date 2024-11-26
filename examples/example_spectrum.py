@@ -28,17 +28,14 @@ from pathsim.solvers import SSPRK33, RKCK54
 
 # FREQUENCY DOMAIN RESPONSE OF A FILTER =================================================
 
-#simulation timestep
-dt = 0.001
-
 #corner frequency of the filter
 f = 5
 
 #blocks that define the system
 Src = GaussianPulseSource(f_max=5*f, tau=0.3)
-FLT = ButterworthLowpassFilter(f, 8)
+FLT = ButterworthLowpassFilter(f, 10)
 Sco = Scope(labels=["pulse", "filtered"])
-Spc = Spectrum(freq=np.linspace(0, 2*f, 1000), 
+Spc = Spectrum(freq=np.linspace(0, 2*f, 100), 
                labels=["pulse", "filtered"])
 
 
@@ -51,10 +48,18 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=1e-3, 
+    log=True, 
+    Solver=RKCK54, 
+    tolerance_lte_rel=1e-7, 
+    tolerance_lte_abs=1e-9
+    )
 
 #run the simulation for some time
-Sim.run(2)
+Sim.run(3)
 
 #plot the simulation results
 Sco.plot()

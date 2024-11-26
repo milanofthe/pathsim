@@ -84,12 +84,10 @@ class Simulation:
         #system definition
         self.blocks      = [] if blocks      is None else blocks
         self.connections = [] if connections is None else connections
-
-        #events (zero crossing detection)
-        self.events = [] if events is None else events
+        self.events      = [] if events      is None else events
 
         #simulation timestep and bounds
-        self.dt = dt
+        self.dt     = dt
         self.dt_min = dt_min
         self.dt_max = dt_max
 
@@ -284,7 +282,12 @@ class Simulation:
             self.iterations_min = max(1, max_path_length)
 
             #logging message, using path length as minimum iterations
-            self._logger_info(f"PATH LENGTH ESTIMATE {max_path_length}, 'iterations_min' set to {self.iterations_min}")
+            self._logger_info(
+                "PATH LENGTH ESTIMATE {}, 'iterations_min' set to {}".format(
+                    max_path_length, 
+                    self.iterations_min
+                    )
+                )
 
         else:
             #logging message
@@ -336,7 +339,13 @@ class Simulation:
             block.set_solver(self.Solver, **self.solver_args)
 
         #logging message
-        self._logger_info(f"SOLVER {self.engine} adaptive={self.engine.is_adaptive} implicit={not self.engine.is_explicit}")
+        self._logger_info(
+            "SOLVER {} adaptive={} implicit={}".format(
+                self.engine, 
+                self.engine.is_adaptive, 
+                not self.engine.is_explicit
+                )
+            )
 
 
     # resetting -------------------------------------------------------------------
@@ -811,9 +820,7 @@ class Simulation:
             adaptive : (bool) use adaptive timesteps if solver is adaptive
 
         RETURN:
-            steps            : (int) total number of simulation timesteps
-            total_evals      : (int) total number of system evaluations
-            total_solver_its : (int) total number of implicit solver iterations
+            stats : (dict) stats of simulation run tracked by the ProgressTracker 
         """
 
         #reset the simulation before running it
@@ -832,17 +839,18 @@ class Simulation:
         #effective timestep for duration
         _dt = self.dt
 
-        #count the number of function evaluations and solver iterations
-        total_evals, total_solver_its = 0, 0
-        
         #initial system function evaluation 
-        total_evals += self._update(self.time)
+        initial_evals = self._update(self.time)
 
         #sampling states and inputs at 'self.time == starting_time' 
         self._sample(self.time)
 
         #initialize progress tracker
-        tracker = ProgressTracker(logger=self.logger, log_interval=10)
+        tracker = ProgressTracker(
+            logger=self.logger, 
+            log_interval=10, 
+            function_evaluations=initial_evals
+            )
 
         #iterate progress tracker generator until 'progress >= 1.0' is reached
         for _ in tracker:
@@ -866,12 +874,12 @@ class Simulation:
                 #advance the simulation by one (effective) timestep '_dt'
                 success, _, scale, evals, solver_its = self.step_fixed(_dt)
 
-            #update evaluation and iteration counters
-            total_evals += evals
-            total_solver_its += solver_its
-
             #calculate progress and update progress tracker
-            progress = (self.time - start_time)/duration
-            tracker.check(progress, success)
+            tracker.check(
+                progress=(self.time - start_time)/duration, 
+                success=success, 
+                function_evaluations=evals, 
+                solver_iterations=solver_its
+                )
 
-        return tracker.steps, total_evals, total_solver_its
+        return tracker.stats

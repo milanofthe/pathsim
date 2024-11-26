@@ -151,7 +151,7 @@ class NewtonAndersonAcceleration(AndersonAcceleration):
 
         #early exit for scalar or purely vectorial values
         if np.isscalar(res) or np.ndim(jac) == 1:
-            return x - res / (jac - 1.0), abs(res)
+            return x - res / (jac - 1.0), np.linalg.norm(res)
 
         #vectorial values (newton raphson)
         jac_f = jac - np.eye(len(res))
