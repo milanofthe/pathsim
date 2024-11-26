@@ -82,9 +82,9 @@ class Simulation:
                  ):
 
         #system definition
-        self.blocks      = [] if blocks      is None else blocks
-        self.connections = [] if connections is None else connections
-        self.events      = [] if events      is None else events
+        self.blocks      = []
+        self.connections = []
+        self.events      = []
 
         #simulation timestep and bounds
         self.dt     = dt
@@ -113,39 +113,46 @@ class Simulation:
         #initial simulation time
         self.time = 0.0
 
-        #setup everything 
-        self._setup()
+        #length of the longest algebraic path
+        self.path_length = 1
 
+        #prepare and add blocks (including internal events)
+        if blocks is not None:
+            for block in blocks:
+                self.add_block(
+                    block, 
+                    recompute_path=False
+                    )
 
-    def __str__(self):
-        return "\n".join([str(block) for block in self.blocks])
+        #check and add connections
+        if connections is not None:
+            for connection in connections:
+                self.add_connection(
+                    connection, 
+                    recompute_path=False
+                    )
 
+        #check and add events
+        if events is not None:
+            for event in events:
+                self.add_event(event)
 
-    # simulation setup ------------------------------------------------------------
-
-    def _setup(self):
-        """
-        Initialize the logger, check the connections for validity, initialize 
-        the numerical integrators within the dynamical blocks and compute the 
-        internal path length of the system.
-
-        This is very lightweight.
-        """
- 
         #initialize logging for logging mode
         self._initialize_logger()
 
-        #check if connections are valid
-        self._check_connections()
-
-        #set numerical integration solver to all blocks 
+        #set numerical integration solver
         self._set_solver()
 
-        #compute the length of the longest path in the system
-        self._estimate_path_length()
+        #find length of longest algebraic path
+        self._algebraic_path_length()
 
-        #collect active system components
+        #assemble lists of active system components
         self._assemble_active()
+
+
+    def __str__(self):
+        # return "\n".join([str(block) for block in self.blocks])
+        return "\n".join(map(str, self.blocks))
 
 
     # logger methods --------------------------------------------------------------
@@ -160,6 +167,7 @@ class Simulation:
 
         #check if logging is selected
         if self.log:
+
             #if a filename for logging is specified
             filename = self.log if isinstance(self.log, str) else None
             handler = logging.FileHandler(filename) if filename else logging.StreamHandler()
@@ -176,29 +184,37 @@ class Simulation:
         if self.log: self.logger.info(message)
 
 
-    def _logger_error(self, message):
+    def _logger_error(self, message, Error=None):
         if self.log: self.logger.error(message)
+        if Error is not None: raise Error(message)
 
 
     def _logger_warning(self, message):
         if self.log: self.logger.warning(message)
 
 
-    # adding blocks and connections -----------------------------------------------
+    # adding system components ----------------------------------------------------
 
-    def add_block(self, block):
+    def add_block(self, block, recompute_path=True):
         """
-        Adds a new block to an existing 'Simulation' instance and initializes the solver.
+        Adds a new block to the simulation, initializes its local solver 
+        instance and collects internal events of the new block. 
+
+        This works dynamically for running simulations.
+
+        Recomputes the length of the longest internal algebraic signal path
+        if specified in the argument. This is for dynamically adding blocks
+        mid simulation.
 
         INPUTS:
-            block : (Block) block to add to the simulation
+            block          : (Block) block to add to the simulation
+            recompute_path : (bool) recompute the algebraic path length
         """
 
         #check if block already in block list
         if block in self.blocks:
             _msg = f"block {block} already part of simulation"
-            self._logger_error(_msg)
-            raise ValueError(_msg)
+            self._logger_error(_msg, ValueError)
 
         #initialize numerical integrator of block
         block.set_solver(self.Solver, **self.solver_args)
@@ -206,62 +222,82 @@ class Simulation:
         #add block to global blocklist
         self.blocks.append(block)
 
+        #add events of block to global event list
+        for event in block.get_events():
+            self.add_event(event)
 
-    def add_connection(self, connection):
+        #recompute algebraic path length
+        if recompute_path:
+            self._algebraic_path_length()
+
+
+    def add_connection(self, connection, recompute_path=True):
         """
-        Adds a new connection to an existing 'Simulation' instance.
+        Adds a new connection to the simulaiton and checks if 
+        the new connection overwrites any existing connections.
+
+        This works dynamically for running simulations.
+
+        Recomputes the length of the longest internal algebraic 
+        signal path if specified in the argument. This is for 
+        dynamically adding connections mid simulation.
 
         INPUTS:
-            connection : (Connection) connection to add to the simulation
+            connection     : (Connection) connection to add to the simulation
+            recompute_path : (bool) recompute the algebraic path length
         """
 
-        #check if connection already in block list
+        #check if connection already in connection list
         if connection in self.connections:
             _msg = f"{connection} already part of simulation"
-            self._logger_error(_msg)
-            raise ValueError(_msg)
+            self._logger_error(_msg, ValueError)
 
         #check if connection overwrites existing connections
         for conn in self.connections:
             if connection.overwrites(conn):
                 _msg = f"{connection} overwrites {conn}"
-                self._logger_error(_msg)
-                raise ValueError(_msg)
+                self._logger_error(_msg, ValueError)
 
         #add connection to global connection list
         self.connections.append(connection)
 
+        #recompute algebraic path length
+        if recompute_path:
+            self._algebraic_path_length()
+
+
+    def add_event(self, event):
+        """
+        Checks and adds a new event to the simulation.
+
+        This works dynamically for running simulations.
+
+        INPUTS:
+            event : (Event) event to add to the simulation
+        """
+
+        #check if event already in event list
+        if event in self.events:
+            _msg = f"{event} already part of simulation"
+            self._logger_error(_msg, ValueError)
+
+        #add event to global event list
+        self.events.append(event)
+
 
     # topological checks ----------------------------------------------------------
 
-    def _check_connections(self):
-        """
-        Check if connections are valid and if there is no input port that recieves 
-        multiple outputs and could be overwritten unintentionally.
-
-        If multiple outputs are assigned to the same input, a 'ValueError' is raised.
-        """
-
-        #iterate connections and check if they are valid
-        for i, conn_1 in enumerate(self.connections):
-
-            #check if connections overwrite each other and raise exception
-            for conn_2 in self.connections[(i+1):]:
-                if conn_1.overwrites(conn_2):
-                    _msg = f"{conn_1} overwrites {conn_2}"
-                    self._logger_error(_msg)
-                    raise ValueError(_msg)
-
-
-    def _estimate_path_length(self):
+    def _algebraic_path_length(self):
         """
         Perform recursive depth first search to compute the length of the 
-        longest signal path over instant time blocks, information can travel 
-        within a single timestep.
+        longest signal path through algebraic (instant time) blocks, 
+        information can travel within a single timestep.
     
         The depth first search leverates the '__len__' method of the blocks 
         for contribution of each block to the total signal path. 
-        This enables 'Subsystem' blocks to propagate their internal length upward.
+
+        This enables 'Subsystem' blocks to recursively propagate their internal 
+        length upward the hierarchies.
 
         The result 'max_path_length' can be used as a an estimate for the 
         minimum number of fixed-point iterations in the '_update' method in 
@@ -269,29 +305,22 @@ class Simulation:
         """
 
         #iterate all possible starting blocks (nodes of directed graph)
-        max_path_length = 0
         for block in self.blocks:
 
             #recursively compute the longest path via depth first search
-            path_length = path_length_dfs(self.connections, block)
-            if path_length > max_path_length:
-                max_path_length = path_length
+            _path_length = path_length_dfs(self.connections, block)
 
+            #update global algebraic path length
+            if _path_length > self.path_length:
+                self.path_length = _path_length
+        
+        #logging message
+        self._logger_info(f"ALGEBRAIC PATH LENGTH {self.path_length}")
+        
         #set 'iterations_min' for fixed-point loop if not provided globally
         if self.iterations_min is None:
-            self.iterations_min = max(1, max_path_length)
+            self.iterations_min = self.path_length
 
-            #logging message, using path length as minimum iterations
-            self._logger_info(
-                "PATH LENGTH ESTIMATE {}, 'iterations_min' set to {}".format(
-                    max_path_length, 
-                    self.iterations_min
-                    )
-                )
-
-        else:
-            #logging message
-            self._logger_info(f"PATH LENGTH ESTIMATE {max_path_length}")
 
     # block management ------------------------------------------------------------
 
@@ -324,7 +353,7 @@ class Simulation:
         """
 
         #update global solver class
-        if Solver is not None: 
+        if Solver is not None:
             self.Solver = Solver
 
         #update solver parmeters
@@ -341,7 +370,7 @@ class Simulation:
         #logging message
         self._logger_info(
             "SOLVER {} adaptive={} implicit={}".format(
-                self.engine, 
+                self.engine,
                 self.engine.is_adaptive, 
                 not self.engine.is_explicit
                 )
@@ -481,8 +510,7 @@ class Simulation:
 
         #not converged
         _msg = f"fixed-point loop in '_update' not converged, iter={iteration+1}, err={max_error}"
-        self._logger_error(_msg)
-        raise RuntimeError(_msg)
+        self._logger_error(_msg, RuntimeError)
 
 
     def _solve(self, t, dt):

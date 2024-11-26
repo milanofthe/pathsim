@@ -132,7 +132,7 @@ class ChirpSource(Block):
         
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = self.engine.change(Solver, **solver_args)
+            self.engine = Solver.cast(self.engine, **solver_args)
             return #quit early
 
         #initialize the numerical integration engine with kernel

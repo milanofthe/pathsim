@@ -159,6 +159,32 @@ class Subsystem(Block):
             block.reset()
 
 
+    def on(self):
+        self._active = True
+        for block in self.blocks: 
+            block.on()
+    
+
+    def off(self):
+        self._active = False
+        for block in self.blocks: 
+            block.off()
+
+
+    # methods for discrete event management -------------------------------------------------
+
+    def get_events(self):
+        """
+        Recursively collect and return events spawned by the 
+        internal blocks of the subsystem, for discrete time 
+        blocks such as triggers / comparators, clocks, etc.
+        """
+        _events = []
+        for block in self.blocks:
+            _events.extend(block.get_events())
+        return _events
+
+
     # methods for inter-block data transfer -------------------------------------------------
 
     def set(self, port, value):

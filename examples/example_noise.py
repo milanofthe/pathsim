@@ -48,7 +48,7 @@ Sco = Scope(labels=["squarewave",
                     "adder", 
                     "pink noise", 
                     "white noise"])
-Spc = Spectrum(freq=np.linspace(0, 5, 5000), 
+Spc = Spectrum(freq=np.linspace(0, 5, 500), 
                labels=["squarewave", 
                        "filter", 
                        "adder", 
@@ -70,7 +70,7 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
 #run the simulation for some time
-Sim.run(200/f)
+Sim.run(100/f)
 
 Sco.plot()
 

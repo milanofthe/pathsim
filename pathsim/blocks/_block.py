@@ -26,7 +26,10 @@ class Block:
     It is realized by dicts for the 'inputs' and for the 'outputs', where 
     the key of the dict is the input/output channel and the corresponding 
     value is the input/output value. 
-    
+
+    The block can spawn discrete events that are handled by the main simulation 
+    for triggers, discrete time blocks, etc.
+
     NOTE : 
         This block is not intended to be used directly and serves as a base 
         class definition for other blocks to be inherited.
@@ -43,6 +46,9 @@ class Block:
 
         #flag to set block active
         self._active = True
+
+        #internal discrete events (for discrete blocks)
+        self.events = []
 
 
     def __str__(self):
@@ -68,7 +74,7 @@ class Block:
         if not isinstance(key, int):
             raise ValueError(f"Port has to be of type 'int' but is '{type(key)}'!")
         return (self, key)
-        
+
 
     def __call__(self):
         """
@@ -87,10 +93,14 @@ class Block:
 
     def on(self):
         self._active = True
+        for event in self.events: 
+            event.on()
 
 
     def off(self):
         self._active = False
+        for event in self.events: 
+            event.off()
 
 
     def reset(self):
@@ -104,6 +114,16 @@ class Block:
 
         #reset engine if block has solver
         if self.engine: self.engine.reset()
+
+
+    # methods for blocks with discrete events -------------------------------------------
+
+    def get_events(self):
+        """
+        return events spawned by the block, for discrete time blocks 
+        such as triggers / comparators, clocks, etc.
+        """
+        return self.events
 
 
     # methods for blocks with integration engines ---------------------------------------
@@ -136,7 +156,7 @@ class Block:
         This is required for multistage, multistep and adaptive integrators.
         """
         if self.engine: self.engine.buffer(dt)
-    
+
 
     # methods for sampling data ---------------------------------------------------------
     

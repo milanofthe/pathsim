@@ -9,7 +9,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pathsim import Simulation
+from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Spectrum
 from pathsim.blocks.rf import SinusoidalPhaseNoiseSource
 

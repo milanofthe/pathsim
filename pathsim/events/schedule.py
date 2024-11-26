@@ -144,4 +144,3 @@ class Schedule(Event):
         if self.func_cbk is not None:
             outputs, states = self._get()
             self.func_cbk(outputs, states, t)
-
