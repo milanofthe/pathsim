@@ -60,14 +60,14 @@ connections = [
 #events (zero crossing)
 
 def func_evt_1(blocks, t):
-    b1, b2 = blocks
-    o, s = b1() 
+    b1, b2 = blocks  
+    *_, s = b1()
     return s
 
 def func_act_1(blocks, t):
     b1, b2 = blocks
-    o1, s1 = b1()
-    o2, s2 = b2()
+    *_, s1 = b1()
+    *_, s2 = b2()
     b1.engine.set(abs(s1))
     b2.engine.set(-b*s2)
 
@@ -79,14 +79,14 @@ E1 = ZeroCrossing(
     )
 
 def func_evt_2(blocks, t):
-    b1, b2 = blocks
-    o, s = b1() 
+    b1, b2 = blocks    
+    *_, s = b1()
     return s + 5
 
 def func_act_2(blocks, t):
     b1, b2 = blocks
-    o1, s1 = b1()
-    o2, s2 = b2()
+    *_, s1 = b1()
+    *_, s2 = b2()
     b1.engine.set(abs(s1 + 5) - 5)
     b2.engine.set(-b*s2)
 

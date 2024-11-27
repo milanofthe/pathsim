@@ -119,16 +119,20 @@ class Subsystem(Block):
 
     def __call__(self):
         """
-        Recursively get the subsystems outputs and internal states of 
-        engines (if available) of internal blocks as an array for use 
-        outside. Either for monitoring, postprocessing or event detection.
+        Recursively get the subsystems internal states of engines (if available)
+        of all internal blocks and nested subsystems and the subsystem inputs and 
+        outputs as arrays for use outside. 
+
+        Either for monitoring, postprocessing or event detection. 
+        In any case this enables easy access to the current block state.
         """
-        _states = []
-        for block in self.blocks:
-            _, sta = block()
-            _states.append(sta)
+        _inputs  = dict_to_array(self.interface.outputs)
         _outputs = dict_to_array(self.interface.inputs)
-        return _outputs, np.hstack(_states)
+        _states  = []
+        for block in self.blocks:
+            _i, _o, _s = block()
+            _states.append(_s)
+        return _inputs, _outputs, np.hstack(_states)
 
 
     def _check_connections(self):

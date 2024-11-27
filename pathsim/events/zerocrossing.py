@@ -48,6 +48,10 @@ class ZeroCrossing(Event):
         #unpack history
         _result, _t = self._history
 
+        #no history -> no zero crossing
+        if _result is None:
+            return False, False, 1.0
+
         #check for zero crossing (sign change)
         is_event = np.sign(_result) != np.sign(result)
 
@@ -82,6 +86,10 @@ class ZeroCrossingUp(Event):
         #unpack history
         _result, _t = self._history
 
+        #no history -> no zero crossing
+        if _result is None:
+            return False, False, 1.0
+
         #check for zero crossing (sign change)
         is_event = np.sign(_result) != np.sign(result)
 
@@ -115,6 +123,10 @@ class ZeroCrossingDown(Event):
             
         #unpack history
         _result, _t = self._history
+
+        #no history -> no zero crossing
+        if _result is None:
+            return False, False, 1.0
 
         #check for zero crossing (sign change)
         is_event = np.sign(_result) != np.sign(result)

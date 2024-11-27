@@ -62,14 +62,14 @@ connections = [
 #event function for zero crossing detection
 def func_evt(blocks, t):
     b1, b2 = blocks
-    o, s = b1() #get block outputs and states
+    *_, s = b1() #get block outputs and states
     return s
 
 #action function for state transformation
 def func_act(blocks, t):
     b1, b2 = blocks
-    o1, s1 = b1()
-    o2, s2 = b2()
+    *_, s1 = b1()
+    *_, s2 = b2()
     b1.engine.set(abs(s1))
     b2.engine.set(-b*s2)
 
@@ -80,7 +80,6 @@ E1 = ZeroCrossing(
     func_act=func_act, 
     tolerance=1e-4
     )
-
 
 events = [E1]
 

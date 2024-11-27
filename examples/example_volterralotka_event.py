@@ -50,7 +50,7 @@ connections = [
 #events to detect
 def func_evt_1(blocks, t):
     b = blocks[0]
-    _, s = b()
+    i, o, s = b()
     return s[0] - 4
 
 E1 = ZeroCrossingUp(
@@ -61,7 +61,7 @@ E1 = ZeroCrossingUp(
 
 def func_evt_2(blocks, t):
     b = blocks[0]
-    _, s = b()
+    i, o, s = b()
     return s[1] - 4
 
 E2 = ZeroCrossingUp(

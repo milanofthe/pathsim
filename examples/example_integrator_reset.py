@@ -34,12 +34,12 @@ connections = [
 
 def func_evt(blocks, t):
     b = blocks[0]
-    o, s = b()
+    i, o, s = b()
     return s - 3
 
 def func_act(blocks, t):
     b = blocks[0]
-    o, s = b()
+    i, o, s = b()
     b.engine.set(s - 1)
 
 E1 = ZeroCrossing(

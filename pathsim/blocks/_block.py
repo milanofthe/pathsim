@@ -78,13 +78,16 @@ class Block:
 
     def __call__(self):
         """
-        The '__call__' method returns the current block outputs and internal states 
-        of engines (if available) as an array for use outside. Either for monitoring, 
-        postprocessing or event detection.
+        The '__call__' method returns internal states of engine (if available) 
+        and the block inputs and outputs as arrays for use outside. 
+
+        Either for monitoring, postprocessing or event detection. 
+        In any case this enables easy access to the current block state.
         """
+        _inputs  = dict_to_array(self.inputs)
         _outputs = dict_to_array(self.outputs)
-        _states = self.engine.get() if self.engine else []
-        return _outputs, _states
+        _states  = self.engine.get() if self.engine else []
+        return _inputs, _outputs, _states
 
 
     def __bool__(self):

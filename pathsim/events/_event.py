@@ -59,7 +59,7 @@ class Event:
         self.tolerance = tolerance
 
         #event function evaluation and evaluation time history (eval, time)
-        self._history = None
+        self._history = None, 0.0
 
         #recording the event times
         self._times = []
@@ -102,6 +102,7 @@ class Event:
         Reset the recorded event times. Resetting the history is not 
         required because of the 'buffer' method.
         """
+        self._history = None, 0.0
         self._times = []
 
 
