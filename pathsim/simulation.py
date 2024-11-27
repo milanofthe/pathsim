@@ -806,7 +806,8 @@ class Simulation:
             #not close enough -> roll back timestep (secant step)
             else:
                 self._revert()
-                return False, error_norm, ratio, total_evals, total_solver_its 
+                scale = min(scale, ratio)
+                return False, error_norm, scale, total_evals, total_solver_its 
         
         #sample data after successful timestep (+dt)
         self._sample(self.time + dt)
@@ -870,6 +871,15 @@ class Simulation:
         #initial system function evaluation 
         initial_evals = self._update(self.time)
 
+        #catch and resolve initial events
+        for event, close, ratio in self._events(self.time):
+
+            #resolve events directly
+            event.resolve(self.time)
+
+            #evaluate system function again -> propagate event
+            initial_evals += self._update(self.time) 
+    
         #sampling states and inputs at 'self.time == starting_time' 
         self._sample(self.time)
 

@@ -255,7 +255,7 @@ class Value:
             return Value(
                 val=self.val + other.val, 
                 grad={k: self.grad.get(k, 0) + other.grad.get(k, 0) 
-                      for k in range(Value._id_counter)}
+                      for k in set(self.grad) | set(other.grad)}
                 )
         elif isinstance(other, np.ndarray):
             return np.array([self + x for x in other])
@@ -279,7 +279,7 @@ class Value:
             return Value(
                 val=self.val * other.val, 
                 grad={k: self.grad.get(k, 0) * other.val + self.val * other.grad.get(k, 0) 
-                      for k in range(Value._id_counter)}
+                      for k in set(self.grad) | set(other.grad)}
                 )
         elif isinstance(other, np.ndarray):
             return np.array([self * x for x in other])
@@ -303,7 +303,7 @@ class Value:
             return Value(
                 val=self.val - other.val, 
                 grad={k: self.grad.get(k, 0) - other.grad.get(k, 0) 
-                      for k in range(Value._id_counter)}
+                      for k in set(self.grad) | set(other.grad)}
                 )
         elif isinstance(other, np.ndarray):
             return np.array([self - x for x in other])
@@ -327,7 +327,7 @@ class Value:
             return Value(
                 val=self.val / other.val, 
                 grad={k: (self.grad.get(k, 0) * other.val - self.val * other.grad.get(k, 0)) / (other.val ** 2) 
-                      if other.val != 0.0 else 0.0 for k in range(Value._id_counter)}
+                      if other.val != 0.0 else 0.0 for k in set(self.grad) | set(other.grad)}
                 )
         if isinstance(other, np.ndarray):
             return np.array([self / x for x in other])
@@ -355,7 +355,7 @@ class Value:
             return Value(
                 val=new_val, 
                 grad={k: new_val * (power.val * self.grad.get(k, 0) / self.val + np.log(self.val) * power.grad.get(k, 0))
-                      for k in range(Value._id_counter)}
+                      for k in set(self.grad) | set(other.grad)}
                 )
         else:
             return Value(

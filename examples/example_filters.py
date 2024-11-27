@@ -38,7 +38,6 @@ connections = [
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 
-
 #run the simulation 
 Sim.run(10)
 

@@ -58,23 +58,48 @@ connections = [
 
 
 #events (zero crossing)
+
+def func_evt_1(blocks, t):
+    b1, b2 = blocks
+    o, s = b1() 
+    return s
+
+def func_act_1(blocks, t):
+    b1, b2 = blocks
+    o1, s1 = b1()
+    o2, s2 = b2()
+    b1.engine.set(abs(s1))
+    b2.engine.set(-b*s2)
+
 E1 = ZeroCrossing(
-    blocks=[Ix, Iv],                               # blocks to watch states of
-    func_evt=lambda y, x, t: x[0],                 # event function for zero crossing detection
-    func_act=lambda y, x, t: [abs(x[0]), -b*x[1]], # action function for state transformation
+    blocks=[Ix, Iv],     # blocks to watch
+    func_evt=func_evt_1, # event function for zero crossing detection
+    func_act=func_act_1, # action function for state transformation
     tolerance=1e-4
     )
 
+def func_evt_2(blocks, t):
+    b1, b2 = blocks
+    o, s = b1() 
+    return s + 5
+
+def func_act_2(blocks, t):
+    b1, b2 = blocks
+    o1, s1 = b1()
+    o2, s2 = b2()
+    b1.engine.set(abs(s1 + 5) - 5)
+    b2.engine.set(-b*s2)
+
 E2 = ZeroCrossing(
-    blocks=[Ix, Iv],                                   # blocks to watch states of
-    func_evt=lambda y, x, t: x[0]+3,                   # event function for zero crossing detection
-    func_act=lambda y, x, t: [abs(x[0]+3)-3, -b*x[1]], # action function for state transformation
+    blocks=[Ix, Iv],     # blocks to watch
+    func_evt=func_evt_2, # event function for zero crossing detection
+    func_act=func_act_2, # action function for state transformation
     tolerance=1e-4
     )
 
 E3 = Condition(
     func_evt=lambda *_: len(E1) >= 13,       # number of events 'E1' (bounces)
-    func_cbk=lambda *_: [E1.off(), E3.off()] # callback switches event tracking
+    func_act=lambda *_: [E1.off(), E3.off()] # callback switches event tracking
     )
 
 events = [E1, E2, E3]

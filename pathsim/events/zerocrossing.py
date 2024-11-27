@@ -21,24 +21,19 @@ class ZeroCrossing(Event):
     Subclass of base 'Event' that triggers if the event function crosses zero. 
     This is a bidirectional zero-crossing detector. 
     
-    Monitors states of solvers of stateful blocks and block outputs by evaluating an 
-    event function (g) with scalar output and testing for zero crossings (sign changes). 
+    Monitors blocks by evaluating an event function (func_evt) with scalar output and 
+    testing for zero crossings (sign changes). 
 
-        g(outputs, states, time) -> event?
+        func_evt(blocks, time) -> event?
 
-    If an event is detected, some action (f) is performed on the states of the blocks.
+    If an event is detected, some action (func_act) is performed on the states of the blocks.
 
-        g(outputs, states, time) == 0 -> event -> states = f(outputs, states, time)
-
-    If a callback function (h) is defined, it is called with the states as args.
-
-        g(outputs, states, time) == 0 -> event -> h(outputs, states, time)
+        func_evt(blocks, time) == 0 -> event -> func_act(blocks, time)
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        func_evt  : (callable: outputs, states, time -> float) event function, where zeros are events
-        func_act  : (callable: outputs, states, time -> states) state transform function to apply for event resolution 
-        func_cbk  : (callable: outputs, states, time -> None) general callaback function at event resolution
+        func_evt  : (callable: blocks, time -> float) event function, where zeros are events
+        func_act  : (callable: blocks, time -> None) action function for event resolution 
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
@@ -48,7 +43,7 @@ class ZeroCrossing(Event):
         """
 
         #evaluate event function
-        result = self._evaluate(t)
+        result = self.func_evt(self.blocks, t)
             
         #unpack history
         _result, _t = self._history
@@ -82,7 +77,7 @@ class ZeroCrossingUp(Event):
         """
             
         #evaluate event function
-        result = self._evaluate(t)
+        result = self.func_evt(self.blocks, t)
             
         #unpack history
         _result, _t = self._history
@@ -116,7 +111,7 @@ class ZeroCrossingDown(Event):
         """
         
         #evaluate event function
-        result = self._evaluate(t)
+        result = self.func_evt(self.blocks, t)
             
         #unpack history
         _result, _t = self._history

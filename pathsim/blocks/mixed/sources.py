@@ -3,28 +3,14 @@
 ##                           SPECIAL MIXED SIGNAL SOURCES 
 ##                            (blocks/mixed/sources.py)
 ##
-##                 this module implements some premade source blocks 
-##                        that produce mixed signal sources
-##
 ##                                Milan Rother 2024
 ##
 #########################################################################################
 
 # IMPORTS ===============================================================================
 
-import numpy as np
-
 from .._block import Block
 from ...events.schedule import Schedule
-
-
-# HELPER FUNCTIONS ======================================================================
-
-def square_wave(t, f):
-    """
-    square wave with amplitude '1' and frequency 'f'
-    """
-    return np.sign(np.sin(2*np.pi*f*t))
 
 
 # SOURCE BLOCKS =========================================================================
@@ -37,21 +23,62 @@ class Clock(Block):
         self.T   = T
         self.tau = tau
 
-        #add internal scheduled event
+        def clk_up(blocks, t):
+            blocks[0].outputs[0] = 1
+
+        def clk_down(blocks, t):
+            blocks[0].outputs[0] = 0
+
+        #internal scheduled events
         self.events = [
             Schedule(
+                blocks=[self],
                 t_start=tau,
-                t_period=0.5*T
+                t_period=T,
+                func_act=clk_up
+                ),
+            Schedule(
+                blocks=[self],
+                t_start=tau+T/2,
+                t_period=T,
+                func_act=clk_down
                 )
-        ]
+            ]
 
 
-    def update(self, t):
-        self.outputs[0] = (1 + square_wave(t, self.frequency)) / 2
-        return 0.0
+class SquareWave(Block):
+
+    def __init__(self, amplitude=1, frequency=1, phase=0):
+        super().__init__()
+
+        self.amplitude = amplitude
+        self.frequency = frequency
+        self.phase     = phase
+
+        def sqw_up(blocks, t):
+            blocks[0].outputs[0] = self.amplitude
+
+        def sqw_down(blocks, t):
+            blocks[0].outputs[0] = -self.amplitude
+
+        #internal scheduled events
+        self.events = [
+            Schedule(
+                blocks=[self],
+                t_start=1/frequency * phase/360,
+                t_period=1/frequency,
+                func_act=sqw_up
+                ),
+            Schedule(
+                blocks=[self],
+                t_start=1/frequency * (phase/360 + 0.5),
+                t_period=1/frequency,
+                func_act=sqw_down
+                )
+            ]
 
 
-class StepSource(Block):
+class Step(Block):
 
     def __init__(self, amplitude=1, tau=0.0):
         super().__init__()
@@ -59,19 +86,17 @@ class StepSource(Block):
         self.amplitude = amplitude
         self.tau = tau
 
-        #add internal scheduled event
+        def stp_up(blocks, t):
+            for b in blocks:
+                b.outputs[0] = self.amplitude
+
+        #internal scheduled event
         self.events = [
             Schedule(
+                blocks=[self],
                 t_start=tau,
                 t_period=tau,
-                t_end=3*tau/2, 
+                t_end=3*tau/2,
+                func_act=stp_up
                 )
-        ]
-
-
-    def update(self, t):
-        self.outputs[0] = self.amplitude * float(t > self.tau)
-        return 0.0
-
-
-class PulseWidthModulation(Block): pass
+            ]

@@ -31,10 +31,21 @@ connections = [
     ]
 
 #events (zero crossings)
+
+def func_evt(blocks, t):
+    b = blocks[0]
+    o, s = b()
+    return s - 3
+
+def func_act(blocks, t):
+    b = blocks[0]
+    o, s = b()
+    b.engine.set(s - 1)
+
 E1 = ZeroCrossing(
     blocks=[I1], 
-    func_evt=lambda y, x, t: x[0] - 3, 
-    func_act=lambda y, x, t: [x[0] - 1]
+    func_evt=func_evt, 
+    func_act=func_act
     )
 
 events = [E1]

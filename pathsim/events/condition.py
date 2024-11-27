@@ -20,26 +20,19 @@ class Condition(Event):
     """
     Subclass of base 'Event' that triggers if the event function evaluates to 'True', 
     i.e. the condition is satisfied.
-    This is a bidirectional zero-crossing detector. 
     
-    Monitors states of solvers of stateful blocks or outputs of algebraic blocks 
-    and sources by evaluating an event function (func_evt) with boolean output.
+    Monitors blocks by evaluating an event function (func_evt) with boolean output.
 
-        func_evt(outputs, states, time) -> event?
+        func_evt(blocks, time) -> event?
 
-    If an event is detected, some action (func_act) is performed on the states of the blocks.
+    If an event is detected, some action (func_act) is performed on the blocks.
 
-        func_evt(outputs, states, time) == True -> event -> states = func_act(outputs, states, time)
-
-    If a callback function (func_cbk) is defined, it is called with the states as args.
-
-        func_evt(outputs, states, time) == True -> event -> func_cbk(outputs, states, time)
+        func_evt(blocks, time) == True -> event -> func_act(blocks, time)
 
     INPUTS : 
         blocks    : (list[block]) list of stateful blocks to monitor
-        func_evt  : (callable: outputs, states, time -> bool) event function, boolean event condition
-        func_act  : (callable: outputs, states, time -> states) state transform function to apply for event resolution 
-        func_cbk  : (callable: outputs, states, time -> None) general callaback function at event resolution
+        func_evt  : (callable: blocks, time -> float) event function, where zeros are events
+        func_act  : (callable: blocks, time -> None) action function for event resolution 
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
@@ -52,7 +45,7 @@ class Condition(Event):
         """
 
         #evaluate event function
-        is_event = self._evaluate(t)
+        is_event = self.func_evt(self.blocks, t)
 
         #discrete condition -> no interpolation (always resolve directly)
         return is_event, is_event, 1.0

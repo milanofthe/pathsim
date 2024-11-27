@@ -58,11 +58,26 @@ connections = [
     ]
 
 
+
+#event function for zero crossing detection
+def func_evt(blocks, t):
+    b1, b2 = blocks
+    o, s = b1() #get block outputs and states
+    return s
+
+#action function for state transformation
+def func_act(blocks, t):
+    b1, b2 = blocks
+    o1, s1 = b1()
+    o2, s2 = b2()
+    b1.engine.set(abs(s1))
+    b2.engine.set(-b*s2)
+
 #events (zero crossing)
 E1 = ZeroCrossing(
-    blocks=[Ix, Iv],                               # blocks to watch states of
-    func_evt=lambda y, x, t: x[0],                 # event function for zero crossing detection
-    func_act=lambda y, x, t: [abs(x[0]), -b*x[1]], # action function for state transformation
+    blocks=[Ix, Iv],    # blocks to watch 
+    func_evt=func_evt,                 
+    func_act=func_act, 
     tolerance=1e-4
     )
 
@@ -78,7 +93,7 @@ Sim = Simulation(
     log=True, 
     Solver=RKBS32, 
     tolerance_lte_rel=1e-3, 
-    tolerance_lte_abs=1e-5
+    tolerance_lte_abs=1e-4
     )
 
 #run the simulation

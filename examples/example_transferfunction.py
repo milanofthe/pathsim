@@ -46,6 +46,6 @@ Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 Sim.run(50)
 
 #plot the results from the scope directly
-Sc.plot()
+Sc.plot(".-")
 
 plt.show()
