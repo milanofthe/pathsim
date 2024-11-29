@@ -47,10 +47,10 @@ class TestProgressTracker(unittest.TestCase):
             tracker.check(progress=i/n, success=True)
 
             #test tracker steps
-            self.assertEqual(tracker.steps, i)
+            self.assertEqual(tracker.stats["total_steps"], i)
 
             #check successful steps tracker
-            self.assertEqual(tracker.successful_steps, i)
+            self.assertEqual(tracker.stats["successful_steps"], i)
 
 
     def test_iter_successful_10(self):
@@ -75,10 +75,10 @@ class TestProgressTracker(unittest.TestCase):
             tracker.check(progress=i/n, success=True)
 
             #test tracker steps
-            self.assertEqual(tracker.steps, i)
+            self.assertEqual(tracker.stats["total_steps"], i)
 
             #check successful steps tracker
-            self.assertEqual(tracker.successful_steps, i)
+            self.assertEqual(tracker.stats["successful_steps"], i)
 
 
     def test_iter_mixed_success_5(self):
@@ -103,10 +103,10 @@ class TestProgressTracker(unittest.TestCase):
             tracker.check(progress=i/n, success=i>j)
 
             #test tracker steps
-            self.assertEqual(tracker.steps, i)
+            self.assertEqual(tracker.stats["total_steps"], i)
 
             #check successful steps tracker
-            self.assertEqual(tracker.successful_steps, max(0, i-j))
+            self.assertEqual(tracker.stats["successful_steps"], max(0, i-j))
 
 
     def test_iter_mixed_success_10(self):
@@ -131,10 +131,10 @@ class TestProgressTracker(unittest.TestCase):
             tracker.check(progress=i/n, success=i>j)
 
             #test tracker steps
-            self.assertEqual(tracker.steps, i)
+            self.assertEqual(tracker.stats["total_steps"], i)
 
             #check successful steps tracker
-            self.assertEqual(tracker.successful_steps, max(0, i-j))
+            self.assertEqual(tracker.stats["successful_steps"], max(0, i-j))
 
 
 

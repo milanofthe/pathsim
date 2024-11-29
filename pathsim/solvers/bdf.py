@@ -71,7 +71,7 @@ class BDF(ImplicitSolver):
 
     def solve(self, u, t, dt):
         """
-        Solves the implicit update equation via anderson acceleration.
+        Solves the implicit update equation using the optimizer of the engine.
         """
 
         #buffer length for BDF order selection
@@ -88,12 +88,12 @@ class BDF(ImplicitSolver):
             #compute jacobian
             jac_g = self.F[n] * dt * self.jac(self.x, u, t)
 
-            #anderson acceleration step with local newton
-            self.x, err = self.acc.step(self.x, g, jac_g)
+            #optimizer step with block local jacobian
+            self.x, err = self.opt.step(self.x, g, jac_g)
 
         else:
-            #anderson acceleration step (pure)
-            self.x, err = self.acc.step(self.x, g, None)
+            #optimizer step (pure)
+            self.x, err = self.opt.step(self.x, g, None)
 
         #return the fixed-point residual
         return err
@@ -104,8 +104,8 @@ class BDF(ImplicitSolver):
         Performs the timestep by buffereing the previous state.
         """
 
-        #reset anderson accelerator
-        self.acc.reset()
+        #reset optimizer
+        self.opt.reset()
 
         #no error control
         return True, 0.0, 1.0

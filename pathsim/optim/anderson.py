@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                               ANDERSON ACCELERATION 
-##                                (utils/anderson.py)
+##                                (optim/anderson.py)
 ##
 ##                                 Milan Rother 2024
 ##

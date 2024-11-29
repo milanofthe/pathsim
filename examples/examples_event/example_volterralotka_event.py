@@ -49,9 +49,14 @@ connections = [
 
 #events to detect
 def func_evt_1(blocks, t):
-    b = blocks[0]
+    b, *_ = blocks
     i, o, s = b()
     return s[0] - 4
+
+def func_evt_2(blocks, t):
+    b, *_ = blocks
+    i, o, s = b()
+    return s[1] - 4
 
 E1 = ZeroCrossingUp(
     blocks=[VL],
@@ -59,12 +64,19 @@ E1 = ZeroCrossingUp(
     tolerance=1e-4
     )
 
-def func_evt_2(blocks, t):
-    b = blocks[0]
-    i, o, s = b()
-    return s[1] - 4
-
 E2 = ZeroCrossingUp(
+    blocks=[VL],
+    func_evt=func_evt_2,
+    tolerance=1e-4
+    )
+
+E3 = ZeroCrossingDown(
+    blocks=[VL],
+    func_evt=func_evt_1,
+    tolerance=1e-4
+    )
+
+E4 = ZeroCrossingDown(
     blocks=[VL],
     func_evt=func_evt_2,
     tolerance=1e-4
@@ -74,7 +86,7 @@ E2 = ZeroCrossingUp(
 Sim = Simulation(
     blocks, 
     connections, 
-    [E1, E2],
+    [E1, E2, E3, E4],
     dt=dt, 
     log=True, 
     Solver=RKBS32, 
@@ -90,6 +102,8 @@ Sc.plot(".-")
 #add detected events to scope plot
 for e in E1: Sc.ax.axvline(e, ls="--", c="k")
 for e in E2: Sc.ax.axvline(e, ls=":", c="k")
+for e in E3: Sc.ax.axvline(e, ls="--", c="k")
+for e in E4: Sc.ax.axvline(e, ls=":", c="k")
 
 plt.show()
 

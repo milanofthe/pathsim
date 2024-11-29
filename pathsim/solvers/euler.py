@@ -60,12 +60,12 @@ class EUB(ImplicitSolver):
             #compute numerical jacobian
             jac_g = dt * self.jac(self.x, u, t)
 
-            #anderson acceleration step with local newton
-            self.x, err = self.acc.step(self.x, g, jac_g)
+            #optimizer step with block local jacobian
+            self.x, err = self.opt.step(self.x, g, jac_g)
 
         else:
-            #anderson acceleration step (pure)
-            self.x, err = self.acc.step(self.x, g, None)
+            #optimizer step (pure)
+            self.x, err = self.opt.step(self.x, g, None)
 
         #return the fixed-point residual
         return err
@@ -73,8 +73,8 @@ class EUB(ImplicitSolver):
 
     def step(self, u, t, dt):
 
-        #reset anderson accelerator
-        self.acc.reset()
+        #reset optimizer
+        self.opt.reset()
 
         #no error estimate available
         return True, 0.0, 1.0

@@ -14,6 +14,7 @@ from pathsim.blocks import Scope, Integrator, Adder, Function
 from pathsim.solvers import ESDIRK43
 
 
+
 # FLAME INITIAL VALUE PROBLEM ===========================================================
 
 #flame parameter (very stiff)
@@ -39,7 +40,7 @@ Sim = Simulation(
     dt=0.1, 
     log=True, 
     Solver=ESDIRK43, 
-    tolerance_lte_abs=1e-8, 
+    tolerance_lte_abs=1e-6, 
     tolerance_lte_rel=1e-4
     )
 

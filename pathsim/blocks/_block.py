@@ -47,7 +47,7 @@ class Block:
         #flag to set block active
         self._active = True
 
-        #internal discrete events (for discrete blocks)
+        #internal discrete events (for mixed signal blocks)
         self.events = []
 
 
@@ -95,15 +95,24 @@ class Block:
 
 
     def on(self):
+        """
+        Activate the block and all internal events, sets the boolean
+        evaluation flag to 'True'.
+        """
         self._active = True
         for event in self.events: 
             event.on()
 
 
     def off(self):
+        """
+        Deactivate the block and all internal events, sets the boolean 
+        evaluation flag to 'False'. Also resets the block.
+        """
         self._active = False
         for event in self.events: 
             event.off()
+        self.reset()  
 
 
     def reset(self):
@@ -123,7 +132,7 @@ class Block:
 
     def get_events(self):
         """
-        return events spawned by the block, for discrete time blocks 
+        Return internal events of the block, for discrete time blocks 
         such as triggers / comparators, clocks, etc.
         """
         return self.events

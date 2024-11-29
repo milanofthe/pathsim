@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                                 MATH VALUE DEFINITION  
+##                   DUAL NUMBER DEFINITION FOR AUTOMATIC DIFFERENTIATION  
 ##                                       (value.py)
 ##
 ##                                   Milan Rother 2024
@@ -15,17 +15,43 @@ import functools
 
 # HELPER FUNCTIONS ======================================================================
 
-def der(array, val):
+def der(arr, val):
     """
     Compute the derivative of an array of 'Value' objects with respect 
     to 'val', fallback to scalar case and non-'Value' objects
     
     INPUTS : 
-        array : (array[Value]) array or list of Values
-        val   : (Value) dual number value for AD
+        arr : (array[Value]) array or list of Values
+        val : (Value) dual number value for AD
     """
-    if np.isscalar(array): return array.d(val) if isinstance(array, Value) else 0.0
-    else: return np.array([a.d(val) if isinstance(a, Value) else 0.0 for a in array])
+    return np.array([a(val) if isinstance(a, Value) else 0.0 for a in np.atleast_1d(arr)])
+
+
+def jac(arr, vals):
+    """
+    Compute the derivative of an array of 'Value' objects with respect 
+    to each 'Value' object in 'vals', fallback to scalars in both cases.
+
+    This effectively constructs the jacobian. 
+    
+    INPUTS : 
+        arr  : (array[Value]) array or list of Values
+        vals : (array[Value]) array or list of Values
+    """
+    return np.array([der(arr, val) for val in np.atleast_1d(vals)]).T
+
+
+def autojac(fnc):
+    """
+    Decorator that wraps a function such that it computes its jacobian 
+    alongside its evaluaiton.
+    """
+    @functools.wraps(fnc)
+    def wrap(*args):
+        vals = Value.array(args)
+        out = fnc(*vals)
+        return Value.numeric(out), jac(out, vals)
+    return wrap
 
 
 # FUNCTION GRADIENTS ====================================================================
@@ -129,18 +155,7 @@ class Value:
             self._id = None
 
 
-    def d(self, other):
-        """
-        Get the partial derivative with respect to 'other'.
-
-        INPUTS :    
-            other : (Value) variable with respect to which to take the derivative
-
-        RETURNS :
-            float : The partial derivative value
-        """
-        return self.grad.get(other._id, 0.0)
-
+    # dynamic properties ------------------------------------------------------------------------
 
     @property
     def real(self):
@@ -158,12 +173,61 @@ class Value:
             ) 
 
 
+    # array conversions -------------------------------------------------------------------------
+
+    @classmethod
+    def numeric(cls, arr):
+        """
+        Cast an array with value objects to an array of numeric values.
+
+        INPUTS :    
+            arr : (array[Value]) array of value objects
+
+        RETURNS :
+            array[numeric] : array of numeric values of the value objects
+        """
+        return np.array([a.val if isinstance(a, Value) else a for a in np.atleast_1d(arr)])
+
+
+    @classmethod
+    def array(cls, arr):
+        """
+        Cast an array or list to an array of value objects.
+
+        INPUTS :    
+            arr : (array[obj]) array of numeric values
+
+        RETURNS :
+            array[Value] : array of Value objects
+        """
+        return np.array([cls(a.val) if isinstance(a, Value) else cls(a) for a in np.atleast_1d(arr)])
+
+
+    # overload builtins -------------------------------------------------------------------------
+
+    def __call__(self, other):
+        """
+        Get the partial derivative with respect to 'other'.
+
+        INPUTS :    
+            other : (Value) variable with respect to which to take the derivative
+
+        RETURNS :
+            float : The partial derivative value
+        """
+        return self.grad.get(other._id, 0.0)
+
+
     def __hash__(self):
         return id(self)
 
 
     def __iter__(self):
         yield self
+
+
+    def __len__(self):
+        return len(self.grad)
 
 
     def __repr__(self):
@@ -228,6 +292,10 @@ class Value:
         return float(self.val)
 
 
+    def __complex__(self):
+        return complex(self.val)
+
+
     # unary operators ---------------------------------------------------------------------------
 
     def __pos__(self):
@@ -271,7 +339,14 @@ class Value:
 
 
     def __iadd__(self, other):
-        return self + other
+        if isinstance(other, Value):
+            self.val += other.val
+            self.grad = {k: self.grad.get(k, 0) + other.grad.get(k, 0) 
+                         for k in set(self.grad) | set(other.grad)}
+            return self
+        else:
+            self.val += other
+            return self
 
 
     def __mul__(self, other):
@@ -295,7 +370,14 @@ class Value:
 
 
     def __imul__(self, other):
-        return self * other        
+        if isinstance(other, Value):
+            self.val *= other.val
+            self.grad = {k: self.grad.get(k, 0) * other.val + self.val * other.grad.get(k, 0) 
+                         for k in set(self.grad) | set(other.grad)}
+            return self
+        else:
+            self.val *= other
+            return self
 
 
     def __sub__(self, other):
@@ -319,7 +401,14 @@ class Value:
 
 
     def __isub__(self, other):
-        return self - other
+        if isinstance(other, Value):
+            self.val -= other.val
+            self.grad = {k: self.grad.get(k, 0) - other.grad.get(k, 0) 
+                         for k in set(self.grad) | set(other.grad)}
+            return self
+        else:
+            self.val -= other
+            return self
 
 
     def __truediv__(self, other):
@@ -355,7 +444,7 @@ class Value:
             return Value(
                 val=new_val, 
                 grad={k: new_val * (power.val * self.grad.get(k, 0) / self.val + np.log(self.val) * power.grad.get(k, 0))
-                      for k in set(self.grad) | set(other.grad)}
+                      for k in set(self.grad) | set(power.grad)}
                 )
         else:
             return Value(

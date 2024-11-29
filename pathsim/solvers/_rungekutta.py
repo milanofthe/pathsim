@@ -201,7 +201,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
 
     def solve(self, u, t, dt):
         """
-        Solves the implicit update equation via anderson acceleration.
+        Solves the implicit update equation using the optimizer of the engine.
 
         INPUTS:
             u  : (float) non-autonomous external component for integration
@@ -230,12 +230,12 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             #compute jacobian of fixed-point equation
             jac_g = dt * b * self.jac(self.x, u, t)
 
-            #anderson acceleration step with local newton
-            self.x, err = self.acc.step(self.x, dt*slope + self.x_0, jac_g)
+            #optimizer step with block local jacobian
+            self.x, err = self.opt.step(self.x, dt*slope + self.x_0, jac_g)
 
         else:
-            #anderson acceleration step (pure)
-            self.x, err = self.acc.step(self.x, dt*slope + self.x_0, None)
+            #optimizer step (pure)
+            self.x, err = self.opt.step(self.x, dt*slope + self.x_0, None)
 
         #return the fixed-point residual
         return err
@@ -256,8 +256,8 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         if self.stage == 0 and self.BT[self.stage] is None:
             self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #restart anderson accelerator 
-        self.acc.reset()
+        #restart optimizer
+        self.opt.reset()
 
         #increment stage counter
         self.stage += 1

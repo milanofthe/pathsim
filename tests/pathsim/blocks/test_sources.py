@@ -27,6 +27,17 @@ class TestConstant(unittest.TestCase):
         C = Constant(value=5)
 
         self.assertEqual(C.value, 5)
+        self.assertEqual(C.get(0), 0)
+
+
+    def test_update(self):
+
+        C = Constant(value=5)
+
+        self.assertEqual(C.get(0), 0)
+
+        C.update(0)
+
         self.assertEqual(C.get(0), 5)
 
 
@@ -39,13 +50,18 @@ class TestConstant(unittest.TestCase):
 
 
     def test_reset(self):
-        
+
         C = Constant(value=5)
 
+        self.assertEqual(C.get(0), 0)
+
+        C.update(0)
+
+        self.assertEqual(C.get(0), 5)
+        
         C.reset()
 
-        #test if output remains after reset
-        self.assertEqual(C.get(0), 5)
+        self.assertEqual(C.get(0), 0)
 
 
 class TestSource(unittest.TestCase):

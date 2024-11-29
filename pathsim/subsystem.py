@@ -164,15 +164,24 @@ class Subsystem(Block):
 
 
     def on(self):
+        """
+        Activate the subsystem and all internal blocks, sets the boolean
+        evaluation flag to 'True'.
+        """
         self._active = True
         for block in self.blocks: 
             block.on()
     
 
     def off(self):
+        """
+        Deactivate the subsystem and all internal blocks, sets the boolean
+        evaluation flag to 'False'. Also resets the subsystem
+        """
         self._active = False
         for block in self.blocks: 
             block.off()
+        self.reset()
 
 
     # methods for discrete event management -------------------------------------------------

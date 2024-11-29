@@ -38,12 +38,10 @@ class Constant(Block):
         super().__init__()
         self.value = value
 
+    def update(self, t):
         #set output with value (DC)
         self.outputs[0] = self.value
-
-
-    def reset(self):
-        pass        
+        return 0.0
 
 
 class Source(Block):

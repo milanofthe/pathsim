@@ -116,6 +116,9 @@ class Simulation:
         #length of the longest algebraic path
         self.path_length = 1
 
+        #initialize logging for logging mode
+        self._initialize_logger()
+
         #prepare and add blocks (including internal events)
         if blocks is not None:
             for block in blocks:
@@ -136,9 +139,6 @@ class Simulation:
         if events is not None:
             for event in events:
                 self.add_event(event)
-
-        #initialize logging for logging mode
-        self._initialize_logger()
 
         #set numerical integration solver
         self._set_solver()
@@ -840,7 +840,7 @@ class Simulation:
         iterations for implicit solvers.
 
         Additionally the progress of the simulation is tracked by a custom
-        'ProgressTracker' class that is a dynamic generator and  interfaces 
+        'ProgressTracker' class that is a dynamic generator and interfaces 
         the logging system.
 
         INPUTS: 
@@ -872,7 +872,7 @@ class Simulation:
         initial_evals = self._update(self.time)
 
         #catch and resolve initial events
-        for event, close, ratio in self._events(self.time):
+        for event, *_ in self._events(self.time):
 
             #resolve events directly
             event.resolve(self.time)

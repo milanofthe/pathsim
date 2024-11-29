@@ -3,7 +3,7 @@
 ##                                  ZERO CROSSING EVENTS
 ##                                (events/zerocrossing.py)
 ##
-##                                   Milan Rother 2024
+##                                    Milan Rother 2024
 ##
 #########################################################################################
 

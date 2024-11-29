@@ -3,7 +3,7 @@
 ##                            BASE NUMERICAL INTEGRATOR CLASSES
 ##                                  (solvers/_solver.py)
 ##
-##                                (c) Milan Rother 2023/24
+##                                  Milan Rother 2023/24
 ##
 ########################################################################################
 
@@ -11,10 +11,17 @@
 
 import numpy as np
 
-from ..utils.anderson import (
+from ..optim.anderson import (
     AndersonAcceleration, 
     NewtonAndersonAcceleration
     )
+
+from ..optim.newton import (
+    LevenbergMarquardtAD,
+    NewtonRaphsonAD, 
+    GaussNewtonAD
+    )
+
 
 # BASE SOLVER CLASS ====================================================================
 
@@ -343,8 +350,11 @@ class ImplicitSolver(Solver):
         #intermediate evaluation times for multistage solvers as ratios between [t, t+dt]
         self.eval_stages = [1.0]
 
-        #initialize anderson accelerator for solving the implicit update equation
-        self.acc = NewtonAndersonAcceleration(m=5, restart=False)
+        #initialize optimizer for solving implicit update equation
+        self.opt = NewtonAndersonAcceleration(m=5, restart=False)
+        # self.opt = NewtonRaphsonAD()
+        # self.opt = GaussNewtonAD()
+        # self.opt = LevenbergMarquardtAD()
 
 
     # methods for timestepping ---------------------------------------------------------
@@ -352,8 +362,8 @@ class ImplicitSolver(Solver):
     def solve(self, u, t, dt):
         """
         Advances the solution of the implicit update equation of the solver 
-        with Anderson Acceleration and tracks the evolution of the solution
-        by providing the residual norm of the fixed-point solution.
+        with the optimizer of the engine and tracks the evolution of the 
+        solution by providing the residual norm of the fixed-point solution.
         """
         return 0.0
 
@@ -398,10 +408,7 @@ class ImplicitSolver(Solver):
             #perform explicit component of timestep
             success, error_norm, scale = self.step(0.0, t, dt)
 
-        #step successful in total
-        success_total = success and success_sol
-
-        return success, error_norm, scale 
+        return success, success_sol, error_norm, scale 
 
 
     def integrate(self, 
@@ -440,10 +447,15 @@ class ImplicitSolver(Solver):
         while time < time_end + dt:
 
             #integrate for single timestep
-            success, error_norm, scale = self.integrate_singlestep(time, dt, tolerance_fpi, max_iterations)
+            success, success_sol, error_norm, scale = self.integrate_singlestep(
+                time, 
+                dt, 
+                tolerance_fpi, 
+                max_iterations
+                )
 
             #check if timestep was successful and adaptive
-            if adaptive and not success:
+            if adaptive and not (success and success_sol):
                 self.revert()
             else:
                 time += dt
