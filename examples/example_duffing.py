@@ -22,7 +22,7 @@ from pathsim.blocks import (
 
 from pathsim.solvers import (
     SSPRK33,
-    RKCK54,
+    RKCK54
     )
 
 

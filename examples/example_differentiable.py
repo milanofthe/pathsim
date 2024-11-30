@@ -18,8 +18,11 @@ from pathsim.blocks import (
     Scope
     )
 
+from pathsim.solvers import DIRK2
+
+
 #optimization module
-from pathsim.diff import Value, der
+from pathsim.optim import Value, der
 
 
 # 1st ORDER FEEDBACK SYSTEM =============================================================
@@ -53,7 +56,13 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=dt, 
+    log=True, 
+    # Solver=DIRK2
+    )
     
 #run the simulation for some time
 Sim.run(4*tau)

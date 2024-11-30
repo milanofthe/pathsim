@@ -14,9 +14,6 @@ from pathsim.blocks import Scope, ODE
 from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR21, GEAR32, GEAR43, GEAR54, GEAR52A
 
 
-from pathsim.diff import Value, der
-
-
 # VAN DER POL OSCILLATOR INITIAL VALUE PROBLEM ==========================================
 
 #initial condition
@@ -59,6 +56,5 @@ Sim.run(3*mu)
 
 #plotting
 Sco.plot(".-")
-
 
 plt.show()

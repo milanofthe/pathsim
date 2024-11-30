@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                   DUAL NUMBER DEFINITION FOR AUTOMATIC DIFFERENTIATION  
-##                                       (value.py)
+##                                   (optim.value.py)
 ##
 ##                                   Milan Rother 2024
 ##
@@ -11,6 +11,7 @@
 
 import numpy as np
 import functools
+import threading
 
 
 # HELPER FUNCTIONS ======================================================================
@@ -45,6 +46,9 @@ def autojac(fnc):
     """
     Decorator that wraps a function such that it computes its jacobian 
     alongside its evaluaiton.
+
+    INPUTS : 
+        fnc : (callable) function to wrap and compute jacobian of
     """
     @functools.wraps(fnc)
     def wrap(*args):
@@ -141,15 +145,26 @@ class Value:
 
     #restrict attributes, makes access faster
     __slots__ = ["val", "grad", "_id"] 
+
+    #keep id counter thread safe
+    _id_lock = threading.Lock()
     _id_counter = 0
 
 
     def __init__(self, val=0.0, grad=None):
-        self.val = val
+
+        #catch instantiating with Value
+        if isinstance(val, Value):
+            self.val = val.val
+        else:
+            self.val = val
+
+        #initialize fresh gradients
         if grad is None:
-            self._id = Value._id_counter
+            with Value._id_lock:
+                self._id = Value._id_counter
+                Value._id_counter += 1
             self.grad = {self._id:1.0} 
-            Value._id_counter += 1
         else:
             self.grad = grad
             self._id = None
@@ -178,29 +193,35 @@ class Value:
     @classmethod
     def numeric(cls, arr):
         """
-        Cast an array with value objects to an array of numeric values.
+        Cast an array with value objects to an array of numeric values. 
+        Numeric entries are just passed through.
 
         INPUTS :    
-            arr : (array[Value]) array of value objects
+            arr : (array[obj]) array of mixed value, numeric objects
 
         RETURNS :
-            array[numeric] : array of numeric values of the value objects
+            array[numeric] : array of numeric values
         """
-        return np.array([a.val if isinstance(a, Value) else a for a in np.atleast_1d(arr)])
+        _arr = np.atleast_1d(arr)
+        return np.array([a.val if isinstance(a, cls) else a  
+            for a in _arr.ravel()]).reshape(_arr.shape).squeeze()
 
 
     @classmethod
     def array(cls, arr):
         """
-        Cast an array or list to an array of value objects.
+        Cast an array or list to an array of value objects. 
+        For Value entries, their numeric values are used to 
+        create a new Value instance.
 
         INPUTS :    
-            arr : (array[obj]) array of numeric values
+            arr : (array[obj]) array of mixed value, numeric objects
 
         RETURNS :
             array[Value] : array of Value objects
         """
-        return np.array([cls(a.val) if isinstance(a, Value) else cls(a) for a in np.atleast_1d(arr)])
+        _arr = np.atleast_1d(arr)
+        return np.array([cls(a) for a in _arr.ravel()]).reshape(_arr.shape).squeeze()
 
 
     # overload builtins -------------------------------------------------------------------------

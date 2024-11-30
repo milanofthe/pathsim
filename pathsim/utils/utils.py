@@ -108,7 +108,7 @@ def numerical_jacobian(func, x, h=1e-8):
     the machine accuracy of 64bit floating point numbers.    
     
     INPUTS : 
-        func : (function object) function to compute jacobian for
+        func : (callable) function to compute jacobian for
         x    : (float or array) value for function at which the jacobian is evaluated
         h    : (float) step size for central differences
     """

@@ -25,5 +25,5 @@ class Adder(Block):
 
     def update(self, t):
         prev_output = self.outputs[0]
-        self.outputs[0] = np.sum(dict_to_array(self.inputs), axis=0)
+        self.outputs[0] = sum(v for v in self.inputs.values())
         return abs(prev_output - self.outputs[0])

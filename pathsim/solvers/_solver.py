@@ -12,8 +12,8 @@
 import numpy as np
 
 from ..optim.anderson import (
-    AndersonAcceleration, 
-    NewtonAndersonAcceleration
+    Anderson, 
+    NewtonAnderson
     )
 
 from ..optim.newton import (
@@ -351,7 +351,8 @@ class ImplicitSolver(Solver):
         self.eval_stages = [1.0]
 
         #initialize optimizer for solving implicit update equation
-        self.opt = NewtonAndersonAcceleration(m=5, restart=False)
+        # self.opt = Anderson(m=5, restart=False)
+        self.opt = NewtonAnderson(m=5, restart=False)
         # self.opt = NewtonRaphsonAD()
         # self.opt = GaussNewtonAD()
         # self.opt = LevenbergMarquardtAD()

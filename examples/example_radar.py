@@ -16,12 +16,17 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import (
     Multiplier,
     Scope, 
+    Adder,
     Spectrum,
     Delay
     )
 
 #special blocks (for example from 'rf' module) are imported like this
-from pathsim.blocks.rf import ChirpSource
+from pathsim.blocks.rf import (
+    ChirpSource, 
+    ButterworthLowpassFilter,
+    WhiteNoise
+    )
 
 
 # FMCW RADAR SYSTEM =====================================================================
@@ -31,35 +36,47 @@ c0 = 3e8
 
 #chirp parameters
 B = 5e9
-T = 0.5e-6
+T = 5e-7
 f_min = 1e9
 
 #simulation timestep
 dt = 5e-12
 
 #delay for target emulation
-tau = 4e-9
+tau = 2e-9
 
 #target distances
 R = c0 * tau / 2
 
 #frequencies for targets
-f_trg = 4 * R * B / (T * c0)
+f_trg = 2 * R * B / (T * c0)
 
 #initialize blocks
-Src  = ChirpSource(f0=f_min, BW=B, T=T)
-Dly  = Delay(tau)
-Mul  = Multiplier()
-Spc  = Spectrum(freq=np.linspace(0, f_trg*2, 500), labels=["chirp", "delay", "mixer"])
-Sco  = Scope(labels=["chirp", "delay", "mixer"])
+Src = ChirpSource(f0=f_min, BW=B, T=T)
+Add = Adder()
+Wns = WhiteNoise(5e-3)
+Dly = Delay(tau)
+Mul = Multiplier()
+Lpf = ButterworthLowpassFilter(f_trg*3, 2)
+Spc = Spectrum(
+    # freq=np.linspace(0, f_trg*2, 300), 
+    freq=np.logspace(6, 10, 2000), 
+    labels=["noisy chirp", "delay", "mixer", "lpf"]
+    )
+Sco = Scope(
+    labels=["noisy chirp", "delay", "mixer", "lpf"]
+    )
 
-blocks = [Src, Dly, Mul, Spc, Sco]
+blocks = [Src, Add, Wns, Dly, Mul, Lpf, Spc, Sco]
 
 #initialize connections
 connections = [
-    Connection(Src, Dly, Mul, Sco, Spc),
+    Connection(Src, Add[0]),
+    Connection(Wns, Add[1]),
+    Connection(Add, Dly, Mul, Sco, Spc),
     Connection(Dly, Mul[1], Sco[1], Spc[1]),
-    Connection(Mul, Sco[2], Spc[2])
+    Connection(Mul, Lpf, Sco[2], Spc[2]),
+    Connection(Lpf, Sco[3], Spc[3])
 ]
 
 #initialize simulation
@@ -68,8 +85,12 @@ Sim = Simulation(blocks, connections, dt=dt, log=True)
 #run simulation for one up chirp period
 Sim.run(T/2)
 
-#plot the recording directly
+#plot the recording of the scope
 Sco.plot()
+
+#plot the spectrum
 Spc.plot()
+Spc.ax.set_xscale("log")
+Spc.ax.set_yscale("log")
 
 plt.show()

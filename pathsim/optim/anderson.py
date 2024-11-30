@@ -13,9 +13,12 @@ import numpy as np
 
 from collections import deque
 
+from .value import Value, der, jac
+
+
 # CLASS ================================================================================
 
-class AndersonAcceleration:
+class Anderson:
     """
     Class for accelerated fixed-point iteration through anderson acceleration. 
     Solves a nonlinear set of equations given in the fixed-point form:
@@ -32,7 +35,7 @@ class AndersonAcceleration:
         restart : (bool) clear buffer when full
     """
 
-    def __init__(self, m=1, restart=True):
+    def __init__(self, m=5, restart=False):
 
         #length of buffer for next estimate
         self.m = m
@@ -72,65 +75,65 @@ class AndersonAcceleration:
             g : (float or array) current evaluation of g(x)
         """
 
+        #make numeric if value
+        _x = Value.numeric(x)
+        _g = Value.numeric(g)
+
         #residual (this gets minimized)
-        res = g - x
+        _res = _g - _x
         
         #fallback to regular fpi if 'm == 0'
         if self.m == 0:
-            return g, np.linalg.norm(res)
-
-        #make x vectorial if g is vector
-        if np.isscalar(x) and not np.isscalar(g):
-            x *= np.ones_like(g)
+            return g, np.linalg.norm(_res)
     
         #if no buffer, regular fixed-point update
         if self.x_prev is None:
 
             #save values for next iteration
-            self.x_prev = x
-            self.r_prev = res
+            self.x_prev = _x
+            self.r_prev = _res
 
-            return g, np.linalg.norm(res)
+            return g, np.linalg.norm(_res)
 
         #append to difference buffer
-        self.dx_buffer.append(x - self.x_prev)
-        self.dr_buffer.append(res - self.r_prev)
+        self.dx_buffer.append(_x - self.x_prev)
+        self.dr_buffer.append(_res - self.r_prev)
         
         #save values for next iteration
-        self.x_prev = x
-        self.r_prev = res
+        self.x_prev = _x
+        self.r_prev = _res
 
         #if buffer size 'm' reached, restart
         if self.restart and len(self.dx_buffer) >= self.m:
             self.reset()
-            return g, np.linalg.norm(res)
-        
+            return g, np.linalg.norm(_res)
+
         #get difference matrices 
         dX = np.array(self.dx_buffer)
         dR = np.array(self.dr_buffer)
 
         #exit for scalar values
-        if np.isscalar(res):
+        if np.isscalar(_res):
 
             #delta squared norm
             dR2 = np.dot(dR, dR)
 
             #catch division by zero
             if dR2 <= 1e-14:
-                return g, abs(res)
+                return g, abs(_res)
 
             #new solution and residual
-            return x - res * np.dot(dR, dX) / dR2, abs(res)        
+            return x - _res * np.dot(dR, dX) / dR2, abs(_res)
 
         #compute coefficients from least squares problem
-        C, *_ = np.linalg.lstsq(dR.T, res, rcond=None)
+        C, *_ = np.linalg.lstsq(dR.T, _res, rcond=None)
 
         #new solution and residual norm
-        return x - C @ dX, np.linalg.norm(res)
+        return x - C @ dX, np.linalg.norm(_res)
 
 
 
-class NewtonAndersonAcceleration(AndersonAcceleration):
+class NewtonAnderson(Anderson):
     """
     Modified class for hybrid anderson acceleration that can use a jacobian 'jac' of 
     the function 'g' for a newton step before the fixed point step for the initial 
@@ -146,16 +149,21 @@ class NewtonAndersonAcceleration(AndersonAcceleration):
         residual and 'jac' is the jacobian of 'g'.
         """
 
+        #make numeric if value
+        _x   = Value.numeric(x)
+        _g   = Value.numeric(g)
+        _jac = Value.numeric(jac)
+        
         #compute residual
-        res = g - x
+        _res = _g - _x
 
         #early exit for scalar or purely vectorial values
-        if np.isscalar(res) or np.ndim(jac) == 1:
-            return x - res / (jac - 1.0), np.linalg.norm(res)
+        if np.isscalar(_res) or np.ndim(_jac) == 1:
+            
+            return x - _res / (_jac - 1.0), np.linalg.norm(_res)
 
         #vectorial values (newton raphson)
-        jac_f = jac - np.eye(len(res))
-        return x - np.linalg.solve(jac_f, res), np.linalg.norm(res)
+        return x - np.linalg.solve(_jac - np.eye(len(_res)), _res), np.linalg.norm(_res)
 
 
     def step(self, x, g, jac=None):

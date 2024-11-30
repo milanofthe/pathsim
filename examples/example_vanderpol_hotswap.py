@@ -25,8 +25,13 @@ mu = 1000
 def func(x, u, t):
     return np.array([x[1], mu*(1 - x[0]**2)*x[1] - x[0]])
 
+#analytical jacobian (optional)
+def jac(x, u, t):
+    return np.array([[0, 1], [-mu*2*x[0]*x[1]-1, mu*(1 - x[0]**2)]])
+
+
 #blocks that define the system
-VDP = ODE(func, x0) 
+VDP = ODE(func, x0, jac) 
 Sco = Scope()
 
 blocks = [VDP, Sco]

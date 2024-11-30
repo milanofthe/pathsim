@@ -23,7 +23,7 @@ from pathsim.blocks.rf import (
     GaussianPulseSource
     )
 
-from pathsim.solvers import SSPRK33, RKCK54
+from pathsim.solvers import SSPRK33, RKCK54, DIRK2
 
 
 # FREQUENCY DOMAIN RESPONSE OF A FILTER =================================================
@@ -51,11 +51,11 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=1e-3, 
+    dt=1e-2, 
     log=True, 
     Solver=RKCK54, 
-    tolerance_lte_rel=1e-7, 
-    tolerance_lte_abs=1e-9
+    tolerance_lte_rel=1e-5, 
+    tolerance_lte_abs=1e-7
     )
 
 #run the simulation for some time

@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope, Differentiator
-from pathsim.solvers import RKCK54
+
+from pathsim.solvers import RKCK54, GEAR52A, ESDIRK43
 
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
@@ -55,7 +56,7 @@ connections = [
 ]
 
 # Simulation initialization
-sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
+sim = Simulation(blocks, connections, dt=0.1, Solver=ESDIRK43)
 
 #run the simulation for some time
 sim.run(100)

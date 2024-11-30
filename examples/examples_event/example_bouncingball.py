@@ -11,10 +11,11 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
-from pathsim.solvers import RKBS32, SSPRK33
+from pathsim.solvers import RKBS32, ESDIRK32
 
 from pathsim.events import ZeroCrossing
-from pathsim.diff import Value, der
+
+from pathsim.optim import Value, der
 
 
 # BOUNCING BALL SYSTEM ==================================================================
@@ -58,7 +59,6 @@ connections = [
     ]
 
 
-
 #event function for zero crossing detection
 def func_evt(blocks, t):
     b1, b2 = blocks
@@ -78,7 +78,7 @@ E1 = ZeroCrossing(
     blocks=[Ix, Iv],    # blocks to watch 
     func_evt=func_evt,                 
     func_act=func_act, 
-    tolerance=1e-4
+    tolerance=1e-3
     )
 
 events = [E1]
@@ -92,7 +92,7 @@ Sim = Simulation(
     log=True, 
     Solver=RKBS32, 
     tolerance_lte_rel=1e-3, 
-    tolerance_lte_abs=1e-4
+    tolerance_lte_abs=1e-5
     )
 
 #run the simulation

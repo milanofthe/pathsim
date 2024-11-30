@@ -15,7 +15,7 @@ Key features of PathSim include:
 - Wide range of numerical solvers, including implicit and explicit very high order Runge-Kutta and multistep methods
 - Modular and hierarchical modeling with (nested) subsystems
 - Event handling system that can detect and resolve discrete events (zero-crossing detection)
-- Automatic differentiation for fully differentiable system simulations (even through events) for sensitivity analysis and optimization
+- Automatic differentiation for fully differentiable system simulations (even through events and for stiff systems) for sensitivity analysis and optimization
 - Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, etc.
 - Easy extensibility, subclassing the base `Block` class with just a handful of methods
 
@@ -97,24 +97,24 @@ Sc.plot()
 time, data = Sc.read();
 ```
 
-    2024-11-27 12:54:48,317 - INFO - LOGGING enabled
-    2024-11-27 12:54:48,317 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-27 12:54:48,317 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-11-27 12:54:48,318 - INFO - RESET
-    2024-11-27 12:54:48,318 - INFO - RUN duration=30.0
-    2024-11-27 12:54:48,319 - INFO - STARTING progress tracker
-    2024-11-27 12:54:48,319 - INFO - progress=0%
-    2024-11-27 12:54:48,330 - INFO - progress=10%
-    2024-11-27 12:54:48,342 - INFO - progress=20%
-    2024-11-27 12:54:48,352 - INFO - progress=30%
-    2024-11-27 12:54:48,364 - INFO - progress=40%
-    2024-11-27 12:54:48,375 - INFO - progress=50%
-    2024-11-27 12:54:48,386 - INFO - progress=60%
-    2024-11-27 12:54:48,400 - INFO - progress=70%
-    2024-11-27 12:54:48,413 - INFO - progress=80%
-    2024-11-27 12:54:48,424 - INFO - progress=90%
-    2024-11-27 12:54:48,436 - INFO - progress=100%
-    2024-11-27 12:54:48,437 - INFO - FINISHED steps(total)=600(600) runtime=117.19ms
+    2024-11-30 12:39:18,046 - INFO - LOGGING enabled
+    2024-11-30 12:39:18,048 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-30 12:39:18,049 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-11-30 12:39:18,049 - INFO - RESET
+    2024-11-30 12:39:18,049 - INFO - RUN duration=30.0
+    2024-11-30 12:39:18,050 - INFO - STARTING progress tracker
+    2024-11-30 12:39:18,050 - INFO - progress=0%
+    2024-11-30 12:39:18,057 - INFO - progress=10%
+    2024-11-30 12:39:18,064 - INFO - progress=20%
+    2024-11-30 12:39:18,072 - INFO - progress=30%
+    2024-11-30 12:39:18,079 - INFO - progress=40%
+    2024-11-30 12:39:18,087 - INFO - progress=50%
+    2024-11-30 12:39:18,095 - INFO - progress=60%
+    2024-11-30 12:39:18,103 - INFO - progress=70%
+    2024-11-30 12:39:18,110 - INFO - progress=80%
+    2024-11-30 12:39:18,118 - INFO - progress=90%
+    2024-11-30 12:39:18,126 - INFO - progress=100%
+    2024-11-30 12:39:18,127 - INFO - FINISHED steps(total)=600(600) runtime=77.36ms
     
 
 
@@ -140,8 +140,8 @@ Below, the Van der Pol system is built with two discrete `Integrator` blocks and
 from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Scope, Function
 
-#implicit adaptive timestep adaptive order solver 
-from pathsim.solvers import GEAR52A
+#implicit adaptive timestep solver 
+from pathsim.solvers import ESDIRK43
 
 #initial conditions
 x1, x2 = 2, 0
@@ -165,7 +165,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=0.05, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-4)
+Sim = Simulation(blocks, connections, dt=0.05, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-3)
 
 #run simulation for some number of seconds
 Sim.run(3*mu)
@@ -174,24 +174,24 @@ Sim.run(3*mu)
 Sc.plot(".-");
 ```
 
-    2024-11-27 12:54:49,311 - INFO - LOGGING enabled
-    2024-11-27 12:54:49,312 - INFO - SOLVER GEAR52A adaptive=True implicit=True
-    2024-11-27 12:54:49,312 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-11-27 12:54:49,312 - INFO - RESET
-    2024-11-27 12:54:49,313 - INFO - RUN duration=3000
-    2024-11-27 12:54:49,313 - INFO - STARTING progress tracker
-    2024-11-27 12:54:49,338 - INFO - progress=0%
-    2024-11-27 12:54:49,719 - INFO - progress=13%
-    2024-11-27 12:54:49,761 - INFO - progress=21%
-    2024-11-27 12:54:50,350 - INFO - progress=30%
-    2024-11-27 12:54:50,376 - INFO - progress=43%
-    2024-11-27 12:54:50,432 - INFO - progress=50%
-    2024-11-27 12:54:51,003 - INFO - progress=61%
-    2024-11-27 12:54:51,025 - INFO - progress=70%
-    2024-11-27 12:54:51,145 - INFO - progress=80%
-    2024-11-27 12:54:51,655 - INFO - progress=92%
-    2024-11-27 12:54:51,684 - INFO - progress=100%
-    2024-11-27 12:54:51,685 - INFO - FINISHED steps(total)=682(880) runtime=2371.59ms
+    2024-11-30 12:40:49,804 - INFO - LOGGING enabled
+    2024-11-30 12:40:49,805 - INFO - SOLVER GEAR52A adaptive=True implicit=True
+    2024-11-30 12:40:49,805 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-11-30 12:40:49,806 - INFO - RESET
+    2024-11-30 12:40:49,806 - INFO - RUN duration=3000
+    2024-11-30 12:40:49,807 - INFO - STARTING progress tracker
+    2024-11-30 12:40:49,809 - INFO - progress=0%
+    2024-11-30 12:40:49,850 - INFO - progress=12%
+    2024-11-30 12:40:50,014 - INFO - progress=20%
+    2024-11-30 12:40:50,970 - INFO - progress=30%
+    2024-11-30 12:40:51,055 - INFO - progress=42%
+    2024-11-30 12:40:51,173 - INFO - progress=50%
+    2024-11-30 12:40:52,285 - INFO - progress=60%
+    2024-11-30 12:40:52,298 - INFO - progress=70%
+    2024-11-30 12:40:52,587 - INFO - progress=80%
+    2024-11-30 12:40:53,458 - INFO - progress=91%
+    2024-11-30 12:40:53,501 - INFO - progress=100%
+    2024-11-30 12:40:53,502 - INFO - FINISHED steps(total)=530(803) runtime=3695.0ms
     
 
 
@@ -202,12 +202,11 @@ Sc.plot(".-");
 
 ## Differentiable Simulation
 
-PathSim also includes a rudimentary automatic differentiation framework based on a dual number system with overloaded operators. This makes the system simulation fully differentiable with respect to a predefined set of parameters. For now it only works with the explicit integrators. To demonstrate this lets consider the following linear feedback system.
+PathSim also includes a fully fledged automatic differentiation framework based on a dual number system with overloaded operators and numpy ufunc integration. This makes the system simulation fully differentiable end-to-end with respect to a predefined set of parameters. Works with all integrators, adaptive, fixed, implicit, explicit. To demonstrate this lets consider the following linear feedback system.
 
 ![png](README_files/linear_feedback_blockdiagram.png)
 
-
-The source term is a scaled unit step function (scaled by $A$). The parameters we want to differentiate the time domain response by are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $A$.
+The source term is a scaled unit step function (scaled by $b$). The parameters we want to differentiate the time domain response by are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $b$.
 
 
 ```python
@@ -215,11 +214,11 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
 
 #AD module
-from pathsim.diff import Value, der
+from pathsim.optim import Value, der
 
 #values for derivative propagation
-A  = Value(1)
 a  = Value(-1)
+b  = Value(1)
 x0 = Value(2)
 
 #simulation timestep
@@ -228,7 +227,7 @@ dt = 0.01
 #step function
 tau = 3
 def s(t):
-    return A*int(t>tau)
+    return b*int(t>tau)
 
 #blocks that define the system
 Src = Source(s)
@@ -256,24 +255,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-11-27 12:54:53,103 - INFO - LOGGING enabled
-    2024-11-27 12:54:53,104 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-27 12:54:53,104 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-11-27 12:54:53,104 - INFO - RESET
-    2024-11-27 12:54:53,105 - INFO - RUN duration=12
-    2024-11-27 12:54:53,106 - INFO - STARTING progress tracker
-    2024-11-27 12:54:53,107 - INFO - progress=0%
-    2024-11-27 12:54:53,151 - INFO - progress=10%
-    2024-11-27 12:54:53,195 - INFO - progress=20%
-    2024-11-27 12:54:53,239 - INFO - progress=30%
-    2024-11-27 12:54:53,282 - INFO - progress=40%
-    2024-11-27 12:54:53,326 - INFO - progress=50%
-    2024-11-27 12:54:53,372 - INFO - progress=60%
-    2024-11-27 12:54:53,415 - INFO - progress=70%
-    2024-11-27 12:54:53,458 - INFO - progress=80%
-    2024-11-27 12:54:53,503 - INFO - progress=90%
-    2024-11-27 12:54:53,547 - INFO - progress=100%
-    2024-11-27 12:54:53,547 - INFO - FINISHED steps(total)=1201(1201) runtime=441.4ms
+    2024-11-30 12:39:22,053 - INFO - LOGGING enabled
+    2024-11-30 12:39:22,053 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-30 12:39:22,054 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-11-30 12:39:22,054 - INFO - RESET
+    2024-11-30 12:39:22,055 - INFO - RUN duration=12
+    2024-11-30 12:39:22,055 - INFO - STARTING progress tracker
+    2024-11-30 12:39:22,056 - INFO - progress=0%
+    2024-11-30 12:39:22,089 - INFO - progress=10%
+    2024-11-30 12:39:22,123 - INFO - progress=20%
+    2024-11-30 12:39:22,156 - INFO - progress=30%
+    2024-11-30 12:39:22,189 - INFO - progress=40%
+    2024-11-30 12:39:22,222 - INFO - progress=50%
+    2024-11-30 12:39:22,256 - INFO - progress=60%
+    2024-11-30 12:39:22,290 - INFO - progress=70%
+    2024-11-30 12:39:22,323 - INFO - progress=80%
+    2024-11-30 12:39:22,356 - INFO - progress=90%
+    2024-11-30 12:39:22,391 - INFO - progress=100%
+    2024-11-30 12:39:22,391 - INFO - FINISHED steps(total)=1201(1201) runtime=335.34ms
     
 
 
@@ -297,7 +296,7 @@ fig, ax = plt.subplots(nrows=1, tight_layout=True, figsize=(8, 4), dpi=120)
 #evaluate and plot partial derivatives
 ax.plot(time, der(data, a), label="$dx/da$")
 ax.plot(time, der(data, x0), label="$dx/dx_0$")
-ax.plot(time, der(data, A), label="$dx/dA$")
+ax.plot(time, der(data, b), label="$dx/db$")
 
 ax.set_xlabel("time [s]")
 ax.grid(True)
@@ -377,24 +376,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2024-11-27 12:55:07,118 - INFO - LOGGING enabled
-    2024-11-27 12:55:07,119 - INFO - SOLVER RKBS32 adaptive=True implicit=False
-    2024-11-27 12:55:07,120 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-11-27 12:55:07,120 - INFO - RESET
-    2024-11-27 12:55:07,120 - INFO - RUN duration=20
-    2024-11-27 12:55:07,121 - INFO - STARTING progress tracker
-    2024-11-27 12:55:07,121 - INFO - progress=0%
-    2024-11-27 12:55:07,125 - INFO - progress=10%
-    2024-11-27 12:55:07,133 - INFO - progress=20%
-    2024-11-27 12:55:07,142 - INFO - progress=30%
-    2024-11-27 12:55:07,150 - INFO - progress=40%
-    2024-11-27 12:55:07,157 - INFO - progress=50%
-    2024-11-27 12:55:07,167 - INFO - progress=60%
-    2024-11-27 12:55:07,177 - INFO - progress=70%
-    2024-11-27 12:55:07,189 - INFO - progress=80%
-    2024-11-27 12:55:07,202 - INFO - progress=90%
-    2024-11-27 12:55:07,224 - INFO - progress=100%
-    2024-11-27 12:55:07,224 - INFO - FINISHED steps(total)=395(496) runtime=102.13ms
+    2024-11-30 12:39:22,737 - INFO - LOGGING enabled
+    2024-11-30 12:39:22,737 - INFO - SOLVER RKBS32 adaptive=True implicit=False
+    2024-11-30 12:39:22,738 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-11-30 12:39:22,738 - INFO - RESET
+    2024-11-30 12:39:22,739 - INFO - RUN duration=20
+    2024-11-30 12:39:22,740 - INFO - STARTING progress tracker
+    2024-11-30 12:39:22,741 - INFO - progress=0%
+    2024-11-30 12:39:22,745 - INFO - progress=10%
+    2024-11-30 12:39:22,752 - INFO - progress=20%
+    2024-11-30 12:39:22,762 - INFO - progress=30%
+    2024-11-30 12:39:22,769 - INFO - progress=40%
+    2024-11-30 12:39:22,776 - INFO - progress=50%
+    2024-11-30 12:39:22,786 - INFO - progress=60%
+    2024-11-30 12:39:22,797 - INFO - progress=70%
+    2024-11-30 12:39:22,810 - INFO - progress=80%
+    2024-11-30 12:39:22,823 - INFO - progress=90%
+    2024-11-30 12:39:22,845 - INFO - progress=100%
+    2024-11-30 12:39:22,845 - INFO - FINISHED steps(total)=395(496) runtime=104.68ms
     
 
 

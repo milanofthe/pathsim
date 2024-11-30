@@ -11,7 +11,7 @@
 
 import numpy as np
 
-from ..diff import Value, der, jac
+from .value import Value, der, jac
 
 
 # CLASS ================================================================================

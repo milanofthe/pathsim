@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, ODE
-from pathsim.solvers import ESDIRK43
+from pathsim.solvers import ESDIRK32
 
 
 # ROBERTSON ODE INITIAL VALUE PROBLEM ===================================================
@@ -45,7 +45,7 @@ Sim = Simulation(
     connections, 
     dt=0.01, 
     log=True, 
-    Solver=ESDIRK43, 
+    Solver=ESDIRK32, 
     tolerance_lte_abs=1e-8, 
     tolerance_lte_rel=1e-6
     )
