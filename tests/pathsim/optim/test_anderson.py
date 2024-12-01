@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                                     TESTS FOR 
-##                                'utils/anderson.py'
+##                                'optim/anderson.py'
 ##
 ##                                 Milan Rother 2024
 ##
@@ -12,30 +12,30 @@
 import unittest
 import numpy as np
 
-from pathsim.utils.anderson import (
-    AndersonAcceleration, 
-    NewtonAndersonAcceleration
+from pathsim.optim.anderson import (
+    Anderson, 
+    NewtonAnderson
     )
 
 
 # TESTS ================================================================================
 
-class TestAndersonAcceleration(unittest.TestCase):
+class TestAnderson(unittest.TestCase):
     """
-    test the implementation of the 'AndersonAcceleration' class 
+    test the implementation of the 'Anderson' class 
     """
 
     def test_init(self):
         m = 5
-        aa = AndersonAcceleration(m)
+        aa = Anderson(m)
         # test initialization
         self.assertEqual(aa.m, m)
-        self.assertTrue(aa.restart)
+        self.assertFalse(aa.restart)
         self.assertEqual(len(aa.dx_buffer), 0)
         self.assertEqual(len(aa.dr_buffer), 0)
 
     def test_reset(self):
-        aa = AndersonAcceleration(5)
+        aa = Anderson(5)
         aa.x_buffer = [1, 2, 3]
         aa.f_buffer = [4, 5, 6]
         aa.counter = 10
@@ -45,7 +45,7 @@ class TestAndersonAcceleration(unittest.TestCase):
         self.assertEqual(len(aa.dr_buffer), 0)
 
     def test_step_scalar(self):
-        aa = AndersonAcceleration(2)
+        aa = Anderson(2)
         x, g = 1.0, 2.0
         result, residual = aa.step(x, g)
         # test scalar step
@@ -53,7 +53,7 @@ class TestAndersonAcceleration(unittest.TestCase):
         self.assertEqual(residual, abs(g - x))
 
     def test_step_vector(self):
-        aa = AndersonAcceleration(2)
+        aa = Anderson(2)
         x = np.array([1.0, 2.0])
         g = np.array([2.0, 3.0])
         result, residual = aa.step(x, g)
@@ -63,7 +63,7 @@ class TestAndersonAcceleration(unittest.TestCase):
 
     def test_solve_scalar_equation(self):
         # Solve x = cos(x)
-        aa = AndersonAcceleration(m=3)
+        aa = Anderson(m=3)
         x = 0.0
         for _ in range(100):
             g = np.cos(x)
@@ -76,7 +76,7 @@ class TestAndersonAcceleration(unittest.TestCase):
     def test_solve_vector_equation(self):
         # Solve the system:
         # x^2 + y^2 = 1
-        aa = AndersonAcceleration(m=3)
+        aa = Anderson(m=3)
         x = np.array([1.0, 0.0])  # Start from a point on the circle
         for _ in range(100):
             g = x / np.linalg.norm(x)  # Project back onto the unit circle
@@ -87,31 +87,31 @@ class TestAndersonAcceleration(unittest.TestCase):
         self.assertAlmostEqual(np.linalg.norm(x), 1.0, places=7)
 
 
-class TestNewtonAndersonAcceleration(unittest.TestCase):
+class TestNewtonAnderson(unittest.TestCase):
     """
-    test the implementation of the 'NewtonAndersonAcceleration' class 
+    test the implementation of the 'NewtonAnderson' class 
     """
 
     def test_init(self):
         m = 5
-        naa = NewtonAndersonAcceleration(m)
+        naa = NewtonAnderson(m)
         # test initialization
         self.assertEqual(naa.m, m)
-        self.assertTrue(naa.restart)
+        self.assertFalse(naa.restart)
         self.assertEqual(len(naa.dx_buffer), 0)
         self.assertEqual(len(naa.dr_buffer), 0)
 
     def test_step_no_jacobian(self):
-        naa = NewtonAndersonAcceleration(2)
+        naa = NewtonAnderson(2)
         x = np.array([1.0, 2.0])
         g = np.array([2.0, 3.0])
         result, residual = naa.step(x, g)
-        # test step without jacobian (should be same as AndersonAcceleration)
+        # test step without jacobian (should be same as Anderson)
         np.testing.assert_array_equal(result, g)
         self.assertAlmostEqual(residual, np.linalg.norm(g - x))
 
     def test_step_with_jacobian(self):
-        naa = NewtonAndersonAcceleration(2)
+        naa = NewtonAnderson(2)
         x = np.array([1.0, 2.0])
         g = np.array([2.0, 3.0])
         jac = np.array([[2.0, 0.0], [0.0, 2.0]])
@@ -122,7 +122,7 @@ class TestNewtonAndersonAcceleration(unittest.TestCase):
 
     def test_solve_scalar_equation(self):
         # Solve x = cos(x)
-        naa = NewtonAndersonAcceleration(m=5)
+        naa = NewtonAnderson(m=5)
         x = 0.0
         for i in range(100):
             g = np.cos(x)
