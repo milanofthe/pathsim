@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                            CONNECTION CLASS (connection.py)
+##                             CONNECTION CLASS (connection.py)
 ##
 ##              This module implements the 'Connection' class that transfers
 ##                data between the blocks and their input/output channels
@@ -17,7 +17,6 @@
 # CLASSES ===============================================================================
 
 class Connection:
-
     """
     Class to handle input-output relations of blocks by connecting them (directed graph) 
     and transfering data from the output port of the source block to the input port of 
@@ -73,7 +72,7 @@ class Connection:
 
     INPUTS: 
         source  : (tuple ('Block', int) OR 'Block') source block and optional source output port
-        targets : (tuples of ('Block' int) OR multiple 'Block's) target blocks and optional target input ports
+        targets : (tuples of ('Block', int) OR multiple 'Block's) target blocks and optional target input ports
     """
 
     def __init__(self, source, *targets):
@@ -107,8 +106,8 @@ class Connection:
 
     def overwrites(self, other):
         """
-        Check if the connection 'self' overwrites the target port
-        of connection 'other' and return 'True' if so.
+        Check if the connection 'self' overwrites the target port of connection 'other' 
+        and return 'True' if so.
 
         INPUTS:
             other : ('Connection' instance) other connection to check 
@@ -135,3 +134,36 @@ class Connection:
         val = self.source[0].get(self.source[1])
         for trg, prt in self.targets:
             trg.set(prt, val)
+
+
+class Duplex(Connection):
+    """
+    Extension of the 'Connection' class, that defines bidirectional connections 
+    between two blocks by grouping together the inputs and outputs of the blocks 
+    into an IO-pair.
+    """
+
+    def __init__(self, *targets):
+
+        if len(targets) != 2:
+            raise ValueError("Duplex needs two targets for bidirectional connection!")
+
+        self.targets = [trg if isinstance(trg, (list, tuple)) else (trg, 0) for trg in targets]
+
+
+    def __str__(self):
+        return f"Duplex between " + " and ".join([f"({trg}, {prt})" for trg, prt in self.targets]) 
+
+
+    def update(self):
+        """
+        Transfers data between the two target blocks 
+        and ports bidirectionally.
+        """
+
+        #unpack the two targets
+        (trg1, prt1), (trg2, prt2) = self.targets
+
+        #bidirectional data transfer
+        trg1.set(prt1, trg2.get(prt2))
+        trg2.set(prt2, trg1.get(prt1))

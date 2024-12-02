@@ -40,7 +40,7 @@ T = 5e-7
 f_min = 1e9
 
 #simulation timestep
-dt = 5e-12
+dt = 1e-11
 
 #delay for target emulation
 tau = 2e-9
@@ -83,7 +83,7 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
 #run simulation for one up chirp period
-Sim.run(T/2)
+Sim.run(T)
 
 #plot the recording of the scope
 Sco.plot()

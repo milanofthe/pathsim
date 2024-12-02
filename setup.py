@@ -5,10 +5,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pathsim",
-    version="0.4.8",
+    version="0.4.9",
     author="Milan Rother",
     author_email="milan.rother@gmx.de",
-    description="A block based time domain system simulation framework.",
+    description="A differentiable block based hybrid system simulation framework.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/milanofthe/pathsim",
