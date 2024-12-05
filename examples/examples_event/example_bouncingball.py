@@ -96,7 +96,7 @@ Sim = Simulation(
     )
 
 #run the simulation
-Sim.run(7)
+Sim.run(8)
 
 #read the recordings from the scope
 time, [x] = Sc.read()

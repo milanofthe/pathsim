@@ -112,7 +112,7 @@ class Spectrum(Block):
         self.time = 0.0
 
         #reset numeric integration engine -> resets the spectrum
-        self.engine.reset()
+        if self.engine: self.engine.reset()
 
 
     def read(self):

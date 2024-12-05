@@ -84,7 +84,7 @@ class Solver:
         """
         return the size of the internal state, i.e. the order
         """
-        return len(self.x)
+        return len(np.atleast_1d(self.x))
 
 
     def __bool__(self):

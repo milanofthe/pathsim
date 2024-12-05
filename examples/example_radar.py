@@ -59,8 +59,7 @@ Dly = Delay(tau)
 Mul = Multiplier()
 Lpf = ButterworthLowpassFilter(f_trg*3, 2)
 Spc = Spectrum(
-    # freq=np.linspace(0, f_trg*2, 300), 
-    freq=np.logspace(6, 10, 2000), 
+    freq=np.logspace(6, 10, 500), 
     labels=["noisy chirp", "delay", "mixer", "lpf"]
     )
 Sco = Scope(

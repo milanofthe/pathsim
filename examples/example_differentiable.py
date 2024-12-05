@@ -18,7 +18,7 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import DIRK2
+from pathsim.solvers import DIRK2, RKCK54
 
 
 #optimization module
@@ -60,8 +60,7 @@ Sim = Simulation(
     blocks, 
     connections, 
     dt=dt, 
-    log=True, 
-    # Solver=DIRK2
+    log=True
     )
     
 #run the simulation for some time

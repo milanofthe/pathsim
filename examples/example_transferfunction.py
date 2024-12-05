@@ -48,4 +48,5 @@ Sim.run(50)
 #plot the results from the scope directly
 Sc.plot(".-")
 
+
 plt.show()
