@@ -33,6 +33,9 @@ class TestBlock(unittest.TestCase):
         #test default engine
         self.assertEqual(B.engine, None)
 
+        #is active
+        self.assertTrue(B._active)
+
 
     def test_len(self):
 
@@ -64,6 +67,14 @@ class TestBlock(unittest.TestCase):
         #activate block
         B.on()
         self.assertTrue(B)
+
+
+    def test_get_events(self):
+
+        B = Block()
+
+        #no internal events by default
+        self.assertEqual(B.get_events(), [])
 
 
     def test_getitem(self):

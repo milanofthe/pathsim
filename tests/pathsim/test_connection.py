@@ -12,7 +12,7 @@
 import unittest
 import numpy as np
 
-from pathsim.connection import Connection
+from pathsim.connection import Connection, Duplex
 from pathsim.blocks._block import Block
 
 
@@ -194,6 +194,72 @@ class TestConnection(unittest.TestCase):
         #activate
         C.on()
         self.assertTrue(C)
+
+
+
+class TestDuplex(unittest.TestCase):
+    """
+    Test the implementation of the 'Duplex' class (bidirectional connection)
+    """
+
+    def test_init_none(self):
+        
+        #default
+        with self.assertRaises(ValueError):
+            D = Duplex()
+
+
+    def test_init_mixed(self):
+
+        B1, B2 = Block(), Block()
+
+        #default
+        D = Duplex(B1, B2)
+
+        #test if ports assigned correctly
+        self.assertEqual(D.targets, [(B1, 0), (B2, 0)])
+
+        #mixed
+        D1 = Duplex(B1, (B2, 2))
+        D2 = Duplex((B1, 3), B2)
+        
+        #test if ports assigned correctly
+        self.assertEqual(D1.targets, [(B1, 0), (B2, 2)])
+
+        #test if ports assigned correctly
+        self.assertEqual(D2.targets, [(B1, 3), (B2, 0)])
+
+        #all
+        D = Duplex((B1, 4), (B2, 1))
+
+        #test if ports assigned correctly
+        self.assertEqual(D.targets, [(B1, 4), (B2, 1)])
+
+        #test too many
+        with self.assertRaises(ValueError):
+            D = Duplex((B1, 4), (B2, 1), (B2, 3))
+
+
+    def test_update(self):
+
+        B1, B2 = Block(), Block()
+
+        #test data transfer with default ports
+        D = Duplex(B1, B2) 
+        B1.outputs[0] = 3
+        B2.outputs[0] = 1
+        D.update()
+        self.assertEqual(B1.inputs[0], 1)
+        self.assertEqual(B2.inputs[0], 3)
+
+        #test data transfer with special ports
+        D = Duplex((B1, 3), (B2, 2)) 
+        B1.outputs[3] = 5.5
+        B2.outputs[2] = 12
+        D.update()
+        self.assertEqual(B1.inputs[3], 12)
+        self.assertEqual(B2.inputs[2], 5.5)
+
 
 
 # RUN TESTS LOCALLY ====================================================================

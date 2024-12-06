@@ -94,6 +94,24 @@ class Block:
         return self._active
 
 
+    # methods for loading and saving existing blocks ------------------------------------
+
+    @classmethod
+    def load(cls, path=""):
+        """
+        Load block from pickled '.blk' file.
+        """
+        raise NotImplementedError("'load' method is not implemented yet")
+
+    def save(self, path=""):
+        """
+        Save block instance to '.blk' file by pickling.
+        """
+        raise NotImplementedError("'save' method is not implemented yet")
+
+
+    # methods for simulation management -------------------------------------------------
+
     def on(self):
         """
         Activate the block and all internal events, sets the boolean
