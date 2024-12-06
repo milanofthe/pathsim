@@ -52,6 +52,21 @@ class Anderson:
         self.r_prev = None
 
 
+    def solve(self, func, x0, iterations_max=100, tolerance=1e-6):
+        """
+        Solve the function 'func' with initial 
+        value 'x0' up to a certain tolerance.
+        """
+
+        _x = x0.copy()
+        for i in range(iterations_max):
+            _x, _res = self.step(_x, func(_x)+_x)
+            if _res < tolerance:
+                return _x, _res, i
+
+        raise RuntimeError(f"did not converge in {iterations_max} steps")
+
+
     def reset(self):
         """
         reset the anderson accelerator
@@ -142,6 +157,22 @@ class NewtonAnderson(Anderson):
     If a jacobian 'jac' is available, this significantly improves the convergence 
     (speed and robustness) of the solution.
     """
+
+
+    def solve(self, func, x0, jac=None, iterations_max=100, tolerance=1e-6):
+        """
+        Solve the function 'func' with initial 
+        value 'x0' up to a certain tolerance.
+        """
+
+        _x = x0.copy()
+        for i in range(iterations_max):
+            _x, _res = self.step(_x, func(_x)+_x, None if jac is None else jac(_x))
+            if _res < tolerance:
+                return _x, _res, i
+
+        raise RuntimeError(f"did not converge in {iterations_max} steps")
+
 
     def _newton(self, x, g, jac):
         """

@@ -24,7 +24,21 @@ class NewtonRaphsonAD:
 
     def __init__(self):
         self.x = None
-        self.alpha = 1e-8
+
+
+    def solve(self, func, x0, iterations_max=100, tolerance=1e-6):
+        """
+        Solve the function 'func' with initial 
+        value 'x0' up to a certain tolerance.
+        """
+
+        _x = x0.copy()
+        for i in range(iterations_max):
+            _x, _res = self.step(_x, func(_x)+_x)
+            if _res < tolerance:
+                return _x, _res, i
+
+        raise RuntimeError(f"did not converge in {iterations_max} steps")
 
 
     def reset(self):
@@ -63,19 +77,11 @@ class NewtonRaphsonAD:
         return self.x, np.linalg.norm(_res)
 
 
-class GaussNewtonAD:
+class GaussNewtonAD(NewtonRaphsonAD):
     """
     This class implements the gauss newton method using pathsims 
     automatic differentiation framework to compute anlytical jacobians.
     """
-
-    def __init__(self):
-        self.x = None
-
-
-    def reset(self):
-        self.x = None
-
 
     def step(self, x, g, *args, **kwargs):
 
@@ -113,7 +119,7 @@ class GaussNewtonAD:
         return self.x, np.linalg.norm(_res)
 
 
-class LevenbergMarquardtAD:
+class LevenbergMarquardtAD(NewtonRaphsonAD):
     """
     This class implements the levenberg marquardt algorithm using pathsims 
     automatic differentiation framework to compute anlytical jacobians.

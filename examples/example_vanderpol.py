@@ -52,7 +52,7 @@ Sim = Simulation(
     tolerance_lte_rel=1e-3
     )
 
-Sim.run(3*mu)
+Sim.run(2*mu)
 
 #plotting
 Sco.plot(".-")
