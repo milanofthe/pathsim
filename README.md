@@ -97,24 +97,24 @@ Sc.plot()
 time, data = Sc.read();
 ```
 
-    2024-11-30 12:39:18,046 - INFO - LOGGING enabled
-    2024-11-30 12:39:18,048 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-30 12:39:18,049 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-11-30 12:39:18,049 - INFO - RESET
-    2024-11-30 12:39:18,049 - INFO - RUN duration=30.0
-    2024-11-30 12:39:18,050 - INFO - STARTING progress tracker
-    2024-11-30 12:39:18,050 - INFO - progress=0%
-    2024-11-30 12:39:18,057 - INFO - progress=10%
-    2024-11-30 12:39:18,064 - INFO - progress=20%
-    2024-11-30 12:39:18,072 - INFO - progress=30%
-    2024-11-30 12:39:18,079 - INFO - progress=40%
-    2024-11-30 12:39:18,087 - INFO - progress=50%
-    2024-11-30 12:39:18,095 - INFO - progress=60%
-    2024-11-30 12:39:18,103 - INFO - progress=70%
-    2024-11-30 12:39:18,110 - INFO - progress=80%
-    2024-11-30 12:39:18,118 - INFO - progress=90%
-    2024-11-30 12:39:18,126 - INFO - progress=100%
-    2024-11-30 12:39:18,127 - INFO - FINISHED steps(total)=600(600) runtime=77.36ms
+    2024-11-30 12:42:32,607 - INFO - LOGGING enabled
+    2024-11-30 12:42:32,608 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-30 12:42:32,609 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-11-30 12:42:32,609 - INFO - RESET
+    2024-11-30 12:42:32,609 - INFO - RUN duration=30.0
+    2024-11-30 12:42:32,610 - INFO - STARTING progress tracker
+    2024-11-30 12:42:32,610 - INFO - progress=0%
+    2024-11-30 12:42:32,618 - INFO - progress=10%
+    2024-11-30 12:42:32,626 - INFO - progress=20%
+    2024-11-30 12:42:32,634 - INFO - progress=30%
+    2024-11-30 12:42:32,642 - INFO - progress=40%
+    2024-11-30 12:42:32,650 - INFO - progress=50%
+    2024-11-30 12:42:32,658 - INFO - progress=60%
+    2024-11-30 12:42:32,666 - INFO - progress=70%
+    2024-11-30 12:42:32,673 - INFO - progress=80%
+    2024-11-30 12:42:32,681 - INFO - progress=90%
+    2024-11-30 12:42:32,688 - INFO - progress=100%
+    2024-11-30 12:42:32,689 - INFO - FINISHED steps(total)=600(600) runtime=78.96ms
     
 
 
@@ -165,7 +165,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=0.05, log=True, Solver=GEAR52A, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-3)
+Sim = Simulation(blocks, connections, dt=0.05, log=True, Solver=ESDIRK43, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-4)
 
 #run simulation for some number of seconds
 Sim.run(3*mu)
@@ -174,24 +174,24 @@ Sim.run(3*mu)
 Sc.plot(".-");
 ```
 
-    2024-11-30 12:40:49,804 - INFO - LOGGING enabled
-    2024-11-30 12:40:49,805 - INFO - SOLVER GEAR52A adaptive=True implicit=True
-    2024-11-30 12:40:49,805 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-11-30 12:40:49,806 - INFO - RESET
-    2024-11-30 12:40:49,806 - INFO - RUN duration=3000
-    2024-11-30 12:40:49,807 - INFO - STARTING progress tracker
-    2024-11-30 12:40:49,809 - INFO - progress=0%
-    2024-11-30 12:40:49,850 - INFO - progress=12%
-    2024-11-30 12:40:50,014 - INFO - progress=20%
-    2024-11-30 12:40:50,970 - INFO - progress=30%
-    2024-11-30 12:40:51,055 - INFO - progress=42%
-    2024-11-30 12:40:51,173 - INFO - progress=50%
-    2024-11-30 12:40:52,285 - INFO - progress=60%
-    2024-11-30 12:40:52,298 - INFO - progress=70%
-    2024-11-30 12:40:52,587 - INFO - progress=80%
-    2024-11-30 12:40:53,458 - INFO - progress=91%
-    2024-11-30 12:40:53,501 - INFO - progress=100%
-    2024-11-30 12:40:53,502 - INFO - FINISHED steps(total)=530(803) runtime=3695.0ms
+    2024-11-30 12:42:32,843 - INFO - LOGGING enabled
+    2024-11-30 12:42:32,844 - INFO - SOLVER ESDIRK43 adaptive=True implicit=True
+    2024-11-30 12:42:32,844 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-11-30 12:42:32,845 - INFO - RESET
+    2024-11-30 12:42:32,845 - INFO - RUN duration=3000
+    2024-11-30 12:42:32,845 - INFO - STARTING progress tracker
+    2024-11-30 12:42:32,852 - INFO - progress=0%
+    2024-11-30 12:42:33,111 - INFO - progress=12%
+    2024-11-30 12:42:33,287 - INFO - progress=20%
+    2024-11-30 12:42:34,892 - INFO - progress=30%
+    2024-11-30 12:42:35,026 - INFO - progress=41%
+    2024-11-30 12:42:35,263 - INFO - progress=50%
+    2024-11-30 12:42:36,843 - INFO - progress=60%
+    2024-11-30 12:42:36,984 - INFO - progress=70%
+    2024-11-30 12:42:37,498 - INFO - progress=80%
+    2024-11-30 12:42:39,115 - INFO - progress=91%
+    2024-11-30 12:42:39,254 - INFO - progress=100%
+    2024-11-30 12:42:39,254 - INFO - FINISHED steps(total)=315(614) runtime=6408.64ms
     
 
 
@@ -255,24 +255,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-11-30 12:39:22,053 - INFO - LOGGING enabled
-    2024-11-30 12:39:22,053 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
-    2024-11-30 12:39:22,054 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-11-30 12:39:22,054 - INFO - RESET
-    2024-11-30 12:39:22,055 - INFO - RUN duration=12
-    2024-11-30 12:39:22,055 - INFO - STARTING progress tracker
-    2024-11-30 12:39:22,056 - INFO - progress=0%
-    2024-11-30 12:39:22,089 - INFO - progress=10%
-    2024-11-30 12:39:22,123 - INFO - progress=20%
-    2024-11-30 12:39:22,156 - INFO - progress=30%
-    2024-11-30 12:39:22,189 - INFO - progress=40%
-    2024-11-30 12:39:22,222 - INFO - progress=50%
-    2024-11-30 12:39:22,256 - INFO - progress=60%
-    2024-11-30 12:39:22,290 - INFO - progress=70%
-    2024-11-30 12:39:22,323 - INFO - progress=80%
-    2024-11-30 12:39:22,356 - INFO - progress=90%
-    2024-11-30 12:39:22,391 - INFO - progress=100%
-    2024-11-30 12:39:22,391 - INFO - FINISHED steps(total)=1201(1201) runtime=335.34ms
+    2024-11-30 12:42:39,500 - INFO - LOGGING enabled
+    2024-11-30 12:42:39,501 - INFO - SOLVER SSPRK22 adaptive=False implicit=False
+    2024-11-30 12:42:39,501 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-11-30 12:42:39,502 - INFO - RESET
+    2024-11-30 12:42:39,502 - INFO - RUN duration=12
+    2024-11-30 12:42:39,503 - INFO - STARTING progress tracker
+    2024-11-30 12:42:39,504 - INFO - progress=0%
+    2024-11-30 12:42:39,537 - INFO - progress=10%
+    2024-11-30 12:42:39,571 - INFO - progress=20%
+    2024-11-30 12:42:39,605 - INFO - progress=30%
+    2024-11-30 12:42:39,638 - INFO - progress=40%
+    2024-11-30 12:42:39,672 - INFO - progress=50%
+    2024-11-30 12:42:39,707 - INFO - progress=60%
+    2024-11-30 12:42:39,741 - INFO - progress=70%
+    2024-11-30 12:42:39,775 - INFO - progress=80%
+    2024-11-30 12:42:39,810 - INFO - progress=90%
+    2024-11-30 12:42:39,843 - INFO - progress=100%
+    2024-11-30 12:42:39,843 - INFO - FINISHED steps(total)=1201(1201) runtime=340.05ms
     
 
 
@@ -376,24 +376,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2024-11-30 12:39:22,737 - INFO - LOGGING enabled
-    2024-11-30 12:39:22,737 - INFO - SOLVER RKBS32 adaptive=True implicit=False
-    2024-11-30 12:39:22,738 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-11-30 12:39:22,738 - INFO - RESET
-    2024-11-30 12:39:22,739 - INFO - RUN duration=20
-    2024-11-30 12:39:22,740 - INFO - STARTING progress tracker
-    2024-11-30 12:39:22,741 - INFO - progress=0%
-    2024-11-30 12:39:22,745 - INFO - progress=10%
-    2024-11-30 12:39:22,752 - INFO - progress=20%
-    2024-11-30 12:39:22,762 - INFO - progress=30%
-    2024-11-30 12:39:22,769 - INFO - progress=40%
-    2024-11-30 12:39:22,776 - INFO - progress=50%
-    2024-11-30 12:39:22,786 - INFO - progress=60%
-    2024-11-30 12:39:22,797 - INFO - progress=70%
-    2024-11-30 12:39:22,810 - INFO - progress=80%
-    2024-11-30 12:39:22,823 - INFO - progress=90%
-    2024-11-30 12:39:22,845 - INFO - progress=100%
-    2024-11-30 12:39:22,845 - INFO - FINISHED steps(total)=395(496) runtime=104.68ms
+    2024-11-30 12:42:40,208 - INFO - LOGGING enabled
+    2024-11-30 12:42:40,209 - INFO - SOLVER RKBS32 adaptive=True implicit=False
+    2024-11-30 12:42:40,209 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-11-30 12:42:40,210 - INFO - RESET
+    2024-11-30 12:42:40,210 - INFO - RUN duration=20
+    2024-11-30 12:42:40,211 - INFO - STARTING progress tracker
+    2024-11-30 12:42:40,212 - INFO - progress=0%
+    2024-11-30 12:42:40,216 - INFO - progress=10%
+    2024-11-30 12:42:40,223 - INFO - progress=20%
+    2024-11-30 12:42:40,233 - INFO - progress=30%
+    2024-11-30 12:42:40,240 - INFO - progress=40%
+    2024-11-30 12:42:40,247 - INFO - progress=50%
+    2024-11-30 12:42:40,257 - INFO - progress=60%
+    2024-11-30 12:42:40,267 - INFO - progress=70%
+    2024-11-30 12:42:40,281 - INFO - progress=80%
+    2024-11-30 12:42:40,294 - INFO - progress=90%
+    2024-11-30 12:42:40,317 - INFO - progress=100%
+    2024-11-30 12:42:40,317 - INFO - FINISHED steps(total)=395(496) runtime=106.04ms
     
 
 
@@ -437,7 +437,8 @@ There are some things I want to explore with PathSim eventually, and your help i
 
 Some of the possible directions for future features are:
 - better `__repr__` for the blocks maybe in json format OR just add a `json` method to the blocks and to the connections that builds a netlist representation to save to and load from an interpretable file (compatibility with other system description languages)
-- performance optimization maybe through jit
+- explore block level parallelization (fork-join) with Python 3.13 free-threading, batching based on execution cost
+- linearization of blocks and subsystems with the AD framework, linear surrogate models, system wide linearization
 - more extensive testing and validation (as always)
 
 
