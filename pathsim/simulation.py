@@ -552,6 +552,10 @@ class Simulation:
         by switching all blocks to steady state solver, solving the 
         fixed point equations, then switching back.
 
+        The steady state solver forces all the temporal derivatives, i.e.
+        the right hand side equation (including external inputs) of the 
+        engines of dynamic blocks to zero.
+
         INPUTS: 
             reset : (bool) reset the simulation before solving for steady state
         """

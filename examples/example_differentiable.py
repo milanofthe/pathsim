@@ -18,9 +18,6 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import DIRK2, RKCK54
-
-
 #optimization module
 from pathsim.optim import Value, der
 
@@ -33,7 +30,7 @@ z = Value(2)
 b = Value(1)
 
 #simulation timestep
-dt = 0.01
+dt = 0.02
 
 #step delay
 tau = 3
