@@ -93,11 +93,11 @@ Sim = Simulation(
     log=True, 
     Solver=GEAR52A, 
     tolerance_lte_abs=1e-6, 
-    tolerance_lte_rel=1e-4
+    tolerance_lte_rel=1e-3
     )
 
 #run simulation for some number of seconds
-Sim.run(3*mu)
+Sim.run(2*mu)
 
 Sco.plot(".-", lw=1.5)
 

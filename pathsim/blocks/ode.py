@@ -15,8 +15,7 @@ from ._block import Block
 
 from ..utils.utils import (
     dict_to_array, 
-    array_to_dict,
-    auto_jacobian
+    array_to_dict
     )
 
 
@@ -64,8 +63,7 @@ class ODE(Block):
     def set_solver(self, Solver, **solver_args):
         if self.engine is None:
             #initialize the integration engine with right hand side
-            _jac = auto_jacobian(self.func) if self.jac is None else self.jac
-            self.engine = Solver(self.initial_value, self.func, _jac, **solver_args)
+            self.engine = Solver(self.initial_value, self.func, self.jac, **solver_args)
         else:
             #change solver if already initialized
             self.engine = Solver.cast(self.engine, **solver_args)

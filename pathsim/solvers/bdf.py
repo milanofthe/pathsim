@@ -58,6 +58,9 @@ class BDF(ImplicitSolver):
         buffer the state for the multistep method
         """
             
+        #reset optimizer
+        self.opt.reset()
+
         #buffer state directly
         self.x_0 = self.x
 
@@ -97,18 +100,6 @@ class BDF(ImplicitSolver):
 
         #return the fixed-point residual
         return err
-
-
-    def step(self, u, t, dt):
-        """
-        Performs the timestep by buffereing the previous state.
-        """
-
-        #reset optimizer
-        self.opt.reset()
-
-        #no error control
-        return True, 0.0, 1.0
 
 
 # SOLVERS ==============================================================================

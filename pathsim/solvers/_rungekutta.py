@@ -256,9 +256,6 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         if self.stage == 0 and self.BT[self.stage] is None:
             self.Ks[self.stage] = self.func(self.x, u, t)
 
-        #restart optimizer
-        self.opt.reset()
-
         #increment stage counter
         self.stage += 1
 

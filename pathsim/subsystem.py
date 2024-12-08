@@ -235,9 +235,9 @@ class Subsystem(Block):
             t  : (float) evaluation time 
         """
 
-        #update internal connenctions (data transfer)
-        for connection in self.connections:
-            connection.update()
+        # #update internal connenctions (data transfer)
+        # for connection in self.connections:
+        #     connection.update()
 
         #record data if required
         for block in self.blocks:

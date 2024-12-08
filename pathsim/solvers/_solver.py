@@ -358,6 +358,24 @@ class ImplicitSolver(Solver):
         # self.opt = LevenbergMarquardtAD()
 
 
+    def buffer(self, dt):
+        """
+        Saves the current state to an internal state buffer which 
+        is especially relevant for multistage and implicit solvers.
+
+        Resets the stage counter and the optimizer of implicit methods.
+        """
+
+        #buffer internal state
+        self.x_0 = self.x
+
+        #reset stage counter
+        self.stage = 0
+
+        #reset optimizer
+        self.opt.reset()
+
+
     # methods for timestepping ---------------------------------------------------------
 
     def solve(self, u, t, dt):

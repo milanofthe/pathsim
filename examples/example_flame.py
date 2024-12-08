@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Integrator, Adder, Function
-from pathsim.solvers import ESDIRK43
+from pathsim.solvers import ESDIRK43, GEAR52A
 
 
 

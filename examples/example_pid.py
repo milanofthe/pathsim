@@ -56,7 +56,7 @@ connections = [
 ]
 
 # Simulation initialization
-sim = Simulation(blocks, connections, dt=0.1, Solver=ESDIRK43)
+sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
 
 #run the simulation for some time
 sim.run(100)

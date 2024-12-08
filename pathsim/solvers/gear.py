@@ -125,6 +125,9 @@ class GEAR(ImplicitSolver):
         variable timestep BDF coefficients on the fly for 
         the current timestep.
         """
+
+        #reset optimizer
+        self.opt.reset()
             
         #buffer state directly
         self.x_0 = self.x
@@ -161,21 +164,21 @@ class GEAR(ImplicitSolver):
         self.T.pop(0)
 
 
-    def error_controller(self, x_m):
+    def error_controller(self, tr):
         """
         compute scaling factor for adaptive timestep based on absolute and 
         relative tolerances for local truncation error. Checks if the error 
         tolerance is achieved and returns a success metric.
 
         INPUTS:
-            x_m : (array[float]) lower order solution 
+            tr : (array[float]) truncation error estimate 
         """
 
         #compute scaling factors (avoid division by zero)
         scale = self.tolerance_lte_abs + self.tolerance_lte_rel * np.abs(self.x)
 
         #compute scaled truncation error (element-wise)
-        scaled_error = np.abs(self.x - x_m) / scale
+        scaled_error = np.abs(tr) / scale
 
         #compute the error norm and clip it
         error_norm = np.clip(float(np.max(scaled_error)), 1e-18, None)
@@ -186,8 +189,8 @@ class GEAR(ImplicitSolver):
         #compute timestep scale factor using accuracy order of truncation error
         timestep_rescale = self.beta / error_norm ** (1/self.n)
 
-        # #clip the rescale factor to a reasonable range
-        # timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+        #clip the rescale factor to a reasonable range
+        timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
 
         return success, error_norm, timestep_rescale
 
@@ -231,20 +234,17 @@ class GEAR(ImplicitSolver):
         solution for error control.
         """
 
-        #reset optimizer
-        self.opt.reset()
-
         #early exit if buffer not long enough for two solutions
         if len(self.B) < self.n:
             return True, 0.0, 1.0
 
-        #estimate lower order solution
-        x_m = self.F[self.m] * dt * self.func(self.x, u, t) 
+        #estimate truncation error from lower order solution
+        tr = self.x - self.F[self.m] * dt * self.func(self.x, u, t) 
         for b, k in zip(self.B, self.K[self.m]):
-            x_m = x_m + b*k
+            tr = tr - b*k
 
         #error control
-        return self.error_controller(x_m)
+        return self.error_controller(tr)
 
 
 # SOLVERS ==============================================================================
@@ -344,6 +344,9 @@ class GEAR52A(GEAR):
         timestep BDF coefficients on the fly for the current timestep.
         """
             
+        #reset optimizer
+        self.opt.reset()
+
         #buffer state directly
         self.x_0 = self.x
 
@@ -362,7 +365,7 @@ class GEAR52A(GEAR):
             self.F[n], self.K[n] = compute_bdf_coefficients(n, self.T)
 
 
-    def error_controller(self, x_m, x_p):
+    def error_controller(self, tr_m, tr_p):
         """
         Compute scaling factor for adaptive timestep based on absolute and relative 
         tolerances of the local truncation error estimate obtained from esimated 
@@ -374,16 +377,16 @@ class GEAR52A(GEAR):
         larger steps can be taken by the integrator.
 
         INPUTS:
-            x_m : (array[float]) lower order solution estimate
-            x_p : (array[float]) higher order solution estimate
+            tr_m : (array[float]) lower order truncation error estimate
+            tr_p : (array[float]) higher order truncation error estimate
         """
 
         #compute scaling factors (avoid division by zero)
         scale = self.tolerance_lte_abs + self.tolerance_lte_rel * np.abs(self.x)
 
         #compute scaled truncation error (element-wise)
-        scaled_error_m = np.abs(self.x - x_m) / scale
-        scaled_error_p = np.abs(self.x - x_p) / scale
+        scaled_error_m = np.abs(tr_m) / scale
+        scaled_error_p = np.abs(tr_p) / scale
 
         #compute the error norm and clip it
         error_norm_m = np.clip(float(np.max(scaled_error_m)), 1e-18, None)
@@ -394,6 +397,9 @@ class GEAR52A(GEAR):
 
         #compute timestep scale factor using accuracy order of truncation error
         timestep_rescale = self.beta / error_norm_m ** (1/self.n)  
+
+        #clip the rescale factor to a reasonable range
+        timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
 
         #decrease the order if smaller order is more accurate (stability)
         if error_norm_m < error_norm_p:
@@ -415,22 +421,21 @@ class GEAR52A(GEAR):
         of the solution. Then calls the error controller.
         """
 
-        #reset optimizer
-        self.opt.reset()
-
         #early exit if buffer not long enough for two solutions
         if len(self.B) < self.n + 1:
             return True, 0.0, 1.0
 
-        #estimate lower order solution
-        x_m = self.F[self.n-1] * dt * self.func(self.x, u, t) 
-        for b, k in zip(self.B, self.K[self.n-1]):
-            x_m = x_m + b*k
+        #lower and higher order
+        n_m, n_p = self.n-1, self.n+1 
 
-        #estimate higher order solution
-        x_p = self.F[self.n+1] * dt * self.func(self.x, u, t) 
-        for b, k in zip(self.B, self.K[self.n+1]):
-            x_p = x_p + b*k
+        #estimate truncation error from lower order solution
+        tr_m = self.x - self.F[n_m] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[n_m]):
+            tr_m = tr_m - b*k
 
-        #error estimate after last stage
-        return self.error_controller(x_m, x_p)
+        #estimate truncation error from higher order solution
+        tr_p = self.x - self.F[n_p] * dt * self.func(self.x, u, t) 
+        for b, k in zip(self.B, self.K[n_p]):
+            tr_p = tr_p - b*k
+
+        return self.error_controller(tr_m, tr_p)

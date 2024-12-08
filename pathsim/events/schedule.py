@@ -88,7 +88,7 @@ class Schedule(Event):
 
         #are we close enough to the scheduled event?
         if abs(t_next - t) <= self.tolerance:
-            return True, True, 1.0    
+            return True, True, 0.0 
 
         #unpack history
         _, _t = self._history

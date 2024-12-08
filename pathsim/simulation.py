@@ -16,8 +16,9 @@ import numpy as np
 import logging
 
 from .utils.utils import path_length_dfs
+from .utils.debugging import Timer
 from .utils.progresstracker import ProgressTracker
-from .solvers import SSPRK22
+from .solvers import SSPRK22, SteadyState
 
 
 # TRANSIENT SIMULATION CLASS ============================================================
@@ -50,7 +51,6 @@ class Simulation:
     to monitor solver states of stateful blocks and applys transformations on the state in 
     case an event is detected. 
 
-
     INPUTS:
         blocks         : (list[Block]) blocks that make up the system
         connections    : (list[Connection]) connections that connect the blocks
@@ -71,7 +71,7 @@ class Simulation:
                  connections=None, 
                  events=None,
                  dt=0.01, 
-                 dt_min=0.0, 
+                 dt_min=1e-16, 
                  dt_max=None, 
                  Solver=SSPRK22, 
                  tolerance_fpi=1e-12, 
@@ -166,13 +166,18 @@ class Simulation:
         self.logger = logging.Logger("PathSim_Simulation_Logger")
 
         #check if logging is selected
-        if self.log:
+        if self.log:    
 
             #if a filename for logging is specified
-            filename = self.log if isinstance(self.log, str) else None
-            handler = logging.FileHandler(filename) if filename else logging.StreamHandler()
-            formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-            handler.setFormatter(formatter)
+            if isinstance(self.log, str):
+                handler = logging.FileHandler(self.log) 
+            else:
+                handler = logging.StreamHandler()
+
+            #logging format
+            handler.setFormatter(
+                logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")   
+                )
 
             self.logger.addHandler(handler)
             self.logger.setLevel(logging.INFO)
@@ -432,30 +437,7 @@ class Simulation:
         return sorted(detected_events, key=lambda e: e[-1])
 
 
-    # timestepping ----------------------------------------------------------------
-
-    def _revert(self):
-        """
-        Revert simulation state to previous timestep for adaptive solvers 
-        when local truncation error is too large and timestep has to be 
-        retaken with smaller timestep.
-        """
-        for block in self._active_blocks:
-            block.revert()
-
-
-    def _sample(self, t):
-        """
-        Sample data from blocks that implement the 'sample' method such 
-        as 'Scope', 'Delay' and the blocks that sample from a random 
-        distribution at a given time 't'.
-
-        INPUTS:
-            t : (float) time where to sample
-        """
-        for block in self._active_blocks:
-            block.sample(t)
-
+    # solving system equations ----------------------------------------------------
 
     def _update(self, t):
         """
@@ -509,7 +491,7 @@ class Simulation:
                 return iteration+1
 
         #not converged
-        _msg = f"fixed-point loop in '_update' not converged, iter={iteration+1}, err={max_error}"
+        _msg = f"fixed-point loop in '_update' not converged, iters={iteration+1}, err={max_error}"
         self._logger_error(_msg, RuntimeError)
 
 
@@ -557,6 +539,70 @@ class Simulation:
 
         #not converged in 'self.iterations_max' steps
         return False, total_evals, iteration + 1
+
+
+    def steadystate(self, reset=True): 
+        """
+        Find steady state solution (DC operating point) of the system 
+        by switching all blocks to steady state solver, solving the 
+        fixed point equations, then switching back.
+
+        INPUTS: 
+            reset : (bool) reset the simulation before solving for steady state
+        """
+    
+        #reset the simulation before solving
+        if reset:
+            self.reset()
+
+        #log message begin of steady state solver
+        self._logger_info(f"STEADYSTATE start")
+
+        #current solver class
+        _solver = self.Solver
+        
+        #switch to steady state solver
+        self._set_solver(SteadyState)
+
+        #solve for steady state at current time
+        with Timer(verbose=False) as T:
+            success, evals, iters = self._solve(self.time, self.dt)
+
+        #catch non convergence
+        if not success:
+            _msg = f"{self.Solver} not converged, evals={evals}, iters={iters}, runtime={T.readout}"
+            self._logger_error(_msg, RuntimeError)
+
+        #switch back to original solver
+        self._set_solver(_solver)
+
+        #log message 
+        self._logger_info(f"STEADYSTATE success, runtime={T.readout}")
+
+
+    # timestepping ----------------------------------------------------------------
+
+    def _revert(self):
+        """
+        Revert simulation state to previous timestep for adaptive solvers 
+        when local truncation error is too large and timestep has to be 
+        retaken with smaller timestep.
+        """
+        for block in self._active_blocks:
+            block.revert()
+
+
+    def _sample(self, t):
+        """
+        Sample data from blocks that implement the 'sample' method such 
+        as 'Scope', 'Delay' and the blocks that sample from a random 
+        distribution at a given time 't'.
+
+        INPUTS:
+            t : (float) time where to sample
+        """
+        for block in self._active_blocks:
+            block.sample(t)
 
 
     def _buffer(self, t, dt):
@@ -807,7 +853,7 @@ class Simulation:
             else:
                 self._revert()
                 scale = min(scale, ratio)
-                return False, error_norm, scale, total_evals, total_solver_its 
+                return False, error_norm, scale, total_evals, total_solver_its
         
         #sample data after successful timestep (+dt)
         self._sample(self.time + dt)
@@ -860,7 +906,7 @@ class Simulation:
         adaptive = adaptive and self.engine.is_adaptive
 
         #log message solver selection
-        self._logger_info(f"RUN duration={duration}")
+        self._logger_info(f"TRANSIENT duration={duration}")
 
         #simulation start and end time
         start_time, end_time = self.time, self.time + duration

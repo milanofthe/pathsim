@@ -31,6 +31,8 @@ class Timer:
     of the code inside of the context in 'ms' for 
     debugging purposes
     """
+    def __init__(self, verbose=True):
+        self.verbose = verbose
 
     def __enter__(self):
         self.start = perf_counter()
@@ -38,8 +40,9 @@ class Timer:
 
     def __exit__(self, type, value, traceback):
         self.time = perf_counter() - self.start
-        self.readout = f"runtime: {self.time*1e3:.3f}ms"
-        print(self.readout)
+        self.readout = f"{self.time*1e3:.3f}ms"
+        if self.verbose:
+            print("runtime:", self.readout)
 
 
 def timer(func):

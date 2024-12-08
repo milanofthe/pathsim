@@ -48,7 +48,8 @@ class EUB(ImplicitSolver):
 
     def solve(self, u, t, dt):
         """
-        Solves the implicit update equation via anderson acceleration.
+        Solves the implicit update equation 
+        using the internal optimizer.
         """
 
         #update the fixed point equation
@@ -69,12 +70,3 @@ class EUB(ImplicitSolver):
 
         #return the fixed-point residual
         return err
-
-
-    def step(self, u, t, dt):
-
-        #reset optimizer
-        self.opt.reset()
-
-        #no error estimate available
-        return True, 0.0, 1.0

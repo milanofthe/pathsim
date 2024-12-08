@@ -31,6 +31,7 @@ def jac(x, u, t):
 
 #blocks that define the system
 VDP = ODE(func, x0, jac) #jacobian improves convergence but is not needed
+# VDP = ODE(func, x0)
 Sco = Scope()
 
 blocks = [VDP, Sco]
@@ -52,7 +53,7 @@ Sim = Simulation(
     tolerance_lte_rel=1e-3
     )
 
-Sim.run(2*mu)
+Sim.run(6*mu)
 
 #plotting
 Sco.plot(".-")

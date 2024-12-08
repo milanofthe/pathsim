@@ -60,13 +60,12 @@ class ZeroCrossing(Event):
             return False, False, 1.0
 
         #are we close to the actual event?
-        if abs(result) <= self.tolerance:
-            return True, True, 1.0
+        close = abs(result) <= self.tolerance
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), 1e-18, None)
         
-        return True, False, float(ratio)
+        return True, close, float(ratio)
 
 
 class ZeroCrossingUp(Event):
@@ -99,13 +98,12 @@ class ZeroCrossingUp(Event):
             return False, False, 1.0
         
         #are we close to the actual event?
-        if abs(result) <= self.tolerance:
-            return True, True, 1.0
+        close = abs(result) <= self.tolerance
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), 1e-18, None)
         
-        return True, False, float(ratio)
+        return True, close, float(ratio)
 
 
 class ZeroCrossingDown(Event):
@@ -138,10 +136,9 @@ class ZeroCrossingDown(Event):
             return False, False, 1.0
         
         #are we close to the actual event?
-        if abs(result) <= self.tolerance:
-            return True, True, 1.0
+        close = abs(result) <= self.tolerance
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), 1e-18, None)
         
-        return True, False, float(ratio)
+        return True, close, float(ratio)

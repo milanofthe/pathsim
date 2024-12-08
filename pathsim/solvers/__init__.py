@@ -1,3 +1,5 @@
+#solver that solves for DC operating point
+from .steadystate import *
 
 #1st order euler methods
 from .euler import *

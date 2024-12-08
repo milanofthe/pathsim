@@ -91,8 +91,8 @@ Sim = Simulation(
     dt=dt, 
     log=True, 
     Solver=RKBS32, 
-    tolerance_lte_rel=0, 
-    tolerance_lte_abs=1e-5
+    tolerance_lte_rel=1e-3, 
+    tolerance_lte_abs=1e-4
     )
 
 #run the simulation
