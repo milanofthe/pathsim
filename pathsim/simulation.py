@@ -374,7 +374,7 @@ class Simulation:
 
         #logging message
         self._logger_info(
-            "SOLVER -> {} adaptive={} implicit={}".format(
+            "SOLVER -> {}, adaptive={}, implicit={}".format(
                 self.engine,
                 self.engine.is_adaptive, 
                 not self.engine.is_explicit
@@ -394,7 +394,7 @@ class Simulation:
         the block inputs and outputs.
         """
 
-        self._logger_info("RESET")
+        self._logger_info("RESET, time -> 0.0")
 
         #reset simulation time
         self.time = 0.0
@@ -491,8 +491,13 @@ class Simulation:
                 return iteration+1
 
         #not converged
-        _msg = f"fixed-point loop in '_update' not converged, iters={iteration+1}, err={max_error}"
-        self._logger_error(_msg, RuntimeError)
+        self._logger_error(
+            "fixed-point loop in '_update' not converged, iters={}, err={}".format(
+                iteration+1, 
+                max_error
+                ), 
+            RuntimeError
+            )
 
 
     def _solve(self, t, dt):
@@ -574,8 +579,7 @@ class Simulation:
         #catch non convergence
         if not success:
             self._logger_error(
-                "{} not converged, evals={}, iters={}, runtime={}".format(
-                    self.engine,
+                "STEADYSTATE not converged, evals={}, iters={}, runtime={}".format(
                     evals, 
                     iters, 
                     T.readout

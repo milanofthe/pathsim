@@ -82,7 +82,7 @@ blocks = [VDP, Sco]
 #the connections between the blocks in the main system
 connections = [
     Connection(VDP, Sco),
-    # Connection(VDP[1], Sco[1])
+    Connection(VDP[1], Sco[1])
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
