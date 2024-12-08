@@ -29,7 +29,7 @@ tau = 3
 
 #blocks that define the system
 Src = Source(lambda t: int(t>tau))
-Int = Integrator(0)
+Int = Integrator()
 Amp = Amplifier(-1)
 Add = Adder()
 Sco = Scope(labels=["step", "response"])

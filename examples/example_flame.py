@@ -44,6 +44,7 @@ Sim = Simulation(
     tolerance_lte_rel=1e-4
     )
 
+
 Sim.run(2/delta)
 
 #plotting

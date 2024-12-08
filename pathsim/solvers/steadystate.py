@@ -9,6 +9,8 @@
 
 # IMPORTS ==============================================================================
 
+import numpy as np
+
 from ._solver import ImplicitSolver
 
 

@@ -374,7 +374,7 @@ class Simulation:
 
         #logging message
         self._logger_info(
-            "SOLVER {} adaptive={} implicit={}".format(
+            "SOLVER -> {} adaptive={} implicit={}".format(
                 self.engine,
                 self.engine.is_adaptive, 
                 not self.engine.is_explicit
@@ -555,14 +555,17 @@ class Simulation:
         if reset:
             self.reset()
 
-        #log message begin of steady state solver
-        self._logger_info(f"STEADYSTATE start")
+        #assemble lists of active system components
+        self._assemble_active()
 
         #current solver class
         _solver = self.Solver
         
         #switch to steady state solver
-        self._set_solver(SteadyState)
+        self._set_solver(SteadyState)    
+
+        #log message begin of steady state solver
+        self._logger_info(f"STEADYSTATE start, reset={reset}")
 
         #solve for steady state at current time
         with Timer(verbose=False) as T:
@@ -570,14 +573,30 @@ class Simulation:
 
         #catch non convergence
         if not success:
-            _msg = f"{self.Solver} not converged, evals={evals}, iters={iters}, runtime={T.readout}"
-            self._logger_error(_msg, RuntimeError)
+            self._logger_error(
+                "{} not converged, evals={}, iters={}, runtime={}".format(
+                    self.engine,
+                    evals, 
+                    iters, 
+                    T.readout
+                    ), 
+                RuntimeError
+                )
+
+        #sample result
+        self._sample(self.time)
+
+        #log message 
+        self._logger_info(
+            "STEADYSTATE success, evals={}, iters={}, runtime={}".format(
+                evals, 
+                iters, 
+                T.readout
+                )
+            )
 
         #switch back to original solver
         self._set_solver(_solver)
-
-        #log message 
-        self._logger_info(f"STEADYSTATE success, runtime={T.readout}")
 
 
     # timestepping ----------------------------------------------------------------
