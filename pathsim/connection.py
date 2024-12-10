@@ -89,7 +89,7 @@ class Connection:
 
     def __str__(self):
         src, prt = self.source
-        return f"Connection from ({src}, {prt}) to " + ", ".join([ f"({trg}, {prt})" for trg, prt in self.targets])
+        return f"Connection ({src}, {prt}) -> " + ", ".join([ f"({trg}, {prt})" for trg, prt in self.targets])
 
 
     def __bool__(self):
@@ -146,13 +146,13 @@ class Duplex(Connection):
     def __init__(self, *targets):
 
         if len(targets) != 2:
-            raise ValueError("Duplex needs two targets for bidirectional connection!")
+            raise ValueError("Duplex needs exactly two targets for bidirectional connection!")
 
         self.targets = [trg if isinstance(trg, (list, tuple)) else (trg, 0) for trg in targets]
 
 
     def __str__(self):
-        return f"Duplex between " + " and ".join([f"({trg}, {prt})" for trg, prt in self.targets]) 
+        return f"Duplex " + " <-> ".join([f"({trg}, {prt})" for trg, prt in self.targets]) 
 
 
     def update(self):
