@@ -1,23 +1,22 @@
 # PathSim: A Time-Domain System Simulation Framework
 
-
 ## Overview
 
 PathSim is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems similar to Matlab Simulink but in Python!
 
 Key features of PathSim include:
 
-- Natural handling of algebraic loops
 - Hot-swappable blocks and solvers during simulation
+- Natural handling of algebraic loops
 - Blocks are inherently MIMO (Multiple Input, Multiple Output) capable
-- Blocks are "physicalized" and manage their own state, i.e. reading from the scope is just scope.read()
-- Scales linearly with the number of blocks and connections
-- Wide range of numerical solvers, including implicit and explicit very high order Runge-Kutta and multistep methods
+- Blocks are decentralized and manage their own state, i.e. reading from the scope is just `scope.read()`
+- Linear scaling with the number of blocks and connections
+- Wide range of numerical integrators (implicit, explicit, high order, adaptive)
 - Modular and hierarchical modeling with (nested) subsystems
-- Event handling system that can detect and resolve discrete events (zero-crossing detection)
-- Automatic differentiation for fully differentiable system simulations (even through events and for stiff systems) for sensitivity analysis and optimization
-- Library of pre-defined blocks, including mathematical operations, integrators, delays, transfer functions, etc.
-- Easy extensibility, subclassing the base `Block` class with just a handful of methods
+- Event handling system to detect and resolve discrete events (zero-crossing detection)
+- Automatic differentiation for fully differentiable system simulations (sensitivity analysis and optimization)
+- Library of pre-defined blocks (`Integrator`, `Adder`, `TransferFunction`, `Scope`, etc.)
+- Extensibility by subclassing the base `Block` class and implementing just a handful of methods
 
 All features are demonstrated for benchmark problems in the `example` directory.
 
@@ -97,24 +96,24 @@ Sc.plot()
 time, data = Sc.read();
 ```
 
-    2024-12-09 22:12:59,517 - INFO - LOGGING enabled
-    2024-12-09 22:12:59,518 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2024-12-09 22:12:59,519 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-12-09 22:12:59,519 - INFO - RESET, time -> 0.0
-    2024-12-09 22:12:59,520 - INFO - TRANSIENT duration=30.0
-    2024-12-09 22:12:59,520 - INFO - STARTING progress tracker
-    2024-12-09 22:12:59,520 - INFO - progress=0%
-    2024-12-09 22:12:59,525 - INFO - progress=10%
-    2024-12-09 22:12:59,529 - INFO - progress=20%
-    2024-12-09 22:12:59,534 - INFO - progress=30%
-    2024-12-09 22:12:59,539 - INFO - progress=40%
-    2024-12-09 22:12:59,544 - INFO - progress=50%
-    2024-12-09 22:12:59,548 - INFO - progress=60%
-    2024-12-09 22:12:59,552 - INFO - progress=70%
-    2024-12-09 22:12:59,557 - INFO - progress=80%
-    2024-12-09 22:12:59,561 - INFO - progress=90%
-    2024-12-09 22:12:59,566 - INFO - progress=100%
-    2024-12-09 22:12:59,566 - INFO - FINISHED steps(total)=600(600) runtime=45.84ms
+    2024-12-12 10:44:36,918 - INFO - LOGGING enabled
+    2024-12-12 10:44:36,918 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2024-12-12 10:44:36,919 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-12-12 10:44:36,919 - INFO - RESET, time -> 0.0
+    2024-12-12 10:44:36,919 - INFO - TRANSIENT duration=30.0
+    2024-12-12 10:44:36,920 - INFO - STARTING progress tracker
+    2024-12-12 10:44:36,920 - INFO - progress=0%
+    2024-12-12 10:44:36,925 - INFO - progress=10%
+    2024-12-12 10:44:36,930 - INFO - progress=20%
+    2024-12-12 10:44:36,936 - INFO - progress=30%
+    2024-12-12 10:44:36,942 - INFO - progress=40%
+    2024-12-12 10:44:36,947 - INFO - progress=50%
+    2024-12-12 10:44:36,952 - INFO - progress=60%
+    2024-12-12 10:44:36,957 - INFO - progress=70%
+    2024-12-12 10:44:36,962 - INFO - progress=80%
+    2024-12-12 10:44:36,967 - INFO - progress=90%
+    2024-12-12 10:44:36,972 - INFO - progress=100%
+    2024-12-12 10:44:36,972 - INFO - FINISHED steps(total)=600(600) runtime=51.83ms
     
 
 
@@ -141,7 +140,7 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Scope, Function
 
 #implicit adaptive timestep solver 
-from pathsim.solvers import ESDIRK43
+from pathsim.solvers import ESDIRK54
 
 #initial conditions
 x1, x2 = 2, 0
@@ -165,7 +164,15 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=0.05, log=True, Solver=ESDIRK43, tolerance_lte_abs=1e-6, tolerance_lte_rel=1e-4)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=0.05, 
+    log=True, 
+    Solver=ESDIRK54, 
+    tolerance_lte_abs=1e-6, 
+    tolerance_lte_rel=1e-4
+    )
 
 #run simulation for some number of seconds
 Sim.run(3*mu)
@@ -174,24 +181,24 @@ Sim.run(3*mu)
 Sc.plot(".-");
 ```
 
-    2024-12-09 22:13:01,459 - INFO - LOGGING enabled
-    2024-12-09 22:13:01,460 - INFO - SOLVER -> ESDIRK43, adaptive=True, implicit=True
-    2024-12-09 22:13:01,460 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-12-09 22:13:01,460 - INFO - RESET, time -> 0.0
-    2024-12-09 22:13:01,460 - INFO - TRANSIENT duration=3000
-    2024-12-09 22:13:01,460 - INFO - STARTING progress tracker
-    2024-12-09 22:13:01,465 - INFO - progress=0%
-    2024-12-09 22:13:01,603 - INFO - progress=10%
-    2024-12-09 22:13:01,797 - INFO - progress=21%
-    2024-12-09 22:13:02,950 - INFO - progress=30%
-    2024-12-09 22:13:03,057 - INFO - progress=41%
-    2024-12-09 22:13:03,233 - INFO - progress=50%
-    2024-12-09 22:13:04,358 - INFO - progress=61%
-    2024-12-09 22:13:04,467 - INFO - progress=70%
-    2024-12-09 22:13:04,836 - INFO - progress=80%
-    2024-12-09 22:13:05,931 - INFO - progress=91%
-    2024-12-09 22:13:05,980 - INFO - progress=100%
-    2024-12-09 22:13:05,980 - INFO - FINISHED steps(total)=330(671) runtime=4519.09ms
+    2024-12-12 10:48:52,277 - INFO - LOGGING enabled
+    2024-12-12 10:48:52,278 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
+    2024-12-12 10:48:52,279 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-12-12 10:48:52,279 - INFO - RESET, time -> 0.0
+    2024-12-12 10:48:52,280 - INFO - TRANSIENT duration=3000
+    2024-12-12 10:48:52,280 - INFO - STARTING progress tracker
+    2024-12-12 10:48:52,286 - INFO - progress=0%
+    2024-12-12 10:48:52,406 - INFO - progress=11%
+    2024-12-12 10:48:52,456 - INFO - progress=20%
+    2024-12-12 10:48:53,461 - INFO - progress=33%
+    2024-12-12 10:48:53,496 - INFO - progress=43%
+    2024-12-12 10:48:53,587 - INFO - progress=50%
+    2024-12-12 10:48:54,687 - INFO - progress=62%
+    2024-12-12 10:48:54,757 - INFO - progress=71%
+    2024-12-12 10:48:55,057 - INFO - progress=80%
+    2024-12-12 10:48:55,941 - INFO - progress=93%
+    2024-12-12 10:48:55,977 - INFO - progress=100%
+    2024-12-12 10:48:55,978 - INFO - FINISHED steps(total)=292(468) runtime=3697.38ms
     
 
 
@@ -202,11 +209,13 @@ Sc.plot(".-");
 
 ## Differentiable Simulation
 
-PathSim also includes a fully fledged automatic differentiation framework based on a dual number system with overloaded operators and numpy ufunc integration. This makes the system simulation fully differentiable end-to-end with respect to a predefined set of parameters. Works with all integrators, adaptive, fixed, implicit, explicit. To demonstrate this lets consider the following linear feedback system.
+PathSim also includes a fully fledged automatic differentiation framework based on a dual number system with overloaded operators and numpy ufunc integration. This makes the system simulation fully differentiable end-to-end with respect to a predefined set of parameters. Works with all integrators, adaptive, fixed, implicit, explicit. 
+
+To demonstrate this lets consider the following linear feedback system and perform a sensitivity analysis on it with respect to some system parameters. 
 
 ![png](README_files/linear_feedback_blockdiagram.png)
 
-The source term is a scaled unit step function (scaled by $b$). The parameters we want to differentiate the time domain response by are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $b$.
+The source term is a scaled unit step function (scaled by $b$). In this example, the parameters for the sensitivity analysis are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $b$.
 
 
 ```python
@@ -216,7 +225,7 @@ from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
 #AD module
 from pathsim.optim import Value, der
 
-#values for derivative propagation
+#values for derivative propagation / parameters for sensitivity analysis
 a  = Value(-1)
 b  = Value(1)
 x0 = Value(2)
@@ -255,24 +264,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-12-09 22:13:10,723 - INFO - LOGGING enabled
-    2024-12-09 22:13:10,724 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2024-12-09 22:13:10,724 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-12-09 22:13:10,724 - INFO - RESET, time -> 0.0
-    2024-12-09 22:13:10,725 - INFO - TRANSIENT duration=12
-    2024-12-09 22:13:10,725 - INFO - STARTING progress tracker
-    2024-12-09 22:13:10,726 - INFO - progress=0%
-    2024-12-09 22:13:10,748 - INFO - progress=10%
-    2024-12-09 22:13:10,768 - INFO - progress=20%
-    2024-12-09 22:13:10,789 - INFO - progress=30%
-    2024-12-09 22:13:10,811 - INFO - progress=40%
-    2024-12-09 22:13:10,831 - INFO - progress=50%
-    2024-12-09 22:13:10,851 - INFO - progress=60%
-    2024-12-09 22:13:10,870 - INFO - progress=70%
-    2024-12-09 22:13:10,891 - INFO - progress=80%
-    2024-12-09 22:13:10,910 - INFO - progress=90%
-    2024-12-09 22:13:10,928 - INFO - progress=100%
-    2024-12-09 22:13:10,928 - INFO - FINISHED steps(total)=1201(1201) runtime=203.21ms
+    2024-12-12 10:43:02,481 - INFO - LOGGING enabled
+    2024-12-12 10:43:02,482 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2024-12-12 10:43:02,482 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-12-12 10:43:02,483 - INFO - RESET, time -> 0.0
+    2024-12-12 10:43:02,483 - INFO - TRANSIENT duration=12
+    2024-12-12 10:43:02,483 - INFO - STARTING progress tracker
+    2024-12-12 10:43:02,485 - INFO - progress=0%
+    2024-12-12 10:43:02,503 - INFO - progress=10%
+    2024-12-12 10:43:02,521 - INFO - progress=20%
+    2024-12-12 10:43:02,540 - INFO - progress=30%
+    2024-12-12 10:43:02,559 - INFO - progress=40%
+    2024-12-12 10:43:02,577 - INFO - progress=50%
+    2024-12-12 10:43:02,597 - INFO - progress=60%
+    2024-12-12 10:43:02,615 - INFO - progress=70%
+    2024-12-12 10:43:02,633 - INFO - progress=80%
+    2024-12-12 10:43:02,653 - INFO - progress=90%
+    2024-12-12 10:43:02,672 - INFO - progress=100%
+    2024-12-12 10:43:02,672 - INFO - FINISHED steps(total)=1201(1201) runtime=188.22ms
     
 
 
@@ -367,7 +376,15 @@ E1 = ZeroCrossing(
 events = [E1]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, events, dt=0.1, log=True, Solver=RKBS32, dt_max=0.1)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    events, 
+    dt=0.1, 
+    log=True, 
+    Solver=RKBS32, 
+    dt_max=0.1
+    )
 
 #run the simulation
 Sim.run(20)
@@ -376,24 +393,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2024-12-08 12:00:07,005 - INFO - LOGGING enabled
-    2024-12-08 12:00:07,006 - INFO - SOLVER RKBS32 adaptive=True implicit=False
-    2024-12-08 12:00:07,006 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-12-08 12:00:07,006 - INFO - RESET
-    2024-12-08 12:00:07,007 - INFO - TRANSIENT duration=20
-    2024-12-08 12:00:07,008 - INFO - STARTING progress tracker
-    2024-12-08 12:00:07,008 - INFO - progress=0%
-    2024-12-08 12:00:07,010 - INFO - progress=10%
-    2024-12-08 12:00:07,015 - INFO - progress=20%
-    2024-12-08 12:00:07,021 - INFO - progress=30%
-    2024-12-08 12:00:07,026 - INFO - progress=40%
-    2024-12-08 12:00:07,030 - INFO - progress=50%
-    2024-12-08 12:00:07,036 - INFO - progress=60%
-    2024-12-08 12:00:07,042 - INFO - progress=70%
-    2024-12-08 12:00:07,050 - INFO - progress=80%
-    2024-12-08 12:00:07,058 - INFO - progress=90%
-    2024-12-08 12:00:07,075 - INFO - progress=100%
-    2024-12-08 12:00:07,076 - INFO - FINISHED steps(total)=395(496) runtime=67.94ms
+    2024-12-12 10:43:17,751 - INFO - LOGGING enabled
+    2024-12-12 10:43:17,752 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
+    2024-12-12 10:43:17,752 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-12-12 10:43:17,753 - INFO - RESET, time -> 0.0
+    2024-12-12 10:43:17,753 - INFO - TRANSIENT duration=20
+    2024-12-12 10:43:17,753 - INFO - STARTING progress tracker
+    2024-12-12 10:43:17,753 - INFO - progress=0%
+    2024-12-12 10:43:17,757 - INFO - progress=10%
+    2024-12-12 10:43:17,761 - INFO - progress=20%
+    2024-12-12 10:43:17,767 - INFO - progress=30%
+    2024-12-12 10:43:17,772 - INFO - progress=40%
+    2024-12-12 10:43:17,776 - INFO - progress=50%
+    2024-12-12 10:43:17,782 - INFO - progress=60%
+    2024-12-12 10:43:17,788 - INFO - progress=70%
+    2024-12-12 10:43:17,796 - INFO - progress=80%
+    2024-12-12 10:43:17,803 - INFO - progress=90%
+    2024-12-12 10:43:17,817 - INFO - progress=100%
+    2024-12-12 10:43:17,818 - INFO - FINISHED steps(total)=395(496) runtime=63.99ms
     
 
 
@@ -402,7 +419,7 @@ Sc.plot();
     
 
 
-During the event handling, the simulator approaches the event until the event tolerance is met. You can see this by analyzing the timesteps taken by `RKBS32`.
+During the event handling, the simulator approaches the event until the event tolerance is met. You can see this by analyzing the timesteps taken by the adaptive integrator `RKBS32`.
 
 
 ```python
@@ -439,7 +456,7 @@ Some of the possible directions for future features are:
 - better `__repr__` for the blocks maybe in json format OR just add a `json` method to the blocks and to the connections that builds a netlist representation to save to and load from an interpretable file (compatibility with other system description languages)
 - explore block level parallelization (fork-join) with Python 3.13 free-threading, batching based on execution cost
 - linearization of blocks and subsystems with the AD framework, linear surrogate models, system wide linearization
-- improved / more robust steady state solver and algebraic loop solver
+- more robust steady state solver and algebraic loop solver
 - methods for periodic steady state analysis
 - more extensive testing and validation (as always)
 
