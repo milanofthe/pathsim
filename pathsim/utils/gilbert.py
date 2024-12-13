@@ -117,6 +117,6 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
     #build block diagonal
     A = np.kron(np.eye(n, dtype=float), a)
     B = np.kron(np.eye(n, dtype=float), b).T
-    D = Const
+    D = Const * np.ones((m, n)) if np.isscalar(Const) else Const
 
     return  A, B, C, D

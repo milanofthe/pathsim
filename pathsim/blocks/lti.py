@@ -95,8 +95,9 @@ class StateSpace(Block):
         #compute implicit balancing update 
         prev_outputs = self.outputs.copy()
         u = dict_to_array(self.inputs)
-        y = np.dot(self.C, self.engine.get()) + np.dot(self.D, u)
-        self.outputs = array_to_dict(y)
+        y_D = np.dot(self.D, u) if np.any(self.D) else 0.0
+        y_C = np.dot(self.C, self.engine.get())
+        self.outputs = array_to_dict(y_C + y_D)
         return max_error_dicts(prev_outputs, self.outputs)
 
 

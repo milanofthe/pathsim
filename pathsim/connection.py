@@ -143,16 +143,19 @@ class Duplex(Connection):
     into an IO-pair.
     """
 
-    def __init__(self, *targets):
+    def __init__(self, source, target):
+        
+        self.source = source if isinstance(source, (list, tuple)) else (source, 0)
+        self.target = target if isinstance(target, (list, tuple)) else (target, 0)
+        
+        #for path length estimation
+        self.targets = [self.target]
 
-        if len(targets) != 2:
-            raise ValueError("Duplex needs exactly two targets for bidirectional connection!")
-
-        self.targets = [trg if isinstance(trg, (list, tuple)) else (trg, 0) for trg in targets]
-
+        #flag to set connection active
+        self._active = True
 
     def __str__(self):
-        return f"Duplex " + " <-> ".join([f"({trg}, {prt})" for trg, prt in self.targets]) 
+        return f"Duplex {self.source} <-> {self.target}" 
 
 
     def update(self):
@@ -162,7 +165,8 @@ class Duplex(Connection):
         """
 
         #unpack the two targets
-        (trg1, prt1), (trg2, prt2) = self.targets
+        (trg1, prt1) = self.target
+        (trg2, prt2) = self.source
 
         #bidirectional data transfer
         trg1.set(prt1, trg2.get(prt2))
