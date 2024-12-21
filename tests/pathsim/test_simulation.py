@@ -36,7 +36,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.blocks, [])
         self.assertEqual(Sim.connections, [])
         self.assertEqual(Sim.dt, 0.01)
-        self.assertEqual(Sim.dt_min, 0.0)
+        self.assertEqual(Sim.dt_min, 1e-16)
         self.assertEqual(Sim.dt_max, None)
         self.assertEqual(str(Sim.Solver()), "SSPRK22")
         self.assertEqual(Sim.tolerance_fpi, 1e-12)

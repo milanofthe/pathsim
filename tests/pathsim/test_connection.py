@@ -205,7 +205,7 @@ class TestDuplex(unittest.TestCase):
     def test_init_none(self):
         
         #default
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             D = Duplex()
 
 
@@ -217,26 +217,30 @@ class TestDuplex(unittest.TestCase):
         D = Duplex(B1, B2)
 
         #test if ports assigned correctly
-        self.assertEqual(D.targets, [(B1, 0), (B2, 0)])
+        self.assertEqual(D.source, (B1, 0))
+        self.assertEqual(D.target, (B2, 0))
 
         #mixed
         D1 = Duplex(B1, (B2, 2))
         D2 = Duplex((B1, 3), B2)
         
         #test if ports assigned correctly
-        self.assertEqual(D1.targets, [(B1, 0), (B2, 2)])
+        self.assertEqual(D1.source, (B1, 0))
+        self.assertEqual(D1.target, (B2, 2))
 
         #test if ports assigned correctly
-        self.assertEqual(D2.targets, [(B1, 3), (B2, 0)])
+        self.assertEqual(D2.source, (B1, 3))
+        self.assertEqual(D2.target, (B2, 0))
 
         #all
         D = Duplex((B1, 4), (B2, 1))
 
         #test if ports assigned correctly
-        self.assertEqual(D.targets, [(B1, 4), (B2, 1)])
+        self.assertEqual(D.source, (B1, 4))
+        self.assertEqual(D.target, (B2, 1))
 
         #test too many
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             D = Duplex((B1, 4), (B2, 1), (B2, 3))
 
 
