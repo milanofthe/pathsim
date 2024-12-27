@@ -34,13 +34,13 @@ class TestExampleLinearFeedback(unittest.TestCase):
         self.tau = 3
         
         #blocks that define the system
-        self.Src = Source(lambda t: int(t>tau))
+        self.Src = Source(lambda t: int(t>self.tau))
         self.Int = Integrator()
         self.Amp = Amplifier(-1)
         self.Add = Adder()
         self.Sco = Scope()
 
-        blocks = [self.Int, self.Amp, self.Add, self.Sco]
+        blocks = [self.Int, self.Src, self.Amp, self.Add, self.Sco]
 
         #the connections between the blocks
         connections = [
@@ -103,6 +103,21 @@ class TestExampleLinearFeedback(unittest.TestCase):
 
         self.assertTrue(time is None)
         self.assertTrue(data is None)        
+
+
+    def test_steadystate(self):
+
+        #run the simulation for some time
+        stats = self.Sim.run(1.1*self.tau, reset=True)
+
+        #force to steady state
+        self.Sim.steadystate(reset=False)
+
+        time, [stp, dta] = self.Sco.read()
+
+        self.assertEqual(dta[-1], 1.0)
+
+
 
 
 

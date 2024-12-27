@@ -35,7 +35,7 @@ dt = 0.05
 x0, v0 = 0.0, 0.0
 
 #driving angular frequency and amplitude
-a, omega = 3.0, 2.0
+a, omega = 15.0, 2.0
 
 #parameters (mass, damping, linear stiffness, nonlienar stiffness)
 m, c, k, d = 1.0, 0.5, 1.0, 1.4
