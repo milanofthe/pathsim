@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pathsim",
-    version="0.5.0",
+    version="0.5.1",
     author="Milan Rother",
     author_email="milan.rother@gmx.de",
     description="A differentiable block based hybrid system simulation framework.",
