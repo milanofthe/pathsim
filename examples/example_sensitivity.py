@@ -10,13 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
-from pathsim.blocks import (
-    Source, 
-    Integrator, 
-    Amplifier, 
-    Adder, 
-    Scope
-    )
+from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
 
 #optimization module
 from pathsim.optim import Value, der

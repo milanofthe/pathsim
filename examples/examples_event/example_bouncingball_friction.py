@@ -11,9 +11,11 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
-from pathsim.solvers import RKBS32
+from pathsim.solvers import RKBS32, ESDIRK32
 
 from pathsim.events import ZeroCrossing
+
+from pathsim.optim import Value, der
 
 
 # BOUNCING BALL SYSTEM ==================================================================
@@ -22,28 +24,40 @@ from pathsim.events import ZeroCrossing
 dt = 0.01
 
 #gravitational acceleration
-g = 9.81
+g = Value(9.81)
 
 #elasticity of bounce
-b = 0.9
+b = Value(0.95)
+
+#mass normalized friction coefficientand
+k = Value(0.2)
 
 #initial values
-x0, v0 = 1, 5
+x0, v0 = Value(1), Value(5)
+
+#newton friction
+def fric(v): 
+    return -k * np.sign(v) * v**2
 
 #blocks that define the system
 Ix = Integrator(x0)     # v -> x
 Iv = Integrator(v0)     # a -> v 
+Fr = Function(fric)     # newton friction
+Ad = Adder()
 Cn = Constant(-g)       # gravitational acceleration
 Sc = Scope(labels=["x", "v"])
 
-blocks = [Ix, Iv, Cn, Sc]
+blocks = [Ix, Iv, Fr, Ad, Cn, Sc]
 
 #the connections between the blocks
 connections = [
-    Connection(Cn, Iv),
-    Connection(Iv, Ix),
+    Connection(Cn, Ad[0]),
+    Connection(Fr, Ad[1]),
+    Connection(Ad, Iv),
+    Connection(Iv, Ix, Fr),
     Connection(Ix, Sc[0])
     ]
+
 
 #event function for zero crossing detection
 def func_evt(blocks, t):
@@ -64,7 +78,7 @@ E1 = ZeroCrossing(
     blocks=[Ix, Iv],    # blocks to watch 
     func_evt=func_evt,                 
     func_act=func_act, 
-    tolerance=1e-4
+    tolerance=1e-3
     )
 
 events = [E1]
@@ -75,15 +89,14 @@ Sim = Simulation(
     connections, 
     events, 
     dt=dt, 
-    dt_max=5*dt,
     log=True, 
     Solver=RKBS32, 
-    tolerance_lte_rel=1e-5, 
-    tolerance_lte_abs=1e-7
+    tolerance_lte_rel=1e-3, 
+    tolerance_lte_abs=1e-4
     )
 
 #run the simulation
-Sim.run(10)
+Sim.run(8)
 
 #read the recordings from the scope
 time, [x] = Sc.read()
@@ -108,5 +121,21 @@ ax.set_ylabel("dt [s]")
 ax.set_xlabel("time [s]")
 ax.grid(True)
 
+
+# derivatives ---------------------------------------------------------------------------
+
+fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
+
+for t in E1: ax.axvline(t, ls="--", c="k")
+
+ax.plot(time, der(x, k), lw=2, label="$dx/dk$")
+ax.plot(time, der(x, g), lw=2, label="$dx/dg$")
+ax.plot(time, der(x, b), lw=2, label="$dx/db$")
+ax.plot(time, der(x, v0), lw=2, label="$dx/dv_0$")
+ax.plot(time, der(x, x0), lw=2, label="$dx/dx_0$")
+
+ax.set_xlabel("time [s]")
+ax.legend()
+ax.grid(True)
 
 plt.show()

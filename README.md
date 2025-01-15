@@ -25,7 +25,13 @@ All features are demonstrated for benchmark problems in the `example` directory.
 The latest release version of pathsim is available on [PyPi](https://pypi.org/project/pathsim/)  and installable via pip:
 
 ```console
-$ pip install pathsim
+pip install pathsim
+```
+
+To install the latest version from github:
+
+```console
+pip install git+https://github.com/milanofthe/pathsim
 ```
 
 ## Example - Harmonic Oscillator
@@ -96,24 +102,24 @@ Sc.plot()
 time, data = Sc.read();
 ```
 
-    2024-12-12 10:49:20,618 - INFO - LOGGING enabled
-    2024-12-12 10:49:20,619 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2024-12-12 10:49:20,619 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-12-12 10:49:20,620 - INFO - RESET, time -> 0.0
-    2024-12-12 10:49:20,620 - INFO - TRANSIENT duration=30.0
-    2024-12-12 10:49:20,621 - INFO - STARTING progress tracker
-    2024-12-12 10:49:20,621 - INFO - progress=0%
-    2024-12-12 10:49:20,625 - INFO - progress=10%
-    2024-12-12 10:49:20,629 - INFO - progress=20%
-    2024-12-12 10:49:20,633 - INFO - progress=30%
-    2024-12-12 10:49:20,637 - INFO - progress=40%
-    2024-12-12 10:49:20,642 - INFO - progress=50%
-    2024-12-12 10:49:20,646 - INFO - progress=60%
-    2024-12-12 10:49:20,650 - INFO - progress=70%
-    2024-12-12 10:49:20,655 - INFO - progress=80%
-    2024-12-12 10:49:20,659 - INFO - progress=90%
-    2024-12-12 10:49:20,663 - INFO - progress=100%
-    2024-12-12 10:49:20,663 - INFO - FINISHED steps(total)=600(600) runtime=42.46ms
+    2024-12-12 11:00:34,406 - INFO - LOGGING enabled
+    2024-12-12 11:00:34,407 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2024-12-12 11:00:34,408 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-12-12 11:00:34,408 - INFO - RESET, time -> 0.0
+    2024-12-12 11:00:34,408 - INFO - TRANSIENT duration=30.0
+    2024-12-12 11:00:34,409 - INFO - STARTING progress tracker
+    2024-12-12 11:00:34,409 - INFO - progress=0%
+    2024-12-12 11:00:34,413 - INFO - progress=10%
+    2024-12-12 11:00:34,418 - INFO - progress=20%
+    2024-12-12 11:00:34,422 - INFO - progress=30%
+    2024-12-12 11:00:34,426 - INFO - progress=40%
+    2024-12-12 11:00:34,430 - INFO - progress=50%
+    2024-12-12 11:00:34,434 - INFO - progress=60%
+    2024-12-12 11:00:34,438 - INFO - progress=70%
+    2024-12-12 11:00:34,442 - INFO - progress=80%
+    2024-12-12 11:00:34,447 - INFO - progress=90%
+    2024-12-12 11:00:34,451 - INFO - progress=100%
+    2024-12-12 11:00:34,451 - INFO - FINISHED steps(total)=600(600) runtime=41.93ms
     
 
 
@@ -181,24 +187,24 @@ Sim.run(3*mu)
 Sc.plot(".-");
 ```
 
-    2024-12-12 10:49:20,743 - INFO - LOGGING enabled
-    2024-12-12 10:49:20,745 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
-    2024-12-12 10:49:20,745 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-12-12 10:49:20,745 - INFO - RESET, time -> 0.0
-    2024-12-12 10:49:20,745 - INFO - TRANSIENT duration=3000
-    2024-12-12 10:49:20,746 - INFO - STARTING progress tracker
-    2024-12-12 10:49:20,751 - INFO - progress=0%
-    2024-12-12 10:49:20,862 - INFO - progress=11%
-    2024-12-12 10:49:20,904 - INFO - progress=20%
-    2024-12-12 10:49:21,877 - INFO - progress=33%
-    2024-12-12 10:49:21,906 - INFO - progress=43%
-    2024-12-12 10:49:21,982 - INFO - progress=50%
-    2024-12-12 10:49:22,890 - INFO - progress=62%
-    2024-12-12 10:49:22,947 - INFO - progress=71%
-    2024-12-12 10:49:23,221 - INFO - progress=80%
-    2024-12-12 10:49:23,952 - INFO - progress=93%
-    2024-12-12 10:49:23,990 - INFO - progress=100%
-    2024-12-12 10:49:23,991 - INFO - FINISHED steps(total)=292(468) runtime=3243.69ms
+    2024-12-12 11:00:34,535 - INFO - LOGGING enabled
+    2024-12-12 11:00:34,535 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
+    2024-12-12 11:00:34,535 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-12-12 11:00:34,536 - INFO - RESET, time -> 0.0
+    2024-12-12 11:00:34,536 - INFO - TRANSIENT duration=3000
+    2024-12-12 11:00:34,537 - INFO - STARTING progress tracker
+    2024-12-12 11:00:34,542 - INFO - progress=0%
+    2024-12-12 11:00:34,650 - INFO - progress=11%
+    2024-12-12 11:00:34,691 - INFO - progress=20%
+    2024-12-12 11:00:35,602 - INFO - progress=33%
+    2024-12-12 11:00:35,631 - INFO - progress=43%
+    2024-12-12 11:00:35,701 - INFO - progress=50%
+    2024-12-12 11:00:36,593 - INFO - progress=62%
+    2024-12-12 11:00:36,648 - INFO - progress=71%
+    2024-12-12 11:00:36,921 - INFO - progress=80%
+    2024-12-12 11:00:37,600 - INFO - progress=93%
+    2024-12-12 11:00:37,639 - INFO - progress=100%
+    2024-12-12 11:00:37,640 - INFO - FINISHED steps(total)=292(468) runtime=3102.85ms
     
 
 
@@ -264,24 +270,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-12-12 10:58:29,279 - INFO - LOGGING enabled
-    2024-12-12 10:58:29,280 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2024-12-12 10:58:29,280 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-12-12 10:58:29,281 - INFO - RESET, time -> 0.0
-    2024-12-12 10:58:29,281 - INFO - TRANSIENT duration=12
-    2024-12-12 10:58:29,282 - INFO - STARTING progress tracker
-    2024-12-12 10:58:29,282 - INFO - progress=0%
-    2024-12-12 10:58:29,302 - INFO - progress=10%
-    2024-12-12 10:58:29,323 - INFO - progress=20%
-    2024-12-12 10:58:29,342 - INFO - progress=30%
-    2024-12-12 10:58:29,363 - INFO - progress=40%
-    2024-12-12 10:58:29,382 - INFO - progress=50%
-    2024-12-12 10:58:29,401 - INFO - progress=60%
-    2024-12-12 10:58:29,420 - INFO - progress=70%
-    2024-12-12 10:58:29,438 - INFO - progress=80%
-    2024-12-12 10:58:29,457 - INFO - progress=90%
-    2024-12-12 10:58:29,476 - INFO - progress=100%
-    2024-12-12 10:58:29,476 - INFO - FINISHED steps(total)=1201(1201) runtime=193.53ms
+    2024-12-12 11:00:37,793 - INFO - LOGGING enabled
+    2024-12-12 11:00:37,795 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2024-12-12 11:00:37,795 - INFO - ALGEBRAIC PATH LENGTH 2
+    2024-12-12 11:00:37,795 - INFO - RESET, time -> 0.0
+    2024-12-12 11:00:37,796 - INFO - TRANSIENT duration=12
+    2024-12-12 11:00:37,796 - INFO - STARTING progress tracker
+    2024-12-12 11:00:37,797 - INFO - progress=0%
+    2024-12-12 11:00:37,815 - INFO - progress=10%
+    2024-12-12 11:00:37,833 - INFO - progress=20%
+    2024-12-12 11:00:37,851 - INFO - progress=30%
+    2024-12-12 11:00:37,868 - INFO - progress=40%
+    2024-12-12 11:00:37,886 - INFO - progress=50%
+    2024-12-12 11:00:37,904 - INFO - progress=60%
+    2024-12-12 11:00:37,921 - INFO - progress=70%
+    2024-12-12 11:00:37,939 - INFO - progress=80%
+    2024-12-12 11:00:37,956 - INFO - progress=90%
+    2024-12-12 11:00:37,973 - INFO - progress=100%
+    2024-12-12 11:00:37,975 - INFO - FINISHED steps(total)=1201(1201) runtime=177.79ms
     
 
 
@@ -393,24 +399,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2024-12-12 10:49:24,502 - INFO - LOGGING enabled
-    2024-12-12 10:49:24,502 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
-    2024-12-12 10:49:24,502 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-12-12 10:49:24,503 - INFO - RESET, time -> 0.0
-    2024-12-12 10:49:24,503 - INFO - TRANSIENT duration=20
-    2024-12-12 10:49:24,503 - INFO - STARTING progress tracker
-    2024-12-12 10:49:24,504 - INFO - progress=0%
-    2024-12-12 10:49:24,507 - INFO - progress=10%
-    2024-12-12 10:49:24,511 - INFO - progress=20%
-    2024-12-12 10:49:24,515 - INFO - progress=30%
-    2024-12-12 10:49:24,519 - INFO - progress=40%
-    2024-12-12 10:49:24,523 - INFO - progress=50%
-    2024-12-12 10:49:24,528 - INFO - progress=60%
-    2024-12-12 10:49:24,533 - INFO - progress=70%
-    2024-12-12 10:49:24,540 - INFO - progress=80%
-    2024-12-12 10:49:24,547 - INFO - progress=90%
-    2024-12-12 10:49:24,558 - INFO - progress=100%
-    2024-12-12 10:49:24,559 - INFO - FINISHED steps(total)=395(496) runtime=54.81ms
+    2024-12-12 11:00:38,147 - INFO - LOGGING enabled
+    2024-12-12 11:00:38,148 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
+    2024-12-12 11:00:38,148 - INFO - ALGEBRAIC PATH LENGTH 1
+    2024-12-12 11:00:38,148 - INFO - RESET, time -> 0.0
+    2024-12-12 11:00:38,148 - INFO - TRANSIENT duration=20
+    2024-12-12 11:00:38,149 - INFO - STARTING progress tracker
+    2024-12-12 11:00:38,149 - INFO - progress=0%
+    2024-12-12 11:00:38,152 - INFO - progress=10%
+    2024-12-12 11:00:38,156 - INFO - progress=20%
+    2024-12-12 11:00:38,160 - INFO - progress=30%
+    2024-12-12 11:00:38,163 - INFO - progress=40%
+    2024-12-12 11:00:38,167 - INFO - progress=50%
+    2024-12-12 11:00:38,173 - INFO - progress=60%
+    2024-12-12 11:00:38,178 - INFO - progress=70%
+    2024-12-12 11:00:38,186 - INFO - progress=80%
+    2024-12-12 11:00:38,192 - INFO - progress=90%
+    2024-12-12 11:00:38,202 - INFO - progress=100%
+    2024-12-12 11:00:38,203 - INFO - FINISHED steps(total)=395(496) runtime=53.55ms
     
 
 
@@ -448,6 +454,19 @@ ax.grid(True)
     
 
 
+## Citation
+
+In case you found this package to be useful in your research, please consider citing.
+
+```
+@misc{pathsim,
+    author={Rother, Milan},
+    title={PathSim: A Time-Domain System Simulation Framework},
+    year={2024},
+    url={https://github.com/milanofthe/pathsim},
+}
+```
+
 ## Contributing and Future
 
 There are some things I want to explore with PathSim eventually, and your help is highly appreciated! If you want to contribute, send me a message and we can discuss how!
@@ -460,8 +479,3 @@ Some of the possible directions for future features are:
 - methods for periodic steady state analysis
 - more extensive testing and validation (as always)
 
-
-
-```python
-
-```
