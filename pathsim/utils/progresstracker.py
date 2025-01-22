@@ -74,7 +74,7 @@ class ProgressTracker:
         #log the runtime
         if self.logger:
             self.logger.info(
-                "FINISHED steps(total)={}({}) runtime={}ms".format(
+                "FINISHED, steps(total)={}({}), runtime={}ms".format(
                     self.stats["successful_steps"],
                     self.stats["total_steps"],
                     round(self.stats["runtime"], 2)
