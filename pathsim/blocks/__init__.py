@@ -4,6 +4,7 @@ from .amplifier import *
 from .function import *
 from .spectrum import *
 from .sources import *
+from .generic import *
 from .multiplier import *
 from .adder import*
 from .scope import *
