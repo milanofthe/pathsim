@@ -69,6 +69,10 @@ class Generic(Block):
 
 
     def set_solver(self, Solver, **solver_args):
+
+        #no dynamic component -> quit
+        if self.func_dyn is None: return
+
         if self.engine is None:
             #initialize the integration engine with right hand side
             self.engine = Solver(self.initial_value, self.func_dyn, self.jac_dyn, **solver_args)
@@ -79,16 +83,20 @@ class Generic(Block):
 
     def update(self, t):
         prev_outputs = self.outputs.copy()
-        x, u = self.engine.get(), dict_to_array(self.inputs)
+        u = dict_to_array(self.inputs)
+        if self.engine: x = self.engine.get()
+        else: x = None
         self.outputs = array_to_dict(self.func_alg(x, u, t))
         return max_error_dicts(prev_outputs, self.outputs)
 
 
     def solve(self, t, dt):
         #advance solution of implicit update equation and update block outputs
+        if not self.engine: return super().solve(t, dt)
         return self.engine.solve(dict_to_array(self.inputs), t, dt)
 
 
     def step(self, t, dt):
         #compute update step with integration engine and update block outputs
+        if not self.engine: return super().step(t, dt)
         return self.engine.step(dict_to_array(self.inputs), t, dt)
