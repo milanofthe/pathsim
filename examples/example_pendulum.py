@@ -22,6 +22,8 @@ from pathsim.blocks import (
 from pathsim.solvers import RKCK54, SSPRK33
 
 
+
+
 # MATHEMATICAL PENDULUM =================================================================
 
 #simulation timestep
@@ -58,5 +60,6 @@ Sim.run(duration=25)
 
 # Plot the results directly from the scope
 Sco.plot(".-")
+
 
 plt.show()
