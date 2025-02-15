@@ -102,24 +102,24 @@ Sc.plot()
 time, data = Sc.read();
 ```
 
-    2024-12-12 11:00:34,406 - INFO - LOGGING enabled
-    2024-12-12 11:00:34,407 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2024-12-12 11:00:34,408 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-12-12 11:00:34,408 - INFO - RESET, time -> 0.0
-    2024-12-12 11:00:34,408 - INFO - TRANSIENT duration=30.0
-    2024-12-12 11:00:34,409 - INFO - STARTING progress tracker
-    2024-12-12 11:00:34,409 - INFO - progress=0%
-    2024-12-12 11:00:34,413 - INFO - progress=10%
-    2024-12-12 11:00:34,418 - INFO - progress=20%
-    2024-12-12 11:00:34,422 - INFO - progress=30%
-    2024-12-12 11:00:34,426 - INFO - progress=40%
-    2024-12-12 11:00:34,430 - INFO - progress=50%
-    2024-12-12 11:00:34,434 - INFO - progress=60%
-    2024-12-12 11:00:34,438 - INFO - progress=70%
-    2024-12-12 11:00:34,442 - INFO - progress=80%
-    2024-12-12 11:00:34,447 - INFO - progress=90%
-    2024-12-12 11:00:34,451 - INFO - progress=100%
-    2024-12-12 11:00:34,451 - INFO - FINISHED steps(total)=600(600) runtime=41.93ms
+    2025-01-15 15:45:42,717 - INFO - LOGGING enabled
+    2025-01-15 15:45:42,721 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2025-01-15 15:45:42,722 - INFO - ALGEBRAIC PATH LENGTH 2
+    2025-01-15 15:45:42,723 - INFO - RESET, time -> 0.0
+    2025-01-15 15:45:42,724 - INFO - TRANSIENT duration=30.0
+    2025-01-15 15:45:42,725 - INFO - STARTING progress tracker
+    2025-01-15 15:45:42,726 - INFO - progress=0%
+    2025-01-15 15:45:42,738 - INFO - progress=10%
+    2025-01-15 15:45:42,749 - INFO - progress=20%
+    2025-01-15 15:45:42,765 - INFO - progress=30%
+    2025-01-15 15:45:42,780 - INFO - progress=40%
+    2025-01-15 15:45:42,798 - INFO - progress=50%
+    2025-01-15 15:45:42,814 - INFO - progress=60%
+    2025-01-15 15:45:42,827 - INFO - progress=70%
+    2025-01-15 15:45:42,843 - INFO - progress=80%
+    2025-01-15 15:45:42,857 - INFO - progress=90%
+    2025-01-15 15:45:42,871 - INFO - progress=100%
+    2025-01-15 15:45:42,872 - INFO - FINISHED steps(total)=600(600) runtime=145.86ms
     
 
 
@@ -187,24 +187,24 @@ Sim.run(3*mu)
 Sc.plot(".-");
 ```
 
-    2024-12-12 11:00:34,535 - INFO - LOGGING enabled
-    2024-12-12 11:00:34,535 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
-    2024-12-12 11:00:34,535 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-12-12 11:00:34,536 - INFO - RESET, time -> 0.0
-    2024-12-12 11:00:34,536 - INFO - TRANSIENT duration=3000
-    2024-12-12 11:00:34,537 - INFO - STARTING progress tracker
-    2024-12-12 11:00:34,542 - INFO - progress=0%
-    2024-12-12 11:00:34,650 - INFO - progress=11%
-    2024-12-12 11:00:34,691 - INFO - progress=20%
-    2024-12-12 11:00:35,602 - INFO - progress=33%
-    2024-12-12 11:00:35,631 - INFO - progress=43%
-    2024-12-12 11:00:35,701 - INFO - progress=50%
-    2024-12-12 11:00:36,593 - INFO - progress=62%
-    2024-12-12 11:00:36,648 - INFO - progress=71%
-    2024-12-12 11:00:36,921 - INFO - progress=80%
-    2024-12-12 11:00:37,600 - INFO - progress=93%
-    2024-12-12 11:00:37,639 - INFO - progress=100%
-    2024-12-12 11:00:37,640 - INFO - FINISHED steps(total)=292(468) runtime=3102.85ms
+    2025-01-15 15:45:43,176 - INFO - LOGGING enabled
+    2025-01-15 15:45:43,177 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
+    2025-01-15 15:45:43,178 - INFO - ALGEBRAIC PATH LENGTH 1
+    2025-01-15 15:45:43,180 - INFO - RESET, time -> 0.0
+    2025-01-15 15:45:43,182 - INFO - TRANSIENT duration=3000
+    2025-01-15 15:45:43,183 - INFO - STARTING progress tracker
+    2025-01-15 15:45:43,202 - INFO - progress=0%
+    2025-01-15 15:45:43,509 - INFO - progress=11%
+    2025-01-15 15:45:43,619 - INFO - progress=20%
+    2025-01-15 15:45:46,065 - INFO - progress=33%
+    2025-01-15 15:45:46,143 - INFO - progress=43%
+    2025-01-15 15:45:46,339 - INFO - progress=50%
+    2025-01-15 15:45:48,723 - INFO - progress=62%
+    2025-01-15 15:45:48,866 - INFO - progress=71%
+    2025-01-15 15:45:49,560 - INFO - progress=80%
+    2025-01-15 15:45:51,394 - INFO - progress=93%
+    2025-01-15 15:45:51,493 - INFO - progress=100%
+    2025-01-15 15:45:51,494 - INFO - FINISHED steps(total)=292(468) runtime=8310.91ms
     
 
 
@@ -270,24 +270,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2024-12-12 11:00:37,793 - INFO - LOGGING enabled
-    2024-12-12 11:00:37,795 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2024-12-12 11:00:37,795 - INFO - ALGEBRAIC PATH LENGTH 2
-    2024-12-12 11:00:37,795 - INFO - RESET, time -> 0.0
-    2024-12-12 11:00:37,796 - INFO - TRANSIENT duration=12
-    2024-12-12 11:00:37,796 - INFO - STARTING progress tracker
-    2024-12-12 11:00:37,797 - INFO - progress=0%
-    2024-12-12 11:00:37,815 - INFO - progress=10%
-    2024-12-12 11:00:37,833 - INFO - progress=20%
-    2024-12-12 11:00:37,851 - INFO - progress=30%
-    2024-12-12 11:00:37,868 - INFO - progress=40%
-    2024-12-12 11:00:37,886 - INFO - progress=50%
-    2024-12-12 11:00:37,904 - INFO - progress=60%
-    2024-12-12 11:00:37,921 - INFO - progress=70%
-    2024-12-12 11:00:37,939 - INFO - progress=80%
-    2024-12-12 11:00:37,956 - INFO - progress=90%
-    2024-12-12 11:00:37,973 - INFO - progress=100%
-    2024-12-12 11:00:37,975 - INFO - FINISHED steps(total)=1201(1201) runtime=177.79ms
+    2025-01-15 15:45:51,783 - INFO - LOGGING enabled
+    2025-01-15 15:45:51,784 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2025-01-15 15:45:51,784 - INFO - ALGEBRAIC PATH LENGTH 2
+    2025-01-15 15:45:51,785 - INFO - RESET, time -> 0.0
+    2025-01-15 15:45:51,785 - INFO - TRANSIENT duration=12
+    2025-01-15 15:45:51,786 - INFO - STARTING progress tracker
+    2025-01-15 15:45:51,788 - INFO - progress=0%
+    2025-01-15 15:45:51,839 - INFO - progress=10%
+    2025-01-15 15:45:51,888 - INFO - progress=20%
+    2025-01-15 15:45:51,937 - INFO - progress=30%
+    2025-01-15 15:45:51,987 - INFO - progress=40%
+    2025-01-15 15:45:52,037 - INFO - progress=50%
+    2025-01-15 15:45:52,088 - INFO - progress=60%
+    2025-01-15 15:45:52,137 - INFO - progress=70%
+    2025-01-15 15:45:52,185 - INFO - progress=80%
+    2025-01-15 15:45:52,234 - INFO - progress=90%
+    2025-01-15 15:45:52,281 - INFO - progress=100%
+    2025-01-15 15:45:52,282 - INFO - FINISHED steps(total)=1201(1201) runtime=494.18ms
     
 
 
@@ -355,25 +355,20 @@ connections = [
     Connection(Ix, Sc)
     ]
 
-#events (zero-crossings) -> ball makes contact
-
 #event function for zero crossing detection
-def func_evt(blocks, t):
-    b1, b2 = blocks
-    i, o, s = b1() #get block inputs, outputs and states
+def func_evt(t):
+    i, o, s = Ix() #get block inputs, outputs and states
     return s
 
 #action function for state transformation
-def func_act(blocks, t):
-    b1, b2 = blocks
-    i1, o1, s1 = b1() 
-    i2, o2, s2 = b2() 
-    b1.engine.set(abs(s1))
-    b2.engine.set(-0.9*s2)
+def func_act(t):
+    i1, o1, s1 = Ix() 
+    i2, o2, s2 = Iv() 
+    Ix.engine.set(abs(s1))
+    Iv.engine.set(-0.9*s2)
 
-#events (zero-crossings) -> ball makes contact
+#event (zero-crossing) -> ball makes contact
 E1 = ZeroCrossing(
-    blocks=[Ix, Iv],    # blocks to watch 
     func_evt=func_evt,                 
     func_act=func_act, 
     tolerance=1e-4
@@ -399,24 +394,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2024-12-12 11:00:38,147 - INFO - LOGGING enabled
-    2024-12-12 11:00:38,148 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
-    2024-12-12 11:00:38,148 - INFO - ALGEBRAIC PATH LENGTH 1
-    2024-12-12 11:00:38,148 - INFO - RESET, time -> 0.0
-    2024-12-12 11:00:38,148 - INFO - TRANSIENT duration=20
-    2024-12-12 11:00:38,149 - INFO - STARTING progress tracker
-    2024-12-12 11:00:38,149 - INFO - progress=0%
-    2024-12-12 11:00:38,152 - INFO - progress=10%
-    2024-12-12 11:00:38,156 - INFO - progress=20%
-    2024-12-12 11:00:38,160 - INFO - progress=30%
-    2024-12-12 11:00:38,163 - INFO - progress=40%
-    2024-12-12 11:00:38,167 - INFO - progress=50%
-    2024-12-12 11:00:38,173 - INFO - progress=60%
-    2024-12-12 11:00:38,178 - INFO - progress=70%
-    2024-12-12 11:00:38,186 - INFO - progress=80%
-    2024-12-12 11:00:38,192 - INFO - progress=90%
-    2024-12-12 11:00:38,202 - INFO - progress=100%
-    2024-12-12 11:00:38,203 - INFO - FINISHED steps(total)=395(496) runtime=53.55ms
+    2025-01-15 15:45:55,775 - INFO - LOGGING enabled
+    2025-01-15 15:45:55,776 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
+    2025-01-15 15:45:55,777 - INFO - ALGEBRAIC PATH LENGTH 1
+    2025-01-15 15:45:55,778 - INFO - RESET, time -> 0.0
+    2025-01-15 15:45:55,779 - INFO - TRANSIENT duration=20
+    2025-01-15 15:45:55,780 - INFO - STARTING progress tracker
+    2025-01-15 15:45:55,782 - INFO - progress=0%
+    2025-01-15 15:45:55,788 - INFO - progress=10%
+    2025-01-15 15:45:55,807 - INFO - progress=20%
+    2025-01-15 15:45:55,838 - INFO - progress=30%
+    2025-01-15 15:45:55,867 - INFO - progress=40%
+    2025-01-15 15:45:55,883 - INFO - progress=50%
+    2025-01-15 15:45:55,903 - INFO - progress=60%
+    2025-01-15 15:45:55,925 - INFO - progress=70%
+    2025-01-15 15:45:55,951 - INFO - progress=80%
+    2025-01-15 15:45:55,977 - INFO - progress=90%
+    2025-01-15 15:45:56,014 - INFO - progress=100%
+    2025-01-15 15:45:56,015 - INFO - FINISHED steps(total)=395(496) runtime=235.02ms
     
 
 
