@@ -38,13 +38,12 @@ class Comparator(Block):
         self.threshold = threshold
         self.tolerance = tolerance
 
-        def func_evt(blocks, t):
-            return blocks[0].inputs[0] - self.threshold
+        def func_evt(t):
+            return self.inputs[0] - self.threshold
 
         #internal event for transition detection
         self.events = [
             ZeroCrossing(
-                blocks=[self], 
                 func_evt=func_evt, 
                 tolerance=tolerance
                 )

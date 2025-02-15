@@ -26,7 +26,6 @@ class Schedule(Event):
         time == next_schedule_time -> event
 
     INPUTS : 
-        blocks    : (list[block]) list of stateful blocks to monitor
         t_start   : (float) starting time for schedule
         t_end     : (float) termination time for schedule
         t_period  : (float) time period of schedule, when events are triggered
@@ -35,13 +34,12 @@ class Schedule(Event):
     """
 
     def __init__(self, 
-                 blocks=None, 
                  t_start=0, 
                  t_end=None, 
                  t_period=1, 
                  func_act=None,      
                  tolerance=1e-4):
-        super().__init__(blocks, None, func_act, tolerance)
+        super().__init__(None, func_act, tolerance)
         
         #schedule times
         self.t_start = t_start

@@ -23,13 +23,12 @@ class SampleHold(Block):
         self.T   = T
         self.tau = tau
 
-        def _sample(blocks, t):
-            blocks[0].outputs = blocks[0].inputs.copy()
+        def _sample(t):
+            self.outputs = self.inputs.copy()
 
         #internal scheduled events
         self.events = [
             Schedule(
-                blocks=[self],
                 t_start=tau,
                 t_period=T,
                 func_act=_sample

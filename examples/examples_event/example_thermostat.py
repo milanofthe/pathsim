@@ -47,33 +47,27 @@ connections = [
 
 #events (zero crossings)
 
-def func_evt_up(blocks, t):
-    b, _ = blocks
-    *_, s = b()
-    return s - Kp
+def func_evt_up(t):
+    *_, x = integ()
+    return x - Kp
 
-def func_act_up(blocks, t):
-    _, h = blocks
-    h.off()
+def func_act_up(t):
+    heater.off()
 
 E1 = ZeroCrossingUp(
-    blocks=[integ, heater], 
     func_evt=func_evt_up, 
     func_act=func_act_up
     )
 
 
-def func_act_down(blocks, t):
-    _, h = blocks
-    h.on()
+def func_act_down(t):
+    heater.on()
  
-def func_evt_down(blocks, t):
-    b, _ = blocks
-    *_, s = b()
-    return s - Km
+def func_evt_down(t):
+    *_, x = integ()
+    return x - Km
 
 E2 = ZeroCrossingDown(
-    blocks=[integ, heater], 
     func_evt=func_evt_down, 
     func_act=func_act_down
     )

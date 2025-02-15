@@ -32,18 +32,15 @@ connections = [
 
 #events (zero crossings)
 
-def func_evt(blocks, t):
-    b = blocks[0]
-    i, o, s = b()
+def func_evt(t):
+    i, o, s = I1()
     return s - 3
 
-def func_act(blocks, t):
-    b = blocks[0]
-    i, o, s = b()
-    b.engine.set(s - 1)
+def func_act(t):
+    i, o, s = I1()
+    I1.engine.set(s - 1)
 
 E1 = ZeroCrossing(
-    blocks=[I1], 
     func_evt=func_evt, 
     func_act=func_act
     )

@@ -48,36 +48,30 @@ connections = [
 
 
 #events to detect
-def func_evt_1(blocks, t):
-    b, *_ = blocks
-    i, o, s = b()
+def func_evt_1(t):
+    i, o, s = VL()
     return s[0] - 4
 
-def func_evt_2(blocks, t):
-    b, *_ = blocks
-    i, o, s = b()
+def func_evt_2(t):
+    i, o, s = VL()
     return s[1] - 4
 
 E1 = ZeroCrossingUp(
-    blocks=[VL],
     func_evt=func_evt_1,
     tolerance=1e-4
     )
 
 E2 = ZeroCrossingUp(
-    blocks=[VL],
     func_evt=func_evt_2,
     tolerance=1e-4
     )
 
 E3 = ZeroCrossingDown(
-    blocks=[VL],
     func_evt=func_evt_1,
     tolerance=1e-4
     )
 
 E4 = ZeroCrossingDown(
-    blocks=[VL],
     func_evt=func_evt_2,
     tolerance=1e-4
     )

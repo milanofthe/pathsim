@@ -23,22 +23,20 @@ class Clock(Block):
         self.T   = T
         self.tau = tau
 
-        def clk_up(blocks, t):
-            blocks[0].outputs[0] = 1
+        def clk_up(t):
+            self.outputs[0] = 1
 
-        def clk_down(blocks, t):
-            blocks[0].outputs[0] = 0
+        def clk_down(t):
+            self.outputs[0] = 0
 
         #internal scheduled events
         self.events = [
             Schedule(
-                blocks=[self],
                 t_start=tau,
                 t_period=T,
                 func_act=clk_up
                 ),
             Schedule(
-                blocks=[self],
                 t_start=tau+T/2,
                 t_period=T,
                 func_act=clk_down
@@ -55,22 +53,20 @@ class SquareWave(Block):
         self.frequency = frequency
         self.phase     = phase
 
-        def sqw_up(blocks, t):
-            blocks[0].outputs[0] = self.amplitude
+        def sqw_up(t):
+            self.outputs[0] = self.amplitude
 
-        def sqw_down(blocks, t):
-            blocks[0].outputs[0] = -self.amplitude
+        def sqw_down(t):
+            self.outputs[0] = -self.amplitude
 
         #internal scheduled events
         self.events = [
             Schedule(
-                blocks=[self],
                 t_start=1/frequency * phase/360,
                 t_period=1/frequency,
                 func_act=sqw_up
                 ),
             Schedule(
-                blocks=[self],
                 t_start=1/frequency * (phase/360 + 0.5),
                 t_period=1/frequency,
                 func_act=sqw_down
@@ -86,14 +82,12 @@ class Step(Block):
         self.amplitude = amplitude
         self.tau = tau
 
-        def stp_up(blocks, t):
-            for b in blocks:
-                b.outputs[0] = self.amplitude
+        def stp_up(t):
+            self.outputs[0] = self.amplitude
 
         #internal scheduled event
         self.events = [
             Schedule(
-                blocks=[self],
                 t_start=tau,
                 t_period=tau,
                 t_end=3*tau/2,

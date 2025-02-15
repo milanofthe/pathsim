@@ -21,18 +21,17 @@ class Condition(Event):
     Subclass of base 'Event' that triggers if the event function evaluates to 'True', 
     i.e. the condition is satisfied.
     
-    Monitors blocks by evaluating an event function (func_evt) with boolean output.
+    Monitors system state by evaluating an event function (func_evt) with boolean output.
 
-        func_evt(blocks, time) -> event?
+        func_evt(time) -> event?
 
-    If an event is detected, some action (func_act) is performed on the blocks.
+    If an event is detected, some action (func_act) is performed on the system state.
 
-        func_evt(blocks, time) == True -> event -> func_act(blocks, time)
+        func_evt(time) == True -> event -> func_act(time)
 
     INPUTS : 
-        blocks    : (list[block]) list of stateful blocks to monitor
-        func_evt  : (callable: blocks, time -> float) event function, where zeros are events
-        func_act  : (callable: blocks, time -> None) action function for event resolution 
+        func_evt  : (callable: time -> float) event function, where zeros are events
+        func_act  : (callable: time -> None) action function for event resolution 
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
@@ -45,7 +44,7 @@ class Condition(Event):
         """
 
         #evaluate event function
-        is_event = self.func_evt(self.blocks, t)
+        is_event = self.func_evt(t)
 
         #discrete condition -> no interpolation (always resolve directly)
         return is_event, is_event, 1.0

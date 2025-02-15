@@ -21,19 +21,18 @@ class ZeroCrossing(Event):
     Subclass of base 'Event' that triggers if the event function crosses zero. 
     This is a bidirectional zero-crossing detector. 
     
-    Monitors blocks by evaluating an event function (func_evt) with scalar output and 
+    Monitors system state by evaluating an event function (func_evt) with scalar output and 
     testing for zero crossings (sign changes). 
 
-        func_evt(blocks, time) -> event?
+        func_evt(time) -> event?
 
-    If an event is detected, some action (func_act) is performed on the states of the blocks.
+    If an event is detected, some action (func_act) is performed on the system state.
 
-        func_evt(blocks, time) == 0 -> event -> func_act(blocks, time)
+        func_evt(time) == 0 -> event -> func_act(time)
 
     INPUTS : 
-        blocks    : (list[block]) list of stateful blocks to monitor
-        func_evt  : (callable: blocks, time -> float) event function, where zeros are events
-        func_act  : (callable: blocks, time -> None) action function for event resolution 
+        func_evt  : (callable: time -> float) event function, where zeros are events
+        func_act  : (callable: time -> None) action function for event resolution 
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
@@ -43,7 +42,7 @@ class ZeroCrossing(Event):
         """
 
         #evaluate event function
-        result = self.func_evt(self.blocks, t)
+        result = self.func_evt(t)
             
         #unpack history
         _result, _t = self._history
@@ -81,7 +80,7 @@ class ZeroCrossingUp(Event):
         """
             
         #evaluate event function
-        result = self.func_evt(self.blocks, t)
+        result = self.func_evt(t)
             
         #unpack history
         _result, _t = self._history
@@ -119,7 +118,7 @@ class ZeroCrossingDown(Event):
         """
         
         #evaluate event function
-        result = self.func_evt(self.blocks, t)
+        result = self.func_evt(t)
             
         #unpack history
         _result, _t = self._history

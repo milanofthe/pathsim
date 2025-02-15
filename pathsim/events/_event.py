@@ -18,13 +18,13 @@ class Event:
     """
     This is the base class of the event handling system.
     
-    Monitors blocks by evaluating an event function (func_evt) with scalar output.
+    Monitors system state by evaluating an event function (func_evt) with scalar output.
 
-        func_evt(blocks, time) -> event?
+        func_evt(time) -> event?
 
     If an event is detected, some action (func_act) is performed on the states of the blocks.
 
-        func_evt(blocks, time) == True -> event -> func_act(blocks, time)
+        func_evt(time) == True -> event -> func_act(time)
 
     The methods are structured such that event detection can be separated from event 
     resolution. This is required for adaptive timestep solvers to approach the event 
@@ -34,21 +34,16 @@ class Event:
     than that, no action will be triggered. For general state monitoring.    
 
     INPUTS : 
-        blocks    : (list[block]) list of stateful blocks to monitor
-        func_evt  : (callable: blocks, time -> float) event function, where zeros are events
-        func_act  : (callable: blocks, time -> None) action function for event resolution 
+        func_evt  : (callable: time -> float) event function, where zeros are events
+        func_act  : (callable: time -> None) action function for event resolution 
         tolerance : (float) tolerance to check if detection is close to actual event
     """
 
     def __init__(self, 
-                 blocks=None, 
                  func_evt=None, 
                  func_act=None, 
                  tolerance=1e-4):
-        
-        #blocks to monitor for events
-        self.blocks = [] if blocks is None else blocks
-    
+            
         #event detection function
         self.func_evt = func_evt
 
@@ -114,7 +109,7 @@ class Event:
             t : (float) evaluation time for buffering history
         """
         if self.func_evt is not None:
-            self._history = self.func_evt(self.blocks, t), t
+            self._history = self.func_evt(t), t
 
 
     def detect(self, t):
@@ -154,4 +149,4 @@ class Event:
 
         #action function for event resolution
         if self.func_act is not None:
-            self.func_act(self.blocks, t)
+            self.func_act(t)
