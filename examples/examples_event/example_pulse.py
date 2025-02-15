@@ -28,7 +28,7 @@ tau1 = 1.0
 tau2 = 1.04
 
 #blocks that define the system
-Src = Source(lambda t: int(t-tau1>0) - int(t-tau2>0))
+Src = Source(lambda t: int(t-tau1>=0) - int(t-tau2>=0))
 Lpf = ButterworthLowpassFilter(B, n)
 Sco = Scope(labels=["source", "output"])
 

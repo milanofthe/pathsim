@@ -1,0 +1,95 @@
+#########################################################################################
+##
+##                  PathSim event detection example with thermostat
+##
+#########################################################################################
+
+# IMPORTS ===============================================================================
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from pathsim import Simulation, Connection
+from pathsim.blocks import Integrator, Constant, Scope, Amplifier, Adder
+from pathsim.solvers import RKBS32
+from pathsim.events import ZeroCrossingUp, ZeroCrossingDown
+
+
+# THERMOSTAT ============================================================================
+
+
+#system parameters
+a = 0.3
+T = 10
+H = 5
+Kp = 25
+Km = 23
+
+#blocks that define the system
+sco = Scope(labels=["temperature", "heater"])
+integ = Integrator(T)
+feedback = Amplifier(-a)
+heater = Constant(H)
+ambient = Constant(a*T)
+add = Adder()
+
+#blocks of the main system
+blocks = [sco, integ, feedback, heater, ambient, add]
+
+#the connections between the blocks in the main system
+connections = [
+    Connection(integ, feedback, sco),
+    Connection(feedback, add),
+    Connection(heater, add[1], sco[1]),
+    Connection(ambient, add[2]),
+    Connection(add, integ)
+    ]
+
+#events (zero crossings)
+
+def func_evt_up(blocks, t):
+    b, _ = blocks
+    *_, s = b()
+    return s - Kp
+
+def func_act_up(blocks, t):
+    _, h = blocks
+    h.off()
+
+E1 = ZeroCrossingUp(
+    blocks=[integ, heater], 
+    func_evt=func_evt_up, 
+    func_act=func_act_up
+    )
+
+
+def func_act_down(blocks, t):
+    _, h = blocks
+    h.on()
+ 
+def func_evt_down(blocks, t):
+    b, _ = blocks
+    *_, s = b()
+    return s - Km
+
+E2 = ZeroCrossingDown(
+    blocks=[integ, heater], 
+    func_evt=func_evt_down, 
+    func_act=func_act_down
+    )
+
+events = [E1, E2]
+
+#initialize simulation with the blocks, connections, timestep and logging enabled
+Sim = Simulation(blocks, connections, events, dt=0.1, dt_max=0.05, log=True, Solver=RKBS32)
+
+#run simulation for some number of seconds
+Sim.run(30)
+
+sco.plot(lw=2)
+
+#thermostat switching events
+for e in E1: sco.ax.axvline(e, ls="--", c="k")
+for e in E2: sco.ax.axvline(e, ls="-.", c="k")
+
+plt.show()

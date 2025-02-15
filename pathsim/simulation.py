@@ -146,9 +146,6 @@ class Simulation:
         #find length of longest algebraic path
         self._algebraic_path_length()
 
-        #assemble lists of active system components
-        self._assemble_active()
-
 
     def __str__(self):
         # return "\n".join([str(block) for block in self.blocks])
@@ -327,21 +324,6 @@ class Simulation:
             self.iterations_min = self.path_length
 
 
-    # block management ------------------------------------------------------------
-
-    def _assemble_active(self):
-        """
-        Assemble lists of internal active blocks, connections and events. 
-        'active' means that their internal flag is set and they should be 
-        updated by the 'Simulation' class. 
-
-        Otherwise they are ignored in the simulation loop.
-        """
-        self._active_blocks      = [blk for blk in self.blocks      if blk]
-        self._active_connections = [con for con in self.connections if con]
-        self._active_events      = [evt for evt in self.events      if evt]
-
-
     # solver management -----------------------------------------------------------
 
     def _set_solver(self, Solver=None, **solver_args):
@@ -424,7 +406,11 @@ class Simulation:
 
         #iterate all event managers
         detected_events = []
-        for event in self._active_events:
+        for event in self.events:
+
+            #skip inactive events
+            if not event:
+                continue
             
             #check if an event is detected
             detected, close, ratio = event.detect(t)
@@ -465,26 +451,27 @@ class Simulation:
         for _iteration in range(self.iterations_min):
                         
             #update connenctions (data transfer)
-            for connection in self._active_connections:
-                connection.update()
+            for connection in self.connections:
+                if connection: connection.update()
 
             #update all blocks
-            for block in self._active_blocks:
-                block.update(t)
+            for block in self.blocks:
+                if block: block.update(t)
 
         #perform fixed-point iterations until convergence with error checking
         for iteration in range(self.iterations_min, self.iterations_max):
                         
             #update connenctions (data transfer)
-            for connection in self._active_connections:
-                connection.update()
+            for connection in self.connections:
+                if connection: connection.update()
 
             #update instant time blocks
             max_error = 0.0
-            for block in self._active_blocks:
-                error = block.update(t)
-                if error > max_error:
-                    max_error = error
+            for block in self.blocks:
+                if block:
+                    error = block.update(t)
+                    if error > max_error:
+                        max_error = error
 
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
@@ -533,10 +520,11 @@ class Simulation:
 
             #advance solution of implicit solver
             max_error = 0.0
-            for block in self._active_blocks:
-                error = block.solve(t, dt)
-                if error > max_error:
-                    max_error = error
+            for block in self.blocks:
+                if block:
+                    error = block.solve(t, dt)
+                    if error > max_error:
+                        max_error = error
 
             #check for convergence (only error)
             if max_error <= self.tolerance_fpi:
@@ -563,9 +551,6 @@ class Simulation:
         #reset the simulation before solving
         if reset:
             self.reset()
-
-        #assemble lists of active system components
-        self._assemble_active()
 
         #current solver class
         _solver = self.Solver
@@ -615,8 +600,8 @@ class Simulation:
         when local truncation error is too large and timestep has to be 
         retaken with smaller timestep.
         """
-        for block in self._active_blocks:
-            block.revert()
+        for block in self.blocks:
+            if block: block.revert()
 
 
     def _sample(self, t):
@@ -628,8 +613,8 @@ class Simulation:
         INPUTS:
             t : (float) time where to sample
         """
-        for block in self._active_blocks:
-            block.sample(t)
+        for block in self.blocks:
+            if block: block.sample(t)
 
 
     def _buffer(self, t, dt):
@@ -648,12 +633,12 @@ class Simulation:
         """
 
         #buffer internal states of stateful blocks
-        for block in self._active_blocks:
-            block.buffer(dt)
+        for block in self.blocks:
+            if block: block.buffer(dt)
 
         #buffer states for event detection (with timestamp)
-        for event in self._active_events:
-            event.buffer(t)
+        for event in self.events:
+            if event: event.buffer(t)
 
 
     def _step(self, t, dt):
@@ -684,7 +669,12 @@ class Simulation:
         success, max_error_norm, relevant_scales = True, 0.0, []
 
         #step blocks and get error estimates if available
-        for block in self._active_blocks:
+        for block in self.blocks:
+
+            #skip inactive blocks
+            if not block:
+                continue
+
             ss, err_norm, scl = block.step(t, dt)
             
             #check solver stepping success
@@ -732,9 +722,6 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
-
-        #assemble lists of active system components
-        self._assemble_active()
 
         #buffer internal states for solvers and event system
         self._buffer(self.time, dt)
@@ -821,9 +808,6 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
-
-        #assemble lists of active system components
-        self._assemble_active()
 
         #buffer internal states for solvers and event system
         self._buffer(self.time, dt)

@@ -312,7 +312,7 @@ class GEAR52A(GEAR):
     yields the lower truncation error. This balances the stability of the lower 
     order methods with the accuracy of higher order methods. 
 
-    Previous solutions and the vadiable timestep BDF coefficients are used 
+    Previous solutions and the variable timestep BDF coefficients are used 
     to estimate a lower and a higher order solution from the solution of the 
     timestepping method. This gives two separate estimates for the local 
     tuncation error.
