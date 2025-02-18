@@ -28,7 +28,6 @@ class TestEvent(unittest.TestCase):
 
         #test default initialization
         e = Event()
-        self.assertEqual(e.blocks, [])
         self.assertEqual(e.func_evt, None)
         self.assertEqual(e.func_act, None)
         self.assertEqual(e.tolerance, 1e-4)

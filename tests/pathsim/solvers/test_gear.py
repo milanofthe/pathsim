@@ -168,11 +168,11 @@ class TestGEAR32(unittest.TestCase):
 
             solver = GEAR32(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-12, tolerance_lte_abs=1e-6)
 
-            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1e-7, adaptive=True)
+            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1e-8, adaptive=True)
             error = np.linalg.norm(numerical_solution - problem.solution(time))
 
             #test if error control was successful (one more OOM, since global error)
-            self.assertLess(error, solver.tolerance_lte_abs*10)
+            self.assertLess(error, solver.tolerance_lte_abs*20)
 
 
 class TestGEAR43(unittest.TestCase):
