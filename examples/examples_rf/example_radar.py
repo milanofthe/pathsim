@@ -81,7 +81,7 @@ connections = [
 #initialize simulation
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
-#run simulation for one up chirp period
+#run simulation for one chirp period
 Sim.run(T)
 
 #plot the recording of the scope
