@@ -9,6 +9,7 @@ PathSim: A Time-Domain System Simulation Framework
 PathSim is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems similar to Matlab Simulink but in Python!
 
 Key Features:
+
 *   **Hot-swappable** blocks and solvers during simulation
 *   Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
 *   Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
@@ -39,14 +40,7 @@ To install PathSim, use pip:
 A Simple Example
 ----------------
 
-Here's a simple example of a linear feedback system translated to be simulated with PathSim:
-
-
-.. raw:: html
-    <img width=500 src="https://github.com/milanofthe/pathsim/blob/master/README_files/linear_feedback_blockdiagram.png">
-
-
-The block diagramm can be translated to a netlist by using the blocks and the connection class provided by PathSim:
+Here's a simple example of a linear feedback system, simulated with PathSim. The block diagramm can be translated to a netlist by using the blocks and the connection class provided by PathSim:
 
 .. code-block:: python
 
