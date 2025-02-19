@@ -1,0 +1,8 @@
+numpy
+matplotlib
+scipy
+sphinx
+sphinx-rtd-theme
+myst-parser
+sphinx-autoapi
+sphinx-copybutton
