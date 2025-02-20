@@ -26,3 +26,5 @@ The numerical integrators, available in PathSim are structured like this:
    :width: 700
    :align: center
    :alt: hierarchy of PathSim numerical integrators
+
+They are implemented from scratch to expose their interfaces to the PathSim simulation loop. The integrators are validated against reference problems in the test suite. 

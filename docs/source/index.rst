@@ -6,7 +6,7 @@
 PathSim: Differentiable System Simulation 
 =========================================
 
-PathSim is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
+**PathSim** is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
 
 Key Features:
 
@@ -19,29 +19,60 @@ Key Features:
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Documentation:
 
-   api
-   structure
-   examples
+Quickstart
+----------
 
-
-
-
-Getting Started
----------------
-
-To install PathSim, use pip:
+1. Install PathSim with pip:
 
 .. code-block:: bash
 
     pip install pathsim
 
 
-A Simple Example
-----------------
+2. Build and simulate a system unsing blocks and connections:
+
+.. code-block:: python
+    
+    import numpy as np
+
+    from pathsim import Simulation, Connection
+    from pathsim.blocks import Source, Integrator, Scope
+
+    Sr = Source(np.sin)
+    In = Integrator()
+    Sc = Scope()
+
+    Sim = Simulation(
+        blocks=[Sr, In, Sc], 
+        connections=[
+            Connection(Sr, In),
+            Connection(Sr, Sc[0]),
+            Connection(In, Sc[1]),
+            ], 
+        dt=0.01 
+        )
+
+    Sim.run(10)
+
+    Sc.plot()
+
+
+Exploration
+-----------
+
+This documentation is structured in the following way:
+
+.. toctree::
+   :maxdepth: 1
+
+   api
+   structure
+   examples
+
+
+An Example
+----------
 
 Here's a simple example of a linear feedback system, simulated with PathSim. 
 
