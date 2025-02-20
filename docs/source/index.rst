@@ -3,28 +3,31 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-PathSim: A Time-Domain System Simulation Framework
-==================================================
+PathSim: Differentiable System Simulation 
+=========================================
 
-PathSim is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems similar to Matlab Simulink but in Python!
+PathSim is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
 
 Key Features:
 
-*   **Hot-swappable** blocks and solvers during simulation
-*   Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
-*   Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
-*   **Modular and hierarchical** modeling with (nested) subsystems
-*   **Event handling** system to detect and resolve discrete events (zero-crossing detection)
-*   Automatic differentiation for **fully differentiable** system simulations
-*   **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
+- **Hot-swappable** blocks and solvers during simulation
+- Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
+- Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
+- **Modular and hierarchical** modeling with (nested) subsystems
+- **Event handling** system to detect and resolve discrete events (zero-crossing detection)
+- Automatic differentiation for **fully differentiable** system simulations
+- **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: Documentation:
 
    api
+   structure
    examples
+
+
 
 
 Getting Started
@@ -40,7 +43,15 @@ To install PathSim, use pip:
 A Simple Example
 ----------------
 
-Here's a simple example of a linear feedback system, simulated with PathSim. The block diagramm can be translated to a netlist by using the blocks and the connection class provided by PathSim:
+Here's a simple example of a linear feedback system, simulated with PathSim. 
+
+.. image:: figures/linear_feedback_blockdiagram.png
+   :width: 700
+   :align: center
+   :alt: block diagram of linear feedback system
+
+
+The block diagramm can be translated to a netlist by using the blocks and the connection class provided by PathSim:
 
 .. code-block:: python
 
@@ -78,7 +89,14 @@ Here's a simple example of a linear feedback system, simulated with PathSim. The
     #run the simulation for some time
     Sim.run(4*tau)
 
+    #plot the results from the scope
+    Sco.plot()
 
+
+.. image:: figures/linear_feedback_result.png
+   :width: 500
+   :align: center
+   :alt: simulation result of linear feedback system
 
 
 Indices and tables
