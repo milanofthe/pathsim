@@ -18,6 +18,7 @@ Key Features:
 - Automatic differentiation for **fully differentiable** system simulations
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
+The source code can be found in the `GitHub repository <https://github.com/milanofthe/pathsim>`.
 
 
 Quickstart
@@ -58,13 +59,13 @@ Quickstart
     Sc.plot()
 
 
-Exploration
------------
+Table of Contents
+-----------------
 
 This documentation is structured in the following way:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    api
    structure
