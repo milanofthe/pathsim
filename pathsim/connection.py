@@ -114,6 +114,12 @@ class Connection:
         ----------
         other : Connection
             other connection to check 
+
+        Returns
+        -------
+        overwrites : bool
+            True if port is overwritten, False otherwise
+
         """
 
         #catch self checking
@@ -154,6 +160,7 @@ class Duplex(Connection):
 
         #flag to set connection active
         self._active = True
+        
 
     def __str__(self):
         return f"Duplex {self.source} <-> {self.target}" 

@@ -17,20 +17,25 @@ from ._event import Event
 # EVENT MANAGER CLASS ===================================================================
 
 class Schedule(Event):
-    """
-    Subclass of base 'Event' that triggers dependent on the evaluation time. 
+    """Subclass of base 'Event' that triggers dependent on the evaluation time. 
     
     Monitors time in every timestep and triggers periodically (period). This event
     does not have an event function as the event condition only depends on time.
 
         time == next_schedule_time -> event
-
-    INPUTS : 
-        t_start   : (float) starting time for schedule
-        t_end     : (float) termination time for schedule
-        t_period  : (float) time period of schedule, when events are triggered
-        func_act  : (callable: blocks, time -> None) action function for event resolution 
-        tolerance : (float) tolerance to check if detection is close to actual event
+    
+    Parameters
+    ----------
+    t_start : float
+        starting time for schedule
+    t_end : float
+        termination time for schedule
+    t_period : float
+        time period of schedule, when events are triggered
+    func_act : callable
+        action function for event resolution 
+    tolerance : float
+        tolerance to check if detection is close to actual event
     """
 
     def __init__(self, 
@@ -55,21 +60,33 @@ class Schedule(Event):
 
 
     def buffer(self, t):
+        """Buffer the current time to history
+        
+        Parameters
+        ----------
+        t : float
+            buffer time
+        """
         self._history = None, t
 
 
     def detect(self, t):
-        """
-        Check if the event condition is satisfied, i.e. if the time period 
-        switch is within the current timestep.
-
-        INPUTS :
-            t : (float) evaluation time for detection 
+        """Check if the event condition is satisfied, i.e. if the 
+        time period switch is within the current timestep.
         
-        RETURNS : 
-            detected : (bool) was an event detected?
-            close    : (bool) are we close to the event?
-            ratio    : (float) interpolated event location ratio in timestep
+        Parameters
+        ----------
+        t : float
+            evaluation time for detection 
+        
+        Returns
+        -------
+        detected : bool
+            was an event detected?
+        close : bool
+            are we close to the event?
+        ratio : float
+            interpolated event location ratio in timestep
         """
 
         #get next period break

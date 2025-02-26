@@ -17,8 +17,7 @@ from ._event import Event
 # EVENT MANAGER CLASS ===================================================================
 
 class Condition(Event):
-    """
-    Subclass of base 'Event' that triggers if the event function evaluates to 'True', 
+    """Subclass of base 'Event' that triggers if the event function evaluates to 'True', 
     i.e. the condition is satisfied.
     
     Monitors system state by evaluating an event function (func_evt) with boolean output.
@@ -28,11 +27,6 @@ class Condition(Event):
     If an event is detected, some action (func_act) is performed on the system state.
 
         func_evt(time) == True -> event -> func_act(time)
-
-    INPUTS : 
-        func_evt  : (callable: time -> float) event function, where zeros are events
-        func_act  : (callable: time -> None) action function for event resolution 
-        tolerance : (float) tolerance to check if detection is close to actual event
     """
 
     def detect(self, t):
@@ -41,6 +35,20 @@ class Condition(Event):
 
         The event function is not differentiable, so this event always resolves 
         within the current timestep
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for detection 
+        
+        Returns
+        -------
+        detected : bool
+            was an event detected?
+        close : bool
+            are we close to the event?
+        ratio : float
+            interpolated event location as ratio of timestep
         """
 
         #evaluate event function

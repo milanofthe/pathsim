@@ -17,8 +17,7 @@ from ._event import Event
 # EVENT MANAGER CLASS ===================================================================
 
 class ZeroCrossing(Event):
-    """
-    Subclass of base 'Event' that triggers if the event function crosses zero. 
+    """Subclass of base 'Event' that triggers if the event function crosses zero. 
     This is a bidirectional zero-crossing detector. 
     
     Monitors system state by evaluating an event function (func_evt) with scalar output and 
@@ -29,16 +28,33 @@ class ZeroCrossing(Event):
     If an event is detected, some action (func_act) is performed on the system state.
 
         func_evt(time) == 0 -> event -> func_act(time)
-
-    INPUTS : 
-        func_evt  : (callable: time -> float) event function, where zeros are events
-        func_act  : (callable: time -> None) action function for event resolution 
-        tolerance : (float) tolerance to check if detection is close to actual event
+    
+    Parameters
+    ----------
+    func_evt : callable
+        event function, where zeros are events
+    func_act : callable
+        action function for event resolution 
+    tolerance : float
+        tolerance to check if detection is close to actual event
     """
 
     def detect(self, t):
-        """
-        Evaluate the event function and check for zero-crossings
+        """Evaluate the event function and check for zero-crossings
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time for detection 
+        
+        Returns
+        -------
+        detected : bool
+            was an event detected?
+        close : bool
+            are we close to the event?
+        ratio : float
+            interpolated event location as ratio of timestep
         """
 
         #evaluate event function
@@ -68,15 +84,27 @@ class ZeroCrossing(Event):
 
 
 class ZeroCrossingUp(Event):
-    """
-    Modification of standard 'ZeroCrossing' event where events are only triggered 
+    """Modification of standard 'ZeroCrossing' event where events are only triggered 
     if the event function changes sign from negative to positive (up). Also called
     unidirectional zero-crossing.
     """
 
     def detect(self, t):
-        """
-        Evaluate the event function and check for zero-crossings
+        """Evaluate the event function and check for zero-crossings
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for detection 
+        
+        Returns
+        -------
+        detected : bool
+            was an event detected?
+        close : bool
+            are we close to the event?
+        ratio : float
+            interpolated event location as ratio of timestep
         """
             
         #evaluate event function
@@ -106,15 +134,27 @@ class ZeroCrossingUp(Event):
 
 
 class ZeroCrossingDown(Event):
-    """
-    Modification of standard 'ZeroCrossing' event where events are only triggered 
+    """Modification of standard 'ZeroCrossing' event where events are only triggered 
     if the event function changes sign from positive to negative (down). Also called
     unidirectional zero-crossing.
     """
 
     def detect(self, t):
-        """
-        Evaluate the event function and check for zero-crossings
+        """Evaluate the event function and check for zero-crossings
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time for detection 
+        
+        Returns
+        -------
+        detected : bool
+            was an event detected?
+        close : bool
+            are we close to the event?
+        ratio : float
+            interpolated event location as ratio of timestep
         """
         
         #evaluate event function

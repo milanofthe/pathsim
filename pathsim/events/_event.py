@@ -15,8 +15,7 @@ import numpy as np
 # EVENT MANAGER CLASS ===================================================================
 
 class Event:
-    """
-    This is the base class of the event handling system.
+    """This is the base class of the event handling system.
     
     Monitors system state by evaluating an event function (func_evt) with scalar output.
 
@@ -33,10 +32,23 @@ class Event:
     If no action function (func_act) is specified, the event will only be detected but other 
     than that, no action will be triggered. For general state monitoring.    
 
-    INPUTS : 
-        func_evt  : (callable: time -> float) event function, where zeros are events
-        func_act  : (callable: time -> None) action function for event resolution 
-        tolerance : (float) tolerance to check if detection is close to actual event
+    Parameters
+    ----------
+    func_evt : callable
+        event function, where zeros are events
+    func_act : callable
+        action function for event resolution 
+    tolerance : float
+        tolerance to check if detection is close to actual event
+
+    Attributes
+    ----------
+    _history : tuple[None, float], tuple[float, float], tuple[bool, float]
+        history of event function evaluation after buffering
+    _times : list[float]
+        tracking the event times
+    _active : bool
+        flag that sets event active or inactive
     """
 
     def __init__(self, 
@@ -70,6 +82,12 @@ class Event:
     def __len__(self):
         """
         Return the number of detected (or rather resolved) events.
+        
+        Returns
+        -------
+        length : int
+            number of events detected
+
         """
         return len(self._times)
 
@@ -102,46 +120,56 @@ class Event:
 
 
     def buffer(self, t):
-        """
-        Buffer the event function evaluation before the timestep is taken and the evaluation time. 
+        """Buffer the event function evaluation before the timestep is 
+        taken and the evaluation time. 
         
-        INPUTS :
-            t : (float) evaluation time for buffering history
+        Parameters
+        ----------
+        t : float
+            evaluation time for buffering history
         """
         if self.func_evt is not None:
             self._history = self.func_evt(t), t
 
 
     def detect(self, t):
-        """
-        Evaluate the event function and decide if an event has occured. 
+        """Evaluate the event function and decide if an event has occured. 
         Can also use the history of the event function evaluation from 
         before the timestep.
 
-        INPUTS :
-            t : (float) evaluation time for detection 
-
-        NOTE : 
-            This does nothing and needs to be implemented for specific events!!!
+        Notes
+        -----
+        This does nothing and needs to be implemented for specific events!!!
+    
+        Parameters
+        ----------
+        t : float
+            evaluation time for detection 
         
-        RETURNS : 
-            detected : (bool) was an event detected?
-            close    : (bool) are we close to the event?
-            ratio    : (float) interpolated event location ratio in timestep
+        Returns
+        -------
+        detected : bool
+            was an event detected?
+        close : bool
+            are we close to the event?
+        ratio : float
+            interpolated event location as ratio of timestep
         """
 
         return False, False, 1.0
         
 
     def resolve(self, t):
-        """
-        Resolve the event and record the time (t) at which it occurs. 
+        """Resolve the event and record the time (t) at which it occurs. 
+        
         Resolves event using the action function (func_act) if it is defined. 
 
         Otherwise this just marks the location of the event in time.
 
-        INPUTS :
-            t : (float) evaluation time for event resolution
+        Parameters
+        ----------
+        t : float
+            evaluation time for event resolution 
         """
 
         #save the time of event resolution
