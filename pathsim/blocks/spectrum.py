@@ -22,8 +22,7 @@ from ..utils.realtimeplotter import RealtimePlotter
 # BLOCKS FOR DATA RECORDING =============================================================
 
 class Spectrum(Block):
-    """
-    Block for fourier spectrum analysis (basically a spectrum analyzer), computes 
+    """Block for fourier spectrum analysis (basically a spectrum analyzer), computes 
     continuous time running fourier transform (RFT) of the incoming signal.
     
     A time threshold can be set by 't_wait' to start recording data only after the 
@@ -45,18 +44,24 @@ class Spectrum(Block):
     complex fourier coefficient to the frequency 'omega'. The ODE is integrated using the 
     numerical integration engine of the block.
 
-    NOTE : 
-        This block is very slow! But it is valuable for long running simulations 
-        with few evaluation frequencies, where just FFT'ing the time series data 
-        wouldnt be efficient OR if only the evaluation at weirdly spaced frequencies 
-        is required. Otherwise its more efficient to just do an FFT on the time 
-        series recording.
+    Notes
+    -----
+    This block is very slow! But it is valuable for long running simulations 
+    with few evaluation frequencies, where just FFT'ing the time series data 
+    wouldnt be efficient OR if only the evaluation at weirdly spaced frequencies 
+    is required. Otherwise its more efficient to just do an FFT on the time 
+    series recording.
     
-    INPUTS : 
-        freq   : (list or array) list of evaluation frequencies for RFT
-        t_wait : (float) t_wait time before starting RFT
-        alpha  : (float) exponential forgetting factor for realtime spectrum
-        labels : (list of strings) labels for the inputs
+    Parameters
+    ----------
+    freq : array[float] 
+        list of evaluation frequencies for RFT, can be arbitrarily spaced
+    t_wait : float 
+        wait time before starting RFT
+    alpha : float
+        exponential forgetting factor for realtime spectrum
+    labels : list[str]
+        labels for the inputs
     """
 
     def __init__(self, freq=[], t_wait=0.0, alpha=0.0, labels=[]):
@@ -84,6 +89,15 @@ class Spectrum(Block):
 
 
     def set_solver(self, Solver, **solver_args):
+        """set the internal numerical integrator for the RFT
+
+        Parameters
+        ----------
+        Solver : Solver
+            numerical integration solver class
+        solver_args : dict
+            parameters for solver initialization
+        """
         
         if self.engine is None:
             
@@ -116,6 +130,16 @@ class Spectrum(Block):
 
 
     def read(self):
+        """Read the recorded spectrum
+
+        Returns
+        -------
+        freq : array[float]
+            evaluation frequencies
+        spec : array[complex]
+            complex spectrum
+        """
+
         #just return zeros if no engine initialized
         if self.engine is None:
             return self.freq, [np.zeros_like(self.freq)]*len(self.inputs)
@@ -143,6 +167,21 @@ class Spectrum(Block):
 
 
     def solve(self, t, dt):
+        """advance solution of implicit update equation of the solver
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+
+        Returns
+        ------- 
+        error : float
+            solver residual norm
+        """
+
         #effective time for integration
         _t = t - self.t_wait
         if _t > dt:
@@ -158,6 +197,25 @@ class Spectrum(Block):
 
 
     def step(self, t, dt):
+        """compute timestep update with integration engine
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+    
+        Returns
+        ------- 
+        success : bool
+            step was successful
+        error : float
+            local truncation error from adaptive integrators
+        scale : float
+            timestep rescale from adaptive integrators
+        """
+
         #effective time for integration
         _t = t - self.t_wait
         if _t > dt:
@@ -173,10 +231,17 @@ class Spectrum(Block):
 
 
     def plot(self, *args, **kwargs):
-        """
-        Directly create a plot of the recorded data for visualization.
+        """Directly create a plot of the recorded data for visualization.
+
         The 'fig' and 'ax' objects are accessible as attributes of the 'Spectrum' instance 
         from the outside for saving, or modification, etc.
+
+        Parameters
+        ----------
+        args : tuple
+            args for ax.plot
+        kwargs : dict
+            kwargs for ax.plot
         """
 
         #just return 'None' if no engine initialized
@@ -233,8 +298,12 @@ class Spectrum(Block):
 
 
     def save(self, path="spectrum.csv"):
-        """
-        save the recording of the spectrum to a csv file        
+        """Save the recording of the spectrum to a csv file        
+        
+        Parameters
+        ----------
+        path : str
+            path where to save the recording as a csv file
         """
 
         #check path ending
@@ -271,22 +340,26 @@ class Spectrum(Block):
 
 
 class RealtimeSpectrum(Spectrum):
-
-    """
-    An extension of the 'Spectrum' block that also initializes a realtime plotter that 
+    """An extension of the 'Spectrum' block that also initializes a realtime plotter that 
     creates an interactive plotting window while the simulation is running. 
     
     Otherwise implements the same functionality as the regular 'Spectrum' block.
-    
-    NOTE :
-        Due to the plotting being relatively expensive, including this block slows down 
-        the simulation significantly but may still be valuable for debugging and testing.
+        
+    Notes
+    -----
+    Due to the plotting being relatively expensive, including this block slows down 
+    the simulation significantly but may still be valuable for debugging and testing.
 
-    INPUTS : 
-        freq      : (list or array) list of evaluation frequencies for RFT
-        t_wait    : (float) t_wait time before starting RFT
-        alpha     : (float) exponential forgetting factor for realtime spectrum
-        labels    : (list of strings) labels for the inputs
+    Parameters
+    ----------
+    freq : array[float] 
+        list of evaluation frequencies for RFT, can be arbitrarily spaced
+    t_wait : float 
+        wait time before starting RFT
+    alpha : float
+        exponential forgetting factor for realtime spectrum
+    labels : list[str]
+        labels for the inputs
     """
 
     def __init__(self, freq=[], t_wait=0.0, alpha=0.0, labels=[]):
@@ -300,6 +373,25 @@ class RealtimeSpectrum(Spectrum):
 
 
     def step(self, t, dt):
+        """compute timestep update with integration engine
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+    
+        Returns
+        ------- 
+        success : bool
+            step was successful
+        error : float
+            local truncation error from adaptive integrators
+        scale : float
+            timestep rescale from adaptive integrators
+        """
+
         #effective time for integration
         _t = t - self.t_wait
         if _t > dt:

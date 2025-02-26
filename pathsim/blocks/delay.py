@@ -17,12 +17,13 @@ from ..utils.adaptivebuffer import AdaptiveBuffer
 # BLOCKS ================================================================================
 
 class Delay(Block):
-    """
-    delays the input signal by a time constant 'tau' in seconds
-    using an adaptive rolling buffer
-
-    INPUTS : 
-        tau : (float) delay time constant for 
+    """Delays the input signal by a time constant 'tau' in seconds
+    using an adaptive rolling buffer.
+    
+    Parameters
+    ----------
+    tau : float
+        delay time constant
     """
 
     def __init__(self, tau=1e-3):
@@ -50,8 +51,17 @@ class Delay(Block):
 
 
     def update(self, t):
-        """
-        Evaluation of the buffer at different times.
+        """Evaluation of the buffer at different times.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
         """
 
         #retrieve value from buffer
@@ -61,9 +71,13 @@ class Delay(Block):
 
 
     def sample(self, t):
-        """
-        Sample input values and time of sampling 
+        """Sample input values and time of sampling 
         and add them to the buffer.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for sampling
         """
 
         #add new value to buffer

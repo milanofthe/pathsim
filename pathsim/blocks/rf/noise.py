@@ -19,16 +19,25 @@ from .._block import Block
 # NOISE SOURCE BLOCKS ===================================================================
 
 class WhiteNoise(Block):
-    """
-    White noise source with uniform spectral density. Samples from distribution 
+    """White noise source with uniform spectral density. Samples from distribution 
     with 'sampling_rate' and holds noise values constant for time bins.
 
     If no 'sampling_rate' (None) is specified, every simulation timestep 
     gets a new noise values. This is the default setting.
+    
+    Parameters
+    ----------
+    spectral_density : float
+        noise spectral density
+    sampling_rate : float, None
+        frequency with which the noise is sampled 
 
-    INPUTS : 
-        spectral_density : (float) noise spectral density
-        sampling_rate    : (float or None) frequency with which the noise is sampled 
+    Attributes
+    ----------
+    sigma : float
+        sqrt of spectral density -> signal amplitude
+    n_samples : int
+        internal sample counter 
     """
 
     def __init__(self, spectral_density=1, sampling_rate=None):
@@ -58,15 +67,27 @@ class WhiteNoise(Block):
 
 
 class PinkNoise(Block):
-    """
-    Pink noise (1/f) source using the Voss-McCartney algorithm.
+    """Pink noise (1/f) source using the Voss-McCartney algorithm.
     Samples from distribution with 'sampling_rate' and generates noise
     with a power spectral density inversely proportional to frequency.
+    
+    Parameters
+    ----------
+    spectral_density : float
+        Desired noise spectral density
+    num_octaves : int
+        Number of octaves (levels of randomness)
+    sampling_rate : float, None
+        Frequency with which the noise is sampled 
 
-    INPUTS : 
-        spectral_density : (float) Desired noise spectral density
-        num_octaves      : (int) Number of octaves (levels of randomness)
-        sampling_rate    : (float or None) Frequency with which the noise is sampled 
+    Attributes
+    ----------
+    sigma : float
+        sqrt of spectral density normalized to number of octaves
+    n_samples : int
+        internal sample counter 
+    octaves_values : array[float]
+        internal random numbers for octaves in the Voss-McCartney algorithm
     """
 
     def __init__(self, spectral_density=1, num_octaves=16, sampling_rate=None):
@@ -122,6 +143,24 @@ class PinkNoise(Block):
 
 
 class SinusoidalPhaseNoiseSource(Block):
+
+    """Sinusoidal source with cumulative and white phase noise
+
+    Parameters
+    ----------
+    frequency : float
+        frequency of the sinusoid
+    amplitude : float
+        amplitude of the sinusoid
+    phase : float
+        phase of the sinusoid
+    sig_cum : float
+        weight for cumulative phase noise contribution
+    sig_white : float
+        weight for white phase noise contribution
+    samplig_rate : float
+        number of samples per unit time for the internal RNG 
+    """
 
     def __init__(self, frequency=1, amplitude=1, phase=0, sig_cum=0, sig_white=0, sampling_rate=10):
         super().__init__()

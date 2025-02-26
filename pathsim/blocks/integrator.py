@@ -22,12 +22,14 @@ from ..utils.utils import (
 # BLOCKS ================================================================================
 
 class Integrator(Block):
-    """
-    Integrates the input signal using a numerical integration engine. 
-    The block is inherently MIMO capable.
+    """Integrates the input signal using a numerical integration engine. 
+    
+    The Integrator block is inherently MIMO capable.
 
-    INPUTS : 
-        initial_value : (float or array) initial value of integrator
+    Parameters
+    ----------
+    initial_value : float, array
+        initial value of integrator
     """
 
     def __init__(self, initial_value=0.0):
@@ -42,25 +44,78 @@ class Integrator(Block):
 
 
     def set_solver(self, Solver, **solver_args):
+        """set the internal numerical integrator
+
+        Parameters
+        ----------
+        Solver : Solver
+            numerical integration solver class
+        solver_args : dict
+            parameters for solver initialization
+        """
+
         #change solver if already initialized
         if self.engine is not None:
             self.engine = Solver.cast(self.engine, **solver_args)
             return #quit early
+            s
         #initialize the integration engine
         def _f(x, u, t): return u
         self.engine = Solver(self.initial_value, _f, None, **solver_args)
         
 
     def update(self, t):
+        """update system equation fixed point loop
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
+        """
         self.outputs = array_to_dict(self.engine.get())
         return 0.0
 
 
     def solve(self, t, dt):
-        #advance solution of implicit update equation and update block outputs
+        """advance solution of implicit update equation of the solver
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+
+        Returns
+        ------- 
+        error : float
+            solver residual norm
+        """
         return self.engine.solve(dict_to_array(self.inputs), t, dt)
 
 
     def step(self, t, dt):
-        #compute update step with integration engine and update block outputs
+        """compute timestep update with integration engine
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+    
+        Returns
+        ------- 
+        success : bool
+            step was successful
+        error : float
+            local truncation error from adaptive integrators
+        scale : float
+            timestep rescale from adaptive integrators
+        """
         return self.engine.step(dict_to_array(self.inputs), t, dt)

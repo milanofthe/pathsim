@@ -20,23 +20,56 @@ from .._block import Block
 # HELPER FUNCTIONS ======================================================================
 
 def gaussian(t, f_max):
-    """
-    gaussian pulse with its maximum at t=0
+    """gaussian pulse with its maximum at t=0
+    
+    Parameters
+    ----------
+    t : float
+        evaluation time
+    f_max : float
+        maximum frequency component of gaussian
+
+    Returns
+    -------
+    out : float
+        gaussian value
     """
     tau = 0.5 / f_max
     return np.exp(-(t/tau)**2)
 
 
 def triangle_wave(t, f):
-    """
-    triangle wave with amplitude '1' and frequency 'f'
+    """triangle wave with amplitude '1' and frequency 'f'
+
+    Parameters
+    ----------
+    t : float
+        evaluation time
+    f : float
+        trig wave frequency
+
+    Returns
+    -------
+    out : float
+        trig wave value
     """
     return 2 * abs(t*f - np.floor(t*f + 0.5)) - 1
 
 
 def square_wave(t, f):
-    """
-    square wave with amplitude '1' and frequency 'f'
+    """square wave with amplitude '1' and frequency 'f'
+    
+    Parameters
+    ----------
+    t : float
+        evaluation time
+    f : float
+        square wave frequency
+
+    Returns
+    -------
+    out : float
+        square wave value
     """
     return np.sign(np.sin(2*np.pi*f*t))
 

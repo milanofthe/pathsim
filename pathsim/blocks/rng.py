@@ -23,8 +23,15 @@ class RNG(Block):
     If no 'sampling_rate' (None) is specified, every 
     simulation timestep gets a random value.
 
-    INPUTS : 
-        sampling_rate : (float or None) number of samples per second
+    Parameters
+    ----------
+    sampling_rate : float, None
+        number of random samples per time unit
+
+    Attributes
+    ----------
+    n_samples : int
+        internal sample counter
     """
 
     def __init__(self, sampling_rate=None):
@@ -48,8 +55,12 @@ class RNG(Block):
 
 
     def sample(self, t):
-        """
-        Sample from a normal distribution after successful timestep.
+        """Sample from a normal distribution after successful timestep.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for sampling
         """
         if (self.sampling_rate is None or 
             self.n_samples < t * self.sampling_rate):

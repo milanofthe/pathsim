@@ -25,6 +25,18 @@ class Multiplier(Block):
     """
 
     def update(self, t):
+        """update system equation fixed point loop
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            relative error to previous iteration for convergence control
+        """
         prev_output = self.outputs[0]
         self.outputs[0] = np.prod(dict_to_array(self.inputs), axis=0)
         return abs(prev_output - self.outputs[0])

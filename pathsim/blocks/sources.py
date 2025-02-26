@@ -11,27 +11,24 @@
 
 # IMPORTS ===============================================================================
 
-import numpy as np
-
 from ._block import Block
-
-from ..utils.utils import (
-    dict_to_array, 
-    array_to_dict
-    )
 
 
 
 # INPUT BLOCKS ==========================================================================
 
 class Constant(Block):
-    """
-    produces a constant output signal (SISO)
-    (same as 'Source' with func=lambda t:value, 
-    therefore one could argue that it is redundant)
+    """Produces a constant output signal (SISO)
+        
+    Notes
+    -----
+    same as 'Source' with func=lambda t:value, 
+    therefore one could argue that it is redundant
 
-    INPUTS : 
-        value : (float) constant defining block output
+    Parameters
+    ----------
+    value : float
+        constant defining block output
     """
 
     def __init__(self, value=1):
@@ -39,18 +36,44 @@ class Constant(Block):
         self.value = value
 
     def update(self, t):
-        #set output with value (DC)
+        """update system equation fixed point loop
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            relative error to previous iteration for convergence control
+        """
         self.outputs[0] = self.value
         return 0.0
 
 
 class Source(Block):
-    """
-    Generator, or source that produces an arbitrary time 
-    dependent output, defined by the func (callable).
+    """Source that produces an arbitrary time dependent output, 
+    defined by the func (callable).
 
-    INPUTS : 
-        func : (callable) function defining time dependent block output
+    Example
+    -------
+
+    For example a ramp:
+    ```pyhon
+    S = Source(lambda t : t)
+    ```
+    
+    or a simple sinusoid 
+    ```python
+    import numpy as np
+    S = Source(np.sin)
+    ```
+
+    Parameters
+    ---------- 
+    func : callable
+        function defining time dependent block output
     """
 
     def __init__(self, func=lambda t: 1):
@@ -63,7 +86,19 @@ class Source(Block):
 
 
     def update(self, t):
-        #set output with internal function definition at time (t)
+        """update system equation fixed point loop 
+        by evaluating the internal function 'func'
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            relative error to previous iteration for convergence control
+        """
         self.outputs[0] = self.func(t)
         return 0.0
         

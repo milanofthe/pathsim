@@ -21,18 +21,19 @@ from ..lti import StateSpace
 # FILTER BLOCKS =========================================================================
 
 class ButterworthLowpassFilter(StateSpace):
-
-    """
-    Direct implementation of a low pass butterworth filter block.
+    """Direct implementation of a low pass butterworth filter block.
 
     Follows the same structure as the 'StateSpace' block in the 
     'pathsim.blocks' module. The numerator and denominator of the 
     filter transfer function are generated and then the transfer 
     function is realized as a state space model. 
     
-    INPUTS : 
-        Fc : (float) corner frequency of the filter in [Hz]
-        n  : (int) filter order
+    Parameters
+    ----------
+    Fc : float
+        corner frequency of the filter in [Hz]
+    n : int
+        filter order
     """
 
     def __init__(self, Fc, n):
@@ -49,18 +50,19 @@ class ButterworthLowpassFilter(StateSpace):
 
 
 class ButterworthHighpassFilter(StateSpace):
-
-    """
-    Direct implementation of a high pass butterworth filter block.
+    """Direct implementation of a high pass butterworth filter block.
 
     Follows the same structure as the 'StateSpace' block in the 
     'pathsim.blocks' module. The numerator and denominator of the 
     filter transfer function are generated and then the transfer 
     function is realized as a state space model. 
     
-    INPUTS : 
-        Fc : (float) corner frequency of the filter in [Hz]
-        n  : (int) filter order
+    Parameters
+    ----------
+    Fc : float
+        corner frequency of the filter in [Hz]
+    n : int
+        filter order
     """
 
     def __init__(self, Fc, n):
@@ -77,18 +79,19 @@ class ButterworthHighpassFilter(StateSpace):
 
 
 class ButterworthBandpassFilter(StateSpace):
-
-    """
-    Direct implementation of a bandpass butterworth filter block.
+    """Direct implementation of a bandpass butterworth filter block.
 
     Follows the same structure as the 'StateSpace' block in the 
     'pathsim.blocks' module. The numerator and denominator of the 
     filter transfer function are generated and then the transfer 
     function is realized as a state space model. 
     
-    INPUTS : 
-        Fc : (list, tuple) corner frequencies of the filter in [Hz]
-        n  : (int) filter order
+    Parameters
+    ----------
+    Fc : float
+        corner frequency of the filter in [Hz]
+    n : int
+        filter order
     """
 
     def __init__(self, Fc, n):
@@ -108,18 +111,19 @@ class ButterworthBandpassFilter(StateSpace):
 
 
 class ButterworthBandstopFilter(StateSpace):
-
-    """
-    Direct implementation of a bandstop butterworth filter block.
+    """Direct implementation of a bandstop butterworth filter block.
 
     Follows the same structure as the 'StateSpace' block in the 
     'pathsim.blocks' module. The numerator and denominator of the 
     filter transfer function are generated and then the transfer 
     function is realized as a state space model. 
     
-    INPUTS : 
-        Fc : (list, tuple) corner frequencies of the filter in [Hz]
-        n  : (int) filter order
+    Parameters
+    ----------
+    Fc : tuple[float], list[float]
+        corner frequencies (left, right) of the filter in [Hz]
+    n : int
+        filter order
     """
 
     def __init__(self, Fc, n):
@@ -140,8 +144,7 @@ class ButterworthBandstopFilter(StateSpace):
 
 class AllpassFilter(StateSpace):
 
-    """
-    Direct implementation of an Allpass filter using Pade approximants. 
+    """Direct implementation of an Allpass filter using Pade approximants. 
     The transfer function of the ideal allpass is
     
         H(s) = exp(-sT) = exp(-sT/2) / exp(sT/2)
@@ -150,9 +153,12 @@ class AllpassFilter(StateSpace):
     of the exponential to create a n-th order LTI statespace model that is 
     used for the numerical integration internally.
     
-    INPUTS : 
-        T : (float) time delay of the allpass in [s]
-        n : (int) order of the pade approximation
+    Parameters
+    ----------
+    T : float
+        time delay of the allpass in [s]
+    n : int
+        order of the pade approximation
     """
 
     def __init__(self, T, n=1):

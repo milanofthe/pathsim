@@ -22,8 +22,7 @@ from ..utils.utils import (
 # MIMO BLOCKS ===========================================================================
 
 class Function(Block):
-    """
-    Arbitrary MIMO function block, defined by a callable object, 
+    """Arbitrary MIMO function block, defined by a callable object, 
     i.e. function or lambda expression.
 
     The function can have multiple arguments that are then provided 
@@ -33,26 +32,35 @@ class Function(Block):
     and for multi output, the aoutputs have to be provided as a 
     tuple or list. 
 
-    INPUTS : 
-        func : (callable) MIMO function that defines block IO behaviour
+    Parameters
+    ---------- 
+    func : callable
+        MIMO function that defines block IO behaviour
 
-    NOTE :
-        If the outputs are provided as a single numpy array,
-        they are considered a single output
+    Notes
+    -----
+    If the outputs are provided as a single numpy array,
+    they are considered a single output
     
-    EXAMPLE :
-        consider the function: 
-            func = lambda a, b, c : (a**2, a*b, b/c)
-        then the input channels of the block are assigned 
-        to the function arguments following this scheme:
-            inputs[0] -> a
-            inputs[1] -> b
-            inputs[2] -> c
-        and the function outputs are assigned to the 
-        output channels of the block in the same way:
-            a**2 -> outputs[0]
-            a*b  -> outputs[1]
-            b/c  -> outputs[2]
+    Example
+    -------
+    consider the function: 
+
+        func = lambda a, b, c : (a**2, a*b, b/c)
+
+    then the input channels of the block are assigned 
+    to the function arguments following this scheme:
+
+        inputs[0] -> a
+        inputs[1] -> b
+        inputs[2] -> c
+
+    and the function outputs are assigned to the 
+    output channels of the block in the same way:
+
+        a**2 -> outputs[0]
+        a*b  -> outputs[1]
+        b/c  -> outputs[2]
     """
 
     def __init__(self, func=lambda x: x):
@@ -67,6 +75,18 @@ class Function(Block):
 
 
     def update(self, t):
+        """update system equation fixed point loop
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            relative error to previous iteration for convergence control
+        """
 
         #compute function output
         output = self.func(*dict_to_array(self.inputs))

@@ -31,10 +31,19 @@ class Scope(Block):
     time is larger then the specified waiting time, i.e. 't - t_wait > 0'. 
     This is useful for recording data only after all the transients have settled.
     
-    INPUTS : 
-        sampling_rate : (int or None) number of samples per second, default is every timestep
-        t_wait        : (float) wait time before starting recording
-        labels        : (list of strings) labels for the scope traces, and for the csv
+    Parameters
+    ----------
+    sampling_rate : int, None
+        number of samples per time unit, default is every timestep
+    t_wait : float
+        wait time before starting recording, optional
+    labels : list[str]
+        labels for the scope traces, and for the csv, optional
+
+    Attributes
+    ----------
+    recording : dict
+        recording, where key is time, and value the recorded values
     """
 
     def __init__(self, sampling_rate=None, t_wait=0.0, labels=[]):
@@ -66,9 +75,15 @@ class Scope(Block):
 
 
     def read(self):
-        """
-        return the recorded time domain data and the 
+        """Return the recorded time domain data and the 
         corresponding time for all input ports
+
+        Returns
+        -------
+        time : array[float]
+            recorded time points
+        data : array[obj]
+            recorded data points
         """
 
         #just return 'None' if no recording available
@@ -81,9 +96,13 @@ class Scope(Block):
 
 
     def sample(self, t):
-        """
-        Sample the data from all inputs, and overwrites existing timepoints, 
+        """Sample the data from all inputs, and overwrites existing timepoints, 
         since we use a dict for storing the recorded data.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for sampling
         """
         if t >= self.t_wait: 
             if (self.sampling_rate is None or 
@@ -92,10 +111,17 @@ class Scope(Block):
 
 
     def plot(self, *args, **kwargs):
-        """
-        Directly create a plot of the recorded data for quick visualization and debugging.
+        """Directly create a plot of the recorded data for quick visualization and debugging.
+
         The 'fig' and 'ax' objects are accessible as attributes of the 'Scope' instance 
         from the outside for saving, or modification, etc.
+
+        Parameters
+        ----------
+        args : tuple
+            args for ax.plot
+        kwargs : dict
+            kwargs for ax.plot
         """ 
 
         #just return 'None' if no recording available
@@ -151,8 +177,12 @@ class Scope(Block):
 
 
     def save(self, path="scope.csv"):
-        """
-        Save the recording of the scope to a csv file.
+        """Save the recording of the scope to a csv file.
+
+        Parameters
+        ----------
+        path : str
+            path where to save the recording as a csv file
         """
 
         #check path ending
@@ -183,39 +213,55 @@ class Scope(Block):
 
 
 class RealtimeScope(Scope):
-    """
-    An extension of the 'Scope' block that also initializes a realtime plotter 
+    """An extension of the 'Scope' block that also initializes a realtime plotter 
     that creates an interactive plotting window while the simulation is running.
 
     Otherwise implements the same functionality as the regular 'Scope' block.
 
-    NOTE : 
-        Due to the plotting being relatively expensive, including this block 
-        slows down the simulation significantly but may still be valuable for 
-        debugging and testing.
+    Notes
+    -----
+    Due to the plotting being relatively expensive, including this block 
+    slows down the simulation significantly but may still be valuable for 
+    debugging and testing.
 
-    INPUTS : 
-        sampling_rate : (int or None) number of samples per second, default is every timestep
-        t_wait        : (float) wait time before starting recording
-        labels        : (list of strings) labels for the scope traces, and for the csv
-        max_samples   : (int or None) number of samples for realtime display, all per default
+    Parameters
+    ----------
+    sampling_rate : int, None
+        number of samples time unit, default is every timestep
+    t_wait : float
+        wait time before starting recording
+    labels : list[str] 
+        labels for the scope traces, and for the csv
+    max_samples : int, None
+        number of samples for realtime display, all per default
+
+    Attributes
+    ----------
+    plotter : RealtimePlotter
+        instance of a RealtimePlotter
     """
 
     def __init__(self, sampling_rate=None, t_wait=0.0, labels=[], max_samples=None):
         super().__init__(sampling_rate, t_wait, labels)
 
         #initialize realtime plotter
-        self.plotter = RealtimePlotter(max_samples=max_samples, 
-                                       update_interval=0.1, 
-                                       labels=labels, 
-                                       x_label="time [s]", 
-                                       y_label="")
+        self.plotter = RealtimePlotter(
+            max_samples=max_samples, 
+            update_interval=0.1, 
+            labels=labels, 
+            x_label="time [s]", 
+            y_label=""
+            )
 
 
     def sample(self, t):
-        """
-        Sample the data from all inputs, and overwrites existing timepoints, 
+        """Sample the data from all inputs, and overwrites existing timepoints, 
         since we use a dict for storing the recorded data.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for sampling
         """
         if (self.sampling_rate is None or t * self.sampling_rate > len(self.recording)):
             values = dict_to_array(self.inputs)

@@ -37,9 +37,12 @@ class StateSpace(Block):
     where A, B, C and D are the state space matrices, x is the state, 
     u the input and y the output vector.
 
-    INPUTS : 
-        A, B, C, D    : (numpy arrays) state space matrices
-        initial_value : (array of floars) initial state / initial condition
+    Parameters
+    ----------
+    A, B, C, D : array
+        state space matrices
+    initial_value : array, None
+        initial state / initial condition
     """
 
     def __init__(self, 
@@ -74,6 +77,15 @@ class StateSpace(Block):
 
     
     def set_solver(self, Solver, **solver_args):
+        """set the internal numerical integrator
+
+        Parameters
+        ----------
+        Solver : Solver
+            numerical integration solver class
+        solver_args : dict
+            parameters for solver initialization
+        """
         
         if self.engine is None:
 
@@ -92,7 +104,18 @@ class StateSpace(Block):
 
 
     def update(self, t):
-        #compute implicit balancing update 
+        """update system equation fixed point loop
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            relative error to previous iteration for convergence control
+        """
         prev_outputs = self.outputs.copy()
         u = dict_to_array(self.inputs)
         y_D = np.dot(self.D, u) if np.any(self.D) else 0.0
@@ -102,18 +125,47 @@ class StateSpace(Block):
 
 
     def solve(self, t, dt):
-        #advance solution of implicit update equation and update outputs
+        """advance solution of implicit update equation of the solver
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+
+        Returns
+        ------- 
+        error : float
+            solver residual norm
+        """
         return self.engine.solve(dict_to_array(self.inputs), t, dt)
 
 
     def step(self, t, dt):
-        #compute update step with integration engine and update outputs
+        """compute timestep update with integration engine
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+    
+        Returns
+        ------- 
+        success : bool
+            step was successful
+        error : float
+            local truncation error from adaptive integrators
+        scale : float
+            timestep rescale from adaptive integrators
+        """
         return self.engine.step(dict_to_array(self.inputs), t, dt)
 
 
 class TransferFunction(StateSpace):
-    """
-    This block integrates a LTI (MIMO for pole residue) transfer function.
+    """This block integrates a LTI (MIMO for pole residue) transfer function.
 
     The transfer function is defined in pole-residue form
     
@@ -134,11 +186,15 @@ class TransferFunction(StateSpace):
     is handled the same as the 'StateSpace' block, where A, B, C and D 
     are the state space matrices, x is the internal state, u the input and 
     y the output vector.
-
-    INPUTS : 
-        Poles    : (list or array of scalars) transfer function poles
-        Residues : (list or array of scalars or arrays) transfer function residues
-        Const    : (scalar or array) constant term of transfer function
+        
+    Parameters
+    ----------
+    Poles : array
+        transfer function poles
+    Residues : array
+        transfer function residues
+    Const : array, float
+        constant term of transfer function
     """
 
     def __init__(self, 

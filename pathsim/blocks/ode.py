@@ -33,10 +33,14 @@ class ODE(Block):
     The block utilizes the integration engine to solve the ODE 
     by integrating the 'func', which is the right hand side function.
 
-    INPUTS : 
-        func          : (callable object) right hand side function of ODE
-        initial_value : (array of floats) initial state / initial condition
-        jac           : (callable or None) jacobian of 'func' or 'None'
+    Parameters
+    ----------
+    func : callable
+        right hand side function of ODE
+    initial_value : array[float]
+        initial state / initial condition
+    jac : callable, None
+        jacobian of 'func' or 'None'
     """
 
     def __init__(self,
@@ -61,6 +65,15 @@ class ODE(Block):
 
 
     def set_solver(self, Solver, **solver_args):
+        """set the internal numerical integrator
+
+        Parameters
+        ----------
+        Solver : Solver
+            numerical integration solver class
+        solver_args : dict
+            parameters for solver initialization
+        """
         if self.engine is None:
             #initialize the integration engine with right hand side
             self.engine = Solver(self.initial_value, self.func, self.jac, **solver_args)
@@ -70,15 +83,58 @@ class ODE(Block):
         
 
     def update(self, t):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
+        """
         self.outputs = array_to_dict(self.engine.get())
         return 0
 
 
     def solve(self, t, dt):
-        #advance solution of implicit update equation and update block outputs
+        """advance solution of implicit update equation of the solver
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+
+        Returns
+        ------- 
+        error : float
+            solver residual norm
+        """
         return self.engine.solve(dict_to_array(self.inputs), t, dt)
 
 
     def step(self, t, dt):
-        #compute update step with integration engine and update block outputs
+        """compute timestep update with integration engine
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+    
+        Returns
+        ------- 
+        success : bool
+            step was successful
+        error : float
+            local truncation error from adaptive integrators
+        scale : float
+            timestep rescale from adaptive integrators
+        """
         return self.engine.step(dict_to_array(self.inputs), t, dt)
