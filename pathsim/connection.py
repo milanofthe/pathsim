@@ -17,62 +17,64 @@
 # CLASSES ===============================================================================
 
 class Connection:
-    """
-    Class to handle input-output relations of blocks by connecting them (directed graph) 
+    """Class to handle input-output relations of blocks by connecting them (directed graph) 
     and transfering data from the output port of the source block to the input port of 
     the target block.
 
     The default ports for connection are (0) -> (0), since these are the default inputs 
     that are used in the SISO blocks.
 
-    EXAMPLE:
+    Example
+    -------
+    Lets assume we have two generic blocks 
 
-        Lets assume we have two generic blocks 
+        B1 = Block...
+        B2 = Block...
 
-            B1 = Block...
-            B2 = Block...
+    that we want to connect. We initialize a 'Connection' with the blocks directly 
+    as the arguments if we want to connect the default ports (0) -> (0) 
 
-        that we want to connect. We initialize a 'Connection' with the blocks directly 
-        as the arguments if we want to connect the default ports (0) -> (0) 
+        C = Connection(B1, B2)
 
-            C = Connection(B1, B2)
+    which is a connection from block 'B1' to 'B2'. If we want to explicitly declare 
+    the input and output ports we can do that by giving tuples (lists also work) as 
+    the arguments
+ 
+        C = Connection((B1, 0), (B2, 0))
 
-        which is a connection from block 'B1' to 'B2'. If we want to explicitly declare 
-        the input and output ports we can do that by giving tuples (lists also work) as 
-        the arguments
-     
-            C = Connection((B1, 0), (B2, 0))
+    which is exactly the default port setup. Connecting output port (1) of 'B1' to 
+    the default input port (0) of 'B2' do
 
-        which is exactly the default port setup. Connecting output port (1) of 'B1' to 
-        the default input port (0) of 'B2' do
+        C = Connection((B1, 1), (B2, 0))
 
-            C = Connection((B1, 1), (B2, 0))
+    or just
 
-        or just
+        C = Connection((B1, 1), B2).
 
-            C = Connection((B1, 1), B2).
+    The 'Connection' class also supports multiple targets for a single source. 
+    This is specified by just adding more blocks with their respective ports into 
+    the constructor like this:
 
-        The 'Connection' class also supports multiple targets for a single source. 
-        This is specified by just adding more blocks with their respective ports into 
-        the constructor like this:
+        C = Connection(B1, (B2, 0), (B2, 1), B3, ...)
 
-            C = Connection(B1, (B2, 0), (B2, 1), B3, ...)
+    The port definitions follow the same structure as for single target connections.
 
-        The port definitions follow the same structure as for single target connections.
+    'self'-connections also work without a problem. This is useful for modeling direct 
+    feedback of a block to itself.
+    
+    The port specification can be simplified (quality of life) by using the __getitem__ 
+    method that is implemented in the base 'Block' class. It returns the tuple of block
+    and port pair that is used for the port specification in the 'Connection' 
+    initialization. For example the following initializations are equivalent:
 
-        'self'-connections also work without a problem. This is useful for modeling direct 
-        feedback of a block to itself.
-        
-        The port specification can be simplified (quality of life) by using the __getitem__ 
-        method that is implemented in the base 'Block' class. It returns the tuple of block
-        and port pair that is used for the port specification in the 'Connection' 
-        initialization. For example the following initializations are equivalent:
+        Connection(B1[1], B2[3]) <=> Connection((B1, 1), (B2, 3))
 
-            Connection(B1[1], B2[3]) <=> Connection((B1, 1), (B2, 3))
-
-    INPUTS: 
-        source  : (tuple ('Block', int) OR 'Block') source block and optional source output port
-        targets : (tuples of ('Block', int) OR multiple 'Block's) target blocks and optional target input ports
+    Parameters
+    ----------
+    source : tuple[Block, int], Block
+        source block and optional source output port
+    targets : tuple[tuple[Block, int]], tuple[Block]
+        target blocks and optional target input ports
     """
 
     def __init__(self, source, *targets):
@@ -105,12 +107,13 @@ class Connection:
 
 
     def overwrites(self, other):
-        """
-        Check if the connection 'self' overwrites the target port of connection 'other' 
-        and return 'True' if so.
-
-        INPUTS:
-            other : ('Connection' instance) other connection to check 
+        """Check if the connection 'self' overwrites the target port of 
+        connection 'other' and return 'True' if so.
+    
+        Parameters
+        ----------
+        other : Connection
+            other connection to check 
         """
 
         #catch self checking
@@ -127,8 +130,7 @@ class Connection:
 
 
     def update(self):
-        """
-        Transfers data from the source block output port 
+        """Transfers data from the source block output port 
         to the target block input port.
         """
         val = self.source[0].get(self.source[1])
@@ -137,10 +139,9 @@ class Connection:
 
 
 class Duplex(Connection):
-    """
-    Extension of the 'Connection' class, that defines bidirectional connections 
-    between two blocks by grouping together the inputs and outputs of the blocks 
-    into an IO-pair.
+    """Extension of the 'Connection' class, that defines bidirectional 
+    connections between two blocks by grouping together the inputs and 
+    outputs of the blocks into an IO-pair.
     """
 
     def __init__(self, source, target):
@@ -159,8 +160,7 @@ class Duplex(Connection):
 
 
     def update(self):
-        """
-        Transfers data between the two target blocks 
+        """Transfers data between the two target blocks 
         and ports bidirectionally.
         """
 
