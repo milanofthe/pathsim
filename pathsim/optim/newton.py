@@ -27,9 +27,28 @@ class NewtonRaphsonAD:
 
 
     def solve(self, func, x0, iterations_max=100, tolerance=1e-6):
-        """
-        Solve the function 'func' with initial 
+        """Solve the function 'func' with initial 
         value 'x0' up to a certain tolerance.
+
+        Parameters
+        ----------
+        func : callable
+            function to solve
+        x0 : numeric
+            starting value for solution
+        iterations_max : int
+            maximum number of solver iterations
+        tolerance : float
+            convergence condition
+
+        Returns
+        -------
+        x : numeric
+            solution
+        res : float
+            residual
+        i : int
+            iteration count
         """
 
         _x = x0.copy()
@@ -46,6 +65,22 @@ class NewtonRaphsonAD:
 
 
     def step(self, x, g, *args, **kwargs):
+        """Perform one newton-raphson step
+
+        Parameters
+        ----------
+        x : float, array
+            current solution
+        g : float, array
+            current evaluation of g(x)
+        
+        Returns
+        -------
+        x : float, array
+            new solution
+        res : float
+            residual norm, fixed point error
+        """
 
         #compute residual -> make sure its an array
         res = np.atleast_1d(g - x)
@@ -84,6 +119,22 @@ class GaussNewtonAD(NewtonRaphsonAD):
     """
 
     def step(self, x, g, *args, **kwargs):
+        """Perform one gauss-newton step
+
+        Parameters
+        ----------
+        x : float, array
+            current solution
+        g : float, array
+            current evaluation of g(x)
+        
+        Returns
+        -------
+        x : float, array
+            new solution
+        res : float
+            residual norm, fixed point error
+        """
 
         #compute residual -> make sure its an array
         res = np.atleast_1d(g - x)
@@ -120,8 +171,7 @@ class GaussNewtonAD(NewtonRaphsonAD):
 
 
 class LevenbergMarquardtAD(NewtonRaphsonAD):
-    """
-    This class implements the levenberg marquardt algorithm using pathsims 
+    """This class implements the levenberg marquardt algorithm using pathsims 
     automatic differentiation framework to compute anlytical jacobians.
     """
 
@@ -138,6 +188,13 @@ class LevenbergMarquardtAD(NewtonRaphsonAD):
 
 
     def _adjust_params(self, cost):
+        """Adjust the LM parameters based on some cost.
+
+        Parameters
+        ----------
+        cost : float
+            cost for LM parameter adjustment
+        """
 
         #first iteration -> set prev_cost and quit
         if self.cost is None:
@@ -155,6 +212,22 @@ class LevenbergMarquardtAD(NewtonRaphsonAD):
 
 
     def step(self, x, g, *args, **kwargs):
+        """Perform one LM step
+
+        Parameters
+        ----------
+        x : float, array
+            current solution
+        g : float, array
+            current evaluation of g(x)
+        
+        Returns
+        -------
+        x : float, array
+            new solution
+        res : float
+            residual norm, fixed point error
+        """
 
         #compute residual -> make sure its an array
         res = np.atleast_1d(g - x)

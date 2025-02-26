@@ -17,38 +17,54 @@ import threading
 # HELPER FUNCTIONS ======================================================================
 
 def der(arr, val):
-    """
-    Compute the derivative of an array of 'Value' objects with respect 
+    """Compute the derivative of an array of 'Value' objects with respect 
     to 'val', fallback to scalar case and non-'Value' objects
     
-    INPUTS : 
-        arr : (array[Value]) array or list of Values
-        val : (Value) dual number value for AD
+    Parameters
+    ----------
+    arr : array[Value]
+        array or list of Values
+    val : Value
+        dual number value for AD
+    
+    Returns
+    -------
+    der : array[float]
+        partial derivatives w.r.t. the 'val'
     """
     return np.array([a(val) if isinstance(a, Value) else 0.0 for a in np.atleast_1d(arr)])
 
 
 def jac(arr, vals):
-    """
-    Compute the derivative of an array of 'Value' objects with respect 
+    """Compute the derivative of an array of 'Value' objects with respect 
     to each 'Value' object in 'vals', fallback to scalars in both cases.
 
     This effectively constructs the jacobian. 
+
+    Parameters
+    ----------
+    arr : array[Value]
+        array or list of Values
+    vals : array[Value]
+        array or list of Values
     
-    INPUTS : 
-        arr  : (array[Value]) array or list of Values
-        vals : (array[Value]) array or list of Values
+    Returns
+    -------
+    jac : array[float]
+        partial derivatives w.r.t. all values in 'vals', effectively the jacobian
+    
     """
     return np.array([der(arr, val) for val in np.atleast_1d(vals)]).T
 
 
 def autojac(fnc):
-    """
-    Decorator that wraps a function such that it computes its jacobian 
+    """Decorator that wraps a function such that it computes its jacobian 
     alongside its evaluaiton.
-
-    INPUTS : 
-        fnc : (callable) function to wrap and compute jacobian of
+    
+    Parameters
+    ----------
+    fnc : callable
+        function to wrap and compute jacobian of
     """
     @functools.wraps(fnc)
     def wrap(*args):
@@ -103,8 +119,7 @@ FUNC_GRAD = {
 # WRAPPER THAT ADDS ADDITIONAL METHODS ==================================================
 
 def add_funcs(cls):
-    """
-    Decorator that adds numpy functions as methods to the Value class while overloading 
+    """Decorator that adds numpy functions as methods to the Value class while overloading 
     them with their analytical derivatives to propagate the gradient with the chain rule.
     """
     
@@ -128,8 +143,7 @@ def add_funcs(cls):
 
 @add_funcs
 class Value:
-    """
-    Dual number 'Value' definition for small autograd framework. 
+    """Dual number 'Value' definition for small autograd framework. 
 
     The dunder methods of the 'Value' class are overloaded to simultaneously compute 
     the partial derivatives with respect to the instance itself and other instances 
@@ -137,10 +151,19 @@ class Value:
 
     This is realized by a dictionary that handles the reference tracking via the id 
     of the 'Value' instances.
-    
-    INPUTS : 
-        val  : (float, int, complex) The numerical value.
-        grad : (dict, optional) The gradient dictionary. If None, initializes with self derivative.
+
+    Parameters
+    ----------
+    val  : float, int, complex
+        The numerical value.
+    grad : dict, None
+        The gradient dictionary. If None, initializes with self derivative.
+
+    Attributes
+    ----------
+    _id : int 
+        id for reference tracking in gradient dict
+
     """
 
     #restrict attributes, makes access faster
@@ -192,15 +215,19 @@ class Value:
 
     @classmethod
     def numeric(cls, arr):
-        """
-        Cast an array with value objects to an array of numeric values. 
+        """Cast an array with value objects to an array of numeric values. 
+        
         Numeric entries are just passed through.
-
-        INPUTS :    
-            arr : (array[obj]) array of mixed value, numeric objects
-
-        RETURNS :
-            array[numeric] : array of numeric values
+    
+        Parameters
+        ----------  
+        arr : array[obj]
+            array of mixed value, numeric objects
+    
+        Returns
+        -------
+        numeric : array[numeric] 
+            array of numeric values
         """
         _arr = np.atleast_1d(arr)
         return np.array([a.val if isinstance(a, cls) else a  
@@ -209,16 +236,20 @@ class Value:
 
     @classmethod
     def array(cls, arr):
-        """
-        Cast an array or list to an array of value objects. 
+        """Cast an array or list to an array of value objects. 
+        
         For Value entries, their numeric values are used to 
         create a new Value instance.
-
-        INPUTS :    
-            arr : (array[obj]) array of mixed value, numeric objects
-
-        RETURNS :
-            array[Value] : array of Value objects
+    
+        Parameters
+        ----------  
+        arr : array[obj]
+            array of mixed value, numeric objects
+    
+        Returns
+        -------
+        array : array[Value] 
+            array of Value objects
         """
         _arr = np.atleast_1d(arr)
         return np.array([cls(a) for a in _arr.ravel()]).reshape(_arr.shape).squeeze()
@@ -230,11 +261,15 @@ class Value:
         """
         Get the partial derivative with respect to 'other'.
 
-        INPUTS :    
-            other : (Value) variable with respect to which to take the derivative
+        Parameters
+        ----------     
+        other : Value
+            variable with respect to which to take the derivative
 
-        RETURNS :
-            float : The partial derivative value
+        Returns
+        -------
+        out : float
+            The partial derivative value
         """
         return self.grad.get(other._id, 0.0)
 

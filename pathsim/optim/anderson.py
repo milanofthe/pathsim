@@ -19,8 +19,7 @@ from .value import Value, der, jac
 # CLASS ================================================================================
 
 class Anderson:
-    """
-    Class for accelerated fixed-point iteration through anderson acceleration. 
+    """Class for accelerated fixed-point iteration through anderson acceleration. 
     Solves a nonlinear set of equations given in the fixed-point form:
 
         x = g(x)
@@ -30,9 +29,12 @@ class Anderson:
     of the previous iterates. The coefficients are computed to minimize the least 
     squares error of the fixed-point problem.
 
-    INPUTS : 
-        m       : (int) buffer length
-        restart : (bool) clear buffer when full
+    Parameters
+    ----------
+    m : int
+        buffer length
+    restart : bool
+        clear buffer when full
     """
 
     def __init__(self, m=5, restart=False):
@@ -53,9 +55,28 @@ class Anderson:
 
 
     def solve(self, func, x0, iterations_max=100, tolerance=1e-6):
-        """
-        Solve the function 'func' with initial 
+        """Solve the function 'func' with initial 
         value 'x0' up to a certain tolerance.
+        
+        Parameters
+        ----------
+        func : callable
+            function to solve
+        x0 : numeric
+            starting value for solution
+        iterations_max : int
+            maximum number of solver iterations
+        tolerance : float
+            convergence condition
+
+        Returns
+        -------
+        x : numeric
+            solution
+        res : float
+            residual
+        i : int
+            iteration count
         """
 
         _x = x0.copy()
@@ -68,9 +89,7 @@ class Anderson:
 
 
     def reset(self):
-        """
-        reset the anderson accelerator
-        """
+        """reset the anderson accelerator"""
 
         #clear difference buffers
         self.dx_buffer.clear()
@@ -82,12 +101,21 @@ class Anderson:
 
 
     def step(self, x, g):
-        """
-        Perform one iteration on the fixed-point solution.
-
-        INPUTS : 
-            x : (float or array) current solution
-            g : (float or array) current evaluation of g(x)
+        """Perform one iteration on the fixed-point solution.
+    
+        Parameters
+        ----------
+        x : float, array
+            current solution
+        g : float, array
+            current evaluation of g(x)
+        
+        Returns
+        -------
+        x : float, array
+            new solution
+        res : float
+            residual norm, fixed point error
         """
 
         #make numeric if value
@@ -149,8 +177,7 @@ class Anderson:
 
 
 class NewtonAnderson(Anderson):
-    """
-    Modified class for hybrid anderson acceleration that can use a jacobian 'jac' of 
+    """Modified class for hybrid anderson acceleration that can use a jacobian 'jac' of 
     the function 'g' for a newton step before the fixed point step for the initial 
     estimate before applying the anderson acceleration.
 
@@ -160,9 +187,29 @@ class NewtonAnderson(Anderson):
 
 
     def solve(self, func, x0, jac=None, iterations_max=100, tolerance=1e-6):
-        """
-        Solve the function 'func' with initial 
-        value 'x0' up to a certain tolerance.
+        """Solve the function 'func' with initial value 'x0' up to a certain tolerance.
+
+        Parameters
+        ----------
+        func : callable
+            function to solve
+        x0 : numeric
+            starting value for solution
+        jac : callable
+            jacobian of 'func'
+        iterations_max : int
+            maximum number of solver iterations
+        tolerance : float
+            convergence condition
+
+        Returns
+        -------
+        x : numeric
+            solution
+        res : float
+            residual
+        i : int
+            iteration count
         """
 
         _x = x0.copy()
@@ -175,9 +222,24 @@ class NewtonAnderson(Anderson):
 
 
     def _newton(self, x, g, jac):
-        """
-        Newton step on solution, where 'f=g-x' is the 
+        """Newton step on solution, where 'f=g-x' is the 
         residual and 'jac' is the jacobian of 'g'.
+
+        Parameters
+        ----------
+        x : float, array
+            current solution
+        g : float, array
+            current evaluation of g(x)
+        jac : array
+            evaluation of jacobian of 'g'
+
+        Returns
+        -------
+        x : float, array
+            new solution
+        res : float
+            residual norm
         """
 
         #make numeric if value
@@ -198,10 +260,26 @@ class NewtonAnderson(Anderson):
 
 
     def step(self, x, g, jac=None):
-        """
-        Perform one iteration on the fixed-point solution. 
+        """Perform one iteration on the fixed-point solution. 
+        
         If the jacobian of g 'jac' is provided, a newton step 
         is performed previous to anderson acceleration.
+            
+        Parameters
+        ----------
+        x : float, array
+            current solution
+        g : float, array
+            current evaluation of g(x)
+        jac : array
+            evaluation of jacobian of 'g'
+
+        Returns
+        -------
+        x : float, array
+            new solution
+        res : float
+            residual norm
         """
 
         #newton step if jacobian available
