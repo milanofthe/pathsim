@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class SSPRK33(ExplicitRungeKutta):
-    """
-    Strong Stability Preserving (SSP) 3-rd order 
+    """Strong Stability Preserving (SSP) 3-rd order 
     three stage (3,3) Runge-Kutta method
     
     This integrator is more accurate and stable then SSPRK22 but 

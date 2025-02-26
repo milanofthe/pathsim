@@ -15,8 +15,7 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class DIRK2(DiagonallyImplicitRungeKutta):
-    """
-    The 2-stage SSP-optimal Diagonally Implicit Runge–Kutta (DIRK) method 
+    """The 2-stage SSP-optimal Diagonally Implicit Runge–Kutta (DIRK) method 
     of second order, namely the second order RK with the largest radius 
     of absolute monotonicity. 
     It is also symplectic and the optimal 2-stage second order implicit RK.

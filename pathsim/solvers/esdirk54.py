@@ -15,8 +15,7 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK54(DiagonallyImplicitRungeKutta):
-    """
-    7 stage 5-th order L-stable and stiffly accurate ESDIRK method with 
+    """7 stage 5-th order L-stable and stiffly accurate ESDIRK method with 
     embedded 4-th order method for stepsize control. This integrator is 
     suited for moderately stiff problems that require high accuracy.
     The first stage is explicit, followed by 6 implicit stages.

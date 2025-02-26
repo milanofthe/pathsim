@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKF78(ExplicitRungeKutta):
-    """
-    13-stage 7-th order embedded Runge-Kutta-Fehlberg method 
+    """13-stage 7-th order embedded Runge-Kutta-Fehlberg method 
     with 8-th order truncation error estimate that can be used to 
     adaptively control the timestep. 
 

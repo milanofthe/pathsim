@@ -15,8 +15,7 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK85(DiagonallyImplicitRungeKutta):
-    """
-    16 stage 8-th order L-stable, stiffly accurate, stage order 2 ESDIRK method with 
+    """16 stage 8-th order L-stable, stiffly accurate, stage order 2 ESDIRK method with 
     embedded 5-th order method for stepsize control. This very high order integrator 
     is suited for very stiff problems that require very high accuracy but is also 
     relatively expensive due to the insane 15 implicit (1 explicit) stages.

@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKF45(ExplicitRungeKutta):
-    """
-    6-stage 4-th order embedded Runge-Kutta-Fehlberg method 
+    """6-stage 4-th order embedded Runge-Kutta-Fehlberg method 
     with 5-th order truncation error estimate that can be used to 
     adaptively control the timestep. 
 

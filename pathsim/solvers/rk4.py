@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RK4(ExplicitRungeKutta):
-    """
-    'The' classical 4-th order 4-stage Runge-Kutta method.
+    """'The' classical 4-th order 4-stage Runge-Kutta method.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

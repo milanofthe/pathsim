@@ -15,8 +15,7 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK32(DiagonallyImplicitRungeKutta):
-    """
-    Williams et.al constructed an ESDIRK method of order 3 with four stages.
+    """Williams et.al constructed an ESDIRK method of order 3 with four stages.
     This method is constructed such that it is applicable to index-2 
     differential algebraic systems.
     """

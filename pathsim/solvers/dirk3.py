@@ -15,8 +15,7 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class DIRK3(DiagonallyImplicitRungeKutta):
-    """
-    Four-stage, 3rd order, L-stable Diagonally Implicit Runge–Kutta (DIRK) method.
+    """Four-stage, 3rd order, L-stable Diagonally Implicit Runge–Kutta (DIRK) method.
 
     (from Wikipedia)
     """

@@ -15,12 +15,13 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKCK54(ExplicitRungeKutta):
-    """
-    6-stage 5-th order with embedded 4-th order Runge-Kutta method from Cash and Karp 
+    """6-stage 5-th order with embedded 4-th order Runge-Kutta method from Cash and Karp 
     with 5-th order truncation error estimate for the 4-th order solution that can be 
-    used to adaptively control the timestep. The 5-th order method is used for 
-    timestepping (local extrapolation) and the difference to the 5-th order solution 
-    is used as an estimate for the local truncation error of the 4-th order solution.
+    used to adaptively control the timestep. 
+
+    The 5-th order method is used for timestepping (local extrapolation) and the difference 
+    to the 5-th order solution is used as an estimate for the local truncation error of 
+    the 4-th order solution.
     
     This is the fixed order Cash-Karp scheme without early quitting.
 

@@ -17,13 +17,31 @@ from ._solver import ExplicitSolver, ImplicitSolver
 # SOLVERS ==============================================================================
 
 class ExplicitRungeKutta(ExplicitSolver):
-    """
-    Base class for explicit Runge-Kutta integrators which implements 
+    """Base class for explicit Runge-Kutta integrators which implements 
     the timestepping at intermediate stages and the error control if 
     the coefficients for the local truncation error estimate are defined.        
     
-    NOTE:
-        This class is not intended to be used directly!!!
+    Notes
+    -----
+    This class is not intended to be used directly!!!
+
+    Attributes
+    ----------
+    n : int 
+        order of stepping integration scheme
+    m : int
+        order of embedded integration scheme for error control
+    s : int
+        numer of RK stages
+    beta : float
+        safety factor for error control
+    Ks : dict
+        slopes at RK stages
+    BT : dict[int: None, list[float]], None
+        butcher table
+    TR : list[float]
+        coefficients for truncation error estimate
+    
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -50,14 +68,24 @@ class ExplicitRungeKutta(ExplicitSolver):
 
 
     def error_controller(self, dt):
-        """
-        compute scaling factor for adaptive timestep based on 
+        """Compute scaling factor for adaptive timestep based on 
         absolute and relative local truncation error estimate, 
         also checks if the error tolerance is achieved and returns 
         a success metric.
 
-        INPUTS:
-            dt : (float) integration timestep
+        Parameters
+        ----------
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        success : bool
+            timestep was successful
+        err : float
+            truncation error estimate
+        scale : float
+            timestep rescale from error controller
         """
 
         #no error estimate or not last stage -> early exit
@@ -91,14 +119,26 @@ class ExplicitRungeKutta(ExplicitSolver):
 
 
     def step(self, u, t, dt):
-        """
-        performs the (explicit) timestep at the intermediate RK stages 
+        """Performs the (explicit) timestep at the intermediate RK stages 
         for (t+dt) based on the state and input at (t)
 
-        INPUTS:
-            u  : (float) non-autonomous external component for integration
-            t  : (float) evaluation time for right-hand-side function
-            dt : (float) integration timestep
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        success : bool
+            timestep was successful
+        err : float
+            truncation error estimate
+        scale : float
+            timestep rescale from error controller        
         """
 
         #buffer intermediate slope
@@ -118,8 +158,7 @@ class ExplicitRungeKutta(ExplicitSolver):
 
 
 class DiagonallyImplicitRungeKutta(ImplicitSolver):
-    """
-    Base class for diagonally implicit Runge-Kutta (DIRK) integrators 
+    """Base class for diagonally implicit Runge-Kutta (DIRK) integrators 
     which implements the timestepping at intermediate stages, involving
     the numerical solution of the implicit update equation and the 
     error control if the coefficients for the local truncation error 
@@ -128,8 +167,29 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
     Extensions and checks to also handle explicit first stages (ESDIRK) 
     and additional final evaluation coefficients (not stiffly accurate)
     
-    NOTE:
-        This class is not intended to be used directly!!!
+    Notes
+    -----
+    This class is not intended to be used directly!!!
+
+    Attributes
+    ----------
+    n : int 
+        order of stepping integration scheme
+    m : int
+        order of embedded integration scheme for error control
+    s : int
+        numer of RK stages
+    beta : float
+        safety factor for error control
+    Ks : dict
+        slopes at RK stages
+    BT : dict[int: None, list[float]], None
+        butcher table
+    A : list[float], None
+        coefficients for final solution evaluation
+    TR : list[float]
+        coefficients for truncation error estimate
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -159,14 +219,24 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
 
 
     def error_controller(self, dt):
-        """
-        compute scaling factor for adaptive timestep based on 
+        """Compute scaling factor for adaptive timestep based on 
         absolute and relative local truncation error estimate, 
         also checks if the error tolerance is achieved and returns 
         a success metric.
 
-        INPUTS:
-            dt : (float) integration timestep
+        Parameters
+        ----------
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        success : bool
+            timestep was successful
+        err : float
+            truncation error estimate
+        scale : float
+            timestep rescale from error controller
         """
 
         #no error estimate or not last stage -> early exit
@@ -200,13 +270,21 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
 
 
     def solve(self, u, t, dt):
-        """
-        Solves the implicit update equation using the optimizer of the engine.
+        """Solves the implicit update equation using the optimizer of the engine.
 
-        INPUTS:
-            u  : (float) non-autonomous external component for integration
-            t  : (float) evaluation time for right-hand-side function
-            dt : (float) integration timestep
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        err : float
+            residual error of the fixed point update equation
         """
 
         #first stage is explicit -> ESDIRK -> early exit
@@ -242,14 +320,26 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
 
 
     def step(self, u, t, dt):
-        """
-        performs the (explicit) timestep at the intermediate RK stages 
+        """performs the (explicit) timestep at the intermediate RK stages 
         for (t+dt) based on the state and input at (t)
 
-        INPUTS:
-            u  : (float) non-autonomous external component for integration
-            t  : (float) evaluation time for right-hand-side function
-            dt : (float) integration timestep
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        success : bool
+            timestep was successful
+        err : float
+            truncation error estimate
+        scale : float
+            timestep rescale from error controller
         """
 
         #first stage is explicit -> ESDIRK

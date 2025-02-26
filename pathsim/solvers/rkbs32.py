@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKBS32(ExplicitRungeKutta):
-    """
-    The Bogacki–Shampine method is a Runge–Kutta method of order three with four stages.
+    """The Bogacki–Shampine method is a Runge–Kutta method of order three with four stages.
     It has an embedded second-order method which can be used to implement adaptive 
     step size. The Bogacki–Shampine method is implemented in the 'ode3' for fixed 
     step solver and 'ode23' for a variable step solver function in MATLAB.

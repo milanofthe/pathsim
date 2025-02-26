@@ -15,12 +15,12 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKDP54(ExplicitRungeKutta):
-    """
-    Dormand–Prince method with seven Runge-Kutta stages is 5-th order 
-    accurate with an embedded 4-th order method. The 5-th order method 
-    is used for timestepping (local extrapolation) and the difference 
-    to the 5-th order solution is used as an estimate for the local 
-    truncation error of the 4-th order solaution.
+    """Dormand–Prince method with seven Runge-Kutta stages is 5-th order 
+    accurate with an embedded 4-th order method. 
+
+    The 5-th order method is used for timestepping (local extrapolation) 
+    and the difference to the 5-th order solution is used as an estimate 
+    for the local truncation error of the 4-th order solaution.
     
     Wikipedia:
         As of 2023, Dormand–Prince is the default method 

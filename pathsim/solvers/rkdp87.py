@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKDP87(ExplicitRungeKutta):
-    """
-    13-stage 8-th order embedded Runge-Kutta method from Dormand and Prince
+    """13-stage 8-th order embedded Runge-Kutta method from Dormand and Prince
     with embedded 7-th order method for 8-th order truncation error estimate 
     that can be used to adaptively control the timestep. 
 

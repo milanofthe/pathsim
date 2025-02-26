@@ -15,8 +15,7 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK4(DiagonallyImplicitRungeKutta):
-    """
-    6-stage, 4th order Diagonally Implicit Runge–Kutta (DIRK) method 
+    """6-stage, 4th order Diagonally Implicit Runge–Kutta (DIRK) method 
     with explicit first stage that is specifically designed to handle 
     differential algebraic equations of indices up to two or three.
     """

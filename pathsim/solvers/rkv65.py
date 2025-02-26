@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKV65(ExplicitRungeKutta):
-    """
-    9-stage 6-th order with embedded 5-th order Runge-Kutta method from Verner 
+    """9-stage 6-th order with embedded 5-th order Runge-Kutta method from Verner 
     with 6-th order truncation error estimate.
 
     This is the 'most robust' 9, 6(5) pair of Jim Verner's Refuge for Runge-Kutta Pairs

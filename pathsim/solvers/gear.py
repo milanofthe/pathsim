@@ -17,8 +17,7 @@ import numpy as np
 # HELPERS ==============================================================================
 
 def compute_bdf_coefficients(order, timesteps):
-    """
-    Computes the coefficients for backward differentiation formulas for a given order.
+    """Computes the coefficients for backward differentiation formulas for a given order.
     The timesteps can be specified for variable timestep BDF methods. 
 
     For m-th order BDF we have for the n-th timestep:
@@ -26,13 +25,19 @@ def compute_bdf_coefficients(order, timesteps):
     or 
         x_n = beta * h_n * f_n(x_n, t_n) - sum(alpha_j * x_{n-1-j}; j=0,...,order-1)
 
-    INPUTS : 
-        order     : (int) order of the integration scheme
-        timesteps : (list[float]) timestep buffer (h_{n-j}; j=0,...,order-1)
-
-    OUTPUTS : 
-        beta  : (float) weight for function
-        alpha : (array[float]) weights for previous solutions
+    Parameters
+    ----------
+    order : int
+        order of the integration scheme
+    timesteps : list[float]
+        timestep buffer (h_{n-j}; j=0,...,order-1)
+    
+    Returns
+    ------- 
+    beta : float
+        weight for function
+    alpha : array[float]
+        weights for previous solutions
     """
 
     #check if valid order
@@ -69,8 +74,7 @@ def compute_bdf_coefficients(order, timesteps):
 # BASE GEAR SOLVER =====================================================================
 
 class GEAR(ImplicitSolver):
-    """
-    Base class for GEAR-type integrators that defines the universal methods.
+    """Base class for GEAR-type integrators that defines the universal methods.
 
     Numerical integration method based on BDFs (linear multistep methods). 
     Uses n-th order BDF for timestepping and (n-1)-th order BDF coefficients 
@@ -79,8 +83,9 @@ class GEAR(ImplicitSolver):
     The adaptive timestep BDF coefficients are dynamically computed at the 
     beginning of each timestep from the buffered previous timsteps.
 
-    NOTE:
-        Not to be used directly!!!
+    Notes
+    -----
+    Not to be used directly!!!
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -107,9 +112,7 @@ class GEAR(ImplicitSolver):
 
 
     def reset(self):
-        """"
-        Resets integration engine to initial state.
-        """
+        """"Resets integration engine to initial state."""
 
         #clear buffers 
         self.B = []
@@ -120,10 +123,14 @@ class GEAR(ImplicitSolver):
 
 
     def buffer(self, dt):
-        """
-        Buffer the state and timestep. Dynamically precompute the 
-        variable timestep BDF coefficients on the fly for 
-        the current timestep.
+        """Buffer the state and timestep. Dynamically precompute 
+        the variable timestep BDF coefficients on the fly for the 
+        current timestep.
+        
+        Parameters
+        ----------
+        dt : float
+            integration timestep
         """
 
         #reset optimizer
@@ -150,10 +157,10 @@ class GEAR(ImplicitSolver):
     # methods for adaptive timestep solvers --------------------------------------------
 
     def revert(self):
-        """
-        Revert integration engine to previous timestep, this is only relevant 
-        for adaptive methods where the simulation timestep 'dt' is rescaled and 
-        the engine step is recomputed with the smaller timestep.
+        """Revert integration engine to previous timestep, this is only 
+        relevant for adaptive methods where the simulation timestep 'dt' 
+        is rescaled and the engine step is recomputed with the smaller 
+        timestep.
         """
         
         #reset internal state to previous state
@@ -165,13 +172,24 @@ class GEAR(ImplicitSolver):
 
 
     def error_controller(self, tr):
-        """
-        compute scaling factor for adaptive timestep based on absolute and 
-        relative tolerances for local truncation error. Checks if the error 
-        tolerance is achieved and returns a success metric.
+        """Compute scaling factor for adaptive timestep based on absolute and 
+        relative tolerances for local truncation error. 
 
-        INPUTS:
-            tr : (array[float]) truncation error estimate 
+        Checks if the error tolerance is achieved and returns a success metric.
+        
+        Parameters
+        ----------
+        tr : array[float]
+            truncation error estimate 
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
 
         #compute scaling factors (avoid division by zero)
@@ -198,8 +216,22 @@ class GEAR(ImplicitSolver):
     # methods for timestepping ---------------------------------------------------------
 
     def solve(self, u, t, dt):
-        """
-        Solves the implicit update equation using the optimizer of the engine.
+        """Solves the implicit update equation using the optimizer of the engine.
+        
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        err : float
+            residual error of the fixed point update equation
+
         """
 
         #order of scheme for current step
@@ -228,10 +260,27 @@ class GEAR(ImplicitSolver):
 
 
     def step(self, u, t, dt):
-        """
-        Finalizes the timestep by resetting the solver for the implicit 
+        """Finalizes the timestep by resetting the solver for the implicit 
         update equation and computing the lower order estimate of the 
         solution for error control.
+
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
 
         #early exit if buffer not long enough for two solutions
@@ -250,8 +299,7 @@ class GEAR(ImplicitSolver):
 # SOLVERS ==============================================================================
 
 class GEAR21(GEAR):
-    """
-    Adaptive GEAR integrator with 2-nd order BDF for timestepping 
+    """Adaptive GEAR integrator with 2-nd order BDF for timestepping 
     and 1-st order BDF (euler backward) for truncation error estimation.
     """
 
@@ -264,8 +312,7 @@ class GEAR21(GEAR):
 
 
 class GEAR32(GEAR):
-    """
-    Adaptive GEAR integrator with 3-rd order BDF for timestepping 
+    """Adaptive GEAR integrator with 3-rd order BDF for timestepping 
     and 2-nd order BDF for truncation error estimation.
     """
 
@@ -278,8 +325,7 @@ class GEAR32(GEAR):
 
 
 class GEAR43(GEAR):
-    """
-    Adaptive GEAR integrator with 4-th order BDF for timestepping 
+    """Adaptive GEAR integrator with 4-th order BDF for timestepping 
     and 3-rd order BDF for truncation error estimation.
     """
 
@@ -292,8 +338,7 @@ class GEAR43(GEAR):
 
 
 class GEAR54(GEAR):
-    """
-    Adaptive GEAR integrator with 5-th order BDF for timestepping 
+    """Adaptive GEAR integrator with 5-th order BDF for timestepping 
     and 4-th order BDF for truncation error estimation.
     """
 
@@ -306,11 +351,12 @@ class GEAR54(GEAR):
 
 
 class GEAR52A(GEAR):
-    """
-    Adaptive order adaptive stepsize GEAR integrator. Adaptively selects the order 
-    (BDF coefficients) for timestepping between 2 and 5 depending on which method 
-    yields the lower truncation error. This balances the stability of the lower 
-    order methods with the accuracy of higher order methods. 
+    """Adaptive order adaptive stepsize GEAR integrator.
+
+    Adaptively selects the order (BDF coefficients) for timestepping between 
+    2 and 5 depending on which method yields the lower truncation error. 
+    This balances the stability of the lower order methods with the accuracy 
+    of higher order methods. 
 
     Previous solutions and the variable timestep BDF coefficients are used 
     to estimate a lower and a higher order solution from the solution of the 
@@ -342,6 +388,12 @@ class GEAR52A(GEAR):
         """
         Buffer the state and timestep. Dynamically precompute the variable 
         timestep BDF coefficients on the fly for the current timestep.
+
+        Parameters
+        ----------
+        dt : float
+            evaluation time
+
         """
             
         #reset optimizer
@@ -366,19 +418,30 @@ class GEAR52A(GEAR):
 
 
     def error_controller(self, tr_m, tr_p):
-        """
-        Compute scaling factor for adaptive timestep based on absolute and relative 
-        tolerances of the local truncation error estimate obtained from esimated 
-        lower and higher order solution. 
+        """Compute scaling factor for adaptive timestep based on absolute and 
+        relative tolerances of the local truncation error estimate obtained from 
+        esimated lower and higher order solution. 
 
         Checks if the error tolerance is achieved and returns a success metric.
 
         Adapts the stepping order such that the normalized error is minimized and 
         larger steps can be taken by the integrator.
 
-        INPUTS:
-            tr_m : (array[float]) lower order truncation error estimate
-            tr_p : (array[float]) higher order truncation error estimate
+        Parameters
+        ----------
+        tr_m : array[float]
+            lower order truncation error estimate
+        tr_p : array[float]
+            higher order truncation error estimate
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
 
         #compute scaling factors (avoid division by zero)
@@ -415,10 +478,29 @@ class GEAR52A(GEAR):
     # methods for timestepping ---------------------------------------------------------
 
     def step(self, u, t, dt):
-        """
-        Finalizes the timestep by resetting the solver for the implicit 
+        """Finalizes the timestep by resetting the solver for the implicit 
         update equation and computing the lower and higher order estimate 
-        of the solution. Then calls the error controller.
+        of the solution. 
+
+        Then calls the error controller.
+
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
 
         #early exit if buffer not long enough for two solutions

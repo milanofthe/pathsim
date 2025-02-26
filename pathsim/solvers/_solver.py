@@ -26,18 +26,40 @@ from ..optim.newton import (
 # BASE SOLVER CLASS ====================================================================
 
 class Solver:
-    """
-    Base skeleton class for solver definition. Defines the basic solver methods and the metadata.
+    """Base skeleton class for solver definition. Defines the basic solver methods and 
+    the metadata.
 
     Specific solvers need to implement (some of) the base class methods defined here. 
     This depends on the type of solver (implicit/explicit, multistage, adaptive).
 
-    INPUTS : 
-        initial_value     : (float or array) initial condition / integration constant
-        func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
-        jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
-        tolerance_lte_abs : (float) absolute tolerance for local truncation error (for solvers with error estimate)
-        tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
+    Parameters
+    ----------
+    initial_value : float, array
+        initial condition / integration constant
+    func : callable
+        function to integrate with state 'x', input 'u' and time 't' dependency
+    jac : callable, None
+        jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', 
+        if 'None', no jacobian is used
+    tolerance_lte_abs : float
+        absolute tolerance for local truncation error (for solvers with error estimate)
+    tolerance_lte_rel : float
+        relative tolerance for local truncation error (for solvers with error estimate)
+
+    Attributes
+    ----------
+    x_0 : numeric, array[numeric]
+        internal 'working' initial value
+    x : numeric, array[numeric]
+        internal 'working' state
+    n : int
+        order of integration scheme
+    s : int
+        number of internal intermediate stages
+    stage : int
+        counter for current intermediate stage
+    eval_stages : list[float]
+        rations for evaluation times of intermediate stages
     """
 
     def __init__(self, 
@@ -81,8 +103,12 @@ class Solver:
 
 
     def __len__(self):
-        """
-        return the size of the internal state, i.e. the order
+        """size of the internal state, i.e. the order
+        
+        Returns
+        -------
+        size : int
+            size of the current internal state
         """
         return len(np.atleast_1d(self.x))
 
@@ -92,26 +118,42 @@ class Solver:
 
 
     def stages(self, t, dt):
-        """
-        Generator that yields the intermediate evaluation 
+        """Generator that yields the intermediate evaluation 
         time during the timestep 't + ratio * dt'.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time
+        dt : float
+            integration timestep
         """
         for ratio in self.eval_stages:
             yield t + ratio * dt
 
 
     def get(self):
-        """
-        Returns current internal state of the solver.
+        """Returns current internal state of the solver.
+    
+        Returns
+        -------
+        x : numeric, array[numeric]
+            current internal state of the solver
         """
         return self.x
 
     
     def set(self, x):
-        """
-        Sets the internal state of the integration engine.
+        """Sets the internal state of the integration engine.
+
         This method is required for event based simulations, 
         and to handle discontinuities in state variables.
+        
+        Parameters
+        ----------
+        x : numeric, array[numeric]
+            new internal state of the solver
+
         """
 
         #overwrite internal state with value
@@ -122,9 +164,7 @@ class Solver:
 
 
     def reset(self):
-        """"
-        Resets integration engine to initial state.
-        """
+        """"Resets integration engine to initial value"""
 
         #overwrite state with initial value
         self.x = self.x_0 = self.initial_value
@@ -134,14 +174,19 @@ class Solver:
 
 
     def buffer(self, dt):
-        """
-        Saves the current state to an internal state buffer which 
+        """Saves the current state to an internal state buffer which 
         is especially relevant for multistage and implicit solvers.
 
         Multistep solver implement rolling buffers for the states 
         and timesteps.
 
         Resets the stage counter.
+        
+        Parameters
+        ----------
+        dt : float
+            integration timestep
+    
         """
 
         #buffer internal state
@@ -153,10 +198,21 @@ class Solver:
 
     @classmethod
     def cast(cls, other, **solver_args):
-        """
-        Cast the integration engine to the new type and initialize 
+        """Cast the integration engine to the new type and initialize 
         with previous solver arguments so it can continue from where 
         the 'old' solver stopped.
+            
+        Parameters
+        ----------
+        other : Solver
+            solver instance to cast to new solver type
+        solver_args : dict
+            additional args for the new solver
+
+        Returns
+        -------
+        engine : Solver
+            new solver instance        
         """
 
         if not isinstance(other, Solver):
@@ -164,12 +220,13 @@ class Solver:
 
 
         #create new solver instance
-        engine = cls(initial_value=other.initial_value, 
-                     func=other.func, 
-                     jac=other.jac, 
-                     tolerance_lte_rel=solver_args.get("tolerance_lte_rel", other.tolerance_lte_rel),
-                     tolerance_lte_abs=solver_args.get("tolerance_lte_abs", other.tolerance_lte_abs)
-                     )
+        engine = cls(
+            initial_value=other.initial_value, 
+            func=other.func, 
+            jac=other.jac, 
+            tolerance_lte_rel=solver_args.get("tolerance_lte_rel", other.tolerance_lte_rel),
+            tolerance_lte_abs=solver_args.get("tolerance_lte_abs", other.tolerance_lte_abs)
+            )
         
         #set internal state of new engine from other
         engine.set(other.get())
@@ -180,18 +237,27 @@ class Solver:
     # methods for adaptive timestep solvers --------------------------------------------
 
     def error_controller(self):
-        """
-        Returns the estimated local truncation error (abs and rel) and scaling factor 
+        """Returns the estimated local truncation error (abs and rel) and scaling factor 
         for the timestep, only relevant for adaptive timestepping methods.
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
         return True, 0.0, 1.0
 
 
     def revert(self):
-        """
-        Revert integration engine to previous timestep, this is only relevant 
-        for adaptive methods where the simulation timestep 'dt' is rescaled and 
-        the engine step is recomputed with the smaller timestep.
+        """Revert integration engine to previous timestep. 
+
+        This is only relevant for adaptive methods where the simulation 
+        timestep 'dt' is rescaled and the engine step is recomputed with 
+        the smaller timestep.
         """
         
         #reset internal state to previous state
@@ -204,12 +270,29 @@ class Solver:
     # methods for timestepping ---------------------------------------------------------
 
     def step(self, u, t, dt):
-        """
-        Performs the explicit timestep for (t+dt) based 
+        """Performs the explicit timestep for (t+dt) based 
         on the state and input at (t).
 
         Returns the local truncation error estimate and the 
         rescale factor for the timestep if the solver is adaptive.
+
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
         return True, 0.0, 1.0
 
@@ -217,13 +300,24 @@ class Solver:
     # methods for interpolation --------------------------------------------------------
 
     def interpolate(self, r, dt):
-        """
-        Interpolate solution after successful timestep as a ratio 
+        """Interpolate solution after successful timestep as a ratio 
         in the interval [t, t+dt].
 
         This is especially relevant for Runge-Kutta solvers that 
         have a higher order interpolant. Otherwise this is just 
         linear interpolation using the buffered state.
+        
+        Parameters
+        ----------
+        r : float
+            ration for interpolation within timestep
+        dt : float
+            integration timestep
+
+        Returns
+        -------
+        x : numeric, array[numeric]
+            interpolated state
         """
         _r = np.clip(r, 0.0, 1.0)
         return _r * self.x + (1.0 - _r) * self.x_0
@@ -232,15 +326,23 @@ class Solver:
 # EXTENDED BASE SOLVER CLASSES =========================================================
 
 class ExplicitSolver(Solver):
-    """
-    Base class for explicit solver definition.
+    """Base class for explicit solver definition.
 
-    INPUTS (*solver_args, **solver_kwargs) : 
-        initial_value     : (float or array) initial condition / integration constant
-        func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
-        jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
-        tolerance_lte_abs : (float) absolute tolerance for local truncation error (for solvers with error estimate)
-        tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
+    Attributes
+    ----------
+    x_0 : numeric, array[numeric]
+        internal 'working' initial value
+    x : numeric, array[numeric]
+        internal 'working' state
+    n : int
+        order of integration scheme
+    s : int
+        number of internal intermediate stages
+    stage : int
+        counter for current intermediate stage
+    eval_stages : list[float]
+        rations for evaluation times of intermediate stages
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -257,13 +359,24 @@ class ExplicitSolver(Solver):
     # method for direct integration ----------------------------------------------------
 
     def integrate_singlestep(self, time=0.0, dt=0.1):
-        """
-        Directly integrate the function 'func' for a single timestep 'dt' with 
+        """Directly integrate the function 'func' for a single timestep 'dt' with 
         explicit solvers. This method is primarily intended for testing purposes.
+        
+        Parameters
+        ----------  
+        time_start : float
+            starting time for timestep
+        dt : float
+            integration timestep
 
-        INPUTS :    
-            time_start : (float) starting time for timestep
-            dt         : (float) timestep
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error_norm : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
 
         #buffer current state
@@ -283,18 +396,32 @@ class ExplicitSolver(Solver):
                   dt_min=0.0, 
                   dt_max=None, 
                   adaptive=True):
-        """
-        Directly integrate the function 'func' from 'time_start' to 'time_end' with 
-        timestep 'dt' for explicit solvers. This method is primarily intended for 
-        testing purposes.
+        """Directly integrate the function 'func' from 'time_start' 
+        to 'time_end' with timestep 'dt' for explicit solvers. 
 
-        INPUTS : 
-            time_start : (float) starting time for integration
-            time_end   : (float) end time for integration
-            dt         : (float) timestep or initial timestep for adaptive solvers
-            dt_min     : (float) lower bound for timestep, default '0.0'
-            dt_max     : (float) upper bound for timestep, default 'None'
-            adaptive   : (bool) usa adaptive timestepping if available
+        This method is primarily intended for testing purposes.
+    
+        Parameters
+        ----------
+        time_start : float
+            starting time for integration
+        time_end : float
+            end time for integration
+        dt : float
+            timestep or initial timestep for adaptive solvers
+        dt_min : float
+            lower bound for timestep, default '0.0'
+        dt_max : float
+            upper bound for timestep, default 'None'
+        adaptive : bool
+            use adaptive timestepping if available
+
+        Returns
+        -------
+        outout_times : array[float]
+            time points of the solution
+        output_states : array[numeric], array[array[numeric]]
+            state values at solution time points
         """
 
         #output lists with initial state
@@ -330,14 +457,25 @@ class ExplicitSolver(Solver):
 
 class ImplicitSolver(Solver):
     """
-    Base class for implicit solver definition. 
+    Base class for implicit solver definition.
 
-    INPUTS (*solver_args, **solver_kwargs) :  
-        initial_value     : (float or array) initial condition / integration constant
-        func              : (callable) function to integrate with state 'x', input 'u' and time 't' dependency
-        jac               : (callable or None) jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', if 'None', no jacobian is used
-        tolerance_lte_abs : (float) absolute tolerance for local truncation error (for solvers with error estimate)
-        tolerance_lte_rel : (float) relative tolerance for local truncation error (for solvers with error estimate)
+    Attributes
+    ----------
+    x_0 : numeric, array[numeric]
+        internal 'working' initial value
+    x : numeric, array[numeric]
+        internal 'working' state
+    n : int
+        order of integration scheme
+    s : int
+        number of internal intermediate stages
+    stage : int
+        counter for current intermediate stage
+    eval_stages : list[float]
+        rations for evaluation times of intermediate stages
+    opt : NewtonAnderson, Anderson, etc.
+        optimizer instance to solve the implicit update equation
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -359,11 +497,15 @@ class ImplicitSolver(Solver):
 
 
     def buffer(self, dt):
-        """
-        Saves the current state to an internal state buffer which 
+        """Saves the current state to an internal state buffer which 
         is especially relevant for multistage and implicit solvers.
 
         Resets the stage counter and the optimizer of implicit methods.
+        
+        Parameters
+        ----------
+        dt : float
+            integration timestep
         """
 
         #buffer internal state
@@ -379,10 +521,23 @@ class ImplicitSolver(Solver):
     # methods for timestepping ---------------------------------------------------------
 
     def solve(self, u, t, dt):
-        """
-        Advances the solution of the implicit update equation of the solver 
+        """Advances the solution of the implicit update equation of the solver 
         with the optimizer of the engine and tracks the evolution of the 
         solution by providing the residual norm of the fixed-point solution.
+
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        err : float
+            residual error of the fixed point update equation
         """
         return 0.0
 
@@ -398,11 +553,28 @@ class ImplicitSolver(Solver):
         Directly integrate the function 'func' for a single timestep 'dt' with 
         implicit solvers. This method is primarily intended for testing purposes.
 
-        INPUTS :    
-            time_start     : (float) starting time for timestep
-            dt             : (float) timestep
-            tolerance_fpi  : (float) tolerance for fixed-point solver  
-            max_iterations : (int) maximum number of fixed-point solver iterations
+        Parameters
+        ----------  
+        time_start : float
+            starting time for timestep
+        dt : float
+            integration timestep
+        tolerance_fpi : float
+            convergence criterion for implicit update equation
+        max_iterations : int
+            maximum numer of iterations for optimizer to solve 
+            implicit update equation
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        success_sol : bool
+            True if optimizer successfully solved implicit update equation
+        error_norm : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
         """
 
         #buffer current state
@@ -439,20 +611,37 @@ class ImplicitSolver(Solver):
                   adaptive=True,
                   tolerance_fpi=1e-12, 
                   max_iterations=5000):
-        """
-        Directly integrate the function 'func' from 'time_start' to 'time_end' with 
-        timestep 'dt' for implicit solvers. This method is primarily intended for 
-        testing purposes.
+        """Directly integrate the function 'func' from 'time_start' to 'time_end' with 
+        timestep 'dt' for implicit solvers. 
 
-        INPUTS : 
-            time_start     : (float) starting time for integration
-            time_end       : (float) end time for integration
-            dt             : (float) timestep or initial timestep for adaptive solvers
-            dt_min         : (float) lower bound for timestep, default '0.0'
-            dt_max         : (float) upper bound for timestep, default 'None'
-            adaptive       : (bool) use adaptive timestepping if available
-            tolerance_fpi  : (float) tolerance for fixed-point solver  
-            max_iterations : (int) maximum number of fixed-point solver iterations
+        This method is primarily intended for testing purposes.
+    
+        Parameters
+        ----------
+        time_start : float
+            starting time for integration
+        time_end : float
+            end time for integration
+        dt : float
+            timestep or initial timestep for adaptive solvers
+        dt_min : float
+            lower bound for timestep, default '0.0'
+        dt_max : float
+            upper bound for timestep, default 'None'
+        adaptive : bool
+            use adaptive timestepping if available
+        tolerance_fpi : float
+            convergence criterion for implicit update equation
+        max_iterations : int
+            maximum numer of iterations for optimizer to solve 
+            implicit update equation
+
+        Returns
+        -------
+        outout_times : array[float]
+            time points of the solution
+        output_states : array[numeric], array[array[numeric]]
+            state values at solution time points    
         """
 
         #output lists with initial state

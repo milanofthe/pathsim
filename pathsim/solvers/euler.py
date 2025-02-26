@@ -15,8 +15,7 @@ from ._solver import ExplicitSolver, ImplicitSolver
 # SOLVERS ==============================================================================
 
 class EUF(ExplicitSolver):
-    """
-    Class that performs explicit (forward) euler integration
+    """Class that performs explicit (forward) euler integration
     it holds the state and implements the timestep update.
 
     Use this only if the function to integrate is super smooth 
@@ -24,9 +23,26 @@ class EUF(ExplicitSolver):
     """
 
     def step(self, u, t, dt):
-        """
-        performs the explicit forward timestep for (t+dt) 
+        """performs the explicit forward timestep for (t+dt) 
         based on the state and input at (t)
+
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        success : bool
+            timestep was successful
+        err : float
+            truncation error estimate
+        scale : float
+            timestep rescale from error controller
         """
 
         #update state with euler step
@@ -37,8 +53,7 @@ class EUF(ExplicitSolver):
 
 
 class EUB(ImplicitSolver):
-    """
-    Class that performs implicit (backward) euler integration
+    """Class that performs implicit (backward) euler integration
     it holds the state and implements the solution of the 
     implicit update equation at each timestep.
 
@@ -47,9 +62,22 @@ class EUB(ImplicitSolver):
     """
 
     def solve(self, u, t, dt):
-        """
-        Solves the implicit update equation 
+        """Solves the implicit update equation 
         using the internal optimizer.
+
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        err : float
+            residual error of the fixed point update equation
         """
 
         #update the fixed point equation

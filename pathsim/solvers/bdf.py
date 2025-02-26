@@ -15,11 +15,34 @@ from ._solver import ImplicitSolver
 # BASE BDF SOLVER ======================================================================
 
 class BDF(ImplicitSolver):
-    """
-    Base class for the backward differentiation formula (BDF) integrators.
+    """Base class for the backward differentiation formula (BDF) integrators.
+    
+    Notes
+    ----- 
+    This solver class is not intended to be used directly
 
-    NOTE : 
-        This solver class is not intended to be used directly
+    Attributes
+    ----------
+    x_0 : numeric, array[numeric]
+        internal 'working' initial value
+    x : numeric, array[numeric]
+        internal 'working' state
+    n : int
+        order of integration scheme
+    s : int
+        number of internal intermediate stages
+    stage : int
+        counter for current intermediate stage
+    eval_stages : list[float]
+        rations for evaluation times of intermediate stages
+    opt : NewtonAnderson, Anderson, etc.
+        optimizer instance to solve the implicit update equation
+    K : dict[int: list[float]]
+        bdf coefficients for the state buffer for each order
+    F : dict[int: float]
+        bdf coefficients for the function 'func' for each order
+    B : list[numeric], list[array[numeric]]
+        buffer for previous states
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -42,9 +65,7 @@ class BDF(ImplicitSolver):
 
 
     def reset(self):
-        """"
-        Resets integration engine to initial state.
-        """
+        """"Resets integration engine to initial state."""
 
         #clear buffer
         self.B = []
@@ -54,8 +75,13 @@ class BDF(ImplicitSolver):
 
 
     def buffer(self, dt):
-        """
-        buffer the state for the multistep method
+        """buffer the state for the multistep method
+        
+        Parameters
+        ----------
+        dt : float
+            integration timestep
+
         """
             
         #reset optimizer
@@ -73,8 +99,21 @@ class BDF(ImplicitSolver):
 
 
     def solve(self, u, t, dt):
-        """
-        Solves the implicit update equation using the optimizer of the engine.
+        """Solves the implicit update equation using the optimizer of the engine.
+
+        Parameters
+        ----------
+        u : numeric, array[numeric]
+            function 'func' input value
+        t : float
+            evaluation time of function 'func'
+        dt : float 
+            integration timestep
+
+        Returns
+        -------
+        err : float
+            residual error of the fixed point update equation
         """
 
         #buffer length for BDF order selection
@@ -105,8 +144,7 @@ class BDF(ImplicitSolver):
 # SOLVERS ==============================================================================
 
 class BDF2(BDF):
-    """
-    2-nd order backward differentiation formula 
+    """2-nd order backward differentiation formula 
     with order ramp up for the initial steps.
     """
 
@@ -118,8 +156,7 @@ class BDF2(BDF):
 
 
 class BDF3(BDF):
-    """
-    3-rd order backward differentiation formula 
+    """3-rd order backward differentiation formula 
     with order ramp up for the initial steps.
     """
 
@@ -131,8 +168,7 @@ class BDF3(BDF):
 
 
 class BDF4(BDF):
-    """
-    4-th order backward differentiation formula 
+    """4-th order backward differentiation formula 
     with order ramp up for the initial steps.
     """
 
@@ -144,8 +180,7 @@ class BDF4(BDF):
 
 
 class BDF5(BDF):
-    """
-    5-th order backward differentiation formula 
+    """5-th order backward differentiation formula 
     with order ramp up for the initial steps.
     """
 
@@ -157,8 +192,7 @@ class BDF5(BDF):
 
 
 class BDF6(BDF):
-    """
-    6-th order backward differentiation formula 
+    """6-th order backward differentiation formula 
     with order ramp up for the initial steps.
     """
 

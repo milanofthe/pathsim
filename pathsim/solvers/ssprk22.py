@@ -15,8 +15,7 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class SSPRK22(ExplicitRungeKutta):
-    """
-    Strong Stability Preserving (SSP) 2-nd order two stage (2,2) Runge-Kutta method,
+    """Strong Stability Preserving (SSP) 2-nd order two stage (2,2) Runge-Kutta method,
     also known as the 'Heun-Method'.
 
     This integrator has a good trade off between speed, accuracy and stability.
