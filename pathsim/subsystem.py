@@ -21,10 +21,10 @@ from .utils.utils import path_length_dfs, dict_to_array
 # IO CLASS ==============================================================================
 
 class Interface(Block):
-    """
-    Bare-bone block that serves as a data interface for the 'Subsystem' class.
+    """Bare-bone block that serves as a data interface for the 'Subsystem' class.
 
     It works like this:
+    
     - Internal blocks of the subsystem are connected to the inputs and outputs 
       of this Interface block via the internal connections.
     - It behaves like a normal block (inherits the main 'Block' class methods).
@@ -45,8 +45,7 @@ class Interface(Block):
 # MAIN SUBSYSTEM CLASS ==================================================================
 
 class Subsystem(Block):
-    """
-    Subsystem class that holds its own blocks and connecions and 
+    """Subsystem class that holds its own blocks and connecions and 
     can natively interface with the main simulation loop. 
 
     IO interface is realized by a special 'Interface' block, that has extra 
@@ -63,9 +62,17 @@ class Subsystem(Block):
     blocks with internal states) and the 'solve' method for solving the 
     implicit update equation for implicit solvers. 
 
-    INPUTS : 
-        blocks      : (list[Block] internal blocks of the subsystem
-        connections : (list[Connection]) internal connections of the subsystem
+    Parameters
+    ----------
+    blocks : list[Block] 
+        internal blocks of the subsystem
+    connections : list[Connection]
+        internal connections of the subsystem
+
+    Attributes
+    ----------
+    interface : Interface
+        internal interface block for data transfer to the outside
     """
 
     def __init__(self, blocks=None, connections=None):
@@ -99,9 +106,9 @@ class Subsystem(Block):
 
 
     def __len__(self):
-        """
-        Recursively compute the longest signal path in the subsytem by 
+        """Recursively compute the longest signal path in the subsytem by 
         depth first search, leveraging the '__len__' methods of the blocks. 
+
         This enables the path length computation even for nested subsystems.
 
         Iterate internal blocks and compute longest path from each block 
@@ -118,10 +125,9 @@ class Subsystem(Block):
 
 
     def __call__(self):
-        """
-        Recursively get the subsystems internal states of engines (if available)
-        of all internal blocks and nested subsystems and the subsystem inputs and 
-        outputs as arrays for use outside. 
+        """Recursively get the subsystems internal states of engines 
+        (if available) of all internal blocks and nested subsystems 
+        and the subsystem inputs and outputs as arrays for use outside. 
 
         Either for monitoring, postprocessing or event detection. 
         In any case this enables easy access to the current block state.
@@ -136,9 +142,8 @@ class Subsystem(Block):
 
 
     def _check_connections(self):
-        """
-        Check if connections are valid and if there is no input port that recieves 
-        multiple outputs and could be overwritten unintentionally.
+        """Check if connections are valid and if there is no input port 
+        that recieves multiple outputs and could be overwritten unintentionally.
 
         If multiple outputs are assigned to the same input, an error is raised.
         """
@@ -154,6 +159,7 @@ class Subsystem(Block):
 
 
     def reset(self):
+        """Reset the subsystem and all internal blocks"""
 
         #reset interface
         self.interface.reset()
@@ -164,8 +170,7 @@ class Subsystem(Block):
 
 
     def on(self):
-        """
-        Activate the subsystem and all internal blocks, sets the boolean
+        """Activate the subsystem and all internal blocks, sets the boolean
         evaluation flag to 'True'.
         """
         self._active = True
@@ -174,9 +179,8 @@ class Subsystem(Block):
     
 
     def off(self):
-        """
-        Deactivate the subsystem and all internal blocks, sets the boolean
-        evaluation flag to 'False'. Also resets the subsystem
+        """Deactivate the subsystem and all internal blocks, sets the boolean
+        evaluation flag to 'False'. Also resets the subsystem.
         """
         self._active = False
         for block in self.blocks: 
@@ -187,8 +191,7 @@ class Subsystem(Block):
     # methods for discrete event management -------------------------------------------------
 
     def get_events(self):
-        """
-        Recursively collect and return events spawned by the 
+        """Recursively collect and return events spawned by the 
         internal blocks of the subsystem, for discrete time 
         blocks such as triggers / comparators, clocks, etc.
         """
@@ -201,24 +204,27 @@ class Subsystem(Block):
     # methods for inter-block data transfer -------------------------------------------------
 
     def set(self, port, value):
-        """
-        The 'set' method of the 'Subsystem' sets the output 
+        """The 'set' method of the 'Subsystem' sets the output 
         values of the 'Interface' block.
-
-        INPUTS : 
-            port  : (int) input port to set value to
-            value : (numeric) value to set at input port (of subsystem)
+    
+        Parameters
+        ----------
+        port : int
+            input port to set value to
+        value : numeric
+            value to set at input port (of subsystem)
         """
         self.interface.set_output(port, value)
 
 
     def get(self, port):
-        """
-        The 'get' method of the 'Subsystem' retrieves the input 
+        """The 'get' method of the 'Subsystem' retrieves the input 
         values of the 'Interface' block.
-
-        INPUTS : 
-            port : (int) output port (of subsystem) to retrieve value from
+    
+        Parameters
+        ----------
+        port : int
+            output port (of subsystem) to retrieve value from
         """
         return self.interface.get_input(port)
 
@@ -226,18 +232,14 @@ class Subsystem(Block):
     # methods for data recording ------------------------------------------------------------
 
     def sample(self, t):
-
-        """
-        Update the internal connections again and sample data from 
+        """Update the internal connections again and sample data from 
         the internal blocks that implement the 'sample' method.
-
-        INPUTS : 
-            t  : (float) evaluation time 
+    
+        Parameters
+        ----------
+        t : float
+            evaluation time 
         """
-
-        # #update internal connenctions (data transfer)
-        # for connection in self.connections:
-        #     connection.update()
 
         #record data if required
         for block in self.blocks:
@@ -247,15 +249,18 @@ class Subsystem(Block):
     # methods for block output and state updates --------------------------------------------
 
     def update(self, t):
-        """
-        Update the instant time components of the internal blocks 
+        """Update the instant time components of the internal blocks 
         to evaluate the (distributed) system equation.
 
-        INPUTS : 
-            t  : (float) evaluation time 
+        Parameters
+        ----------
+        t : float
+            evaluation time 
 
-        RETURNS : 
-            max_error : (float) error tolerance of system equation convergence
+        Returns
+        ------- 
+        max_error : float
+            error tolerance of system equation convergence
         """
 
         #update internal connections (data transfer)
@@ -277,12 +282,17 @@ class Subsystem(Block):
         """
         Advance solution of implicit update equation for internal blocks.
 
-        INPUTS : 
-            t  : (float) evaluation time 
-            dt : (float) timestep
-
-        RETURNS : 
-            max_error : (float) maximum error of implicit update equaiton
+        Parameters
+        ----------
+        t : float
+            evaluation time 
+        dt : float
+            timestep
+    
+        Returns
+        -------
+        max_error : float
+            maximum error of implicit update equaiton
         """
         max_error = 0.0
         for block in self.blocks:
@@ -293,21 +303,29 @@ class Subsystem(Block):
 
 
     def step(self, t, dt):
-        """
-        Explicit component of timestep for internal blocks including error propagation.
+        """Explicit component of timestep for internal blocks 
+        including error propagation.
 
-        NOTE : 
-            This is pretty much an exact copy of the '_step' method 
-            from the 'Simulation' class.
+        Notes
+        ----- 
+        This is pretty much an exact copy of the '_step' method 
+        from the 'Simulation' class.
 
-        INPUTS : 
-            t  : (float) evaluation time 
-            dt : (float) timestep
+        Parameters
+        ---------- 
+        t : float
+            evaluation time 
+        dt : float
+            timestep
 
-        RETURNS : 
-            success   : (bool) indicator if the timestep was successful
-            max_error : (float) maximum local truncation error from integration
-            scale     : (float) rescale factor for timestep
+        Returns
+        -------
+        success : bool
+            indicator if the timestep was successful
+        max_error : float
+            maximum local truncation error from integration
+        scale : float
+            rescale factor for timestep
         """
 
         #initial timestep rescale and error estimate
@@ -340,16 +358,18 @@ class Subsystem(Block):
     # methods for blocks with integration engines -------------------------------------------
 
     def set_solver(self, Solver, **solver_args):
-        """
-        Initialize all blocks with solver for numerical integration
+        """Initialize all blocks with solver for numerical integration
         and additional args for the solver such as tolerances, etc.
 
         If blocks already have solvers, change the numerical integrator
         to the 'Solver' class.
         
-        INPUTS :
-            Solver      : ('Solver' class) numerical solver definition
-            solver_args : (dict) args to initialize solver with 
+        Parameters
+        ----------
+        Solver : Solver
+            numerical solver definition
+        solver_args : dict
+            args to initialize solver with 
         """
 
         #iterate all blocks and set integration engines
@@ -358,8 +378,7 @@ class Subsystem(Block):
 
 
     def revert(self):
-        """
-        revert the internal blocks to the state 
+        """revert the internal blocks to the state 
         of the previous timestep 
         """
         for block in self.blocks:
@@ -367,9 +386,13 @@ class Subsystem(Block):
 
 
     def buffer(self, dt):
-        """
-        buffer internal states of blocks with 
+        """buffer internal states of blocks with 
         internal integration engines 
+        
+        Parameters
+        ----------
+        dt : float
+            evaluation time for buffering    
         """
         for block in self.blocks:
             block.buffer(dt)
