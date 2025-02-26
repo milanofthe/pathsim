@@ -17,13 +17,24 @@ from bisect import bisect_left
 # HELPER CLASS =========================================================================
 
 class AdaptiveBuffer:
-    """
-    A class that manages an adaptive buffer for delay modeling which is primarily 
-    used in the pathsim 'Delay' block. It implements a linear interpolation for 
-    arbitraty time lookup.
+    """A class that manages an adaptive buffer for delay modeling which is primarily 
+    used in the pathsim 'Delay' block. 
 
-    INPUTS : 
-        delay : (float) time delay in seconds
+    It implements a linear interpolation for arbitraty time lookup.
+    
+    Parameters
+    ----------
+    delay : float
+        time delay in seconds
+    
+    Attributes
+    ----------
+    buffer : deque
+        deque that collects the data for buffering
+    counter : int
+        count the number of lookups
+    clean_every : int
+        interval for buffer cleanup
     """
 
     def __init__(self, delay):
@@ -42,6 +53,15 @@ class AdaptiveBuffer:
 
 
     def add(self, t, value):
+        """adding a new datapoint to the buffer
+
+        Parameters
+        ----------
+        t : float
+            time to add
+        value : float, int, complex
+            numerical value to add
+        """
 
         #add the time-value tuple
         self.buffer.append((t, value))
@@ -56,6 +76,13 @@ class AdaptiveBuffer:
 
     
     def get(self, t):
+        """lookup datapoint from buffer
+    
+        Parameters
+        ----------
+        t : float
+            time for lookup
+        """
 
         #default 0
         if not self.buffer:
@@ -82,6 +109,6 @@ class AdaptiveBuffer:
 
 
     def clear(self):
-        #reset everything
+        """clear the buffer, reset everything"""
         self.buffer = deque()
         self.counter = 0

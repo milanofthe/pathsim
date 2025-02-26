@@ -16,9 +16,15 @@ import logging
 # HELPER CLASS =========================================================================
 
 class ProgressTracker:
-    """
-    Class that manages progress tracking by providing a generator
+    """Class that manages progress tracking by providing a generator
     interface that runs until an external condition is satisfied.
+    
+    Parameters
+    ----------
+    logger : logging.Logger
+        logger instance
+    log_interval : int
+        interval to log percentages, from 0 to 100    
     """
 
     def __init__(self, logger=None, log_interval=10, **kwargs):
@@ -52,6 +58,7 @@ class ProgressTracker:
 
 
     def __iter__(self):
+        """Iterator interface for ProgressTracker"""
 
         #starting progress tracker
         if self.logger:
@@ -83,15 +90,17 @@ class ProgressTracker:
 
 
     def check(self, progress, success=False, **kwargs):
-        """
-        Update the progress of the generator. 
+        """Update the progress of the generator. 
 
         This method needs to be called within the iteration loop 
         to update the looping condition and the internal tracking.
-
-        INPUTS :
-            progress : (float) progress number between 0 and 1
-            success  : (bool) was the update step successful?
+    
+        Parameters
+        ----------
+        progress : float
+            progress number between 0 and 1
+        success : bool
+            True if the update step was successful, False otherwise
         """
 
         #compute progress in percent (round to integer)

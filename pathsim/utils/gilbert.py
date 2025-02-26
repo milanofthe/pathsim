@@ -26,10 +26,8 @@ def is_numeric(array):
 
 # STATESPACE REALIZATION ===============================================================
 
-def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
-        
-    """
-    Build real valued statespace model from transfer function 
+def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9): 
+    """Build real valued statespace model from transfer function 
     in pole residue form by Gilberts method and an additional 
     similarity transformation to get fully real valued matrices.
 
@@ -39,15 +37,32 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
     statespace form:
         H(s) = C * (s*I - A)^-1 * B + D 
     
-    NOTE :  
-        The resulting system is identical to the so-called 
-        'Modal Form' and is a minimal realization.
+    Notes
+    -----  
+    The resulting system is identical to the so-called 
+    'Modal Form' and is a minimal realization.
 
-    INPUTS : 
-        Poles     : (array) real and complex poles
-        Residues  : (array) array of real and complex residue matrices
-        Const     : (array) matrix for constant term
-        tolerance : (float) relative tolerance for checking real poles
+    Parameters
+    ---------- 
+    Poles : array
+        real and complex poles
+    Residues : array
+        array of real and complex residue matrices
+    Const : array
+        matrix for constant term
+    tolerance : float
+        relative tolerance for checking real poles
+    
+    Returns 
+    -------
+    A : array
+        state matrix
+    B : array 
+        input mapping matrix
+    C : array
+        state to output projection matrix
+    D : array, float
+        direct passthrough
     """
 
     #make arrays

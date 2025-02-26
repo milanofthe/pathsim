@@ -26,10 +26,14 @@ from contextlib import ContextDecorator
 # CLASSES ==============================================================================
 
 class Timer:
-    """
-    context manager that times the execution time 
+    """context manager that times the execution time 
     of the code inside of the context in 'ms' for 
     debugging purposes
+    
+    Parameters
+    ----------
+    verbose : bool
+        flag for verbose output
     """
     def __init__(self, verbose=True):
         self.verbose = verbose
@@ -46,9 +50,13 @@ class Timer:
 
 
 def timer(func):
-    """
-    shows the execution time in milliseconds of the 
+    """Shows the execution time in milliseconds of the 
     function object passed for debugging purposes
+    
+    Parameters
+    ----------
+    func : callable
+        function to track execution time of
     """
 
     @wraps(func)
@@ -107,6 +115,17 @@ def track_block_runtime(cls):
 
     
 class Profiler(ContextDecorator):
+
+    """Context manager for easy code profiling
+
+    Parameters
+    ----------
+    top_n : int
+        track top n function calls
+    sort_by : str
+        method to sort function cally by
+    """
+    
     def __init__(self, top_n=50, sort_by="cumulative"):
         self.top_n = top_n
         self.sort_by = sort_by
@@ -124,11 +143,3 @@ class Profiler(ContextDecorator):
         stats.print_stats(self.top_n)
         return False        
         
-
-
-
-
-
-
-
-

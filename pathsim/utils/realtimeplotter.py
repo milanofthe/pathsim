@@ -23,16 +23,28 @@ from collections import deque
 
 
 class RealtimePlotter:
-    """
-    Class that manages a realtime plotting window that 
+    """Class that manages a realtime plotting window that 
     can stream in x-y-data and update accordingly
         
-    INPUTS:
-        max_samples     : (int) maximum number of samples to plot
-        update_interval : (float) time in seconds between refreshs
-        labels          : (list of strings) labels for plot traces
-        x_label         : (str) label for x-axis
-        y_label         : (str) label for y-axis
+    Parameters
+    ----------
+    max_samples : int
+        maximum number of samples to plot
+    update_interval : float
+        time in seconds between refreshs
+    labels : list[str]
+        labels for plot traces
+    x_label : str
+        label for x-axis
+    y_label : str
+        label for y-axis
+
+    Attributes
+    ----------
+    fig : matplotlib.pyplot.figure
+        internal figure of the realtime plotter
+    ax : matplotlib.pyplot.axis
+        internal axis of the realtime plotter
     """
 
     def __init__(self, max_samples=None, update_interval=1, labels=[], x_label="", y_label=""):
@@ -85,6 +97,15 @@ class RealtimePlotter:
 
 
     def update_all(self, x, y):
+        """update the plot completely with new data
+
+        Parameters
+        ----------
+        x : array[float]
+            new x values to plot
+        y : array[float]
+            new y values to plot
+        """
 
         #not running? -> quit early
         if not self.is_running:
@@ -122,6 +143,15 @@ class RealtimePlotter:
 
 
     def update(self, x, y):
+        """update the plot with new data
+
+        Parameters
+        ----------
+        x : float
+            new x value to add
+        y : float
+            new y value to add
+        """
         
         #not running? -> quit early
         if not self.is_running:

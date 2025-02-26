@@ -15,43 +15,102 @@ import numpy as np
 # HELPERS FOR SIMULATION ===============================================================
 
 def dict_to_array(a):
+    """convert a dict with integer keys to a numpy array
+
+    Parameters
+    ----------
+    a : dict[int: int, float, complex]
+        dict to convert to numpy array
+        
+    Returns
+    -------
+    out : array[int, float, complex]
+        converted array
+    """
     return np.array([a[k] for k in sorted(a.keys())])
 
 
 def array_to_dict(a):
+    """convert a numpy array to a dict with integer keys
+
+    Parameters
+    ----------
+    a : array[int, float, complex]
+        numpy array to convert
+    
+    Returns
+    -------
+    out: dict[int: int, float, complex]
+        converted dict
+    """
     if np.isscalar(a): return {0:a}
     else: return dict(enumerate(a))
 
 
 def rel_error(a, b):
-    """
-    Computes the relative error between two scalars.
+    """Computes the relative error between two scalars.
     It is robust to one of them being zero and falls 
     back to the absolute error in this case.
 
-    NOTE : 
-        this is actually faster then inlining the 
-        branching into the return statement
+    Notes
+    ----- 
+    this is actually faster then inlining the 
+    branching into the return statement
+    
+    Parameters
+    ----------
+    a : float, int, complex
+        first number
+    b : float, int, complex
+        second number
+    
+    Returns
+    -------
+    err : float
+        retative error
     """
     if a == 0.0: return abs(b)
     else: return abs((a - b)/a)
 
 
 def abs_error(a, b):
-    """
-    Computes the absolute error between two scalars.
+    """Computes the absolute error between two scalars.
+
+    Parameters
+    ----------
+    a : float, int, complex
+        first number
+    b : float, int, complex
+        second number
+    
+    Returns
+    -------
+    err : float
+        absolute error
     """
     return abs(a - b)
 
 
 def max_error(a, b):
-    """
-    Computes the maximum absolute error / deviation between two
+    """Computes the maximum absolute error / deviation between two
     iterables such as lists with numerical values. Returns a scalar 
     value representing the maximum deviation.
 
-    NOTE:
-        this is actually faster then 'max' over a list comprehension
+    Notes
+    -----
+    this is actually faster then 'max' over a list comprehension
+    
+    Parameters
+    ----------
+    a : iterable[float, int, complex]
+        first iterable with numerical values
+    b : iterable[float, int, complex]
+        second iterable with numerical values
+    
+    Returns
+    -------
+    err : float
+        maximum absolute error
     """
     max_err = 0.0
     for err in map(abs_error, a, b):
@@ -61,15 +120,29 @@ def max_error(a, b):
 
 
 def max_rel_error(a, b):
-    """
-    Computes the maximum relative error between two iterables 
-    such as lists with numerical values. It is robust to one of 
-    them being zero and falls back to the absolute error in this 
-    case. It returns a scalar value representing the maximum 
-    relative error. 
+    """Computes the maximum relative error between two iterables 
+    such as lists with numerical values. 
 
-    NOTE:
-        this is actually faster then 'max' over a list comprehension
+    It is robust to one of them being zero and falls back to the 
+    absolute error in this case. 
+
+    It returns a scalar value representing the maximum relative error. 
+
+    Notes
+    -----
+    this is actually faster then 'max' over a list comprehension
+
+    Parameters
+    ----------
+    a : iterable[float, int, complex]
+        first iterable with numerical values
+    b : iterable[float, int, complex]
+        second iterable with numerical values
+    
+    Returns
+    -------
+    err : float
+        maximum retative error
     """
     max_err = 0.0
     for err in map(rel_error, a, b):
@@ -79,20 +152,46 @@ def max_rel_error(a, b):
 
 
 def max_error_dicts(a, b):
-    """
-    Computes the maximum absolute error between two dictionaries 
-    with numerical values. It returns a scalar value representing 
-    the maximum absolute error. 
+    """Computes the maximum absolute error between two dictionaries 
+    with numerical values. 
+
+    It returns a scalar value representing the maximum absolute error.
+
+    Parameters
+    ----------
+    a : dict[int: float, int, complex]
+        first dict with numerical values
+    b : dict[int: float, int, complex]
+        second iterable with numerical values
+
+    Returns
+    -------
+    err : float
+        maximum absolute error
     """
     return max_error(a.values(), b.values())
 
 
 def max_rel_error_dicts(a, b):
-    """
-    Computes the maximum relative error between two dictionaries 
-    with numerical values. It is robust to one of them being zero 
-    and falls back to the absolute error in this case. It returns 
-    a scalar value representing the maximum relative error. 
+    """Computes the maximum relative error between two dictionaries 
+    with numerical values. 
+
+    It is robust to one of them being zero and falls back to the 
+    absolute error in this case. 
+
+    It returns a scalar value representing the maximum relative error. 
+
+    Parameters
+    ----------
+    a : dict[int: float, int, complex]
+        first dict with numerical values
+    b : dict[int: float, int, complex]
+        second iterable with numerical values
+
+    Returns
+    -------
+    err : float
+        maximum relative error
     """
     return max_rel_error(a.values(), b.values())
 
@@ -100,17 +199,27 @@ def max_rel_error_dicts(a, b):
 # AUTOMATIC DIFFERENTIATION ============================================================
 
 def numerical_jacobian(func, x, h=1e-8):
-    """
-    Numerically computes the jacobian of the function 'func' by 
-    central differences with the stepsize 'h' which is set to 
-    a default value of 'h=1e-8' which is the point where the 
-    truncation error of the central differences balances with 
-    the machine accuracy of 64bit floating point numbers.    
+    """Numerically computes the jacobian of the function 'func' by 
+    central differences. 
+
+    With the stepsize 'h' which is set to a default value of 'h=1e-8' 
+    which is the point where the truncation error of the central 
+    differences balances with the machine accuracy of 64bit floating 
+    point numbers.    
     
-    INPUTS : 
-        func : (callable) function to compute jacobian for
-        x    : (float or array) value for function at which the jacobian is evaluated
-        h    : (float) step size for central differences
+    Parameters
+    ----------
+    func : callable
+        function to compute jacobian for
+    x : float, array[float] 
+        value for function at which the jacobian is evaluated
+    h : float
+        step size for central differences
+    
+    Returns
+    -------
+    jac : array[array[float]]
+        2d jacobian array
     """
     
     #catch scalar case (gradient)
@@ -123,8 +232,7 @@ def numerical_jacobian(func, x, h=1e-8):
 
 
 def auto_jacobian(func):
-    """
-    Wraps a function object such that it computes the jacobian 
+    """Wraps a function object such that it computes the jacobian 
     of the function with respect to the first argument.
 
     This is intended to compute the jacobian 'jac(x, u, t)' of 
@@ -141,9 +249,22 @@ def auto_jacobian(func):
 # PATH ESTIMATION ======================================================================
 
 def path_length_dfs(connections, starting_block, visited=None):
-    """
-    Recursively compute the longest path (depth first search) 
+    """Recursively compute the longest path (depth first search) 
     in a directed graph from a starting node / block.
+    
+    Parameters
+    ----------
+    connections : list[Connection]
+        connections of the graph
+    starting_block : Block
+        block to start dfs
+    visited : None, set
+        set of already visited graph nodes (blocks)
+    
+    Returns
+    -------
+    length : int
+        length of path starting from ´starting_block´
     """
 
     if visited is None:
