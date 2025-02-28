@@ -13,12 +13,18 @@
 # IMPORTS ===============================================================================
 
 import numpy as np
+
+import datetime
 import logging
 
 from .utils.utils import path_length_dfs
 from .utils.debugging import Timer
 from .utils.progresstracker import ProgressTracker
+
 from .solvers import SSPRK22, SteadyState
+
+from .blocks._block import Block
+from .connection import Connection
 
 
 # TRANSIENT SIMULATION CLASS ============================================================
@@ -217,6 +223,120 @@ class Simulation:
 
     def _logger_warning(self, message):
         if self.log: self.logger.warning(message)
+
+
+    # serialization/deserialization -----------------------------------------------
+
+    def to_dict(self, name="Model", description=""):
+        """Convert simulation to a complete model representation as a dict
+
+        Parameters
+        ----------
+        name : str
+            model name
+        description : str
+            description of the model
+
+        Returns
+        -------
+        data : dict
+            dict that describes the simulation model
+        """
+        
+        #serialize system components
+        blocks = [block.to_dict() for block in self.blocks]
+        events = [event.to_dict() for event in self.events]
+        connections = [conn.to_dict() for conn in self.connections]
+                
+        #create the full model
+        data = {
+            "metadata": {
+                "name": name,
+                "description": description,
+                "created": datetime.datetime.now().isoformat()
+            },
+            "blocks": blocks,
+            "connections": connections,
+            "events": events,
+            "simulation": {
+                "dt": self.dt,
+                "dt_min": self.dt_min,
+                "dt_max": self.dt_max,
+                "solver": self.Solver.__name__,
+                "tolerance_fpi": self.tolerance_fpi,
+                "iterations_min": self.iterations_min,
+                "iterations_max": self.iterations_max
+            }
+        }
+        
+        return data
+
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create simulation from model data dict
+
+        Parameters
+        ----------
+        data : dict
+            model definition in json format
+
+        Returns
+        -------
+        simulation : Simulation
+            instance of the Simulation class with mode definition
+        """
+        from . import solvers
+        
+        # Deserialize blocks and create block ID mapping
+        blocks, id_to_block = [], {}
+        for block_data in data["blocks"]:
+            block = Block.from_dict(block_data)
+            blocks.append(block)
+            id_to_block[block_data["id"]] = block
+        
+        # Deserialize connections
+        connections = []
+        for conn_data in data["connections"]:
+            # Get source block and port
+            source_block = id_to_block[conn_data["source"]["block"]]
+            source_port = conn_data["source"]["port"]
+            
+            # Get targets
+            targets = []
+            for trg in conn_data["targets"]:
+                target_block = id_to_block[trg["block"]]
+                target_port = trg["port"]
+                targets.append((target_block, target_port))
+            
+            # Create connection
+            connections.append(Connection((source_block, source_port), *targets))
+        
+        # Deserialize events
+        events = []
+        for event_data in data.get("events", []):
+            events.append(Event.from_dict(event_data))
+        
+        # Get simulation parameters
+        sim_data = data.get("simulation", {})
+        
+        # Get solver class
+        solver_name = sim_data.get("solver", "SSPRK22")
+        Solver = getattr(solvers, solver_name)
+        
+        # Create simulation
+        return cls(
+            blocks=blocks,
+            connections=connections,
+            events=events,
+            dt=sim_data.get("dt", 0.01),
+            dt_min=sim_data.get("dt_min", 0.0),
+            dt_max=sim_data.get("dt_max", None),
+            Solver=Solver,
+            tolerance_fpi=sim_data.get("tolerance_fpi", 1e-12),
+            iterations_min=sim_data.get("iterations_min", None),
+            iterations_max=sim_data.get("iterations_max", 200)
+            )
 
 
     # adding system components ----------------------------------------------------

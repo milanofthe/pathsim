@@ -44,6 +44,7 @@ class Interface(Block):
 
 # MAIN SUBSYSTEM CLASS ==================================================================
 
+
 class Subsystem(Block):
     """Subsystem class that holds its own blocks and connecions and 
     can natively interface with the main simulation loop. 
@@ -187,6 +188,55 @@ class Subsystem(Block):
             block.off()
         self.reset()
 
+
+    # serialization / deserialization -------------------------------------------------------
+    
+    def to_dict(self):
+        """Custom serialization for Subsystem"""
+        result = super().to_dict()
+        
+        #serialization for internal blocks and interface
+        result["params"]["blocks"] = [block.to_dict() for block in self.blocks + [self.interface]]
+
+        #serialize connections
+        result["params"]["connections"] = [conn.to_dict() for conn in self.connections]
+        
+        return result
+
+    
+    @classmethod
+    def from_dict(cls, data):
+        """Custom deserialization for Subsystem"""
+        from .connection import Connection
+        
+        #deserialize blocks and create block ID mapping
+        blocks, id_to_block = [], {}
+        for blk_data in data["params"].pop("blocks", []):
+            block = Block.from_dict(blk_data)
+            blocks.append(block)
+            id_to_block[blk_data["id"]] = block
+
+        #deserialize connections
+        connections = []
+        for conn_data in data["params"].pop("connections", []):
+
+            #source data
+            source_block = id_to_block[conn_data["source"]["block"]]
+            source_port = conn_data["source"]["port"]
+            
+            #target data
+            targets = []
+            for trg in conn_data["targets"]:
+                target_block = id_to_block[trg["block"]]
+                target_port = trg["port"]
+                targets.append((target_block, target_port))
+            
+            #create the connection
+            connections.append(Connection((source_block, source_port), *targets))
+        
+        #finally construct the subsystem
+        return cls(blocks, connections)
+        
 
     # methods for discrete event management -------------------------------------------------
 

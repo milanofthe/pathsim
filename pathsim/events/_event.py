@@ -9,12 +9,17 @@
 
 # IMPORTS ===============================================================================
 
+import inspect
+import json
+
 import numpy as np
+
+from ..utils.serialization import Serializable
 
 
 # EVENT MANAGER CLASS ===================================================================
 
-class Event:
+class Event(Serializable):
     """This is the base class of the event handling system.
     
     Monitors system state by evaluating an event function (func_evt) with scalar output.
@@ -105,20 +110,6 @@ class Event:
 
 
     # external methods ------------------------------------------------------------------
-
-    def _get_params(self):
-        """Return dictionary of parameters that define this event"""
-        return {}
-
-
-    def to_dict(self):
-        """Convert event to dictionary representation for serialization"""
-        return {
-            "id": id(self),
-            "type": self.__class__.__name__,
-            "params": self._get_params()
-        }
-
 
     def on(self): self._active = True
     def off(self): self._active = False

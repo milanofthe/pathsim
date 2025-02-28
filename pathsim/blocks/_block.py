@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                                     BASE BLOCK 
-##                                  (blocks/_block.py)
+##                                 (blocks/_block.py)
 ##
 ##            This module defines the base 'Block' class that is the parent 
 ##         to all other blocks and can serve as a base for new or custom blocks
@@ -13,12 +13,16 @@
 
 # IMPORTS ===============================================================================
 
+import inspect
+import json
+
 from ..utils.utils import dict_to_array
+from ..utils.serialization import Serializable
 
 
 # BASE BLOCK CLASS ======================================================================
 
-class Block:
+class Block(Serializable):
     """Base 'Block' object that defines the inputs, outputs and the connect method.
 
     Block interconnections are handeled via the io interface of the blocks. 
@@ -127,29 +131,6 @@ class Block:
 
     def __bool__(self):
         return self._active
-
-
-    # methods for serialization ---------------------------------------------------------
-
-    def _get_params(self):
-        """Return dictionary of parameters that define this block"""
-        return {}
-
-
-    def to_dict(self):
-        """Convert block to dictionary representation for serialization"""
-        return {
-            "id": id(self),
-            "type": self.__class__.__name__,
-            "params": self._get_params()
-        }
-
-
-    @classmethod
-    def from_dict(cls, data):
-        """Create block instance from dictionary representation"""
-        block_class = globals()[data["type"]]
-        return block_class(**data["params"])
 
 
     # methods for simulation management -------------------------------------------------
