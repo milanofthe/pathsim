@@ -14,6 +14,7 @@
 
 import numpy as np
 
+import json
 import datetime
 import logging
 
@@ -178,8 +179,10 @@ class Simulation:
 
 
     def __str__(self):
-        # return "\n".join([str(block) for block in self.blocks])
-        return "\n".join(map(str, self.blocks))
+        """String representation of the simulation using the 
+        dict model format and readable json formatting
+        """
+        return json.dumps(self.to_dict(), indent=2, sort_keys=False)
 
 
     # logger methods --------------------------------------------------------------

@@ -68,10 +68,6 @@ class Block(Serializable):
         self.events = []
 
 
-    def __str__(self):
-        return self.__class__.__name__
-
-
     def __len__(self):
         """The '__len__' method of the block is used to compute the length of the 
         algebraic path of the block. For instant time blocks or blocks with 

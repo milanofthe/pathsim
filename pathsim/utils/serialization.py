@@ -180,6 +180,11 @@ def deserialize_callable(func_dict, global_env=None):
 class Serializable:
     """Mixin that provides automatic serialization based on __init__ parameters"""
     
+
+    def __str__(self):
+        return json.dumps(self.to_dict(), indent=2, sort_keys=False)
+
+        
     def to_dict(self):
         """Convert object to dictionary representation"""
         
@@ -215,7 +220,7 @@ class Serializable:
     @classmethod
     def from_dict(cls, data):
         """Create block instance from dictionary representation"""
-        
+
         # Use the class specified in the data
         block_type = data.get("type")
         

@@ -80,10 +80,6 @@ class Event(Serializable):
         self._active = True
 
 
-    def __str__(self):
-        return self.__class__.__name__
-
-
     def __len__(self):
         """
         Return the number of detected (or rather resolved) events.
