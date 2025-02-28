@@ -135,6 +135,21 @@ class Connection:
         return False 
 
 
+    def to_dict(self):
+        """Convert connection to dictionary representation"""
+        return {
+            "id": id(self),
+            "source": {
+                "block": id(self.source[0]),
+                "port": self.source[1]
+            },
+            "targets": [
+                {"block": id(trg[0]), "port": trg[1]} 
+                for trg in self.targets
+            ]
+        }
+
+
     def update(self):
         """Transfers data from the source block output port 
         to the target block input port.

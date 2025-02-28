@@ -106,6 +106,20 @@ class Event:
 
     # external methods ------------------------------------------------------------------
 
+    def _get_params(self):
+        """Return dictionary of parameters that define this event"""
+        return {}
+
+
+    def to_dict(self):
+        """Convert event to dictionary representation for serialization"""
+        return {
+            "id": id(self),
+            "type": self.__class__.__name__,
+            "params": self._get_params()
+        }
+
+
     def on(self): self._active = True
     def off(self): self._active = False
 

@@ -129,20 +129,27 @@ class Block:
         return self._active
 
 
-    # methods for loading and saving existing blocks ------------------------------------
+    # methods for serialization ---------------------------------------------------------
+
+    def _get_params(self):
+        """Return dictionary of parameters that define this block"""
+        return {}
+
+
+    def to_dict(self):
+        """Convert block to dictionary representation for serialization"""
+        return {
+            "id": id(self),
+            "type": self.__class__.__name__,
+            "params": self._get_params()
+        }
+
 
     @classmethod
-    def load(cls, path=""):
-        """
-        Load block from pickled '.blk' file.
-        """
-        raise NotImplementedError("'load' method is not implemented yet")
-
-    def save(self, path=""):
-        """
-        Save block instance to '.blk' file by pickling.
-        """
-        raise NotImplementedError("'save' method is not implemented yet")
+    def from_dict(cls, data):
+        """Create block instance from dictionary representation"""
+        block_class = globals()[data["type"]]
+        return block_class(**data["params"])
 
 
     # methods for simulation management -------------------------------------------------

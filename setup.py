@@ -1,11 +1,14 @@
 from setuptools import setup, find_packages
 
+from pathsim import __version__
+
+
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="pathsim",
-    version="0.5.3",
+    version=__version__,
     author="Milan Rother",
     author_email="milan.rother@gmx.de",
     description="A differentiable block based hybrid system simulation framework.",
