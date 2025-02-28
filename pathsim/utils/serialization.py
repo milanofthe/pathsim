@@ -9,16 +9,26 @@
 
 # IMPORTS ==============================================================================
 
-import inspect
-import json
-import re
-import ast
 import textwrap
+import inspect
 import types
-import functools
+import json
+import ast
+import re
 
 
 # SERIALIZATION ========================================================================
+
+def extract_source(func):
+    source = inspect.getsource(func)
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Lambda):
+            # Extract the substring corresponding to the lambda expression
+            lambda_source = source[node.col_offset:node.end_col_offset]
+            return lambda_source
+    return textwrap.dedent(source)
+    
 
 def serialize_callable(func):
     """Serialize a callable (function or lambda) 
@@ -41,19 +51,8 @@ def serialize_callable(func):
     # Get source code
     try:
         # Try to get the source code
-        source = inspect.getsource(func)
-        
-        # Clean up indentation
-        source = textwrap.dedent(source)
-        
-        # For lambda expressions, extract just the lambda part
-        if is_lambda:
+        source = extract_source(func)
 
-            # Extract the lambda expression using regex
-            lambda_pattern = r'lambda\s+[^:]*:\s*.*'
-            matches = re.search(lambda_pattern, source)
-            if matches:
-                source = matches.group(0)
         
         # Get function globals that are referenced in the function
         func_globals = {}
@@ -173,6 +172,7 @@ def deserialize_callable(func_dict, global_env=None):
             return local_vars[func_dict["name"]]
         except Exception as e:
             raise ValueError(f"Error deserializing function: {e}")
+
 
 
 # CLASS FOR AUTOMATIC SERIALIZATION CAPABILITIES =======================================

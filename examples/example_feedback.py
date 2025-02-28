@@ -28,7 +28,7 @@ dt = 0.02
 tau = 3
 
 #blocks that define the system
-Src = Source(lambda t: int(t>tau))
+Src = Source(lambda t : int(t>tau) )
 Int = Integrator()
 Amp = Amplifier(-1)
 Add = Adder()
@@ -46,10 +46,21 @@ connections = [
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True)
-    
+
+print(Sim)
+
+Sim = Simulation.from_dict(Sim.to_dict())
+
+print(Sim)
+
+
 #run the simulation for some time
 Sim.run(3*tau)
 
-Sco.plot()
+for b in Sim.blocks:
+    if isinstance(b, Scope):
+        b.plot()
+
+# Sco.plot()
 
 plt.show()
