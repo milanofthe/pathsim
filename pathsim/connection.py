@@ -138,13 +138,13 @@ class Connection:
     def to_dict(self):
         """Convert connection to dictionary representation for serialization"""
         return {
-            "id": str(id(self)),
+            "id": id(self),
             "source": {
-                "block": str(id(self.source[0])),
+                "block": id(self.source[0]),
                 "port": self.source[1]
             },
             "targets": [
-                {"block": str(id(trg[0])), "port": trg[1]} 
+                {"block": id(trg[0]), "port": trg[1]} 
                 for trg in self.targets
             ]
         }
