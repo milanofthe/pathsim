@@ -178,18 +178,58 @@ def deserialize_callable(func_dict, global_env=None):
 # CLASS FOR AUTOMATIC SERIALIZATION CAPABILITIES =======================================
 
 class Serializable:
-    """Mixin that provides automatic serialization based on __init__ parameters"""
+    """Mixin that provides automatic serialization based on __init__ parameters 
+    and loading/saving to json formatted readable files
+
+    """
     
 
     def __str__(self):
         return json.dumps(self.to_dict(), indent=2, sort_keys=False)
 
+
+    def save(self, path=""):
+        """Save the dictionary representation of object to an external file
         
+        Parameters
+        ----------
+        path : str
+            filepath to save data to
+        """
+        with open(path, "w", encoding="utf-8") as file:
+            json.dump(self.to_dict(), file, indent=2, ensure_ascii=False)
+
+
+    @classmethod
+    def load(cls, path=""):
+        """Load and instantiate an object from an external file in json format
+        
+        Parameters
+        ----------
+        path : str
+            filepath to load data from
+
+        Returns
+        -------
+        out : obj
+            reconstructed object from dict representation
+        """
+        with open(path, "r", encoding="utf-8") as file:
+            return cls.from_dict(json.load(file))
+        return None
+        
+
     def to_dict(self):
-        """Convert object to dictionary representation"""
+        """Convert object to dictionary representation
+        
+        Returns
+        -------
+        result : dict
+            representation of object
+        """
         
         result = {
-            "id": str(id(self)),
+            "id": id(self),
             "type": self.__class__.__name__,
             "params": {}
         }
@@ -219,7 +259,18 @@ class Serializable:
 
     @classmethod
     def from_dict(cls, data):
-        """Create block instance from dictionary representation"""
+        """Create block instance from dictionary representation.
+
+        Parameters
+        ----------
+        data : dict
+            representation of object
+
+        Returns
+        -------
+        out : obj
+            reconstructed object from dict representation            
+        """
 
         # Use the class specified in the data
         block_type = data.get("type")

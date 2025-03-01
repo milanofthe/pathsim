@@ -193,15 +193,15 @@ class Subsystem(Block):
     
     def to_dict(self):
         """Custom serialization for Subsystem"""
-        result = super().to_dict()
+        data = super().to_dict()
         
         #serialization for internal blocks and interface
-        result["params"]["blocks"] = [block.to_dict() for block in self.blocks + [self.interface]]
+        data["params"]["blocks"] = [block.to_dict() for block in self.blocks + [self.interface]]
 
         #serialize connections
-        result["params"]["connections"] = [conn.to_dict() for conn in self.connections]
+        data["params"]["connections"] = [conn.to_dict() for conn in self.connections]
         
-        return result
+        return data
 
     
     @classmethod
