@@ -6,9 +6,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
-def get_version():
+def get_version():    
     version_file = os.path.join("pathsim", "_version.py")
-    with open(os.path.join("pathsim", "__init__.py"), "r") as f:
+    with open(version_file, "r") as f:
         version_line = f.read()    
     version_regex = r"__version__ = ['\"]([^'\"]*)['\"]"
     match = re.search(version_regex, version_line)

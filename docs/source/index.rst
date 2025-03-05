@@ -126,7 +126,7 @@ The block diagramm can be translated to a netlist by using the blocks and the co
 
 
 .. image:: figures/linear_feedback_result.png
-   :width: 500
+   :width: 700
    :align: center
    :alt: simulation result of linear feedback system
 
