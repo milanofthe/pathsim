@@ -47,20 +47,9 @@ connections = [
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
-print(Sim)
-
-Sim = Simulation.from_dict(Sim.to_dict())
-
-print(Sim)
-
-
 #run the simulation for some time
 Sim.run(3*tau)
 
-for b in Sim.blocks:
-    if isinstance(b, Scope):
-        b.plot()
-
-# Sco.plot()
+Sco.plot()
 
 plt.show()

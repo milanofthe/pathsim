@@ -42,8 +42,10 @@ sub_connections = [
     Connection(Fn, I2)
     ]
 
-#this is subsystem acts just like a normal block
+#the subsystem acts just like a normal block
 VDP = Subsystem(sub_blocks, sub_connections)
+
+VDP.save("vdp.mdl")
 
 #blocks of the main system
 blocks = [VDP, Sco]

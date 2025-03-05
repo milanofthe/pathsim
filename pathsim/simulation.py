@@ -230,6 +230,39 @@ class Simulation:
 
     # serialization/deserialization -----------------------------------------------
 
+    def save(self, path=""):
+        """Save the dictionary representation of the simulation instance 
+        to an external file
+        
+        Parameters
+        ----------
+        path : str
+            filepath to save data to
+        """
+        with open(path, "w", encoding="utf-8") as file:
+            json.dump(self.to_dict(), file, indent=2, ensure_ascii=False)
+
+
+    @classmethod
+    def load(cls, path=""):
+        """Load and instantiate a Simulation from an external file 
+        in json format
+        
+        Parameters
+        ----------
+        path : str
+            filepath to load data from
+
+        Returns
+        -------
+        out : Simulation
+            reconstructed object from dict representation
+        """
+        with open(path, "r", encoding="utf-8") as file:
+            return cls.from_dict(json.load(file))
+        return None
+
+
     def to_dict(self, name="Model", description=""):
         """Convert simulation to a complete model representation as a dict
 
@@ -291,43 +324,44 @@ class Simulation:
         """
         from . import solvers
         
-        # Deserialize blocks and create block ID mapping
+        #deserialize blocks and create block ID mapping
         blocks, id_to_block = [], {}
         for block_data in data["blocks"]:
             block = Block.from_dict(block_data)
             blocks.append(block)
             id_to_block[block_data["id"]] = block
         
-        # Deserialize connections
+        #deserialize connections
         connections = []
         for conn_data in data["connections"]:
-            # Get source block and port
+            
+            #get source block and port
             source_block = id_to_block[conn_data["source"]["block"]]
             source_port = conn_data["source"]["port"]
             
-            # Get targets
+            #get targets
             targets = []
             for trg in conn_data["targets"]:
                 target_block = id_to_block[trg["block"]]
                 target_port = trg["port"]
                 targets.append((target_block, target_port))
             
-            # Create connection
+            #create connection
             connections.append(Connection((source_block, source_port), *targets))
         
-        # Deserialize events
+        #deserialize events
         events = []
         for event_data in data.get("events", []):
             events.append(Event.from_dict(event_data))
         
-        # Get simulation parameters
+        #get simulation parameters
         sim_data = data.get("simulation", {})
         
-        # Get solver class
+        #get solver class
         solver_name = sim_data.get("solver", "SSPRK22")
         Solver = getattr(solvers, solver_name)
         
-        # Create simulation
+        #create simulation
         return cls(
             blocks=blocks,
             connections=connections,

@@ -49,7 +49,8 @@ E = Schedule(
     )
 
 events = [E]
-# E.off() #switch event tracking
+E.off() #switch event tracking
+
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, events, dt=dt, log=True, Solver=RKCK54)

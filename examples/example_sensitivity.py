@@ -15,6 +15,8 @@ from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
 #optimization module
 from pathsim.optim import Value, der
 
+from pathsim.solvers import RKBS32
+
 
 # 1st ORDER FEEDBACK SYSTEM =============================================================
 
@@ -51,13 +53,14 @@ Sim = Simulation(
     blocks, 
     connections, 
     dt=dt, 
-    log=True
+    log=True,
+    Solver=RKBS32
     )
     
 #run the simulation for some time
 Sim.run(4*tau)
 
-Sco.plot()
+Sco.plot(".-")
 
 
 #plot derivatives -----------------------------------------------------------------------

@@ -1,0 +1,95 @@
+{
+  "id": 1459781890848,
+  "type": "Subsystem",
+  "params": {
+    "blocks": [
+      {
+        "id": 1459780873840,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 2
+        }
+      },
+      {
+        "id": 1459780873744,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 0
+        }
+      },
+      {
+        "id": 1459780870816,
+        "type": "Function",
+        "params": {
+          "func": {
+            "type": "lambda",
+            "name": "<lambda>",
+            "source": "lambda x1, x2: mu*(1 - x1**2)*x2 - x1",
+            "globals": {
+              "mu": 1000
+            },
+            "closures": {}
+          }
+        }
+      },
+      {
+        "id": 1459332521936,
+        "type": "Interface",
+        "params": {}
+      }
+    ],
+    "connections": [
+      {
+        "id": 1459781877936,
+        "source": {
+          "block": 1459780873744,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 1459780873840,
+            "port": 0
+          },
+          {
+            "block": 1459780870816,
+            "port": 1
+          },
+          {
+            "block": 1459332521936,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 1459781890416,
+        "source": {
+          "block": 1459780873840,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 1459780870816,
+            "port": 0
+          },
+          {
+            "block": 1459332521936,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 1459781890800,
+        "source": {
+          "block": 1459780870816,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 1459780873744,
+            "port": 0
+          }
+        ]
+      }
+    ]
+  }
+}
