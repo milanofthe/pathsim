@@ -5,6 +5,7 @@ pathsim.solvers
    :maxdepth: 4
 
    pathsim.solvers._solver
+   pathsim.solvers._rungekutta
    pathsim.solvers.euler
    pathsim.solvers.ssprk22
    pathsim.solvers.ssprk33
