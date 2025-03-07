@@ -25,7 +25,7 @@ Then lets define the system parameters such as the initial value `x0` of the int
     a, x0 = -1, 2
 
     #delay for step function
-	tau = 3
+    tau = 3
 
     #step function
     def s(t):

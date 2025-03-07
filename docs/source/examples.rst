@@ -7,3 +7,4 @@ Here is a range of examples. From simple linear feedback systems to hierarchical
    :maxdepth: 3
 
    examples/linear_feedback
+   examples/bouncing_ball
