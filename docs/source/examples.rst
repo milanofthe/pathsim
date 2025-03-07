@@ -8,3 +8,4 @@ Here is a range of examples. From simple linear feedback systems to hierarchical
 
    examples/linear_feedback
    examples/bouncing_ball
+   examples/stick_slip
