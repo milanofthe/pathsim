@@ -48,10 +48,15 @@ The following modules serve the system definition and simulation.
 
 
 
-Solvers and Utils
------------------
+ODE Solvers
+-----------
 
-These modules are internal to the simulation loop.
+The numerical ODE solvers, available in PathSim are structured like this:
+
+.. image:: figures/pathsim_solver_hierarchy.png
+   :width: 700
+   :align: center
+   :alt: hierarchy of PathSim numerical integrators
 
 
 .. toctree::
@@ -60,11 +65,24 @@ These modules are internal to the simulation loop.
 
    modules/pathsim.solvers
 
+
+
+Optimizers and Automatic Differentiation
+----------------------------------------
+
+The `pathsim.optim` module contains a range of nonlinear solvers / optimizers that are primarily used for the implicit update equation of implicit ODE solvers and for the steadystate solver. This module also includes the automatic differentiation framework.
+
 .. toctree::
    :maxdepth: 4
-   :caption: Optimizers and AD
+   :caption: Optim
 
    modules/pathsim.optim
+
+
+Utilities
+---------
+
+Utility functions and classes.
 
 .. toctree::
    :maxdepth: 4

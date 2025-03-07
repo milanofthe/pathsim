@@ -69,68 +69,10 @@ This documentation is structured in the following way:
 .. toctree::
    :maxdepth: 2
 
-   api
-   structure
    examples
+   api
+   
 
-
-An Example
-----------
-
-Here's a simple example of a linear feedback system, simulated with PathSim. 
-
-.. image:: figures/linear_feedback_blockdiagram.png
-   :width: 700
-   :align: center
-   :alt: block diagram of linear feedback system
-
-
-The block diagramm can be translated to a netlist by using the blocks and the connection class provided by PathSim:
-
-.. code-block:: python
-
-    from pathsim import Simulation, Connection
-    from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
-
-    #values parameters
-    a, b, x0 = -1, 1, 2
-
-    #step function
-    tau = 3
-    def s(t):
-        return b*int(t>tau)
-
-    #blocks that define the system
-    Src = Source(s)
-    Int = Integrator(x0)
-    Amp = Amplifier(a)
-    Add = Adder()
-    Sco = Scope(labels=["step", "response"])
-
-    blocks = [Src, Int, Amp, Add, Sco]
-
-    #the connections between the blocks
-    connections = [
-        Connection(Src, Add[0], Sco[0]),
-        Connection(Amp, Add[1]),
-        Connection(Add, Int),
-        Connection(Int, Amp, Sco[1])
-        ]
-
-    #initialize simulation with the blocks, connections, timestep
-    Sim = Simulation(blocks, connections, dt=0.01, log=True)
-        
-    #run the simulation for some time
-    Sim.run(4*tau)
-
-    #plot the results from the scope
-    Sco.plot()
-
-
-.. image:: figures/linear_feedback_result.png
-   :width: 700
-   :align: center
-   :alt: simulation result of linear feedback system
 
 
 Indices and tables

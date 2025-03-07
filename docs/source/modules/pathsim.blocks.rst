@@ -10,7 +10,6 @@ pathsim.blocks
    pathsim.blocks.delay
    pathsim.blocks.differentiator
    pathsim.blocks.function
-   pathsim.blocks.generic
    pathsim.blocks.integrator
    pathsim.blocks.lti
    pathsim.blocks.multiplier
