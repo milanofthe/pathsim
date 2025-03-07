@@ -33,7 +33,7 @@ Quickstart
     pip install pathsim
 
 
-2. Build and simulate a system unsing blocks and connections:
+2. Build a dynamical system unsing blocks and connections. Here we just integrate a cosine:
 
 .. code-block:: python
     
@@ -42,10 +42,12 @@ Quickstart
     from pathsim import Simulation, Connection
     from pathsim.blocks import Source, Integrator, Scope
 
-    Sr = Source(np.sin)
+    #these are the blocks of our system
+    Sr = Source(np.cos)
     In = Integrator()
-    Sc = Scope()
+    Sc = Scope(labels=["cos", "sin"])
 
+    #simulation instance with blocks and connections
     Sim = Simulation(
         blocks=[Sr, In, Sc], 
         connections=[
@@ -56,9 +58,22 @@ Quickstart
         dt=0.01 
         )
 
+3. Run the simulation and look at the results:
+
+.. code-block:: python
+    
+    #run for 10 time units
     Sim.run(10)
 
+    #plot the scope
     Sc.plot()
+
+
+.. image:: figures/sin_cos.png
+   :width: 700
+   :align: center
+   :alt: cos integration result
+
 
 
 Table of Contents
