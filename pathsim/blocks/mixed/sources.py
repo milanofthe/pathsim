@@ -16,6 +16,23 @@ from ...events.schedule import Schedule
 # SOURCE BLOCKS =========================================================================
 
 class Clock(Block):
+    """Discrete time clock source block.
+    
+    Utilizes scheduled events to periodically set 
+    the block output to 0 or 1 at discrete times.
+
+    Parameters
+    ----------
+    T : float
+        period of the clock
+    tau : float
+        clock delay
+
+    Attributes
+    ----------
+    events : list[Schedule]
+        internal scheduled event list 
+    """
 
     def __init__(self, T=1, tau=0):
         super().__init__()
@@ -45,6 +62,25 @@ class Clock(Block):
 
 
 class SquareWave(Block):
+    """Discrete time square wave source.
+    
+    Utilizes scheduled events to periodically set 
+    the block output at discrete times.
+
+    Parameters
+    ----------
+    amplitude : float
+        amplitude of the square wave signal
+    frequency : float
+        frequency of the square wave signal
+    phase : float
+        phase of the square wave signal
+
+    Attributes
+    ----------
+    events : list[Schedule]
+        internal scheduled events 
+    """
 
     def __init__(self, amplitude=1, frequency=1, phase=0):
         super().__init__()
@@ -75,6 +111,23 @@ class SquareWave(Block):
 
 
 class Step(Block):
+    """Discrete time unit step block.
+    
+    Utilizes a scheduled event to set 
+    the block output at the defined delay.
+
+    Parameters
+    ----------
+    amplitude : float
+        amplitude of the step signal
+    tau : float
+        delay of the step
+
+    Attributes
+    ----------
+    events : list[Schedule]
+        internal scheduled event 
+    """
 
     def __init__(self, amplitude=1, tau=0.0):
         super().__init__()

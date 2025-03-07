@@ -13,9 +13,6 @@
 
 # IMPORTS ===============================================================================
 
-import inspect
-import json
-
 from ..utils.utils import dict_to_array
 from ..utils.serialization import Serializable
 
@@ -70,16 +67,21 @@ class Block(Serializable):
 
     def __len__(self):
         """The '__len__' method of the block is used to compute the length of the 
-        algebraic path of the block. For instant time blocks or blocks with 
-        purely algenbraic components (adders, amplifiers, etc.) it returns 1, 
-        otherwise (integrator, delay, etc.) it returns 0.
+        algebraic path of the block. 
+
+        For instant time blocks or blocks with purely algenbraic components 
+        (adders, amplifiers, etc.) it returns 1, otherwise (integrator, delay, etc.) 
+        it returns 0.
+
+        If the block is disabled '_active == False', it returns 0 as well, since
+        this breaks the signal path.
 
         Returns
         -------
         len : int
             length of the algebraic path of the block
         """
-        return 1
+        return 1 if self._active else 0
 
 
     def __getitem__(self, key):

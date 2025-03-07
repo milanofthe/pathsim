@@ -48,6 +48,7 @@ class WhiteNoise(Block):
         self.sigma = np.sqrt(spectral_density)
         self.n_samples = 0
 
+
     def reset(self):
         #reset inputs and outputs
         self.inputs  = {0:0.0}  
@@ -56,9 +57,14 @@ class WhiteNoise(Block):
         #reset noise samples
         self.n_samples = 0
 
+
     def sample(self, t):
-        """
-        Sample from a normal distribution after successful timestep.
+        """Sample from a normal distribution after successful timestep
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for sampling
         """
         if (self.sampling_rate is None or 
             self.n_samples < t * self.sampling_rate):
@@ -68,6 +74,7 @@ class WhiteNoise(Block):
 
 class PinkNoise(Block):
     """Pink noise (1/f) source using the Voss-McCartney algorithm.
+
     Samples from distribution with 'sampling_rate' and generates noise
     with a power spectral density inversely proportional to frequency.
     
@@ -104,6 +111,7 @@ class PinkNoise(Block):
         # Initialize the random values for each octave
         self.octave_values = np.random.normal(0, 1, self.num_octaves)
 
+
     def reset(self):
         # Reset inputs and outputs
         self.inputs  = {0: 0.0}  
@@ -113,9 +121,15 @@ class PinkNoise(Block):
         self.n_samples = 0
         self.octave_values = np.random.normal(0, 1, self.num_octaves)
 
+
     def sample(self, t):
-        """
-        Generate a new pink noise sample using the Voss-McCartney algorithm.
+        """Generate a new pink noise sample at 't' using 
+        the Voss-McCartney algorithm.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for sampling
         """
         if (self.sampling_rate is None or 
             self.n_samples < t * self.sampling_rate):
@@ -143,7 +157,6 @@ class PinkNoise(Block):
 
 
 class SinusoidalPhaseNoiseSource(Block):
-
     """Sinusoidal source with cumulative and white phase noise
 
     Parameters

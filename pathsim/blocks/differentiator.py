@@ -43,7 +43,7 @@ class Differentiator(Block):
 
 
     def __len__(self):
-        return 1
+        return 1 if self._active else 0
 
 
     def set_solver(self, Solver, **solver_args):

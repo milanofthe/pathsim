@@ -58,7 +58,7 @@ class Integrator(Block):
         if self.engine is not None:
             self.engine = Solver.cast(self.engine, **solver_args)
             return #quit early
-            s
+            
         #initialize the integration engine
         def _f(x, u, t): return u
         self.engine = Solver(self.initial_value, _f, None, **solver_args)

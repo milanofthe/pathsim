@@ -77,34 +77,76 @@ def square_wave(t, f):
 # SOURCE BLOCKS =========================================================================
 
 class SquareWaveSource(Block):
+    """Source block that generates an analog square wave
+    
+    Notes
+    -----
+    This block is purely analog with no internal events. 
+    Not to be confused with a clock that has internal scheduled events
+    
+    Parameters
+    ----------
+    frequency : float
+        frequency of the square wave
+    amplitude : float
+        amplitude of the square wave
+    phase : float
+        phase of the square wave
+    """
 
-    def __init__(self, frequency=1, amplitude=1):
+    def __init__(self, frequency=1, amplitude=1, phase=0):
         super().__init__()
 
         self.amplitude = amplitude
         self.frequency = frequency
+        self.phase = phase
 
 
     def update(self, t):
-        self.outputs[0] = self.amplitude * square_wave(t, self.frequency)
+        tau = self.phase/(2*np.pi*self.frequency)
+        self.outputs[0] = self.amplitude * square_wave(t + tau, self.frequency)
         return 0.0
 
 
 class TriangleWaveSource(Block):
+    """Source block that generates an analog triangle wave
+        
+    Parameters
+    ----------
+    frequency : float
+        frequency of the triangle wave
+    amplitude : float
+        amplitude of the triangle wave
+    phase : float
+        phase of the triangle wave
+    """
 
-    def __init__(self, frequency=1, amplitude=1):
+    def __init__(self, frequency=1, amplitude=1, phase=0):
         super().__init__()
 
         self.amplitude = amplitude
         self.frequency = frequency
+        self.phase = phase
 
 
     def update(self, t):
-        self.outputs[0] = self.amplitude * triangle_wave(t, self.frequency)
+        tau = self.phase/(2*np.pi*self.frequency)
+        self.outputs[0] = self.amplitude * triangle_wave(t + tau, self.frequency)
         return 0.0
 
 
 class SinusoidalSource(Block):
+    """Source block that generates a sinusoid wave
+        
+    Parameters
+    ----------
+    frequency : float
+        frequency of the sinusoid
+    amplitude : float
+        amplitude of the sinusoid
+    phase : float
+        phase of the sinusoid
+    """
 
     def __init__(self, frequency=1, amplitude=1, phase=0):
         super().__init__()
@@ -121,6 +163,17 @@ class SinusoidalSource(Block):
 
 
 class GaussianPulseSource(Block):
+    """Source block that generates a gaussian pulse
+        
+    Parameters
+    ----------
+    amplitude : float
+        amplitude of the gaussian pulse
+    f_max : float
+        maximum frequency component of the gaussian pulse (steepness)
+    tau : float
+        time delay of the gaussian pulse 
+    """
 
     def __init__(self, amplitude=1, f_max=1e3, tau=0.0):
         super().__init__()
@@ -136,6 +189,15 @@ class GaussianPulseSource(Block):
 
 
 class StepSource(Block):
+    """Source block that generates a unit step
+
+    Parameters
+    ----------
+    amplitude : float
+        amplitude of the step / step height
+    tau : float
+        time delay of the step
+    """
 
     def __init__(self, amplitude=1, tau=0.0):
         super().__init__()
@@ -150,6 +212,24 @@ class StepSource(Block):
 
 
 class ChirpSource(Block):
+    """Chirp source, sinusoid with frequency ramp up and ramp down.
+
+    This works by using a time dependent triangle wave for the 
+    frequency and integrating it with a numerical integration 
+    engine to get a continuous phase. This phase is then used 
+    to evaluate a sinusoid. 
+
+    Parameters
+    ----------
+    amplitude : float
+        amplitude of the chirp signal
+    f0 : float
+        start frequency of the chirp signal
+    BW : float
+        bandwidth of the frequency ramp of the chirp signal
+    T : float
+        period of the frequency ramp of the chirp signal
+    """
 
     def __init__(self, amplitude=1, f0=1, BW=1, T=1):
         super().__init__()

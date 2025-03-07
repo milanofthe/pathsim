@@ -19,8 +19,7 @@ from ...events.zerocrossing import ZeroCrossing
 # MIXED SIGNAL BLOCKS ===================================================================
 
 class Comparator(Block):
-    """
-    Comparator block that sets the output to '1' it the input 
+    """Comparator block that sets the output to '1' it the input 
     signal crosses a predefined threshold and to '-1' if it 
     crosses in the reverse direction. 
 
@@ -30,6 +29,18 @@ class Comparator(Block):
     
     The block output is determined by a simple sign check in
     the 'update' method.
+
+    Parameters
+    ----------
+    threshold : float
+        threshold value for the comparator
+    tolerance : float
+        tolerance for zero crossing detection
+    
+    Attributes
+    ----------
+    events : list[ZeroCrossing]
+        internal zero crossing event
     """
 
     def __init__(self, threshold=0, tolerance=1e-4):

@@ -73,7 +73,7 @@ class StateSpace(Block):
 
     def __len__(self):
         #check if direct passthrough exists
-        return int(np.any(self.D))
+        return int(np.any(self.D)) if self._active else 0
 
     
     def set_solver(self, Solver, **solver_args):

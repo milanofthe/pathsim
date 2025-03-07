@@ -9,6 +9,9 @@
 
 # IMPORTS ===============================================================================
 
+import warnings
+
+
 import numpy as np
 
 from ._block import Block
@@ -61,6 +64,11 @@ class Generic(Block):
 
         #jacobian of 'func_dyn'
         self.jac_dyn = jac_dyn
+
+        warnings.warn(
+            "Generic block will be deprecated in next release due to naming conflict with core Python", 
+            DeprecationWarning
+            )
 
 
     def __len__(self):
