@@ -1,4 +1,4 @@
-# PathSim: A Time-Domain System Simulation Framework
+# PathSim - A Time-Domain System Simulation Framework
 
 ## Overview
 
@@ -96,24 +96,24 @@ Sc.plot()
 time, data = Sc.read();
 ```
 
-    2025-03-05 16:47:38,868 - INFO - LOGGING enabled
-    2025-03-05 16:47:38,869 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2025-03-05 16:47:38,869 - INFO - ALGEBRAIC PATH LENGTH 2
-    2025-03-05 16:47:38,870 - INFO - RESET, time -> 0.0
-    2025-03-05 16:47:38,870 - INFO - TRANSIENT duration=30.0
-    2025-03-05 16:47:38,870 - INFO - STARTING progress tracker
-    2025-03-05 16:47:38,871 - INFO - progress=0%
-    2025-03-05 16:47:38,875 - INFO - progress=10%
-    2025-03-05 16:47:38,880 - INFO - progress=20%
-    2025-03-05 16:47:38,885 - INFO - progress=30%
-    2025-03-05 16:47:38,890 - INFO - progress=40%
-    2025-03-05 16:47:38,895 - INFO - progress=50%
-    2025-03-05 16:47:38,899 - INFO - progress=60%
-    2025-03-05 16:47:38,904 - INFO - progress=70%
-    2025-03-05 16:47:38,909 - INFO - progress=80%
-    2025-03-05 16:47:38,913 - INFO - progress=90%
-    2025-03-05 16:47:38,918 - INFO - progress=100%
-    2025-03-05 16:47:38,919 - INFO - FINISHED, steps(total)=600(600), runtime=48.23ms
+    2025-03-07 14:16:13,573 - INFO - LOGGING enabled
+    2025-03-07 14:16:13,574 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2025-03-07 14:16:13,574 - INFO - ALGEBRAIC PATH LENGTH 2
+    2025-03-07 14:16:13,575 - INFO - RESET, time -> 0.0
+    2025-03-07 14:16:13,576 - INFO - TRANSIENT duration=30.0
+    2025-03-07 14:16:13,577 - INFO - STARTING progress tracker
+    2025-03-07 14:16:13,578 - INFO - progress=0%
+    2025-03-07 14:16:13,593 - INFO - progress=10%
+    2025-03-07 14:16:13,611 - INFO - progress=20%
+    2025-03-07 14:16:13,631 - INFO - progress=30%
+    2025-03-07 14:16:13,644 - INFO - progress=40%
+    2025-03-07 14:16:13,670 - INFO - progress=50%
+    2025-03-07 14:16:13,695 - INFO - progress=60%
+    2025-03-07 14:16:13,719 - INFO - progress=70%
+    2025-03-07 14:16:13,737 - INFO - progress=80%
+    2025-03-07 14:16:13,760 - INFO - progress=90%
+    2025-03-07 14:16:13,780 - INFO - progress=100%
+    2025-03-07 14:16:13,782 - INFO - FINISHED, steps(total)=600(600), runtime=205.21ms
     
 
 
@@ -170,8 +170,8 @@ Sim = Simulation(
     dt=0.05, 
     log=True, 
     Solver=ESDIRK54, 
-    tolerance_lte_abs=1e-6, 
-    tolerance_lte_rel=1e-4
+    tolerance_lte_abs=1e-5, 
+    tolerance_lte_rel=1e-3
     )
 
 #run simulation for some number of seconds
@@ -181,24 +181,24 @@ Sim.run(3*mu)
 Sc.plot(".-");
 ```
 
-    2025-03-05 16:47:41,530 - INFO - LOGGING enabled
-    2025-03-05 16:47:41,530 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
-    2025-03-05 16:47:41,531 - INFO - ALGEBRAIC PATH LENGTH 1
-    2025-03-05 16:47:41,532 - INFO - RESET, time -> 0.0
-    2025-03-05 16:47:41,532 - INFO - TRANSIENT duration=3000
-    2025-03-05 16:47:41,533 - INFO - STARTING progress tracker
-    2025-03-05 16:47:41,540 - INFO - progress=0%
-    2025-03-05 16:47:41,688 - INFO - progress=11%
-    2025-03-05 16:47:41,739 - INFO - progress=20%
-    2025-03-05 16:47:42,724 - INFO - progress=33%
-    2025-03-05 16:47:42,760 - INFO - progress=43%
-    2025-03-05 16:47:42,833 - INFO - progress=50%
-    2025-03-05 16:47:44,009 - INFO - progress=62%
-    2025-03-05 16:47:44,079 - INFO - progress=71%
-    2025-03-05 16:47:44,397 - INFO - progress=80%
-    2025-03-05 16:47:45,178 - INFO - progress=93%
-    2025-03-05 16:47:45,224 - INFO - progress=100%
-    2025-03-05 16:47:45,224 - INFO - FINISHED, steps(total)=292(468), runtime=3691.04ms
+    2025-03-07 14:17:09,477 - INFO - LOGGING enabled
+    2025-03-07 14:17:09,477 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
+    2025-03-07 14:17:09,479 - INFO - ALGEBRAIC PATH LENGTH 1
+    2025-03-07 14:17:09,479 - INFO - RESET, time -> 0.0
+    2025-03-07 14:17:09,480 - INFO - TRANSIENT duration=3000
+    2025-03-07 14:17:09,482 - INFO - STARTING progress tracker
+    2025-03-07 14:17:09,500 - INFO - progress=0%
+    2025-03-07 14:17:09,838 - INFO - progress=11%
+    2025-03-07 14:17:10,037 - INFO - progress=20%
+    2025-03-07 14:17:12,757 - INFO - progress=32%
+    2025-03-07 14:17:13,061 - INFO - progress=42%
+    2025-03-07 14:17:13,366 - INFO - progress=51%
+    2025-03-07 14:17:16,021 - INFO - progress=63%
+    2025-03-07 14:17:16,256 - INFO - progress=70%
+    2025-03-07 14:17:17,067 - INFO - progress=80%
+    2025-03-07 14:17:18,991 - INFO - progress=90%
+    2025-03-07 14:17:19,129 - INFO - progress=100%
+    2025-03-07 14:17:19,130 - INFO - FINISHED, steps(total)=228(397), runtime=9647.2ms
     
 
 
@@ -264,24 +264,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2025-03-05 16:47:50,982 - INFO - LOGGING enabled
-    2025-03-05 16:47:50,983 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2025-03-05 16:47:50,983 - INFO - ALGEBRAIC PATH LENGTH 2
-    2025-03-05 16:47:50,983 - INFO - RESET, time -> 0.0
-    2025-03-05 16:47:50,984 - INFO - TRANSIENT duration=12
-    2025-03-05 16:47:50,984 - INFO - STARTING progress tracker
-    2025-03-05 16:47:50,985 - INFO - progress=0%
-    2025-03-05 16:47:51,006 - INFO - progress=10%
-    2025-03-05 16:47:51,026 - INFO - progress=20%
-    2025-03-05 16:47:51,046 - INFO - progress=30%
-    2025-03-05 16:47:51,065 - INFO - progress=40%
-    2025-03-05 16:47:51,084 - INFO - progress=50%
-    2025-03-05 16:47:51,104 - INFO - progress=60%
-    2025-03-05 16:47:51,124 - INFO - progress=70%
-    2025-03-05 16:47:51,144 - INFO - progress=80%
-    2025-03-05 16:47:51,164 - INFO - progress=90%
-    2025-03-05 16:47:51,184 - INFO - progress=100%
-    2025-03-05 16:47:51,184 - INFO - FINISHED, steps(total)=1201(1201), runtime=199.73ms
+    2025-03-07 14:18:08,414 - INFO - LOGGING enabled
+    2025-03-07 14:18:08,415 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2025-03-07 14:18:08,416 - INFO - ALGEBRAIC PATH LENGTH 2
+    2025-03-07 14:18:08,416 - INFO - RESET, time -> 0.0
+    2025-03-07 14:18:08,418 - INFO - TRANSIENT duration=12
+    2025-03-07 14:18:08,419 - INFO - STARTING progress tracker
+    2025-03-07 14:18:08,421 - INFO - progress=0%
+    2025-03-07 14:18:08,488 - INFO - progress=10%
+    2025-03-07 14:18:08,541 - INFO - progress=20%
+    2025-03-07 14:18:08,593 - INFO - progress=30%
+    2025-03-07 14:18:08,648 - INFO - progress=40%
+    2025-03-07 14:18:08,699 - INFO - progress=50%
+    2025-03-07 14:18:08,751 - INFO - progress=60%
+    2025-03-07 14:18:08,802 - INFO - progress=70%
+    2025-03-07 14:18:08,854 - INFO - progress=80%
+    2025-03-07 14:18:08,926 - INFO - progress=90%
+    2025-03-07 14:18:08,989 - INFO - progress=100%
+    2025-03-07 14:18:08,990 - INFO - FINISHED, steps(total)=1201(1201), runtime=569.59ms
     
 
 
@@ -319,7 +319,7 @@ ax.legend(fancybox=False);
 
 ## Event Detection
 
-PathSim has an event handling system that monitors the simulation state and can find and locate discrete events by  trigger callbacks or state transformations.
+PathSim has an event handling system that monitors the simulation state and can find and locate discrete events by evaluating an event function and trigger callbacks or state transformations. Multiple event types are supported such as `ZeroCrossing` or `Schedule`. 
 
 This enables the simulation of hybrid continuous time systems with discrete events. Probably the most popular example for this is the bouncing ball where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
 
@@ -389,24 +389,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2025-02-19 17:19:54,853 - INFO - LOGGING enabled
-    2025-02-19 17:19:54,854 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
-    2025-02-19 17:19:54,854 - INFO - ALGEBRAIC PATH LENGTH 1
-    2025-02-19 17:19:54,855 - INFO - RESET, time -> 0.0
-    2025-02-19 17:19:54,855 - INFO - TRANSIENT duration=20
-    2025-02-19 17:19:54,856 - INFO - STARTING progress tracker
-    2025-02-19 17:19:54,856 - INFO - progress=0%
-    2025-02-19 17:19:54,859 - INFO - progress=10%
-    2025-02-19 17:19:54,863 - INFO - progress=20%
-    2025-02-19 17:19:54,869 - INFO - progress=30%
-    2025-02-19 17:19:54,873 - INFO - progress=40%
-    2025-02-19 17:19:54,877 - INFO - progress=50%
-    2025-02-19 17:19:54,883 - INFO - progress=60%
-    2025-02-19 17:19:54,889 - INFO - progress=70%
-    2025-02-19 17:19:54,897 - INFO - progress=80%
-    2025-02-19 17:19:54,904 - INFO - progress=90%
-    2025-02-19 17:19:54,917 - INFO - progress=100%
-    2025-02-19 17:19:54,918 - INFO - FINISHED, steps(total)=395(496), runtime=62.44ms
+    2025-03-07 14:18:17,227 - INFO - LOGGING enabled
+    2025-03-07 14:18:17,229 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
+    2025-03-07 14:18:17,230 - INFO - ALGEBRAIC PATH LENGTH 1
+    2025-03-07 14:18:17,231 - INFO - RESET, time -> 0.0
+    2025-03-07 14:18:17,232 - INFO - TRANSIENT duration=20
+    2025-03-07 14:18:17,233 - INFO - STARTING progress tracker
+    2025-03-07 14:18:17,234 - INFO - progress=0%
+    2025-03-07 14:18:17,245 - INFO - progress=10%
+    2025-03-07 14:18:17,259 - INFO - progress=20%
+    2025-03-07 14:18:17,274 - INFO - progress=30%
+    2025-03-07 14:18:17,286 - INFO - progress=40%
+    2025-03-07 14:18:17,297 - INFO - progress=50%
+    2025-03-07 14:18:17,313 - INFO - progress=60%
+    2025-03-07 14:18:17,329 - INFO - progress=70%
+    2025-03-07 14:18:17,352 - INFO - progress=80%
+    2025-03-07 14:18:17,373 - INFO - progress=90%
+    2025-03-07 14:18:17,408 - INFO - progress=100%
+    2025-03-07 14:18:17,408 - INFO - FINISHED, steps(total)=395(496), runtime=174.95ms
     
 
 
@@ -415,7 +415,7 @@ Sc.plot();
     
 
 
-During the event handling, the simulator approaches the event until the event tolerance is met. You can see this by analyzing the timesteps taken by the adaptive integrator `RKBS32`.
+During the event handling, the simulator approaches the event until the specified tolerance is met. You can see this by analyzing the timesteps taken by the adaptive integrator `RKBS32`.
 
 
 ```python
@@ -443,19 +443,6 @@ ax.grid(True)
 ![png](README_files/README_14_0.png)
     
 
-
-## Citation
-
-In case you found this package to be useful in your research, please consider citing.
-
-```
-@misc{pathsim,
-    author={Rother, Milan},
-    title={PathSim: A Time-Domain System Simulation Framework},
-    year={2024},
-    url={https://github.com/milanofthe/pathsim},
-}
-```
 
 ## Contributing and Future
 
