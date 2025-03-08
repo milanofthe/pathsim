@@ -17,6 +17,7 @@ def get_version():
     raise RuntimeError(f"Unable to find version string in {version_file}")
 
 
+
 setup(
     name="pathsim",
     version=get_version(),
@@ -26,6 +27,10 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/milanofthe/pathsim",
+    project_urls={
+        "Repository" : "https://github.com/milanofthe/pathsim",
+        "Documentation" : "https://pathsim.readthedocs.io/en/latest/"
+    },
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
