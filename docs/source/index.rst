@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-PathSim: Differentiable System Simulation 
-=========================================
+PathSim - A System Simulation Framework
+=======================================
 
 **PathSim** is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism! It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
 
@@ -20,20 +20,20 @@ Key Features:
 - Automatic differentiation for **fully differentiable** system simulations
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
-The source code can be found in the `GitHub repository <https://github.com/milanofthe/pathsim>`_.
+The source code can be found in the `GitHub repository <https://github.com/milanofthe/pathsim>`_ and is fully open source under MIT license. Consider starring PathSim to support its development.
 
 
 Quickstart
 ----------
 
-1. Install PathSim with pip:
+1. **Install** PathSim with pip:
 
 .. code-block:: bash
 
     pip install pathsim
 
 
-2. Build a dynamical system unsing blocks and connections. Here we just integrate a cosine:
+2. **Build** a dynamical system unsing blocks and connections. Here we just integrate a cosine:
 
 .. code-block:: python
     
@@ -57,8 +57,9 @@ Quickstart
             ], 
         dt=0.01 
         )
+        
 
-3. Run the simulation and look at the results:
+3. **Run** the simulation and look at the results:
 
 .. code-block:: python
     
@@ -79,7 +80,7 @@ Quickstart
 Table of Contents
 -----------------
 
-This documentation is structured in the following way:
+This documentation is structured in the following way. There are a number of **examples** that almost have tutorial-charakter and of course the **API-reference**.
 
 .. toctree::
    :maxdepth: 2

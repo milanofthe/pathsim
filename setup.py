@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 import os
 import re
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README_PYPI.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
-def get_version():    
+def get_version():
     version_file = os.path.join("pathsim", "_version.py")
     with open(version_file, "r") as f:
         version_line = f.read()    

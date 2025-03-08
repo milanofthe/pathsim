@@ -1,28 +1,26 @@
-# PathSim - A Time-Domain System Simulation Framework
+# PathSim - A System Simulation Framework
 
 ## Overview
 
-PathSim is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism. It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems similar to Matlab Simulink but in Python!
+**PathSim** is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism! It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
 
-Key features of PathSim include:
+All of that with minimal dependencies, only `numpy`, `scipy` and `matplotlib`!
 
-- Hot-swappable blocks and solvers during simulation
-- Natural handling of algebraic loops
-- Blocks are inherently MIMO (Multiple Input, Multiple Output) capable
-- Blocks are decentralized and manage their own state, i.e. reading from the scope is just `scope.read()`
-- Linear scaling with the number of blocks and connections
-- Wide range of numerical integrators (implicit, explicit, high order, adaptive)
-- Modular and hierarchical modeling with (nested) subsystems
-- Event handling system to detect and resolve discrete events (zero-crossing detection)
-- Automatic differentiation for fully differentiable system simulations (sensitivity analysis and optimization)
-- Library of pre-defined blocks (`Integrator`, `Adder`, `TransferFunction`, `Scope`, etc.)
-- Extensibility by subclassing the base `Block` class and implementing just a handful of methods
+Key Features:
 
-For the full documentation, examples, tutorials and API-reference visit [readthedocs](https://pathsim.readthedocs.io/en/latest/)!
+- **Hot-swappable** blocks and solvers during simulation
+- Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
+- Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
+- **Modular and hierarchical** modeling with (nested) subsystems
+- **Event handling** system to detect and resolve discrete events (zero-crossing detection)
+- Automatic differentiation for **fully differentiable** system simulations
+- **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
+
+For the full documentation, tutorials and API-reference visit [readthedocs](https://pathsim.readthedocs.io/en/latest/)!
 
 ## Installation
 
-The latest release version of pathsim is available on [PyPi](https://pypi.org/project/pathsim/) and installable via pip:
+The latest release version of PathSim is available on [PyPi](https://pypi.org/project/pathsim/) and installable via pip:
 
 ```console
 pip install pathsim
@@ -30,33 +28,30 @@ pip install pathsim
 
 ## Example - Harmonic Oscillator
 
-Here's an example that demonstrates how to create a basic simulation. The main components of the package are:
+There are lots of [examples](https://github.com/milanofthe/pathsim/tree/master/examples) of dynamical system simulations in the GitHub repository. 
 
-- `Simulation`: The main class that handles the blocks, connections, and the simulation loop.
-- `Connection`: The class that defines the connections between blocks.
-- Various block classes from the `blocks` module, such as `Integrator`, `Amplifier`, `Adder`, `Scope`, etc.
+But first, lets have a look at how we can simulate the harmonic oscillator (a spring mass damper 2nd order system) using PathSim. The system and its corresponding equivalent block diagram are shown in the figure below:
 
-In this example, we create a simulation of the harmonic oscillator (a spring mass damper 2nd order system) initial value problem. The ODE that defines it is give by
+![png](README_files/harmonic_oscillator.png)
+
+The equation of motion that defines the harmonic oscillator it is give by
 
 $$
 \ddot{x} + \frac{c}{m} \dot{x} + \frac{k}{m} x = 0
 $$
 
-where $c$ is the damping, $k$ the spring constant and $m$ the mass. And initial conditions $x_0$ and $v_0$ for position and velocity.
+where $c$ is the damping, $k$ the spring constant and $m$ the mass together with the initial conditions  $x_0$ and $v_0$ for position and velocity.
 
-The ODE above can be translated to a block diagram using integrators, amplifiers and adders in the following way:
+The topology of the block diagram above can be directly defined as blocks and connections in the PathSim framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops.
 
-![png](README_files/harmonic_oscillator_blockdiagram.png)
-
-The topology of the block diagram above can be directly defined as blocks and connections in the `PathSim` framework. First we initialize the blocks needed to represent the dynamical systems with their respective arguments such as initial conditions and gain values, then the blocks are connected using `Connection` objects, forming two feedback loops. The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
-
+The `Simulation` instance manages the blocks and connections and advances the system in time with the timestep (`dt`). The `log` flag for logging the simulation progress is also set. Finally, we run the simulation for some number of seconds and plot the results using the `plot()` method of the scope block.
 
 
 ```python
-from pathsim import Simulation
-from pathsim import Connection
+from pathsim import Simulation, Connection
+
+#import the blocks we need for the harmonic oscillator
 from pathsim.blocks import Integrator, Amplifier, Adder, Scope
-from pathsim.solvers import SSPRK22  # 2nd order fixed timestep, this is also the default
 
 #initial position and velocity
 x0, v0 = 2, 5
@@ -64,7 +59,7 @@ x0, v0 = 2, 5
 #parameters (mass, damping, spring constant)
 m, c, k = 0.8, 0.2, 1.5
 
-# Create blocks 
+#define the blocks 
 I1 = Integrator(v0)   # integrator for velocity
 I2 = Integrator(x0)   # integrator for position
 A1 = Amplifier(-c/m)
@@ -74,7 +69,7 @@ Sc = Scope(labels=["v(t)", "x(t)"])
 
 blocks = [I1, I2, A1, A2, P1, Sc]
 
-# Create connections
+#define the connections between the blocks
 connections = [
     Connection(I1, I2, A1, Sc),   # one to many connection
     Connection(I2, A2, Sc[1]),
@@ -83,37 +78,37 @@ connections = [
     Connection(P1, I1)
     ]
 
-# Create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=0.05, log=True, Solver=SSPRK22)
+#create a simulation instance from the blocks and connections
+Sim = Simulation(blocks, connections, dt=0.05, log=True)
 
-# Run the simulation for 30 seconds
+#run the simulation for 30 seconds
 Sim.run(duration=30.0)
 
-# Plot the results directly from the scope
+#plot the results directly from the scope
 Sc.plot()
 
-# Read the results from the scope for further processing
+#read the results from the scope for further processing
 time, data = Sc.read();
 ```
 
-    2025-03-07 14:16:13,573 - INFO - LOGGING enabled
-    2025-03-07 14:16:13,574 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2025-03-07 14:16:13,574 - INFO - ALGEBRAIC PATH LENGTH 2
-    2025-03-07 14:16:13,575 - INFO - RESET, time -> 0.0
-    2025-03-07 14:16:13,576 - INFO - TRANSIENT duration=30.0
-    2025-03-07 14:16:13,577 - INFO - STARTING progress tracker
-    2025-03-07 14:16:13,578 - INFO - progress=0%
-    2025-03-07 14:16:13,593 - INFO - progress=10%
-    2025-03-07 14:16:13,611 - INFO - progress=20%
-    2025-03-07 14:16:13,631 - INFO - progress=30%
-    2025-03-07 14:16:13,644 - INFO - progress=40%
-    2025-03-07 14:16:13,670 - INFO - progress=50%
-    2025-03-07 14:16:13,695 - INFO - progress=60%
-    2025-03-07 14:16:13,719 - INFO - progress=70%
-    2025-03-07 14:16:13,737 - INFO - progress=80%
-    2025-03-07 14:16:13,760 - INFO - progress=90%
-    2025-03-07 14:16:13,780 - INFO - progress=100%
-    2025-03-07 14:16:13,782 - INFO - FINISHED, steps(total)=600(600), runtime=205.21ms
+    2025-03-08 10:23:20,415 - INFO - LOGGING enabled
+    2025-03-08 10:23:20,417 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2025-03-08 10:23:20,417 - INFO - ALGEBRAIC PATH LENGTH 2
+    2025-03-08 10:23:20,417 - INFO - RESET, time -> 0.0
+    2025-03-08 10:23:20,418 - INFO - TRANSIENT duration=30.0
+    2025-03-08 10:23:20,418 - INFO - STARTING progress tracker
+    2025-03-08 10:23:20,419 - INFO - progress=0%
+    2025-03-08 10:23:20,424 - INFO - progress=10%
+    2025-03-08 10:23:20,428 - INFO - progress=20%
+    2025-03-08 10:23:20,433 - INFO - progress=30%
+    2025-03-08 10:23:20,438 - INFO - progress=40%
+    2025-03-08 10:23:20,443 - INFO - progress=50%
+    2025-03-08 10:23:20,448 - INFO - progress=60%
+    2025-03-08 10:23:20,452 - INFO - progress=70%
+    2025-03-08 10:23:20,457 - INFO - progress=80%
+    2025-03-08 10:23:20,462 - INFO - progress=90%
+    2025-03-08 10:23:20,467 - INFO - progress=100%
+    2025-03-08 10:23:20,467 - INFO - FINISHED, steps(total)=600(600), runtime=48.32ms
     
 
 
@@ -181,24 +176,24 @@ Sim.run(3*mu)
 Sc.plot(".-");
 ```
 
-    2025-03-07 14:17:09,477 - INFO - LOGGING enabled
-    2025-03-07 14:17:09,477 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
-    2025-03-07 14:17:09,479 - INFO - ALGEBRAIC PATH LENGTH 1
-    2025-03-07 14:17:09,479 - INFO - RESET, time -> 0.0
-    2025-03-07 14:17:09,480 - INFO - TRANSIENT duration=3000
-    2025-03-07 14:17:09,482 - INFO - STARTING progress tracker
-    2025-03-07 14:17:09,500 - INFO - progress=0%
-    2025-03-07 14:17:09,838 - INFO - progress=11%
-    2025-03-07 14:17:10,037 - INFO - progress=20%
-    2025-03-07 14:17:12,757 - INFO - progress=32%
-    2025-03-07 14:17:13,061 - INFO - progress=42%
-    2025-03-07 14:17:13,366 - INFO - progress=51%
-    2025-03-07 14:17:16,021 - INFO - progress=63%
-    2025-03-07 14:17:16,256 - INFO - progress=70%
-    2025-03-07 14:17:17,067 - INFO - progress=80%
-    2025-03-07 14:17:18,991 - INFO - progress=90%
-    2025-03-07 14:17:19,129 - INFO - progress=100%
-    2025-03-07 14:17:19,130 - INFO - FINISHED, steps(total)=228(397), runtime=9647.2ms
+    2025-03-08 10:23:23,867 - INFO - LOGGING enabled
+    2025-03-08 10:23:23,868 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
+    2025-03-08 10:23:23,868 - INFO - ALGEBRAIC PATH LENGTH 1
+    2025-03-08 10:23:23,869 - INFO - RESET, time -> 0.0
+    2025-03-08 10:23:23,869 - INFO - TRANSIENT duration=3000
+    2025-03-08 10:23:23,869 - INFO - STARTING progress tracker
+    2025-03-08 10:23:23,876 - INFO - progress=0%
+    2025-03-08 10:23:23,987 - INFO - progress=11%
+    2025-03-08 10:23:24,059 - INFO - progress=20%
+    2025-03-08 10:23:24,956 - INFO - progress=32%
+    2025-03-08 10:23:25,042 - INFO - progress=42%
+    2025-03-08 10:23:25,118 - INFO - progress=51%
+    2025-03-08 10:23:26,153 - INFO - progress=63%
+    2025-03-08 10:23:26,217 - INFO - progress=70%
+    2025-03-08 10:23:26,529 - INFO - progress=80%
+    2025-03-08 10:23:27,245 - INFO - progress=90%
+    2025-03-08 10:23:27,291 - INFO - progress=100%
+    2025-03-08 10:23:27,291 - INFO - FINISHED, steps(total)=228(397), runtime=3420.48ms
     
 
 
@@ -264,24 +259,24 @@ Sim.run(4*tau)
 Sco.plot()
 ```
 
-    2025-03-07 14:18:08,414 - INFO - LOGGING enabled
-    2025-03-07 14:18:08,415 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2025-03-07 14:18:08,416 - INFO - ALGEBRAIC PATH LENGTH 2
-    2025-03-07 14:18:08,416 - INFO - RESET, time -> 0.0
-    2025-03-07 14:18:08,418 - INFO - TRANSIENT duration=12
-    2025-03-07 14:18:08,419 - INFO - STARTING progress tracker
-    2025-03-07 14:18:08,421 - INFO - progress=0%
-    2025-03-07 14:18:08,488 - INFO - progress=10%
-    2025-03-07 14:18:08,541 - INFO - progress=20%
-    2025-03-07 14:18:08,593 - INFO - progress=30%
-    2025-03-07 14:18:08,648 - INFO - progress=40%
-    2025-03-07 14:18:08,699 - INFO - progress=50%
-    2025-03-07 14:18:08,751 - INFO - progress=60%
-    2025-03-07 14:18:08,802 - INFO - progress=70%
-    2025-03-07 14:18:08,854 - INFO - progress=80%
-    2025-03-07 14:18:08,926 - INFO - progress=90%
-    2025-03-07 14:18:08,989 - INFO - progress=100%
-    2025-03-07 14:18:08,990 - INFO - FINISHED, steps(total)=1201(1201), runtime=569.59ms
+    2025-03-08 10:23:33,029 - INFO - LOGGING enabled
+    2025-03-08 10:23:33,030 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
+    2025-03-08 10:23:33,030 - INFO - ALGEBRAIC PATH LENGTH 2
+    2025-03-08 10:23:33,031 - INFO - RESET, time -> 0.0
+    2025-03-08 10:23:33,031 - INFO - TRANSIENT duration=12
+    2025-03-08 10:23:33,031 - INFO - STARTING progress tracker
+    2025-03-08 10:23:33,032 - INFO - progress=0%
+    2025-03-08 10:23:33,053 - INFO - progress=10%
+    2025-03-08 10:23:33,076 - INFO - progress=20%
+    2025-03-08 10:23:33,096 - INFO - progress=30%
+    2025-03-08 10:23:33,117 - INFO - progress=40%
+    2025-03-08 10:23:33,138 - INFO - progress=50%
+    2025-03-08 10:23:33,159 - INFO - progress=60%
+    2025-03-08 10:23:33,179 - INFO - progress=70%
+    2025-03-08 10:23:33,198 - INFO - progress=80%
+    2025-03-08 10:23:33,218 - INFO - progress=90%
+    2025-03-08 10:23:33,237 - INFO - progress=100%
+    2025-03-08 10:23:33,237 - INFO - FINISHED, steps(total)=1201(1201), runtime=205.34ms
     
 
 
@@ -389,24 +384,24 @@ Sim.run(20)
 Sc.plot();
 ```
 
-    2025-03-07 14:18:17,227 - INFO - LOGGING enabled
-    2025-03-07 14:18:17,229 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
-    2025-03-07 14:18:17,230 - INFO - ALGEBRAIC PATH LENGTH 1
-    2025-03-07 14:18:17,231 - INFO - RESET, time -> 0.0
-    2025-03-07 14:18:17,232 - INFO - TRANSIENT duration=20
-    2025-03-07 14:18:17,233 - INFO - STARTING progress tracker
-    2025-03-07 14:18:17,234 - INFO - progress=0%
-    2025-03-07 14:18:17,245 - INFO - progress=10%
-    2025-03-07 14:18:17,259 - INFO - progress=20%
-    2025-03-07 14:18:17,274 - INFO - progress=30%
-    2025-03-07 14:18:17,286 - INFO - progress=40%
-    2025-03-07 14:18:17,297 - INFO - progress=50%
-    2025-03-07 14:18:17,313 - INFO - progress=60%
-    2025-03-07 14:18:17,329 - INFO - progress=70%
-    2025-03-07 14:18:17,352 - INFO - progress=80%
-    2025-03-07 14:18:17,373 - INFO - progress=90%
-    2025-03-07 14:18:17,408 - INFO - progress=100%
-    2025-03-07 14:18:17,408 - INFO - FINISHED, steps(total)=395(496), runtime=174.95ms
+    2025-03-08 10:23:39,586 - INFO - LOGGING enabled
+    2025-03-08 10:23:39,586 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
+    2025-03-08 10:23:39,587 - INFO - ALGEBRAIC PATH LENGTH 1
+    2025-03-08 10:23:39,588 - INFO - RESET, time -> 0.0
+    2025-03-08 10:23:39,588 - INFO - TRANSIENT duration=20
+    2025-03-08 10:23:39,588 - INFO - STARTING progress tracker
+    2025-03-08 10:23:39,589 - INFO - progress=0%
+    2025-03-08 10:23:39,591 - INFO - progress=10%
+    2025-03-08 10:23:39,595 - INFO - progress=20%
+    2025-03-08 10:23:39,600 - INFO - progress=30%
+    2025-03-08 10:23:39,605 - INFO - progress=40%
+    2025-03-08 10:23:39,609 - INFO - progress=50%
+    2025-03-08 10:23:39,615 - INFO - progress=60%
+    2025-03-08 10:23:39,621 - INFO - progress=70%
+    2025-03-08 10:23:39,628 - INFO - progress=80%
+    2025-03-08 10:23:39,636 - INFO - progress=90%
+    2025-03-08 10:23:39,648 - INFO - progress=100%
+    2025-03-08 10:23:39,648 - INFO - FINISHED, steps(total)=395(496), runtime=60.45ms
     
 
 
@@ -446,17 +441,14 @@ ax.grid(True)
 
 ## Contributing and Future
 
-There are some things I want to explore with PathSim eventually, and your help is highly appreciated! If you want to contribute, send me a message and we can discuss how!
+PathSim is in active development and your feedback is highly appreciated! Dont shy away from filing issues or requests! If you want to contribute in a mayor way, send me a message and we can discuss how!
 
-Some of the possible directions for future features are:
-- explore block level parallelization (fork-join) with Python 3.13 free-threading, batching based on execution cost
+## Roadmap
+
+Some of the possible directions for future PathSim are:
+
+- block level parallelization (fork-join) with Python 3.13 free-threading, batching based on execution cost
 - linearization of blocks and subsystems with the AD framework, linear surrogate models, system wide linearization
 - improved / more robust steady state solver and algebraic loop solver
 - methods for periodic steady state analysis
 - more extensive testing and validation (as always)
-
-
-
-```python
-
-```

@@ -4,7 +4,7 @@ authors:
   - family-names: "Rother"
     given-names: "Milan"
     orcid: "https://orcid.org/0009-0006-5964-6115"
-title: "PathSim - A Time-Domain System Simulation Framework"
+title: "PathSim - A System Simulation Framework"
 version: 0.5.5
 date-released: 2025-03-07
 url: "https://github.com/milanofthe/pathsim"
