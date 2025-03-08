@@ -16,7 +16,10 @@ Key Features:
 - Automatic differentiation for **fully differentiable** system simulations
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
-For the full documentation, tutorials and API-reference visit [readthedocs](https://pathsim.readthedocs.io/en/latest/)!
+
+For the full **documentation**, tutorials and API-reference visit [readthedocs](https://pathsim.readthedocs.io/en/latest/)!
+
+The source code can be found in the [GitHub repository](https://github.com/milanofthe/pathsim) and is fully open source under **MIT license**. Consider starring PathSim to support its development.
 
 ## Installation
 
@@ -32,7 +35,9 @@ There are lots of [examples](https://github.com/milanofthe/pathsim/tree/master/e
 
 But first, lets have a look at how we can simulate the harmonic oscillator (a spring mass damper 2nd order system) using PathSim. The system and its corresponding equivalent block diagram are shown in the figure below:
 
-![png](README_files/harmonic_oscillator.png)
+
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/harmonic_oscillator.png)
+
 
 The equation of motion that defines the harmonic oscillator it is give by
 
@@ -112,9 +117,8 @@ time, data = Sc.read();
     
 
 
-    
-![png](README_files/README_4_1.png)
-    
+        
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/README_4_1.png)
 
 
 ## Stiff Systems
@@ -196,10 +200,7 @@ Sc.plot(".-");
     2025-03-08 10:56:08,326 - INFO - FINISHED, steps(total)=228(397), runtime=3451.53ms
     
 
-
-    
-![png](README_files/README_6_1.png)
-    
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/README_6_1.png)
 
 
 ## Differentiable Simulation
@@ -208,7 +209,9 @@ PathSim also includes a fully fledged automatic differentiation framework based 
 
 To demonstrate this lets consider the following linear feedback system and perform a sensitivity analysis on it with respect to some system parameters. 
 
-![png](README_files/linear_feedback_blockdiagram.png)
+
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/linear_feedback_blockdiagram.png)
+
 
 The source term is a scaled unit step function (scaled by $b$). In this example, the parameters for the sensitivity analysis are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $b$.
 
@@ -280,9 +283,7 @@ Sco.plot()
     
 
 
-    
-![png](README_files/README_8_1.png)
-    
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/README_8_1.png)
 
 
 Now the recorded time series data is of type `Value` and we can evaluate the automatically computed partial derivatives at each timestep. For example the response, differentiated with respect to the linear feedback parameter $\partial x(t) / \partial a$ can be extracted from the data like this `der(data, a)`.
@@ -307,9 +308,7 @@ ax.legend(fancybox=False);
 ```
 
 
-    
-![png](README_files/README_10_0.png)
-    
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/README_10_0.png)
 
 
 ## Event Detection
@@ -319,7 +318,8 @@ PathSim has an event handling system that monitors the simulation state and can 
 This enables the simulation of hybrid continuous time systems with discrete events. 
 
 
-![png](README_files/bouncing_ball.png)
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/bouncing_ball.png)
+
 
 Probably the most popular example for this is the bouncing ball (see figure above) where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
 
@@ -410,9 +410,7 @@ Sc.plot();
     
 
 
-    
-![png](README_files/README_12_1.png)
-    
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/README_12_1.png)
 
 
 During the event handling, the simulator approaches the event until the specified tolerance is met. You can see this by analyzing the timesteps taken by the adaptive integrator `RKBS32`.
@@ -439,9 +437,7 @@ ax.grid(True)
 ```
 
 
-    
-![png](README_files/README_14_0.png)
-    
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/README_14_0.png)
 
 
 ## Contributing
@@ -457,9 +453,3 @@ Some of the possible directions for future PathSim are:
 - improved / more robust steady state solver and algebraic loop solver
 - methods for periodic steady state analysis
 - more extensive testing and validation (as always)
-
-
-
-```python
-
-```
