@@ -316,7 +316,12 @@ ax.legend(fancybox=False);
 
 PathSim has an event handling system that monitors the simulation state and can find and locate discrete events by evaluating an event function and trigger callbacks or state transformations. Multiple event types are supported such as `ZeroCrossing` or `Schedule`. 
 
-This enables the simulation of hybrid continuous time systems with discrete events. Probably the most popular example for this is the bouncing ball where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
+This enables the simulation of hybrid continuous time systems with discrete events. 
+
+
+
+
+Probably the most popular example for this is the bouncing ball where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
 
 
 ```python
@@ -439,7 +444,7 @@ ax.grid(True)
     
 
 
-## Contributing and Future
+## Contributing
 
 PathSim is in active development and your feedback is highly appreciated! Dont shy away from filing issues or requests! If you want to contribute in a mayor way, send me a message and we can discuss how!
 
@@ -452,3 +457,9 @@ Some of the possible directions for future PathSim are:
 - improved / more robust steady state solver and algebraic loop solver
 - methods for periodic steady state analysis
 - more extensive testing and validation (as always)
+
+
+
+```python
+
+```
