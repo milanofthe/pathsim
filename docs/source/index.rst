@@ -26,7 +26,7 @@ The source code can be found in the `GitHub repository <https://github.com/milan
 Quickstart
 ----------
 
-1. **Install** PathSim with pip:
+1. **Install** PathSim with `pip <https://pypi.org/project/pathsim/>`_:
 
 .. code-block:: bash
 
