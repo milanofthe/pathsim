@@ -14,7 +14,15 @@ The continuous dynamics part of the system has the following two ODEs for the tw
     \end{cases}
 
 
-First lets import the `Simulation` and `Connection` classes and the required blocks from the block library. In addition to this we also need to define events to detect the threshold crossings for the regulator.
+With some algebraic manipulations we can translate the system equation into a block diagram that can be implemented in `PathSim`. Note the event manager, that watches the state of the integrator and controls the heater.
+
+.. image:: figures/thermostat_blockdiagram.png
+   :width: 700
+   :align: center
+   :alt: block diagram of thermostat system
+
+
+Lets start by importing the `Simulation` and `Connection` classes and the required blocks from the block library. In addition to this we also need to define events to detect the threshold crossings for the regulator.
 
 .. code-block:: python
 
