@@ -12,6 +12,15 @@ This example demonstrates `PathSims` event handling system. The classical exampl
 
 Systems like this require the location and resolution of discrete events within the timestep and are not easily solved with standard numerical ODE solvers. `PathSim` implements an event management system that can track the system state and locate and resolve specified events. 
 
+We can translate the dynamics of the system into a block diagram. Note the event manager that watches the state of the integrator for the position and can act on both integrator states:
+
+
+.. image:: figures/bouncing_ball_blockdiagram.png
+   :width: 700
+   :align: center
+   :alt: block diagram of the bouncing ball system
+
+
 To simulate the bouncing ball, lets start by importing the required blocks from block library. In this case integrators and a constant for gravity. And of course the zero crossing event manager from the event library.
 
 .. code-block:: python
