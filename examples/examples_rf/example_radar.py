@@ -89,4 +89,6 @@ Spc.plot()
 Spc.ax.set_xscale("log")
 Spc.ax.set_yscale("log")
 
+Spc.ax.axvline(f_trg, ls="--", c="k")
+
 plt.show()

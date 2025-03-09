@@ -3,12 +3,14 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
 
+
+from pathsim._version import __version__ as release
+
 # -- Project information -----------------------------------------------------
 
 project = 'pathsim'
 copyright = '2025, Milan Rother' 
 author = 'Milan Rother'
-release = '0.5.5'  
 
 # -- General configuration ---------------------------------------------------
 
