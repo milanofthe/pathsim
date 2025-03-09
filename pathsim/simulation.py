@@ -1085,6 +1085,10 @@ class Simulation:
             #not close enough -> roll back timestep (secant step)
             else:
                 self._revert()
+
+                #after revert, evaluate system equation again -> reset for buffer
+                total_evals += self._update(self.time) 
+
                 scale = min(scale, ratio)
                 return False, error_norm, scale, total_evals, total_solver_its
         

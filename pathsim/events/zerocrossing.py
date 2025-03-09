@@ -59,6 +59,9 @@ class ZeroCrossing(Event):
 
         #evaluate event function
         result = self.func_evt(t)
+
+        #are we close to the actual event?
+        close = abs(result) <= self.tolerance
             
         #unpack history
         _result, _t = self._history
@@ -68,15 +71,12 @@ class ZeroCrossing(Event):
             return False, False, 1.0
 
         #check for zero crossing (sign change)
-        is_event = np.sign(_result) != np.sign(result)
+        is_event = np.sign(result * _result) < 0 
 
         #definitely no event detected -> quit early
         if not is_event:
             return False, False, 1.0
 
-        #are we close to the actual event?
-        close = abs(result) <= self.tolerance
-        
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), 1e-18, None)
         
@@ -109,23 +109,23 @@ class ZeroCrossingUp(Event):
             
         #evaluate event function
         result = self.func_evt(t)
+
+        #are we close to the actual event?
+        close = abs(result) <= self.tolerance
             
         #unpack history
         _result, _t = self._history
-
+        
         #no history -> no zero crossing
         if _result is None:
             return False, False, 1.0
 
         #check for zero crossing (sign change)
-        is_event = np.sign(_result) != np.sign(result)
+        is_event = np.sign(result * _result) < 0 and result > _result
 
         #no event detected or wrong direction -> quit early
         if not is_event or _result >= 0:
             return False, False, 1.0
-        
-        #are we close to the actual event?
-        close = abs(result) <= self.tolerance
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), 1e-18, None)
@@ -159,6 +159,9 @@ class ZeroCrossingDown(Event):
         
         #evaluate event function
         result = self.func_evt(t)
+        
+        #are we close to the actual event?
+        close = abs(result) <= self.tolerance
             
         #unpack history
         _result, _t = self._history
@@ -168,14 +171,11 @@ class ZeroCrossingDown(Event):
             return False, False, 1.0
 
         #check for zero crossing (sign change)
-        is_event = np.sign(_result) != np.sign(result)
+        is_event = np.sign(result * _result) < 0 and result < _result
 
         #no event detected or wrong direction -> quit early
         if not is_event or _result <= 0:
             return False, False, 1.0
-        
-        #are we close to the actual event?
-        close = abs(result) <= self.tolerance
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), 1e-18, None)

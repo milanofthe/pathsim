@@ -17,6 +17,7 @@ pathsim.blocks
    pathsim.blocks.rng
    pathsim.blocks.scope
    pathsim.blocks.sources
+   pathsim.blocks.switch
    pathsim.blocks.spectrum
    pathsim.blocks.mixed
    pathsim.blocks.rf

@@ -56,8 +56,6 @@ connections = [
 # Create a simulation instance from the blocks and connections
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 
-print(Sim)
-
 # Run the simulation for 25 seconds
 Sim.run(duration=25)
 

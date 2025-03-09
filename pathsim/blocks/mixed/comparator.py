@@ -9,7 +9,6 @@
 
 # IMPORTS ===============================================================================
 
-
 import numpy as np
 
 from .._block import Block

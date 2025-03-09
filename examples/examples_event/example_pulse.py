@@ -49,7 +49,7 @@ E = Schedule(
     )
 
 events = [E]
-E.off() #switch event tracking
+# E.off() #switch event tracking
 
 
 #initialize simulation with the blocks, connections, timestep and logging enabled

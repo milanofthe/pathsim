@@ -25,6 +25,11 @@ g = 9.81    # gravity
 v = 3.0     # belt velocity magnitude
 T = 50.0    # excitation period
 
+
+#function for belt velocity
+def v_belt(t):
+    return v * np.sin(2*np.pi*t/T)
+
 #ODE function
 def _f(x, u, t):
     v_rel = x[1] - u[0] #relative velocity
@@ -32,7 +37,7 @@ def _f(x, u, t):
     return np.array([x[1], -(k*x[0] + d*x[1] + F_c)/m])
 
 #blocks that define the system
-Sr = Source(lambda t: v*np.sin(2*np.pi*t/T)) #this is the velocity of the belt
+Sr = Source(v_belt) #this is the velocity of the belt
 St = ODE(_f, np.zeros(2))
 Sc = Scope(labels=["belt velocity", "box position", "box velocity"])
 

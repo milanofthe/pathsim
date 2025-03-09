@@ -9,6 +9,7 @@ There is a more comprehensive collection of examples availabe in the `GitHub rep
    :maxdepth: 3
 
    examples/linear_feedback
+   examples/harmonic_oscillator
    examples/bouncing_ball
    examples/thermostat
    examples/fmcw_radar
