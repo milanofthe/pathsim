@@ -24,8 +24,7 @@ from pathsim.blocks import (
 #special blocks (for example from 'rf' module) are imported like this
 from pathsim.blocks.rf import (
     ChirpSource, 
-    ButterworthLowpassFilter,
-    WhiteNoise
+    ButterworthLowpassFilter
     )
 
 
@@ -54,24 +53,22 @@ f_trg = 2 * R * B / (T * c0)
 #initialize blocks
 Src = ChirpSource(f0=f_min, BW=B, T=T)
 Add = Adder()
-Wns = WhiteNoise(5e-3)
 Dly = Delay(tau)
 Mul = Multiplier()
 Lpf = ButterworthLowpassFilter(f_trg*3, 2)
 Spc = Spectrum(
     freq=np.logspace(6, 10, 500), 
-    labels=["noisy chirp", "delay", "mixer", "lpf"]
+    labels=["chirp", "delay", "mixer", "lpf"]
     )
 Sco = Scope(
-    labels=["noisy chirp", "delay", "mixer", "lpf"]
+    labels=["chirp", "delay", "mixer", "lpf"]
     )
 
-blocks = [Src, Add, Wns, Dly, Mul, Lpf, Spc, Sco]
+blocks = [Src, Add,  Dly, Mul, Lpf, Spc, Sco]
 
 #initialize connections
 connections = [
     Connection(Src, Add[0]),
-    Connection(Wns, Add[1]),
     Connection(Add, Dly, Mul, Sco, Spc),
     Connection(Dly, Mul[1], Sco[1], Spc[1]),
     Connection(Mul, Lpf, Sco[2], Spc[2]),
