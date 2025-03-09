@@ -1,7 +1,9 @@
 Bouncing Ball
 -------------
 
-This example demonstrates `PathSims` event handling system. The classical example here is the bouncing ball. The ball accelerates downward due to gravity and one it hits the floor, it bounces back. The dynamics of this system are discontinuous due to the jump in velocity (sign change) exactly at the bounce. This is called a discrete event, specifically a zero crossing event. You can also find this example in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/examples_event/example_bouncingball.py>`_.
+This example demonstrates `PathSims` event handling system. The classical example here is the bouncing ball. The ball accelerates downward due to gravity and one it hits the floor, it bounces back. The dynamics of this system are discontinuous due to the jump in velocity (sign change) exactly at the bounce. This is called a discrete event, specifically a zero crossing event. 
+
+You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/examples_event/example_bouncingball.py>`_.
 
 
 .. image:: figures/bouncing_ball.png

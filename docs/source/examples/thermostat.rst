@@ -2,7 +2,9 @@
 Thermostat
 ----------------------
 
-In this example we have a look at a thermostat, which is a kind off discrete regulator. It switches a heating element on or of depending on defined upper and lower thresholds. You can also find this example in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/examples_event/example_thermostat.py>`_.
+In this example we have a look at a thermostat, which is a kind off discrete regulator. It switches a heating element on or of depending on defined upper and lower thresholds. 
+
+You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/examples_event/example_thermostat.py>`_.
 
 The continuous dynamics part of the system has the following two ODEs for the two heater states:
 

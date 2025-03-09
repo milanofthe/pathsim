@@ -1,7 +1,9 @@
 Linear Feedback System
 ----------------------
 
-Here's a simple example of a linear feedback system, simulated with `PathSim`. You can also find this example in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/example_feedback.py>`_.
+Here's a simple example of a linear feedback system, simulated with `PathSim`. 
+
+You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/example_feedback.py>`_.
 
 .. image:: figures/linear_feedback_blockdiagram.png
    :width: 700
