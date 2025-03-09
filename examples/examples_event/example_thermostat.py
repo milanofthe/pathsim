@@ -75,14 +75,22 @@ E2 = ZeroCrossingDown(
 events = [E1, E2]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, events, dt=0.1, dt_max=0.05, log=True, Solver=RKBS32)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    events, 
+    dt=0.1, 
+    dt_max=0.05, 
+    log=True, 
+    Solver=RKBS32
+    )
 
 #run simulation for some number of seconds
 Sim.run(30)
 
 sco.plot(lw=2)
 
-#thermostat switching events
+# #thermostat switching events
 for e in E1: sco.ax.axvline(e, ls="--", c="k")
 for e in E2: sco.ax.axvline(e, ls="-.", c="k")
 
