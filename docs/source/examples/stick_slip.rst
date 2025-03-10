@@ -33,21 +33,21 @@ with the sticking condition:
    
 .. math::
    
-   | F_c - k x - d v_b| \leq \mu_s m g
+   |k x + d v_b| \leq \mu_s m g
 
 
 the transition condition from **slip to stick**, when:
    
 .. math::
 
-   \dot{x} = v_b \text{ and } |F_c - k x - d v_b| \leq \mu_s m g 
+   \dot{x} = v_b \text{ and } |k x + d v_b| \leq \mu_s m g 
 
 
 and from **stick to slip**, when 
 
 .. math::
 
-   |F_c - k x - d v_b| > \mu_s m g
+   |k x + d v_b| > \mu_s m g
 
 
 The resulting switched system is shown in the block diagram below:
@@ -271,10 +271,10 @@ Lets have a look at the scopes and see what we got for the position and velocity
     Sc1.plot("-", lw=2)
 
 
-.. image:: figures/stick_slip_results_xv.png
+.. image:: figures/stick_slip_result_xv.png
    :width: 700
    :align: center
-   :alt: results of stick slip system, pos, vel
+   :alt: results of stick slip system pos vel
 
 
 And the scope that recorded the forces:
@@ -285,8 +285,8 @@ And the scope that recorded the forces:
     Sc2.plot("-", lw=2)
 
 
-.. image:: figures/stick_slip_results_forces.png
+.. image:: figures/stick_slip_result_forces.png
    :width: 700
    :align: center
-   :alt: results of stick slip system, forces
+   :alt: results of stick slip system forces
 
