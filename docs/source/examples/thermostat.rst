@@ -1,4 +1,3 @@
-
 Thermostat
 ----------------------
 
@@ -11,8 +10,8 @@ The continuous dynamics part of the system has the following two ODEs for the tw
 .. math::
     
     \begin{cases} 
-    \dot{T} = - a ( T - T_a ) + H \ \text{heater on} \\
-    \dot{T} = - a ( T - T_a ) \ \text{heater off}
+    \dot{T} = - a ( T - T_a ) + H & \text{heater on} \\
+    \dot{T} = - a ( T - T_a )     &  \text{heater off}
     \end{cases}
 
 

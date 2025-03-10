@@ -1067,6 +1067,10 @@ class Simulation:
         #if step not successful and adaptive -> roll back timestep
         if not success:
             self._revert()
+            
+            #after revert, evaluate system equation again -> reset for buffer
+            total_evals += self._update(self.time) 
+
             return False, error_norm, scale, total_evals, total_solver_its
 
         #evaluate system equation before sampling and event check (+dt)
