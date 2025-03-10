@@ -794,8 +794,10 @@ class Simulation:
     def _revert(self):
         """Revert simulation state to previous timestep for adaptive solvers 
         when local truncation error is too large and timestep has to be 
-        retaken with smaller timestep.
+        retaken with smaller timestep. 
         """
+
+        #revert to previous integrator state
         for block in self.blocks:
             if block: block.revert()
 

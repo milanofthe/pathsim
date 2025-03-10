@@ -15,6 +15,7 @@ from pathsim.blocks import (
     Integrator, 
     Amplifier, 
     Constant,
+    Function,
     Source,
     Switch,
     Adder, 
@@ -35,32 +36,47 @@ x0, v0 = 0, 0
 m = 20.0    # mass
 k = 70.0    # spring constant
 d = 10.0    # spring damping
-mu_s = 1.5    # stick friction coefficient
-mu_k = 1.3    # kinetic friction coefficient
+mu_s = 1.5  # stick friction coefficient
+mu_k = 1.4  # kinetic friction coefficient
 g = 9.81    # gravity
 v = 3.0     # belt velocity magnitude
 T = 50.0    # excitation period
 
-#coulomb friction
-F_s = mu_s * m * g 
-F_k = mu_k * m * g 
+F_s = mu_s * m * g # sticking friction force 
+F_k = mu_k * m * g #kinetic friction force
 
 #function for belt velocity
 def v_belt(t):
-    return v * t/T
+    return v * np.sin(2*np.pi*t/T)
+    # return v * t/T
+
+#function for coulomb friction (acceleration)
+def f_coulomb(v, vb):
+    return F_k / m * np.sign(vb - v)
+
+
+# system topology -----------------------------------------------------------------------
 
 #blocks that define the system
-Sr = Source(v_belt)   # velocity of the belt
-I1 = Integrator(v0)   # integrator for velocity
-I2 = Integrator(x0)   # integrator for position
+Sr = Source(v_belt)      # velocity of the belt
+I1 = Integrator(v0)      # integrator for velocity
+I2 = Integrator(x0)      # integrator for position
 A1 = Amplifier(-d/m)
 A2 = Amplifier(-k/m)
-Cf = Constant(F_k/m) # friction constant (kinetic)
+Fc = Function(f_coulomb) # coulomb friction (kinetic)
 P1 = Adder()
-Sw = Switch(1)        # selecting port '1' initially
-Sc = Scope(labels=["belt velocity", "box velocity", "box position", "box acceleration"])
+Sw = Switch(1)           # selecting port '1' initially
+Sc = Scope(
+    labels=[
+        "belt velocity", 
+        "box velocity", 
+        "box position", 
+        "box acceleration",
+        "coulomb acceleration"
+        ]
+    )
 
-blocks = [Sr, I1, I2, A1, A2, Cf, P1, Sw, Sc]
+blocks = [Sr, I1, I2, A1, A2, Fc, P1, Sw, Sc]
 
 
 #connections between the blocks
@@ -68,16 +84,18 @@ connections = [
     Connection(I1, Sw[0]), 
     Connection(Sr, Sw[1], Sc[0]), 
     Connection(Sw, I2, A1, Sc[1]), 
-    Connection(I2, A2, Sc[2]),
+    Connection(I2, A2, Sc[2]), 
+    Connection(Sw, Fc[0]), 
+    Connection(Sr, Fc[1]),
     Connection(A1, P1[0]), 
     Connection(A2, P1[1]), 
-    Connection(Cf, P1[2]), 
+    Connection(Fc, P1[2], Sc[4]), 
     Connection(P1, I1, Sc[3])
     ]
 
 
 
-#event manager
+# event management ----------------------------------------------------------------------
 
 def slip_to_stick_evt(t):
     _1, v_box , _2 = Sw() 
@@ -92,7 +110,7 @@ def slip_to_stick_act(t):
     Sw.state = 1
 
     I1.off()
-    Cf.off()
+    Fc.off()
 
     E_slip_to_stick.off()
     E_stick_to_slip.on()
@@ -102,7 +120,6 @@ E_slip_to_stick = ZeroCrossing(
     func_act=slip_to_stick_act, 
     tolerance=1e-3
     )
-
 
 
 def stick_to_slip_evt(t):
@@ -115,7 +132,7 @@ def stick_to_slip_act(t):
     Sw.state = 0
 
     I1.on()
-    Cf.on()
+    Fc.on()
 
     #set integrator state
     _1, v_box , _2 = Sw() 
@@ -134,6 +151,8 @@ E_stick_to_slip = ZeroCrossing(
 events = [E_slip_to_stick, E_stick_to_slip]
 
 
+# simulation setup ----------------------------------------------------------------------
+
 #create a simulation instance from the blocks and connections
 Sim = Simulation(
     blocks, 
@@ -148,7 +167,10 @@ Sim = Simulation(
     )
 
 #run the simulation for some time
-Sim.run(T)
+Sim.run(2*T)
+
+
+# visualization -------------------------------------------------------------------------
 
 #plot the results directly from the scope
 Sc.plot()
@@ -156,11 +178,8 @@ Sc.plot()
 for t in E_slip_to_stick:
     Sc.ax.axvline(t, ls=":", c="k")
 
-
 for t in E_stick_to_slip:
     Sc.ax.axvline(t, ls="--", c="k")
-
-
 
 
 plt.show()

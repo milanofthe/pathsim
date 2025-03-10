@@ -399,7 +399,8 @@ class ExplicitSolver(Solver):
         """Directly integrate the function 'func' from 'time_start' 
         to 'time_end' with timestep 'dt' for explicit solvers. 
 
-        This method is primarily intended for testing purposes.
+        This method is primarily intended for testing purposes or 
+        for use as a standalone numerical integrator.
     
         Parameters
         ----------
@@ -611,10 +612,11 @@ class ImplicitSolver(Solver):
                   adaptive=True,
                   tolerance_fpi=1e-12, 
                   max_iterations=5000):
-        """Directly integrate the function 'func' from 'time_start' to 'time_end' with 
-        timestep 'dt' for implicit solvers. 
+        """Directly integrate the function 'func' from 'time_start' 
+        to 'time_end' with timestep 'dt' for implicit solvers. 
 
-        This method is primarily intended for testing purposes.
+        This method is primarily intended for testing purposes or 
+        for use as a standalone numerical integrator.
     
         Parameters
         ----------
