@@ -271,7 +271,8 @@ class Value:
         out : float
             The partial derivative value
         """
-        return self.grad.get(other._id, 0.0)
+        if isinstance(other, Value): return self.grad.get(other._id, 0.0)
+        else: return 0.0
 
 
     def __hash__(self):

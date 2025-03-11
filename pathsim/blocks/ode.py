@@ -43,10 +43,12 @@ class ODE(Block):
         jacobian of 'func' or 'None'
     """
 
-    def __init__(self,
-                 func=lambda x, u, t: -x,
-                 initial_value=0.0,
-                 jac=None):
+    def __init__(
+        self,
+        func=lambda x, u, t: -x,
+        initial_value=0.0,
+        jac=None
+        ):
 
         super().__init__()
           

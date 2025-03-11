@@ -196,56 +196,6 @@ def max_rel_error_dicts(a, b):
     return max_rel_error(a.values(), b.values())
 
 
-# AUTOMATIC DIFFERENTIATION ============================================================
-
-def numerical_jacobian(func, x, h=1e-8):
-    """Numerically computes the jacobian of the function 'func' by 
-    central differences. 
-
-    With the stepsize 'h' which is set to a default value of 'h=1e-8' 
-    which is the point where the truncation error of the central 
-    differences balances with the machine accuracy of 64bit floating 
-    point numbers.    
-    
-    Parameters
-    ----------
-    func : callable
-        function to compute jacobian for
-    x : float, array[float] 
-        value for function at which the jacobian is evaluated
-    h : float
-        step size for central differences
-    
-    Returns
-    -------
-    jac : array[array[float]]
-        2d jacobian array
-    """
-    
-    #catch scalar case (gradient)
-    if np.isscalar(x):
-        return 0.5 * (func(x+h) - func(x-h)) / h
-         
-    #perturbation matrix and jacobian
-    e = np.eye(len(x)) * h
-    return 0.5 * np.array([func(x_p) - func(x_m) for x_p, x_m in zip(x+e, x-e)]).T / h
-
-
-def auto_jacobian(func):
-    """Wraps a function object such that it computes the jacobian 
-    of the function with respect to the first argument.
-
-    This is intended to compute the jacobian 'jac(x, u, t)' of 
-    the right hand side function 'func(x, u, t)' of numerical 
-    integrators with respect to 'x'.
-    """
-    def wrap_func(*args):
-        _x, *_args = args
-        return numerical_jacobian(lambda x: func(x, *_args), _x)
-    return wrap_func
-
-
-
 # PATH ESTIMATION ======================================================================
 
 def path_length_dfs(connections, starting_block, visited=None):
