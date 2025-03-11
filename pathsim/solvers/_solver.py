@@ -11,6 +11,16 @@
 
 import numpy as np
 
+from .._constants import (
+    SIM_DT,
+    SIM_DT_MIN,
+    SIM_DT_MAX,
+    SOLVER_TOLERANCE_LTE_ABS, 
+    SOLVER_TOLERANCE_LTE_REL,
+    SOLVER_TOLERANCE_FPI,
+    SOLVER_ITERATIONS_MAX
+    )
+
 from ..optim.anderson import (
     Anderson, 
     NewtonAnderson
@@ -66,8 +76,8 @@ class Solver:
                  initial_value=0, 
                  func=lambda x, u, t: u, 
                  jac=None, 
-                 tolerance_lte_abs=1e-8, 
-                 tolerance_lte_rel=1e-5):
+                 tolerance_lte_abs=SOLVER_TOLERANCE_LTE_ABS, 
+                 tolerance_lte_rel=SOLVER_TOLERANCE_LTE_REL):
 
         #set buffer, state and initial condition    
         self.x_0 = self.x = self.initial_value = initial_value
@@ -358,7 +368,7 @@ class ExplicitSolver(Solver):
 
     # method for direct integration ----------------------------------------------------
 
-    def integrate_singlestep(self, time=0.0, dt=0.1):
+    def integrate_singlestep(self, time=0.0, dt=SIM_DT):
         """Directly integrate the function 'func' for a single timestep 'dt' with 
         explicit solvers. This method is primarily intended for testing purposes.
         
@@ -392,9 +402,9 @@ class ExplicitSolver(Solver):
     def integrate(self, 
                   time_start=0.0, 
                   time_end=1.0, 
-                  dt=0.1, 
-                  dt_min=0.0, 
-                  dt_max=None, 
+                  dt=SIM_DT, 
+                  dt_min=SIM_DT_MIN, 
+                  dt_max=SIM_DT_MAX, 
                   adaptive=True):
         """Directly integrate the function 'func' from 'time_start' 
         to 'time_end' with timestep 'dt' for explicit solvers. 
@@ -547,9 +557,9 @@ class ImplicitSolver(Solver):
 
     def integrate_singlestep(self, 
                              time=0.0, 
-                             dt=0.1, 
-                             tolerance_fpi=1e-12, 
-                             max_iterations=5000):
+                             dt=SIM_DT, 
+                             tolerance_fpi=SOLVER_TOLERANCE_FPI, 
+                             max_iterations=SOLVER_ITERATIONS_MAX):
         """
         Directly integrate the function 'func' for a single timestep 'dt' with 
         implicit solvers. This method is primarily intended for testing purposes.
@@ -606,12 +616,12 @@ class ImplicitSolver(Solver):
     def integrate(self, 
                   time_start=0.0, 
                   time_end=1.0, 
-                  dt=0.1, 
-                  dt_min=0.0, 
-                  dt_max=None, 
+                  dt=SIM_DT, 
+                  dt_min=SIM_DT_MIN, 
+                  dt_max=SIM_DT_MAX, 
                   adaptive=True,
-                  tolerance_fpi=1e-12, 
-                  max_iterations=5000):
+                  tolerance_fpi=SOLVER_TOLERANCE_FPI, 
+                  max_iterations=SOLVER_ITERATIONS_MAX):
         """Directly integrate the function 'func' from 'time_start' 
         to 'time_end' with timestep 'dt' for implicit solvers. 
 

@@ -24,7 +24,7 @@ The continuous time dynamics for the two states have the following ODE(s):
 .. math::
    
    \begin{cases}
-   m \ddot{x} = F_c - k x - d \dot{x} - \mu_k m g \, \mathrm{sign}\left( \dot{x} - v_b \right) & \text{slip}  \\
+   m \ddot{x} = - k x - d \dot{x} - F_c \, \mathrm{sign}\left( \dot{x} - v_b \right) & \text{slip}  \\
    \dot{x} = v_b & \text{stick}
    \end{cases}
 
@@ -33,21 +33,21 @@ with the sticking condition:
    
 .. math::
    
-   |k x + d v_b| \leq \mu_s m g
+   |k x + d v_b| \leq F_c
 
 
 the transition condition from **slip to stick**, when:
    
 .. math::
 
-   \dot{x} = v_b \text{ and } |k x + d v_b| \leq \mu_s m g 
+   \dot{x} = v_b \quad \text{and} \quad |k x + d v_b| \leq F_c
 
 
 and from **stick to slip**, when 
 
 .. math::
 
-   |k x + d v_b| > \mu_s m g
+   |k x + d v_b| > F_c
 
 
 The resulting switched system is shown in the block diagram below:
@@ -106,23 +106,20 @@ Next are the system parameters, including the function definitions for the `Sour
     m = 20.0    # mass
     k = 70.0    # spring constant
     d = 10.0    # spring damping
-    mu_s = 1.5  # stick friction coefficient
-    mu_k = 1.5  # kinetic friction coefficient
+    mu = 1.5    # friction coefficient
     g = 9.81    # gravity
     v = 3.0     # belt velocity magnitude
     T = 50.0    # excitation period
 
-    F_s = mu_s * m * g # sticking friction force 
-    F_k = mu_k * m * g # kinetic friction force
+    F_c = mu * m * g # friction force 
 
     #function for belt velocity
     def v_belt(t):
         return v * np.sin(2*np.pi*t/T)
-        # return v * t / T
 
     #function for coulomb friction force
     def f_coulomb(v, vb):
-        return F_k * np.sign(vb - v)
+        return F_c * np.sign(vb - v)
 
 
 Now we can construct the system by instantiating the blocks we need with their corresponding prameters and collect them together in a list:
@@ -183,7 +180,6 @@ Next we need to define the two event managers for the state transitions of the s
 
 .. code-block:: python
 
-
     #event for slip -> stick transition
 
     def slip_to_stick_evt(t):
@@ -215,7 +211,7 @@ Next we need to define the two event managers for the state transitions of the s
 
     def stick_to_slip_evt(t):
         _1, F, _2 = P1()
-        return F_s - abs(F)
+        return F_c - abs(F)
 
     def stick_to_slip_act(t):
 

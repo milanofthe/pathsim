@@ -9,9 +9,16 @@
 
 # IMPORTS ==============================================================================
 
+import numpy as np
+
 from ._solver import ImplicitSolver
 
-import numpy as np
+from .._constants import (
+    TOLERANCE_FLOAT, 
+    SOLVER_BETA, 
+    SOLVER_SCALE_MIN,
+    SOLVER_SCALE_MAX
+    )
 
 
 # HELPERS ==============================================================================
@@ -96,7 +103,7 @@ class GEAR(ImplicitSolver):
         self.m = None
 
         #safety factor for error controller (if available)
-        self.beta = 0.9
+        self.beta = SOLVER_BETA
 
         #bdf solution buffer
         self.B = []
@@ -199,7 +206,7 @@ class GEAR(ImplicitSolver):
         scaled_error = np.abs(tr) / scale
 
         #compute the error norm and clip it
-        error_norm = np.clip(float(np.max(scaled_error)), 1e-18, None)
+        error_norm = np.clip(float(np.max(scaled_error)), TOLERANCE_FLOAT, None)
 
         #determine if the error is acceptable
         success = error_norm <= 1.0
@@ -208,7 +215,7 @@ class GEAR(ImplicitSolver):
         timestep_rescale = self.beta / error_norm ** (1/self.n)
 
         #clip the rescale factor to a reasonable range
-        timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+        timestep_rescale = np.clip(timestep_rescale, SOLVER_SCALE_MIN, SOLVER_SCALE_MAX)
 
         return success, error_norm, timestep_rescale
 
@@ -452,8 +459,8 @@ class GEAR52A(GEAR):
         scaled_error_p = np.abs(tr_p) / scale
 
         #compute the error norm and clip it
-        error_norm_m = np.clip(float(np.max(scaled_error_m)), 1e-18, None)
-        error_norm_p = np.clip(float(np.max(scaled_error_p)), 1e-18, None)      
+        error_norm_m = np.clip(float(np.max(scaled_error_m)), TOLERANCE_FLOAT, None)
+        error_norm_p = np.clip(float(np.max(scaled_error_p)), TOLERANCE_FLOAT, None)      
 
         #success metric (use lower order estimate)
         success = error_norm_m <= 1.0
@@ -462,7 +469,7 @@ class GEAR52A(GEAR):
         timestep_rescale = self.beta / error_norm_m ** (1/self.n)  
 
         #clip the rescale factor to a reasonable range
-        timestep_rescale = np.clip(timestep_rescale, 0.1, 10.0)
+        timestep_rescale = np.clip(timestep_rescale, SOLVER_SCALE_MIN, SOLVER_SCALE_MAX)
 
         #decrease the order if smaller order is more accurate (stability)
         if error_norm_m < error_norm_p:

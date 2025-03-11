@@ -13,6 +13,8 @@ import numpy as np
 
 from ._event import Event
 
+from .. _constants import TOLERANCE_FLOAT, EVENT_TOLERANCE
+
 
 # EVENT MANAGER CLASS ===================================================================
 
@@ -38,12 +40,14 @@ class Schedule(Event):
         tolerance to check if detection is close to actual event
     """
 
-    def __init__(self, 
-                 t_start=0, 
-                 t_end=None, 
-                 t_period=1, 
-                 func_act=None,      
-                 tolerance=1e-4):
+    def __init__(
+        self, 
+        t_start=0, 
+        t_end=None, 
+        t_period=1, 
+        func_act=None,      
+        tolerance=EVENT_TOLERANCE
+        ):
         super().__init__(None, func_act, tolerance)
         
         #schedule times
@@ -113,7 +117,7 @@ class Schedule(Event):
             return True, True, 0.0        
 
         #whats the timestep ratio?
-        ratio = (t_next - _t) / np.clip(t - _t, 1e-18, None)
+        ratio = (t_next - _t) / np.clip(t - _t, TOLERANCE_FLOAT, None)
 
         return True, False, ratio
 

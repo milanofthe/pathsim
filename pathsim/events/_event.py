@@ -14,6 +14,8 @@ import json
 
 import numpy as np
 
+from .. _constants import EVENT_TOLERANCE
+
 from ..utils.serialization import Serializable
 
 
@@ -56,10 +58,12 @@ class Event(Serializable):
         flag that sets event active or inactive
     """
 
-    def __init__(self, 
-                 func_evt=None, 
-                 func_act=None, 
-                 tolerance=1e-4):
+    def __init__(
+        self, 
+        func_evt=None, 
+        func_act=None, 
+        tolerance=EVENT_TOLERANCE
+        ):
             
         #event detection function
         self.func_evt = func_evt

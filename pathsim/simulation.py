@@ -18,6 +18,16 @@ import json
 import datetime
 import logging
 
+from ._constants import (
+    TOLERANCE_FLOAT,
+    SIM_DT,
+    SIM_DT_MIN,
+    SIM_DT_MAX,
+    SIM_TOLERANCE_FPI,
+    SIM_ITERATIONS_MIN,
+    SIM_ITERATIONS_MAX
+    )
+
 from .utils.utils import path_length_dfs
 from .utils.debugging import Timer
 from .utils.progresstracker import ProgressTracker
@@ -25,6 +35,7 @@ from .utils.progresstracker import ProgressTracker
 from .solvers import SSPRK22, SteadyState
 
 from .blocks._block import Block
+
 from .connection import Connection
 
 
@@ -94,23 +105,23 @@ class Simulation:
         global integrator instance
     logger : logging.Logger
         global simulation logger
-
     """
 
-    def __init__(self, 
-                 blocks=None, 
-                 connections=None, 
-                 events=None,
-                 dt=0.01, 
-                 dt_min=1e-16, 
-                 dt_max=None, 
-                 Solver=SSPRK22, 
-                 tolerance_fpi=1e-12, 
-                 iterations_min=None, 
-                 iterations_max=200, 
-                 log=True,
-                 **solver_args
-                 ):
+    def __init__(
+        self, 
+        blocks=None, 
+        connections=None, 
+        events=None,
+        dt=SIM_DT, 
+        dt_min=SIM_DT_MIN, 
+        dt_max=SIM_DT_MAX, 
+        Solver=SSPRK22, 
+        tolerance_fpi=SIM_TOLERANCE_FPI, 
+        iterations_min=SIM_ITERATIONS_MIN, 
+        iterations_max=SIM_ITERATIONS_MAX, 
+        log=True,
+        **solver_args
+        ):
 
         #system definition
         self.blocks      = []
@@ -265,6 +276,7 @@ class Simulation:
 
     def to_dict(self, name="Model", description=""):
         """Convert simulation to a complete model representation as a dict
+        with additional metadata.
 
         Parameters
         ----------
@@ -283,17 +295,20 @@ class Simulation:
         blocks = [block.to_dict() for block in self.blocks]
         events = [event.to_dict() for event in self.events]
         connections = [conn.to_dict() for conn in self.connections]
+
+        #get current timestamp
+        timestamp = datetime.datetime.now().isoformat()
                 
         #create the full model
-        data = {
+        return {
             "metadata": {
                 "name": name,
                 "description": description,
-                "created": datetime.datetime.now().isoformat()
-            },
+                "created": timestamp
+                },
             "blocks": blocks,
-            "connections": connections,
             "events": events,
+            "connections": connections,
             "simulation": {
                 "dt": self.dt,
                 "dt_min": self.dt_min,
@@ -302,11 +317,9 @@ class Simulation:
                 "tolerance_fpi": self.tolerance_fpi,
                 "iterations_min": self.iterations_min,
                 "iterations_max": self.iterations_max
+                }
             }
-        }
         
-        return data
-
 
     @classmethod
     def from_dict(cls, data):
@@ -366,13 +379,13 @@ class Simulation:
             blocks=blocks,
             connections=connections,
             events=events,
-            dt=sim_data.get("dt", 0.01),
-            dt_min=sim_data.get("dt_min", 0.0),
-            dt_max=sim_data.get("dt_max", None),
+            dt=sim_data.get("dt", SIM_DT),
+            dt_min=sim_data.get("dt_min", SIM_DT_MIN),
+            dt_max=sim_data.get("dt_max", SIM_DT_MAX),
             Solver=Solver,
-            tolerance_fpi=sim_data.get("tolerance_fpi", 1e-12),
-            iterations_min=sim_data.get("iterations_min", None),
-            iterations_max=sim_data.get("iterations_max", 200)
+            tolerance_fpi=sim_data.get("tolerance_fpi", SIM_TOLERANCE_FPI),
+            iterations_min=sim_data.get("iterations_min", SIM_ITERATIONS_MIN),
+            iterations_max=sim_data.get("iterations_max", SIM_ITERATIONS_MAX)
             )
 
 
@@ -665,12 +678,12 @@ class Simulation:
 
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
-                return iteration+1
+                return iteration + 1
 
         #not converged
         self._logger_error(
             "fixed-point loop in '_update' not converged, iters={}, err={}".format(
-                iteration+1, 
+                iteration + 1, 
                 max_error
                 ), 
             RuntimeError
@@ -796,8 +809,6 @@ class Simulation:
         when local truncation error is too large and timestep has to be 
         retaken with smaller timestep. 
         """
-
-        #revert to previous integrator state
         for block in self.blocks:
             if block: block.revert()
 
@@ -968,23 +979,26 @@ class Simulation:
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time, dt)
 
+        #system time after timestep
+        time_dt = self.time + dt
+
         #evaluate system equation before sampling and event check (+dt)
-        total_evals += self._update(self.time + dt) 
+        total_evals += self._update(time_dt) 
 
         #handle events chronologically after timestep (+dt)
-        for event, _, ratio in self._events(self.time + dt):
+        for event, _, ratio in self._events(time_dt):
 
             #fixed timestep -> resolve event directly
             event.resolve(self.time + ratio * dt)  
 
             #after resolve, evaluate system equation again -> propagate event
-            total_evals += self._update(self.time + dt)      
+            total_evals += self._update(time_dt)      
 
         #sample data after successful timestep (+dt)
-        self._sample(self.time + dt)
+        self._sample(time_dt)
  
         #increment global time and continue simulation
-        self.time += dt 
+        self.time = time_dt 
 
         #max local truncation error, timestep rescale, successful step
         return success, error_norm, scale, total_evals, total_solver_its
@@ -1075,18 +1089,21 @@ class Simulation:
 
             return False, error_norm, scale, total_evals, total_solver_its
 
+        #system time after timestep
+        time_dt = self.time + dt
+
         #evaluate system equation before sampling and event check (+dt)
-        total_evals += self._update(self.time + dt) 
+        total_evals += self._update(time_dt) 
 
-        #handle events chronologically after timestep (+dt)
-        for event, close, ratio in self._events(self.time + dt):
+        #handle detected events chronologically after timestep (+dt)
+        for event, close, ratio in self._events(time_dt):
 
-            #close enough to event -> resolve it
+            #close enough to event (ratio approx 1) -> resolve it
             if close:
-                event.resolve(self.time + ratio * dt)
+                event.resolve(time_dt)
 
                 #after resolve, evaluate system equation again -> propagate event
-                total_evals += self._update(self.time + dt) 
+                total_evals += self._update(time_dt) 
     
             #not close enough -> roll back timestep (secant step)
             else:
@@ -1095,14 +1112,13 @@ class Simulation:
                 #after revert, evaluate system equation again -> reset for buffer
                 total_evals += self._update(self.time) 
 
-                scale = min(scale, ratio)
-                return False, error_norm, scale, total_evals, total_solver_its
+                return False, error_norm, ratio, total_evals, total_solver_its
         
         #sample data after successful timestep (+dt)
-        self._sample(self.time + dt)
+        self._sample(time_dt)
 
         #increment global time and continue simulation
-        self.time += dt    
+        self.time = time_dt    
 
         #max local truncation error, timestep rescale, successful step
         return success, error_norm, scale, total_evals, total_solver_its
@@ -1111,9 +1127,9 @@ class Simulation:
     def step(self, dt=None, adaptive=False):
         """Advances the simulation by one timestep 'dt'. 
         
-        Wraps the 'step_fixed' and 'step_adaptive' methods
-        and can be called from the outside in case the simulation
-        should be advanced one step at a time.
+        Wraps the 'step_fixed' and 'step_adaptive' methods and 
+        selects between them. Can be called from the outside in 
+        case the simulation should be advanced one step at a time.
         
         Parameters
         ----------
@@ -1134,10 +1150,11 @@ class Simulation:
             total number of system evaluations
         total_solver_its : int
             total number of implicit solver iterations            
-    
         """
-        if adaptive: return self.step_adaptive(dt)
-        else: return self.step_fixed(dt)
+        if adaptive: 
+            return self.step_adaptive(dt)
+        else: 
+            return self.step_fixed(dt)
 
 
     def run(self, duration=10, reset=True, adaptive=True):

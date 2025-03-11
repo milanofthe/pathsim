@@ -21,7 +21,7 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.events import ZeroCrossing, ZeroCrossingUp
+from pathsim.events import ZeroCrossing
 
 from pathsim.solvers import RKBS32
 
@@ -35,14 +35,12 @@ x0, v0 = 0, 0
 m = 20.0    # mass
 k = 70.0    # spring constant
 d = 10.0    # spring damping
-mu_s = 1.5  # stick friction coefficient
-mu_k = 1.5  # kinetic friction coefficient
+mu = 1.5    # friction coefficient
 g = 9.81    # gravity
 v = 3.0     # belt velocity magnitude
 T = 50.0    # excitation period
 
-F_s = mu_s * m * g # sticking friction force 
-F_k = mu_k * m * g # kinetic friction force
+F_c = mu * m * g # friction force 
 
 #function for belt velocity
 def v_belt(t):
@@ -51,7 +49,7 @@ def v_belt(t):
 
 #function for coulomb friction force
 def f_coulomb(v, vb):
-    return F_k * np.sign(vb - v)
+    return F_c * np.sign(vb - v)
 
 
 # system topology -----------------------------------------------------------------------
@@ -130,7 +128,7 @@ E_slip_to_stick = ZeroCrossing(
 
 def stick_to_slip_evt(t):
     _1, F, _2 = P1()
-    return F_s - abs(F)
+    return F_c - abs(F)
 
 def stick_to_slip_act(t):
 
