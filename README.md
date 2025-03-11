@@ -1,5 +1,10 @@
 # PathSim - A System Simulation Framework
 
+![GitHub License](https://img.shields.io/github/license/milanofthe/pathsim)
+![GitHub Release](https://img.shields.io/github/v/release/milanofthe/pathsim)
+![PyPI - Downloads](https://img.shields.io/pypi/dw/pathsim)
+
+
 ## Overview
 
 **PathSim** is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism! It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
