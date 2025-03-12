@@ -33,14 +33,18 @@ class Spectrum(Block):
     analysis. It biases the spectral components exponentially to the most recent signal 
     values by applying a single sided exponential window like this:
 
-        int_0^t x(tau) * exp(alpha*(t-tau)) * exp(-j*omega*tau) dtau
+    .. math::
+
+        \int_0^t x(\tau) * \exp(\alpha*(t-\tau)) * \exp(-j*\omega*\tau)\ d \tau
 
     It is also known as the 'exponentially forgetting transform' (EFT) and a form of 
     short time fourier transform (STFT). It is implemented as a 1st order statespace model 
         
-        dx/dt = - alpha * x +  exp(-j*omega*t) * u
+    .. math::
 
-    , where 'u' is the input signal and 'x' is the state variable that represents the 
+        \dot{x} = - \alpha * x +  \exp(-j*\omega*t) * u
+
+    where 'u' is the input signal and 'x' is the state variable that represents the 
     complex fourier coefficient to the frequency 'omega'. The ODE is integrated using the 
     numerical integration engine of the block.
 
@@ -366,10 +370,12 @@ class RealtimeSpectrum(Spectrum):
         super().__init__(freq, t_wait, alpha, labels)
 
         #initialize realtime plotter
-        self.plotter = RealtimePlotter(update_interval=0.1, 
-                                       labels=labels, 
-                                       x_label="freq [Hz]", 
-                                       y_label="magnitude")
+        self.plotter = RealtimePlotter(
+            update_interval=0.1, 
+            labels=labels, 
+            x_label="freq [Hz]", 
+            y_label="magnitude"
+            )
 
 
     def step(self, t, dt):
