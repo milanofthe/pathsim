@@ -16,7 +16,12 @@ from ._block import Block
 
 class Amplifier(Block):
     """Amplifies the input signal by 
-    multiplication with a constant gain term 
+    multiplication with a constant gain term like this:
+
+    .. math::
+        
+        y(t) = \\mathrm{gain} \\cdot u(t)
+
     
     Parameters
     ----------

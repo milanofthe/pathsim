@@ -20,8 +20,12 @@ from ..utils.utils import dict_to_array
 # MISO BLOCKS ===========================================================================
 
 class Multiplier(Block):
-    """
-    multiplies / product of all input signals (MISO)
+    """multiplies all input signals (MISO)
+      
+    .. math::
+        
+        y(t) = \\prod_i u_i(t)
+
     """
 
     def update(self, t):

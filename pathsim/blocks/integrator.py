@@ -22,9 +22,29 @@ from ..utils.utils import (
 # BLOCKS ================================================================================
 
 class Integrator(Block):
-    """Integrates the input signal using a numerical integration engine. 
+    """Integrates the input signal using a numerical integration engine like this:
+
+    .. math::
+
+        y(t) = \\int_0^t u(\\tau) \\ d \\tau
     
-    The Integrator block is inherently MIMO capable.
+    The Integrator block is inherently MIMO capable, so `u` and `y` can be vectors.
+    
+    Example
+    -------
+    
+    This is how to initialize the integrator: 
+
+    .. code-block:: python
+    
+        from pathsim.blocks import Integrator
+    
+        #initial value 0.0
+        i1 = Integrator()
+
+        #initial value 2.5
+        i2 = Integrator(2.5)
+    
 
     Parameters
     ----------

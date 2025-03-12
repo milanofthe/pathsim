@@ -19,8 +19,10 @@ from ._block import Block
 class Differentiator(Block):
     """Differentiates the input signal (SISO) using a first order transfer function 
     with a pole at the origin which implements a high pass filter. 
-
-        H_diff(s) = s / (1 + s/f_max)
+        
+    .. math::
+        
+        H_\\mathrm{diff}(s) = \\frac{s}{1 + s / f_\\mathrm{max}} 
 
     The approximation holds for signals up to a frequency of approximately f_max.
 

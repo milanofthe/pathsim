@@ -46,10 +46,20 @@ class Function(Block):
     -------
     consider the function: 
 
-        func = lambda a, b, c : (a**2, a*b, b/c)
+    .. code-block:: python
+    
+        from pathsim.blocks import Function
+
+        def f(a, b, c):
+            return a**2, a*b, b/c
+
+        fn = Function(f)
+        
 
     then the input channels of the block are assigned 
     to the function arguments following this scheme:
+
+    .. code-block::
 
         inputs[0] -> a
         inputs[1] -> b
@@ -58,9 +68,12 @@ class Function(Block):
     and the function outputs are assigned to the 
     output channels of the block in the same way:
 
+    .. code-block::
+
         a**2 -> outputs[0]
         a*b  -> outputs[1]
         b/c  -> outputs[2]
+    
     """
 
     def __init__(self, func=lambda x: x):

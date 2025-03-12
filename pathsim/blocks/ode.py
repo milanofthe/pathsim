@@ -26,12 +26,56 @@ class ODE(Block):
     This block implements an ordinary differential equation (ODE) 
     defined by its right hand side
 
-        d/dt x = func(x, u, t)
+    .. math::
     
+        \\dot{x}(t) = \\mathrm{func}(x(t), u(t), t)
+
     with inhomogenity (input) 'u' and state vector 'x'. The function 
     can be nonlinear and the ODE can be of arbitrary order. 
     The block utilizes the integration engine to solve the ODE 
     by integrating the 'func', which is the right hand side function.
+
+
+    Example
+    -------
+
+    For example a linear 1st order ODE:
+
+    .. code-block:: python
+        
+        from pathsim.blocks import ODE
+        
+        ode = ODE(lambda x, u, t: -x)
+
+
+    Or something more complex like the vanderpol system, where it makes 
+    sense to also specify the jacobian, which improves convergence for 
+    implicit solvers but is not needed in most cases: 
+
+    .. code-block:: python
+        
+        import numpy as np
+        from pathsim.blocks import ODE
+            
+        #initial condition
+        x0 = np.array([2, 0])
+
+        #van der Pol parameter
+        mu = 1000
+
+        def func(x, u, t):
+            return np.array([x[1], mu*(1 - x[0]**2)*x[1] - x[0]])
+
+        #analytical jacobian (optional)
+        def jac(x, u, t):
+            return np.array(
+                [[0                , 1               ], 
+                 [-mu*2*x[0]*x[1]-1, mu*(1 - x[0]**2)]]
+                 )
+    
+        #finally the block
+        vdp = ODE(func, x0, jac) 
+                
 
     Parameters
     ----------

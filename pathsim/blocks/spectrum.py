@@ -35,14 +35,14 @@ class Spectrum(Block):
 
     .. math::
 
-        \int_0^t x(\tau) * \exp(\alpha*(t-\tau)) * \exp(-j*\omega*\tau)\ d \tau
+        \\int_0^t u(\\tau) \\exp(\\alpha (t-\\tau))  \\exp(-j \\omega \\tau)\\ d \\tau
 
     It is also known as the 'exponentially forgetting transform' (EFT) and a form of 
     short time fourier transform (STFT). It is implemented as a 1st order statespace model 
         
     .. math::
 
-        \dot{x} = - \alpha * x +  \exp(-j*\omega*t) * u
+        \\dot{x} = - \\alpha  x +  \\exp(-j \\omega t) u
 
     where 'u' is the input signal and 'x' is the state variable that represents the 
     complex fourier coefficient to the frequency 'omega'. The ODE is integrated using the 

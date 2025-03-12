@@ -14,7 +14,6 @@
 from ._block import Block
 
 
-
 # INPUT BLOCKS ==========================================================================
 
 class Constant(Block):
@@ -34,6 +33,7 @@ class Constant(Block):
     def __init__(self, value=1):
         super().__init__()
         self.value = value
+        
 
     def update(self, t):
         """update system equation fixed point loop
@@ -56,19 +56,38 @@ class Source(Block):
     """Source that produces an arbitrary time dependent output, 
     defined by the func (callable).
 
+    .. math::
+    
+        \\y(t) = \\mathrm{func}(t)
+
+
     Example
     -------
 
     For example a ramp:
-    ```pyhon
-    S = Source(lambda t : t)
-    ```
+
+    .. code-block:: python
+
+        from pathsim.blocks import Source
+
+        src = Source(lambda t : t)
     
-    or a simple sinusoid 
-    ```python
-    import numpy as np
-    S = Source(np.sin)
-    ```
+    or a simple sinusoid with some frequency:
+
+    .. code-block:: python
+        
+        import numpy as np
+        from pathsim.blocks import Source
+    
+        #some parameter
+        omega = 100
+    
+        #the function that gets evaluated
+        def f(t):
+            return np.sin(omega * t)
+
+        src = Source(f)
+
 
     Parameters
     ---------- 

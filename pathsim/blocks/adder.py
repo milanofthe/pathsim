@@ -19,7 +19,13 @@ from ..utils.utils import dict_to_array
 # MISO BLOCKS ===========================================================================
 
 class Adder(Block):
-    """Summs / adds all input signals (MISO)"""
+    """Summs / adds all input signals (MISO)
+    
+    .. math::
+        
+        y(t) = \\sum_i u_i(t)
+
+    """
 
     def update(self, t):
         """update system equation in fixed point loop

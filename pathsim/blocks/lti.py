@@ -31,8 +31,12 @@ class StateSpace(Block):
     """
     This block integrates a LTI MIMO state space model with the structure
 
-        d/dt x = A x + B u
-             y = C x + D u 
+    .. math::
+
+        \\begin{eqnarray}
+            \\dot{x} &= \\mathbf{A} x + \\mathbf{B} u \\\\
+                   y &= \\mathbf{C} x + \\mathbf{D} u 
+        \\end{eqnarray}
 
     where A, B, C and D are the state space matrices, x is the state, 
     u the input and y the output vector.
@@ -168,8 +172,10 @@ class TransferFunction(StateSpace):
     """This block integrates a LTI (MIMO for pole residue) transfer function.
 
     The transfer function is defined in pole-residue form
-    
-        H(s) = Const + sum( Residues / (s - Poles) )
+
+    .. math::
+        
+        \\mathbf{H}(s) = \\mathbf{C} + \\sum_n^N \\frac{\\mathbf{R}_n}{s - p_n}
 
     where 'Poles' are the scalar poles of the transfer function and
     'Residues' are the possibly matrix valued (in MIMO case) residues of
@@ -180,8 +186,12 @@ class TransferFunction(StateSpace):
 
     The resulting statespace model of the form
 
-        d/dt x = A x + B u
-             y = C x + D u 
+    .. math::
+        
+        \\begin{eqnarray}
+            \\dot{x} &= \\mathbf{A} x + \\mathbf{B} u \\\\
+                   y &= \\mathbf{C} x + \\mathbf{D} u 
+        \\end{eqnarray}
 
     is handled the same as the 'StateSpace' block, where A, B, C and D 
     are the state space matrices, x is the internal state, u the input and 
