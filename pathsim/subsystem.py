@@ -63,6 +63,42 @@ class Subsystem(Block):
     blocks with internal states) and the 'solve' method for solving the 
     implicit update equation for implicit solvers. 
 
+
+    Example
+    -------
+    
+    This is how we can wrap up multiple blocks within a subsystem. 
+    In this case vanderpol system built from discrete components 
+    instead of using an ODE block (in practice you should use 
+    a monolithic ODE whenever possible due to performance).
+
+    .. code-block:: python
+        
+        from pathsim import Subsystem, Interface, Connection
+        from pathsim.blocks import Integrator, Function
+
+        #van der Pol parameter
+        mu = 1000
+
+        #blocks in the subsystem
+        If = Interface() # this is the interface to the outside
+        I1 = Integrator(2)
+        I2 = Integrator(0)
+        Fn = Function(lambda x1, x2: mu*(1 - x1**2)*x2 - x1)
+
+        sub_blocks = [If, I1, I2, Fn]
+
+        #connections in the subsystem
+        sub_connections = [
+            Connection(I2, I1, Fn[1], If[1]), 
+            Connection(I1, Fn, If), 
+            Connection(Fn, I2)
+            ]
+
+        #the subsystem acts just like a normal block
+        vdp = Subsystem(sub_blocks, sub_connections)
+
+
     Parameters
     ----------
     blocks : list[Block] 

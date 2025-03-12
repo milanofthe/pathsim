@@ -28,34 +28,57 @@ class Connection:
     -------
     Lets assume we have two generic blocks 
 
-        B1 = Block...
-        B2 = Block...
+    .. code-block:: python
+    
+        from pathsim.blocks._block import Block
+
+        B1 = Block()
+        B2 = Block()
+        B3 = Block()
+
 
     that we want to connect. We initialize a 'Connection' with the blocks directly 
     as the arguments if we want to connect the default ports (0) -> (0) 
+    
+    .. code-block:: python
+
+        from pathsim import Connection
 
         C = Connection(B1, B2)
+
 
     which is a connection from block 'B1' to 'B2'. If we want to explicitly declare 
     the input and output ports we can do that by giving tuples (lists also work) as 
     the arguments
+
+    .. code-block:: python
  
         C = Connection((B1, 0), (B2, 0))
+
 
     which is exactly the default port setup. Connecting output port (1) of 'B1' to 
     the default input port (0) of 'B2' do
 
+    .. code-block:: python
+
         C = Connection((B1, 1), (B2, 0))
+        
 
     or just
+    
+    .. code-block:: python
 
         C = Connection((B1, 1), B2).
+
 
     The 'Connection' class also supports multiple targets for a single source. 
     This is specified by just adding more blocks with their respective ports into 
     the constructor like this:
+    
+    .. code-block:: python
 
-        C = Connection(B1, (B2, 0), (B2, 1), B3, ...)
+        C = Connection(B1, (B2, 0), (B2, 1), B3)
+
 
     The port definitions follow the same structure as for single target connections.
 
@@ -67,7 +90,10 @@ class Connection:
     and port pair that is used for the port specification in the 'Connection' 
     initialization. For example the following initializations are equivalent:
 
+    .. code-block::
+
         Connection(B1[1], B2[3]) <=> Connection((B1, 1), (B2, 3))
+
 
     Parameters
     ----------
