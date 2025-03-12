@@ -1,4 +1,13 @@
-# PathSim - A System Simulation Framework
+
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/logos/pathsim_logo.png" width="300" alt="Pathsim Logo" />
+</p>
+
+------------
+
+
+# A System Simulation Framework
 
 ![GitHub License](https://img.shields.io/github/license/milanofthe/pathsim)
 ![GitHub Release](https://img.shields.io/github/v/release/milanofthe/pathsim)
