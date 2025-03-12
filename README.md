@@ -7,7 +7,7 @@
 ------------
 
 
-# A System Simulation Framework
+# PathSim - A System Simulation Framework
 
 ![GitHub License](https://img.shields.io/github/license/milanofthe/pathsim)
 ![GitHub Release](https://img.shields.io/github/v/release/milanofthe/pathsim)
