@@ -29,14 +29,6 @@ class TestAmplifier(unittest.TestCase):
         self.assertEqual(A.gain, 5)
 
 
-    def test_str(self):
-
-        A = Amplifier()
-
-        #test default str method
-        self.assertEqual(str(A), "Amplifier")
-
-
     def test_update(self):
         
         A = Amplifier(gain=5)

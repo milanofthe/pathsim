@@ -49,17 +49,19 @@ class TestSimulation(unittest.TestCase):
         C1 = Connection(B1, B2)
         C2 = Connection(B2, B3)
         C3 = Connection(B3, B1)
-        Sim = Simulation(blocks=[B1, B2, B3], 
-                         connections=[C1, C2, C3], 
-                         dt=0.02, 
-                         dt_min=0.001, 
-                         dt_max=0.1, 
-                         tolerance_fpi=1e-9, 
-                         tolerance_lte_rel=1e-4, 
-                         tolerance_lte_abs=1e-6, 
-                         iterations_min=None, 
-                         iterations_max=100, 
-                         log=False)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C2, C3], 
+            dt=0.02, 
+            dt_min=0.001, 
+            dt_max=0.1, 
+            tolerance_fpi=1e-9, 
+            tolerance_lte_rel=1e-4, 
+            tolerance_lte_abs=1e-6, 
+            iterations_min=None, 
+            iterations_max=100, 
+            log=False
+            )
         self.assertEqual(len(Sim.blocks), 3)
         self.assertEqual(len(Sim.connections), 3)
         self.assertEqual(Sim.dt, 0.02)
@@ -172,7 +174,7 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(len(self.Sim.blocks), 4)
         self.assertEqual(len(self.Sim.connections), 3)
         self.assertEqual(self.Sim.dt, 0.02)
-        self.assertEqual(self.Sim.iterations_min, 2)
+        self.assertEqual(self.Sim.iterations_min, 1)
         self.assertTrue(isinstance(self.Sim.engine, SSPRK22))
         self.assertTrue(self.Sim.engine.is_explicit)
         self.assertFalse(self.Sim.engine.is_adaptive)

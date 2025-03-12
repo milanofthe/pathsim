@@ -43,6 +43,28 @@ class Switch(Block):
         self.state = state
 
 
+    def __len__(self):
+        """Algebraic passthrough only possible if state is defined"""
+        return 0 if self.state is None else 1
+
+
+    def select(self, state=0):
+        """
+        This method is unique to the `Switch` block and intended 
+        to be used from outside the simulation level for selecting 
+        the input ports for the switch state.
+    
+        This can be achieved for example with the event management 
+        system and its callback/action functions.
+
+        Parameters
+        ---------
+        state : int, None
+            switch state / input port selection
+        """
+        self.state = state
+
+
     def update(self, t):
         """Update switch output depending on inputs
 
@@ -52,5 +74,5 @@ class Switch(Block):
             evaluation time
         """
 
-        self.outputs[0] = self.inputs.get(self.state)
+        self.outputs[0] = self.inputs.get(self.state, 0.0)
         return 0.0

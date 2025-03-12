@@ -39,14 +39,6 @@ class TestFunction(unittest.TestCase):
             F = Function(func=2)
 
 
-    def test_str(self):
-
-        F = Function()
-
-        #test default str method
-        self.assertEqual(str(F), "Function")
-
-
     def test_update_siso(self):
 
         def f(a):

@@ -40,14 +40,6 @@ class TestDelay(unittest.TestCase):
         self.assertEqual(len(D), 0)
 
 
-    def test_str(self):
-
-        D = Delay()
-
-        #test default str method
-        self.assertEqual(str(D), "Delay")
-
-
     def test_reset(self):
 
         D = Delay(tau=100)

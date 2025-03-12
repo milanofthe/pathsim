@@ -42,14 +42,6 @@ class TestRNG(unittest.TestCase):
         self.assertEqual(len(R), 0)
 
 
-    def test_str(self):
-
-        R = RNG()
-
-        #test default str method
-        self.assertEqual(str(R), "RNG")
-
-
     def test_reset(self):
 
         R = RNG()

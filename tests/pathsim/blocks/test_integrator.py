@@ -45,14 +45,6 @@ class TestIntegrator(unittest.TestCase):
         self.assertEqual(len(I), 0)
 
 
-    def test_str(self):
-
-        I = Integrator()
-
-        #test default str method
-        self.assertEqual(str(I), "Integrator")
-
-
     def test_set_solver(self):
 
         I = Integrator()

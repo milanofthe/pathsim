@@ -45,14 +45,6 @@ class TestDifferentiator(unittest.TestCase):
         self.assertEqual(len(D), 1)
 
 
-    def test_str(self):
-
-        D = Differentiator()
-
-        #test default str method
-        self.assertEqual(str(D), "Differentiator")
-
-
     def test_set_solver(self):
 
         D = Differentiator()

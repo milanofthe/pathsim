@@ -19,9 +19,7 @@ from pathsim.utils.utils import (
     max_error,
     max_error_dicts,
     max_rel_error, 
-    max_rel_error_dicts,
-    numerical_jacobian,
-    auto_jacobian
+    max_rel_error_dicts
     )
 
 
@@ -97,43 +95,6 @@ class TestUtilsFuncs(unittest.TestCase):
         self.assertEqual(max_error_dicts({0:0.00139, 1:2.4, 2:87, 3:1, 4:97.8, 5:4.35}, 
                                              {0:1.00139, 1:1.4, 2:86, 3:2, 4:98.2, 5:33.35}), 
                          29)
-
-
-class TestJacobian(unittest.TestCase):
-    """
-    testing of numerical jacobian calculation
-    """
-
-    def test_numerical_jacobian(self):
-
-        #test scalar case
-        def _f(x): return x**2
-        def _df(x): return 2*x
-        self.assertAlmostEqual(numerical_jacobian(_f, 3), _df(3), 4)
-        self.assertAlmostEqual(numerical_jacobian(_f, -6.0), _df(-6.0), 4)
-        self.assertAlmostEqual(numerical_jacobian(_f, 100), _df(100), 3)
-
-        #test vectorial case
-        def _f(x): return np.array([np.cos(x[0]), np.sin(x[1])])
-        def _df(x): return np.array([[-np.sin(x[0]), 0.0], [0.0, np.cos(x[1])]])
-        self.assertAlmostEqual(np.sum(np.abs(numerical_jacobian(_f, np.ones(2)) - _df(np.ones(2)))), 0.0, 6)
-
-
-    def test_auto_jacobian(self):
-
-        #test scalar case
-        def _f(x): return x**2
-        def _df(x): return 2*x
-        _j = auto_jacobian(_f)
-        self.assertAlmostEqual(_j(3), _df(3), 6)
-        self.assertAlmostEqual(_j(-6.0), _df(-6.0), 6)
-        self.assertAlmostEqual(_j(100), _df(100), 3)
-
-        #test vectorial case
-        def _f(x): return np.array([np.cos(x[0]), np.sin(x[1])])
-        def _df(x): return np.array([[-np.sin(x[0]), 0.0], [0.0, np.cos(x[1])]])
-        _j = auto_jacobian(_f)
-        self.assertAlmostEqual(np.sum(np.abs(_j(np.ones(2)) - _df(np.ones(2)))), 0.0, 6)
 
 
 

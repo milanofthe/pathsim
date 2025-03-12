@@ -265,8 +265,11 @@ class TestJacDer(unittest.TestCase):
         """Test the der function when variable is not a Value object."""
         x = Value(2.0)
         f = [x ** 2, np.sin(x)]
-        with self.assertRaises(AttributeError):
-            der(f, 2.0)  # Should raise AttributeError because 2.0 has no '_id' attribute
+
+        #fallback to zeros
+        d = der(f, 2.0)
+        self.assertEqual(d[0], 0)
+        self.assertEqual(d[1], 0)
 
 
     def test_jac_with_non_value_variable(self):
@@ -274,8 +277,13 @@ class TestJacDer(unittest.TestCase):
         x = Value(1.0)
         y = 2.0  # Not a Value object
         f = [x + y, x * y]
-        with self.assertRaises(AttributeError):
-            jac(f, [x, y])  # Should raise AttributeError because y has no '_id' attribute
+
+        #fallback to zeros where no value object
+        J = jac(f, [x, y])
+        self.assertEqual(J[0, 0], 1)
+        self.assertEqual(J[0, 1], 0)
+        self.assertEqual(J[1, 0], 2)
+        self.assertEqual(J[1, 1], 0)
 
 
     def test_der_with_mixed_function_output(self):

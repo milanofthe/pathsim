@@ -63,14 +63,6 @@ class TestODE(unittest.TestCase):
         self.assertEqual(len(D), 0)
 
 
-    def test_str(self):
-
-        D = ODE()
-
-        #test default str method
-        self.assertEqual(str(D), "ODE")
-
-
     def test_set_solver(self):
 
         def f(x, u, t): 

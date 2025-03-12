@@ -22,13 +22,6 @@ class TestMultiplier(unittest.TestCase):
     Test the implementation of the 'Multiplier' block class
     """
 
-    def test_str(self):
-
-        M = Multiplier()
-
-        #test default str method
-        self.assertEqual(str(M), "Multiplier")
-
 
     def test_update_single(self):
         

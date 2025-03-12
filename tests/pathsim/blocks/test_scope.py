@@ -48,14 +48,6 @@ class TestScope(unittest.TestCase):
         self.assertEqual(len(S), 0)
 
 
-    def test_str(self):
-
-        S = Scope()
-
-        #test default str method
-        self.assertEqual(str(S), "Scope")
-
-
     def test_reset(self):
 
         S = Scope()

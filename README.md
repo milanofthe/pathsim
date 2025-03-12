@@ -2,6 +2,7 @@
 
 ![GitHub License](https://img.shields.io/github/license/milanofthe/pathsim)
 ![GitHub Release](https://img.shields.io/github/v/release/milanofthe/pathsim)
+[![Documentation Status](https://readthedocs.org/projects/pathsim/badge/?version=latest)](https://pathsim.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Downloads](https://img.shields.io/pypi/dw/pathsim)
 
 

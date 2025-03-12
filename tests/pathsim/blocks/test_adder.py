@@ -22,14 +22,6 @@ class TestAdder(unittest.TestCase):
     Test the implementation of the 'Adder' block class
     """
 
-    def test_str(self):
-
-        A = Adder()
-
-        #test default str method
-        self.assertEqual(str(A), "Adder")
-
-
     def test_update_single(self):
         
         A = Adder()

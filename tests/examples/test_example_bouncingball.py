@@ -41,7 +41,8 @@ class TestExampleBouncingBall(unittest.TestCase):
         connections = [
             Connection(self.Cn, self.Iv),
             Connection(self.Iv, self.Ix),
-            Connection(self.Ix, self.Sc[0])
+            Connection(self.Ix, self.Sc[0]),
+            Connection(self.Iv, self.Sc[1])
             ]
 
 
@@ -61,7 +62,7 @@ class TestExampleBouncingBall(unittest.TestCase):
         self.E1 = ZeroCrossing(
             func_evt=func_evt,                 
             func_act=func_act, 
-            tolerance=1e-5
+            tolerance=1e-4
             )
 
         events = [self.E1]
@@ -75,20 +76,24 @@ class TestExampleBouncingBall(unittest.TestCase):
             dt_max=0.05,
             log=False, 
             Solver=RKBS32, 
-            tolerance_lte_rel=1e-5, 
-            tolerance_lte_abs=1e-7
+            tolerance_lte_rel=1e-4, 
+            tolerance_lte_abs=1e-6
             )
 
 
 
     def test_run(self):
 
-
         self.Sim.run(10)
 
-        print(self.E1._times)
+        #check number of events
+        self.assertEqual(len(self.E1), 11)
 
-        
+        #check height remains bounded
+        _time, [height, _] = self.Sc.read()
+        for h in height[1:]:
+            self.assertTrue(h <= height[0])
+
 
 
 # RUN TESTS LOCALLY ====================================================================

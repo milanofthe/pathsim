@@ -41,14 +41,6 @@ class TestConstant(unittest.TestCase):
         self.assertEqual(C.get(0), 5)
 
 
-    def test_str(self):
-
-        C = Constant(value=5)
-
-        #test default str method
-        self.assertEqual(str(C), "Constant")
-
-
     def test_reset(self):
 
         C = Constant(value=5)
@@ -84,14 +76,6 @@ class TestSource(unittest.TestCase):
         #test input validation
         with self.assertRaises(ValueError): 
             S = Source(func=2)
-
-
-    def test_str(self):
-
-        S = Source()
-
-        #test default str method
-        self.assertEqual(str(S), "Source")
 
 
     def test_update(self):

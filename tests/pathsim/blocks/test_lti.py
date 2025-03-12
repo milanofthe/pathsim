@@ -74,14 +74,6 @@ class TestStateSpace(unittest.TestCase):
         self.assertEqual(len(S), 1)
 
 
-    def test_str(self):
-
-        S = StateSpace()
-
-        #test default str method
-        self.assertEqual(str(S), "StateSpace")
-
-
     def test_set_solver(self):
 
         S = StateSpace(initial_value=1.0)

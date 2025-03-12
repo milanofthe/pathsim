@@ -55,14 +55,6 @@ class TestSpectrum(unittest.TestCase):
         self.assertEqual(len(S), 0)
 
 
-    def test_str(self):
-
-        S = Spectrum()
-
-        #test default str method
-        self.assertEqual(str(S), "Spectrum")
-
-
     def test_set_solver(self):
 
         S = Spectrum()

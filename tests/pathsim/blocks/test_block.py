@@ -45,14 +45,6 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(len(B), 1)
             
 
-    def test_str(self):
-
-        B = Block()
-
-        #test default str method
-        self.assertEqual(str(B), "Block")
-
-
     def test_on_off_bool(self):
         
         B = Block()
