@@ -338,6 +338,13 @@ This enables the simulation of hybrid continuous time systems with discrete even
 
 Probably the most popular example for this is the bouncing ball (see figure above) where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
 
+The dynamics of this system can be translated into a block diagramm in the following way:
+
+
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/bouncing_ball_blockdiagram.png)
+
+
+And built and simulated with `PathSim` like this:
 
 ```python
 from pathsim import Simulation, Connection
