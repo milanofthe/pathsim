@@ -35,6 +35,15 @@ Quickstart
 
 2. **Build** a dynamical system unsing blocks and connections. Here we just integrate a cosine:
 
+
+.. image:: figures/sin_cos_blockdiagram.png
+   :width: 700
+   :align: center
+   :alt: cos integration block diagram
+
+
+Which looks like this, translated to PathSim:
+
 .. code-block:: python
     
     import numpy as np
