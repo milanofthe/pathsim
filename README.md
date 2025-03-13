@@ -51,7 +51,7 @@ There are lots of [examples](https://github.com/milanofthe/pathsim/tree/master/e
 But first, lets have a look at how we can simulate the harmonic oscillator (a spring mass damper 2nd order system) using PathSim. The system and its corresponding equivalent block diagram are shown in the figure below:
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/harmonic_oscillator.png)
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/examples/figures/harmonic_oscillator_g.png)
 
 
 The equation of motion that defines the harmonic oscillator it is give by
@@ -225,7 +225,7 @@ PathSim also includes a fully fledged automatic differentiation framework based 
 To demonstrate this lets consider the following linear feedback system and perform a sensitivity analysis on it with respect to some system parameters. 
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/linear_feedback_blockdiagram.png)
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/examples/figures/linear_feedback_blockdiagram_g.png)
 
 
 The source term is a scaled unit step function (scaled by $b$). In this example, the parameters for the sensitivity analysis are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $b$.
@@ -333,7 +333,7 @@ PathSim has an event handling system that monitors the simulation state and can 
 This enables the simulation of hybrid continuous time systems with discrete events. 
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/bouncing_ball.png)
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/examples/figures/bouncing_ball_g.png)
 
 
 Probably the most popular example for this is the bouncing ball (see figure above) where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
@@ -341,7 +341,7 @@ Probably the most popular example for this is the bouncing ball (see figure abov
 The dynamics of this system can be translated into a block diagramm in the following way:
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/README_files/bouncing_ball_blockdiagram.png)
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/examples/figures/bouncing_ball_blockdiagram_g.png)
 
 
 And built and simulated with `PathSim` like this:
