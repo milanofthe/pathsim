@@ -1,6 +1,7 @@
 #########################################################################################
 ##
-##                             CONNECTION CLASS (connection.py)
+##                                    CONNECTION CLASS 
+##                                    (connection.py)
 ##
 ##              This module implements the 'Connection' class that transfers
 ##                data between the blocks and their input/output channels
@@ -11,7 +12,7 @@
 
 # IMPORTS ===============================================================================
 
-#no dependencies
+import json
 
 
 # CLASSES ===============================================================================
@@ -116,8 +117,10 @@ class Connection:
 
 
     def __str__(self):
-        src, prt = self.source
-        return f"Connection ({src}, {prt}) -> " + ", ".join([ f"({trg}, {prt})" for trg, prt in self.targets])
+        """String representation of the connection using the 
+        'to_dict' method with readable json formatting
+        """
+        return json.dumps(self.to_dict(), indent=2, sort_keys=False)
 
 
     def __bool__(self):
@@ -197,14 +200,25 @@ class Duplex(Connection):
         self.target = target if isinstance(target, (list, tuple)) else (target, 0)
         
         #for path length estimation
-        self.targets = [self.target]
+        self.targets = [self.target, self.source]
 
         #flag to set connection active
         self._active = True
         
 
-    def __str__(self):
-        return f"Duplex {self.source} <-> {self.target}" 
+    def to_dict(self):
+        """Convert duplex to dictionary representation for serialization"""
+        return {
+            "id": id(self),
+            "source": {
+                "block": id(self.source[0]),
+                "port": self.source[1]
+            },
+            "target": [
+                "block": id(self.target[0]),
+                "port": self.target[1]
+            ]
+        }
 
 
     def update(self):

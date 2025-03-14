@@ -22,14 +22,14 @@ from pathsim.blocks import (
 # 1st ORDER SYSTEM ======================================================================
 
 #simulation timestep
-dt = 0.02
+dt = 0.01
 
 #step delay
 tau = 3
 
 #blocks that define the system
 Src = Source(lambda t : int(t>tau) )
-Int = Integrator()
+Int = Integrator(2)
 Amp = Amplifier(-1)
 Add = Adder()
 Sco = Scope(labels=["step", "response"])
@@ -48,7 +48,7 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
 #run the simulation for some time
-Sim.run(3*tau)
+Sim.run(4*tau)
 
 Sco.plot()
 

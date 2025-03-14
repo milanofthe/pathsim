@@ -21,7 +21,7 @@ SIM_ITERATIONS_MAX = 200          # maximum number of fixed point loop iteration
 # Solver default constants
 SOLVER_TOLERANCE_LTE_ABS = 1e-8   # absolute local truncation error (adaptive solvers)
 SOLVER_TOLERANCE_LTE_REL = 1e-5   # relative local truncation error (adaptive solvers)
-SOLVER_TOLERANCE_FPI = 1e-12      # tolerance for optimizer convergence (implicit solvers)
+SOLVER_TOLERANCE_FPI = 1e-9       # tolerance for optimizer convergence (implicit solvers)
 SOLVER_ITERATIONS_MAX = 500       # maximum number of optimizer iterations (implicit solvers)
 SOLVER_SCALE_MIN = 0.1            # maximum timestep rescale factor (adaptive solvers)
 SOLVER_SCALE_MAX = 10             # minimum timestep rescale factor (adaptive solvers)

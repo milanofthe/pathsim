@@ -399,13 +399,15 @@ class ExplicitSolver(Solver):
         return success, error_norm, scale
 
 
-    def integrate(self, 
-                  time_start=0.0, 
-                  time_end=1.0, 
-                  dt=SIM_DT, 
-                  dt_min=SIM_DT_MIN, 
-                  dt_max=SIM_DT_MAX, 
-                  adaptive=True):
+    def integrate(
+        self, 
+        time_start=0.0, 
+        time_end=1.0, 
+        dt=SIM_DT, 
+        dt_min=SIM_DT_MIN, 
+        dt_max=SIM_DT_MAX, 
+        adaptive=True
+        ):
         """Directly integrate the function 'func' from 'time_start' 
         to 'time_end' with timestep 'dt' for explicit solvers. 
 
@@ -555,11 +557,12 @@ class ImplicitSolver(Solver):
 
     # method for direct integration ----------------------------------------------------
 
-    def integrate_singlestep(self, 
-                             time=0.0, 
-                             dt=SIM_DT, 
-                             tolerance_fpi=SOLVER_TOLERANCE_FPI, 
-                             max_iterations=SOLVER_ITERATIONS_MAX):
+    def integrate_singlestep(
+        self, 
+        time=0.0, 
+        dt=SIM_DT, 
+        tolerance_fpi=SOLVER_TOLERANCE_FPI, 
+        max_iterations=SOLVER_ITERATIONS_MAX):
         """
         Directly integrate the function 'func' for a single timestep 'dt' with 
         implicit solvers. This method is primarily intended for testing purposes.
@@ -613,15 +616,17 @@ class ImplicitSolver(Solver):
         return success, success_sol, error_norm, scale 
 
 
-    def integrate(self, 
-                  time_start=0.0, 
-                  time_end=1.0, 
-                  dt=SIM_DT, 
-                  dt_min=SIM_DT_MIN, 
-                  dt_max=SIM_DT_MAX, 
-                  adaptive=True,
-                  tolerance_fpi=SOLVER_TOLERANCE_FPI, 
-                  max_iterations=SOLVER_ITERATIONS_MAX):
+    def integrate(
+        self, 
+        time_start=0.0, 
+        time_end=1.0, 
+        dt=SIM_DT, 
+        dt_min=SIM_DT_MIN, 
+        dt_max=SIM_DT_MAX, 
+        adaptive=True,
+        tolerance_fpi=SOLVER_TOLERANCE_FPI, 
+        max_iterations=SOLVER_ITERATIONS_MAX
+        ):
         """Directly integrate the function 'func' from 'time_start' 
         to 'time_end' with timestep 'dt' for implicit solvers. 
 
