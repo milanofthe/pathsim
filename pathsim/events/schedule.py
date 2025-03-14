@@ -24,6 +24,8 @@ class Schedule(Event):
     Monitors time in every timestep and triggers periodically (period). This event
     does not have an event function as the event condition only depends on time.
 
+    .. code-block::
+
         time == next_schedule_time -> event
     
     Parameters

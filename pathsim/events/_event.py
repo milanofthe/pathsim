@@ -25,10 +25,14 @@ class Event(Serializable):
     """This is the base class of the event handling system.
     
     Monitors system state by evaluating an event function (func_evt) with scalar output.
+    
+    .. code-block::
 
         func_evt(time) -> event?
 
     If an event is detected, some action (func_act) is performed on the states of the blocks.
+
+    .. code-block::
 
         func_evt(time) == True -> event -> func_act(time)
 
