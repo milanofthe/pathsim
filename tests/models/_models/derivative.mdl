@@ -1,0 +1,179 @@
+{
+  "metadata": {
+    "duration": 20.0,
+    "timestamp": "2025-03-14T10:06:41.013087"
+  },
+  "blocks": [
+    {
+      "id": 2086359206272,
+      "type": "Source",
+      "params": {
+        "func": {
+          "type": "lambda",
+          "name": "<lambda>",
+          "source": "lambda t: np.sin(omega*t)",
+          "globals": {
+            "np": {
+              "type": "module",
+              "name": "numpy"
+            },
+            "omega": 6.283185307179586
+          },
+          "closures": {}
+        }
+      }
+    },
+    {
+      "id": 2086358088784,
+      "type": "Source",
+      "params": {
+        "func": {
+          "type": "lambda",
+          "name": "<lambda>",
+          "source": "lambda t: -1/omega*np.cos(omega*t)",
+          "globals": {
+            "omega": 6.283185307179586,
+            "np": {
+              "type": "module",
+              "name": "numpy"
+            }
+          },
+          "closures": {}
+        }
+      }
+    },
+    {
+      "id": 2086358089424,
+      "type": "Source",
+      "params": {
+        "func": {
+          "type": "lambda",
+          "name": "<lambda>",
+          "source": "lambda t: omega*np.cos(omega*t)",
+          "globals": {
+            "omega": 6.283185307179586,
+            "np": {
+              "type": "module",
+              "name": "numpy"
+            }
+          },
+          "closures": {}
+        }
+      }
+    },
+    {
+      "id": 2086359206608,
+      "type": "Integrator",
+      "params": {
+        "initial_value": -0.15915494309189535
+      }
+    },
+    {
+      "id": 2086359206944,
+      "type": "Differentiator",
+      "params": {
+        "f_max": 100
+      }
+    },
+    {
+      "id": 2086359207280,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": [
+          "sin",
+          "integrator",
+          "differentiator",
+          "reference integral",
+          "reference derivative"
+        ]
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 2086359207616,
+      "source": {
+        "block": 2086359206272,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2086359206608,
+          "port": 0
+        },
+        {
+          "block": 2086359206944,
+          "port": 0
+        },
+        {
+          "block": 2086359207280,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2086359547984,
+      "source": {
+        "block": 2086359206608,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2086359207280,
+          "port": 1
+        }
+      ]
+    },
+    {
+      "id": 2086359548304,
+      "source": {
+        "block": 2086359206944,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2086359207280,
+          "port": 2
+        }
+      ]
+    },
+    {
+      "id": 2086359112000,
+      "source": {
+        "block": 2086358088784,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2086359207280,
+          "port": 3
+        }
+      ]
+    },
+    {
+      "id": 2086359112608,
+      "source": {
+        "block": 2086358089424,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2086359207280,
+          "port": 4
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.02,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "RKCK54",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200
+  }
+}

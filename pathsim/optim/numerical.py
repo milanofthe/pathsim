@@ -11,12 +11,12 @@
 
 import numpy as np
 
-from .. _constants import TOLERANCE_FLOAT
+from .. _constants import TOLERANCE
 
 
 # NUMERICAL DIFFERENTIATION ============================================================
 
-def num_jac(func, x, r=1e-3, tol=TOLERANCE_FLOAT):
+def num_jac(func, x, r=1e-3, tol=TOLERANCE):
     """Numerically computes the jacobian of the function 'func' 
     by central differences. 
 

@@ -1,0 +1,125 @@
+{
+  "metadata": {
+    "duration": 25,
+    "timestamp": "2025-03-14T10:08:31.960598"
+  },
+  "blocks": [
+    {
+      "id": 2752335907536,
+      "type": "Integrator",
+      "params": {
+        "initial_value": 0
+      }
+    },
+    {
+      "id": 2752334805776,
+      "type": "Integrator",
+      "params": {
+        "initial_value": 2.827433388230814
+      }
+    },
+    {
+      "id": 2752335907872,
+      "type": "Amplifier",
+      "params": {
+        "gain": -9.81
+      }
+    },
+    {
+      "id": 2752335908208,
+      "type": "Function",
+      "params": {
+        "func": {
+          "type": "unserializable_callable",
+          "name": "sin",
+          "repr": "<ufunc 'sin'>"
+        }
+      }
+    },
+    {
+      "id": 2752335908544,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": [
+          "angular velocity",
+          "angle"
+        ]
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 2752335908880,
+      "source": {
+        "block": 2752335907536,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2752334805776,
+          "port": 0
+        },
+        {
+          "block": 2752335908544,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2752334806416,
+      "source": {
+        "block": 2752334805776,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2752335908208,
+          "port": 0
+        },
+        {
+          "block": 2752335908544,
+          "port": 1
+        }
+      ]
+    },
+    {
+      "id": 2752334806736,
+      "source": {
+        "block": 2752335908208,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2752335907872,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2752335812928,
+      "source": {
+        "block": 2752335907872,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2752335907536,
+          "port": 0
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.1,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "RKCK54",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200,
+    "tolerance_lte_rel": 1e-06
+  }
+}

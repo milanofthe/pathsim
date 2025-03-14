@@ -91,7 +91,7 @@ class Simulation:
         maximum allowed number of fixed-point iterations for system function evaluation
     log : bool, string
         flag to enable logging (alternatively a path can be specified)
-    solver_args : dict
+    solver_kwargs : dict
         additional parameters for numerical solvers such as abs and rel tolerance
 
     Attributes
@@ -119,7 +119,7 @@ class Simulation:
         iterations_min=SIM_ITERATIONS_MIN, 
         iterations_max=SIM_ITERATIONS_MAX, 
         log=True,
-        **solver_args
+        **solver_kwargs
         ):
 
         #system definition
@@ -142,7 +142,7 @@ class Simulation:
         self.tolerance_fpi = tolerance_fpi
 
         #additional solver parameters
-        self.solver_args = solver_args
+        self.solver_kwargs = solver_kwargs
 
         #iterations for fixed-point loop
         self.iterations_min = iterations_min
@@ -240,7 +240,7 @@ class Simulation:
 
     # serialization/deserialization -----------------------------------------------
 
-    def save(self, path=""):
+    def save(self, path="", **metadata):
         """Save the dictionary representation of the simulation instance 
         to an external file
         
@@ -248,13 +248,19 @@ class Simulation:
         ----------
         path : str
             filepath to save data to
+        metadata : dict
+            metadata for the simulation model
         """
+
+        #add current timestamp
+        metadata["timestamp"] = datetime.datetime.now().isoformat()
+
         with open(path, "w", encoding="utf-8") as file:
-            json.dump(self.to_dict(), file, indent=2, ensure_ascii=False)
+            json.dump(self.to_dict(**metadata), file, indent=2, ensure_ascii=False)
 
 
     @classmethod
-    def load(cls, path=""):
+    def load(cls, path="", **kwargs):
         """Load and instantiate a Simulation from an external file 
         in json format
         
@@ -262,6 +268,8 @@ class Simulation:
         ----------
         path : str
             filepath to load data from
+        kwargs : dict
+            additional args for the simulation, overwriting metadata
 
         Returns
         -------
@@ -269,20 +277,18 @@ class Simulation:
             reconstructed object from dict representation
         """
         with open(path, "r", encoding="utf-8") as file:
-            return cls.from_dict(json.load(file))
+            return cls.from_dict(json.load(file), **kwargs)
         return None
 
 
-    def to_dict(self, name="Model", description=""):
+    def to_dict(self, **metadata):
         """Convert simulation to a complete model representation as a dict
         with additional metadata.
 
         Parameters
         ----------
-        name : str
-            model name
-        description : str
-            description of the model
+        metadata : dict
+            metadata for the simulation model
 
         Returns
         -------
@@ -294,17 +300,10 @@ class Simulation:
         blocks = [block.to_dict() for block in self.blocks]
         events = [event.to_dict() for event in self.events]
         connections = [conn.to_dict() for conn in self.connections]
-
-        #get current timestamp
-        timestamp = datetime.datetime.now().isoformat()
                 
         #create the full model
         return {
-            "metadata": {
-                "name": name,
-                "description": description,
-                "created": timestamp
-                },
+            "metadata": metadata,
             "blocks": blocks,
             "events": events,
             "connections": connections,
@@ -312,22 +311,25 @@ class Simulation:
                 "dt": self.dt,
                 "dt_min": self.dt_min,
                 "dt_max": self.dt_max,
-                "solver": self.Solver.__name__,
+                "Solver": self.Solver.__name__,
                 "tolerance_fpi": self.tolerance_fpi,
                 "iterations_min": self.iterations_min,
-                "iterations_max": self.iterations_max
+                "iterations_max": self.iterations_max,
+                **self.solver_kwargs
                 }
             }
         
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data, **kwargs):
         """Create simulation from model data dict
 
         Parameters
         ----------
         data : dict
             model definition in json format
+        kwargs : dict
+            additional args for the simulation, overwriting metadata
 
         Returns
         -------
@@ -359,7 +361,9 @@ class Simulation:
                 targets.append((target_block, target_port))
             
             #create connection
-            connections.append(Connection((source_block, source_port), *targets))
+            connections.append(
+                Connection((source_block, source_port), *targets)
+                )
         
         #deserialize events
         events = []
@@ -367,24 +371,22 @@ class Simulation:
             events.append(Event.from_dict(event_data))
         
         #get simulation parameters
-        sim_data = data.get("simulation", {})
-        
+        sim_kwargs = data.get("simulation", {})
+
         #get solver class
-        solver_name = sim_data.get("solver", "SSPRK22")
-        Solver = getattr(solvers, solver_name)
-        
+        solver_name = sim_kwargs.get("Solver", "SSPRK22")
+        sim_kwargs["Solver"] = getattr(solvers, solver_name)
+
+        #replace with kwargs
+        for arg, val in kwargs.items():
+            sim_kwargs[arg] = val
+
         #create simulation
         return cls(
             blocks=blocks,
             connections=connections,
             events=events,
-            dt=sim_data.get("dt", SIM_TIMESTEP),
-            dt_min=sim_data.get("dt_min", SIM_TIMESTEP_MIN),
-            dt_max=sim_data.get("dt_max", SIM_TIMESTEP_MAX),
-            Solver=Solver,
-            tolerance_fpi=sim_data.get("tolerance_fpi", SIM_TOLERANCE_FPI),
-            iterations_min=sim_data.get("iterations_min", SIM_ITERATIONS_MIN),
-            iterations_max=sim_data.get("iterations_max", SIM_ITERATIONS_MAX)
+            **sim_kwargs
             )
 
 
@@ -414,7 +416,7 @@ class Simulation:
             self._logger_error(_msg, ValueError)
 
         #initialize numerical integrator of block
-        block.set_solver(self.Solver, **self.solver_args)
+        block.set_solver(self.Solver, **self.solver_kwargs)
 
         #add block to global blocklist
         self.blocks.append(block)
@@ -523,7 +525,7 @@ class Simulation:
 
     # solver management -----------------------------------------------------------
 
-    def _set_solver(self, Solver=None, **solver_args):
+    def _set_solver(self, Solver=None, **solver_kwargs):
         """Initialize all blocks with solver for numerical integration
         and tolerance for local truncation error ´tolerance_lte´.
 
@@ -534,7 +536,7 @@ class Simulation:
         ----------
         Solver : Solver
             numerical solver definition from ´pathsim.solvers´
-        solver_args : dict
+        solver_kwargs : dict
             additional parameters for numerical solvers
         """
 
@@ -543,15 +545,15 @@ class Simulation:
             self.Solver = Solver
 
         #update solver parmeters
-        for k, v in solver_args.items():
-            self.solver_args[k] = v
+        for k, v in solver_kwargs.items():
+            self.solver_kwargs[k] = v
 
         #initialize dummy engine to get solver attributes
         self.engine = self.Solver()
 
         #iterate all blocks and set integration engines with tolerances
         for block in self.blocks:
-            block.set_solver(self.Solver, **self.solver_args)
+            block.set_solver(self.Solver, **self.solver_kwargs)
 
         #logging message
         self._logger_info(
@@ -1010,7 +1012,7 @@ class Simulation:
         additional loop for solving the implicit update equation in each timestep.
     
         If the local truncation error of the solver exceeds the tolerances
-        set in the 'solver_args', simulation state is reverted to the state 
+        set in the 'solver_kwargs', simulation state is reverted to the state 
         before the 'step' method was called. 
 
         If the solver is implicit and the solution of the implicit update 

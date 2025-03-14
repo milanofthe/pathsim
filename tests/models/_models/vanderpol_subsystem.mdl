@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "duration": 2000,
+    "timestamp": "2025-03-14T10:04:39.857893"
+  },
+  "blocks": [
+    {
+      "id": 1982370156896,
+      "type": "Subsystem",
+      "params": {
+        "blocks": [
+          {
+            "id": 1982370155888,
+            "type": "Integrator",
+            "params": {
+              "initial_value": 2
+            }
+          },
+          {
+            "id": 1982369037072,
+            "type": "Integrator",
+            "params": {
+              "initial_value": 0
+            }
+          },
+          {
+            "id": 1982370156224,
+            "type": "Function",
+            "params": {
+              "func": {
+                "type": "lambda",
+                "name": "<lambda>",
+                "source": "lambda x1, x2: mu*(1 - x1**2)*x2 - x1",
+                "globals": {
+                  "mu": 1000
+                },
+                "closures": {}
+              }
+            }
+          },
+          {
+            "id": 1982370155552,
+            "type": "Interface",
+            "params": {}
+          }
+        ],
+        "connections": [
+          {
+            "id": 1982370156560,
+            "source": {
+              "block": 1982369037072,
+              "port": 0
+            },
+            "targets": [
+              {
+                "block": 1982370155888,
+                "port": 0
+              },
+              {
+                "block": 1982370156224,
+                "port": 1
+              },
+              {
+                "block": 1982370155552,
+                "port": 1
+              }
+            ]
+          },
+          {
+            "id": 1982369037712,
+            "source": {
+              "block": 1982370155888,
+              "port": 0
+            },
+            "targets": [
+              {
+                "block": 1982370156224,
+                "port": 0
+              },
+              {
+                "block": 1982370155552,
+                "port": 0
+              }
+            ]
+          },
+          {
+            "id": 1982369038032,
+            "source": {
+              "block": 1982370156224,
+              "port": 0
+            },
+            "targets": [
+              {
+                "block": 1982369037072,
+                "port": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 1982370155216,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": []
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 1982370060608,
+      "source": {
+        "block": 1982370156896,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 1982370155216,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 1982370061216,
+      "source": {
+        "block": 1982370156896,
+        "port": 1
+      },
+      "targets": [
+        {
+          "block": 1982370155216,
+          "port": 1
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.05,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "GEAR52A",
+    "tolerance_fpi": 1e-09,
+    "iterations_min": 1,
+    "iterations_max": 200,
+    "tolerance_lte_abs": 1e-05,
+    "tolerance_lte_rel": 0.001
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "duration": 12,
+    "timestamp": "2025-03-14T10:07:05.219992"
+  },
+  "blocks": [
+    {
+      "id": 2407636339072,
+      "type": "Source",
+      "params": {
+        "func": {
+          "type": "lambda",
+          "name": "<lambda>",
+          "source": "lambda t : int(t>tau)",
+          "globals": {
+            "tau": 3
+          },
+          "closures": {}
+        }
+      }
+    },
+    {
+      "id": 2407636339408,
+      "type": "Integrator",
+      "params": {
+        "initial_value": 2
+      }
+    },
+    {
+      "id": 2407636339744,
+      "type": "Amplifier",
+      "params": {
+        "gain": -1
+      }
+    },
+    {
+      "id": 2407636340080,
+      "type": "Adder",
+      "params": {}
+    },
+    {
+      "id": 2407636340416,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": [
+          "step",
+          "response"
+        ]
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 2407636340752,
+      "source": {
+        "block": 2407636339072,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2407636340080,
+          "port": 0
+        },
+        {
+          "block": 2407636340416,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2407635221264,
+      "source": {
+        "block": 2407636339744,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2407636340080,
+          "port": 1
+        }
+      ]
+    },
+    {
+      "id": 2407635221904,
+      "source": {
+        "block": 2407636340080,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2407636339408,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2407636244800,
+      "source": {
+        "block": 2407636339408,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2407636339744,
+          "port": 0
+        },
+        {
+          "block": 2407636340416,
+          "port": 1
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.01,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "SSPRK22",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200
+  }
+}

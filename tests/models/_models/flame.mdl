@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "duration": 20000.0,
+    "timestamp": "2025-03-14T10:07:26.811353"
+  },
+  "blocks": [
+    {
+      "id": 2234066733440,
+      "type": "Integrator",
+      "params": {
+        "initial_value": 0.0001
+      }
+    },
+    {
+      "id": 2234066733776,
+      "type": "Function",
+      "params": {
+        "func": {
+          "type": "lambda",
+          "name": "<lambda>",
+          "source": "lambda x: x**2 - x**3",
+          "globals": {},
+          "closures": {}
+        }
+      }
+    },
+    {
+      "id": 2234066734112,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": []
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 2234066734448,
+      "source": {
+        "block": 2234066733440,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2234066733776,
+          "port": 0
+        },
+        {
+          "block": 2234066734112,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2234065632016,
+      "source": {
+        "block": 2234066733776,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2234066733440,
+          "port": 0
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.1,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "ESDIRK43",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200,
+    "tolerance_lte_abs": 1e-06,
+    "tolerance_lte_rel": 0.0001
+  }
+}

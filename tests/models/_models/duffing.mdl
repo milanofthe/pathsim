@@ -1,0 +1,236 @@
+{
+  "metadata": {
+    "duration": 50,
+    "timestamp": "2025-03-14T10:05:59.498980"
+  },
+  "blocks": [
+    {
+      "id": 2054598297984,
+      "type": "Integrator",
+      "params": {
+        "initial_value": 0.0
+      }
+    },
+    {
+      "id": 2054597196560,
+      "type": "Integrator",
+      "params": {
+        "initial_value": 0.0
+      }
+    },
+    {
+      "id": 2054598298320,
+      "type": "Amplifier",
+      "params": {
+        "gain": 0.5
+      }
+    },
+    {
+      "id": 2054597197200,
+      "type": "Amplifier",
+      "params": {
+        "gain": 1.0
+      }
+    },
+    {
+      "id": 2054597197520,
+      "type": "Amplifier",
+      "params": {
+        "gain": -1.0
+      }
+    },
+    {
+      "id": 2054598299328,
+      "type": "Adder",
+      "params": {}
+    },
+    {
+      "id": 2054598298656,
+      "type": "Function",
+      "params": {
+        "func": {
+          "type": "lambda",
+          "name": "<lambda>",
+          "source": "lambda x: d*x**3",
+          "globals": {
+            "d": 1.4
+          },
+          "closures": {}
+        }
+      }
+    },
+    {
+      "id": 2054598298992,
+      "type": "Source",
+      "params": {
+        "func": {
+          "type": "lambda",
+          "name": "<lambda>",
+          "source": "lambda t: a*np.sin(omega*t)",
+          "globals": {
+            "a": 15.0,
+            "np": {
+              "type": "module",
+              "name": "numpy"
+            },
+            "omega": 2.0
+          },
+          "closures": {}
+        }
+      }
+    },
+    {
+      "id": 2054598299664,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": [
+          "velocity",
+          "position"
+        ]
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 2054598300000,
+      "source": {
+        "block": 2054598297984,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054597196560,
+          "port": 0
+        },
+        {
+          "block": 2054598298320,
+          "port": 0
+        },
+        {
+          "block": 2054598299664,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2054598639696,
+      "source": {
+        "block": 2054597196560,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054598298656,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2054598640016,
+      "source": {
+        "block": 2054598298656,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054598299328,
+          "port": 2
+        }
+      ]
+    },
+    {
+      "id": 2054598220096,
+      "source": {
+        "block": 2054598298992,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054598299328,
+          "port": 3
+        }
+      ]
+    },
+    {
+      "id": 2054598220704,
+      "source": {
+        "block": 2054597196560,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054597197200,
+          "port": 0
+        },
+        {
+          "block": 2054598299664,
+          "port": 1
+        }
+      ]
+    },
+    {
+      "id": 2054597932912,
+      "source": {
+        "block": 2054598298320,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054598299328,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2054597916288,
+      "source": {
+        "block": 2054597197200,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054598299328,
+          "port": 1
+        }
+      ]
+    },
+    {
+      "id": 2054597916560,
+      "source": {
+        "block": 2054598299328,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054597197520,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2054572955472,
+      "source": {
+        "block": 2054597197520,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2054598297984,
+          "port": 0
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.05,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "RKCK54",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200
+  }
+}
