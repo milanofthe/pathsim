@@ -214,10 +214,10 @@ class Duplex(Connection):
                 "block": id(self.source[0]),
                 "port": self.source[1]
             },
-            "target": [
+            "target": {
                 "block": id(self.target[0]),
                 "port": self.target[1]
-            ]
+            }
         }
 
 

@@ -13,7 +13,7 @@ import numpy as np
 
 from ._event import Event
 
-from .. _constants import TOLERANCE_FLOAT, EVENT_TOLERANCE
+from .. _constants import TOLERANCE, EVT_TOLERANCE
 
 
 # EVENT MANAGER CLASS ===================================================================
@@ -48,7 +48,7 @@ class Schedule(Event):
         t_end=None, 
         t_period=1, 
         func_act=None,      
-        tolerance=EVENT_TOLERANCE
+        tolerance=EVT_TOLERANCE
         ):
         super().__init__(None, func_act, tolerance)
         
@@ -119,7 +119,7 @@ class Schedule(Event):
             return True, True, 0.0        
 
         #whats the timestep ratio?
-        ratio = (t_next - _t) / np.clip(t - _t, TOLERANCE_FLOAT, None)
+        ratio = (t_next - _t) / np.clip(t - _t, TOLERANCE, None)
 
         return True, False, ratio
 

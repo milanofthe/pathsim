@@ -13,7 +13,7 @@ import numpy as np
 
 from ._event import Event
 
-from .. _constants import TOLERANCE_FLOAT
+from .. _constants import TOLERANCE
 
 
 # EVENT MANAGER CLASS ===================================================================
@@ -80,7 +80,7 @@ class ZeroCrossing(Event):
             return False, False, 1.0
 
         #linear interpolation to find event time ratio (secant crosses x-axis)
-        ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE_FLOAT, None)
+        ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE, None)
         
         return True, close, float(ratio)
 
@@ -130,7 +130,7 @@ class ZeroCrossingUp(Event):
             return False, False, 1.0
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
-        ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE_FLOAT, None)
+        ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE, None)
         
         return True, close, float(ratio)
 
@@ -180,6 +180,6 @@ class ZeroCrossingDown(Event):
             return False, False, 1.0
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
-        ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE_FLOAT, None)
+        ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE, None)
         
         return True, close, float(ratio)

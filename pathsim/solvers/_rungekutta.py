@@ -12,10 +12,10 @@
 import numpy as np
 
 from .._constants import (
-    TOLERANCE_FLOAT, 
-    SOLVER_BETA, 
-    SOLVER_SCALE_MIN,
-    SOLVER_SCALE_MAX
+    TOLERANCE, 
+    SOL_BETA, 
+    SOL_SCALE_MIN,
+    SOL_SCALE_MAX
     )
 
 from ._solver import ExplicitSolver, ImplicitSolver
@@ -62,7 +62,7 @@ class ExplicitRungeKutta(ExplicitSolver):
         self.s = 0
 
         #safety factor for error controller (if available)
-        self.beta = SOLVER_BETA
+        self.beta = SOL_BETA
 
         #slope coefficients for stages
         self.Ks = {}
@@ -111,7 +111,7 @@ class ExplicitRungeKutta(ExplicitSolver):
         scaled_error = np.abs(dt * slope) / scale
 
         #compute the error norm and clip it
-        error_norm = np.clip(float(np.max(scaled_error)), TOLERANCE_FLOAT, None)
+        error_norm = np.clip(float(np.max(scaled_error)), TOLERANCE, None)
 
         #determine if the error is acceptable
         success = error_norm <= 1.0
@@ -120,7 +120,7 @@ class ExplicitRungeKutta(ExplicitSolver):
         timestep_rescale = self.beta / error_norm ** (1/(min(self.m, self.n) + 1)) 
 
         #clip the rescale factor to a reasonable range
-        timestep_rescale = np.clip(timestep_rescale, SOLVER_SCALE_MIN, SOLVER_SCALE_MAX)
+        timestep_rescale = np.clip(timestep_rescale, SOL_SCALE_MIN, SOL_SCALE_MAX)
 
         return success, error_norm, timestep_rescale
 
@@ -210,7 +210,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         self.s = 0
 
         #safety factor for error controller (if available)
-        self.beta = SOLVER_BETA
+        self.beta = SOL_BETA
 
         #slope coefficients for stages
         self.Ks = {}
@@ -262,7 +262,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         scaled_error = np.abs(dt * slope) / scale
 
         #compute the error norm and clip it#compute the error norm and clip it
-        error_norm = np.clip(float(np.max(scaled_error)), TOLERANCE_FLOAT, None)
+        error_norm = np.clip(float(np.max(scaled_error)), TOLERANCE, None)
 
         #determine if the error is acceptable
         success = error_norm <= 1.0
@@ -271,7 +271,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         timestep_rescale = self.beta / error_norm ** (1/(min(self.m, self.n) + 1)) 
 
         #clip the rescale factor to a reasonable range
-        timestep_rescale = np.clip(timestep_rescale, SOLVER_SCALE_MIN, SOLVER_SCALE_MAX)
+        timestep_rescale = np.clip(timestep_rescale, SOL_SCALE_MIN, SOL_SCALE_MAX)
 
         return success, error_norm, timestep_rescale
 

@@ -49,7 +49,8 @@ Sim = Simulation(
     dt=0.5, 
     log=True, 
     tolerance_lte_abs=1e-6, 
-    tolerance_lte_rel=1e-3
+    tolerance_lte_rel=1e-3,
+    tolerance_fpi=1e-9
     )
 
 

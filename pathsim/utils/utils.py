@@ -11,6 +11,8 @@
 
 import numpy as np
 
+from .. _constants import TOLERANCE
+
 
 # HELPERS FOR SIMULATION ===============================================================
 
@@ -49,8 +51,9 @@ def array_to_dict(a):
 
 def rel_error(a, b):
     """Computes the relative error between two scalars.
-    It is robust to one of them being zero and falls 
-    back to the absolute error in this case.
+    
+    It is robust to one of them being close to zero and 
+    falls back to the absolute error in this case.
 
     Notes
     ----- 
@@ -69,7 +72,7 @@ def rel_error(a, b):
     err : float
         retative error
     """
-    if a == 0.0: return abs(b)
+    if abs(a) < TOLERANCE: return abs(b)
     else: return abs((a - b)/a)
 
 

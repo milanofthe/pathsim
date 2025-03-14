@@ -58,7 +58,8 @@ Sim = Simulation(
     log=True, 
     Solver=GEAR52A, 
     tolerance_lte_abs=1e-6, 
-    tolerance_lte_rel=1e-3
+    tolerance_lte_rel=1e-3,
+    tolerance_fpi=1e-9
     )
 
 #run the simulation for some time
