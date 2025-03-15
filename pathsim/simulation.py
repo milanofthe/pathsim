@@ -67,6 +67,35 @@ class Simulation:
     to monitor solver states of stateful blocks and applys transformations on the state in 
     case an event is detected. 
 
+    Example
+    -------
+
+    This is how to setup a simple system simulation using the 'Simulation' class:
+
+    .. code-block:: python
+        
+        import numpy as np
+
+        from pathsim import Simulation, Connection
+        from pathsim.blocks import Source, Integrator, Scope
+
+        src = Source(lambda t: np.cos(2*np.pi*t))
+        itg = Integrator()
+        sco = Scope(labels=["source", "integrator"])
+        
+        sim = Simulation(
+            blocks=[src, itg, sco],
+            connections=[
+                Connection(src[0], itg[0], sco[0]),
+                Connection(itg[0], sco[1])    
+                ],
+            dt=0.01
+            )
+
+        sim.run(4)
+        sim.plot()
+
+
     Parameters
     ----------
     blocks : list[Block] 
@@ -540,7 +569,7 @@ class Simulation:
                 self.path_length = _path_length
         
         #logging message
-        self._logger_info(f"ALGEBRAIC PATH LENGTH {self.path_length}")
+        self._logger_info(f"ALGEBRAIC PATH LENGTH -> {self.path_length}")
         
         #set 'iterations_min' for fixed-point loop if not provided globally
         if self.iterations_min is None:

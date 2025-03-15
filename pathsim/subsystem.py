@@ -195,6 +195,26 @@ class Subsystem(Block):
                     raise ValueError(_msg)
 
 
+    # visualization -------------------------------------------------------------------------
+
+    def plot(self, *args, **kwargs):
+        """Plot the simulation results by calling all the blocks 
+        that have visualization capabilities such as the 'Scope' 
+        and 'Spectrum'.
+
+        Parameters
+        ----------
+        args : tuple
+            args for the plot methods
+        kwargs : dict
+            kwargs for the plot method
+        """
+        for block in self.blocks:
+            if block: block.plot(*args, **kwargs)
+
+
+    # system management ---------------------------------------------------------------------
+
     def reset(self):
         """Reset the subsystem and all internal blocks"""
 
