@@ -39,6 +39,7 @@ def test_for_each_model(file_pattern):
                 #load the simulation from file
                 sim = Simulation.load(file_path, log=False)
 
+                #run the simulation for duration from metadata
                 sim.run(duration)
 
             return test

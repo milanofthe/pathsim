@@ -1,97 +1,93 @@
 {
   "metadata": {
     "duration": 2000,
-    "timestamp": "2025-03-14T10:04:39.857893"
+    "timestamp": "2025-03-15T11:32:48.265345"
   },
   "blocks": [
     {
-      "id": 1982370156896,
+      "id": 2730752753152,
       "type": "Subsystem",
       "params": {
         "blocks": [
           {
-            "id": 1982370155888,
+            "id": 2730752752144,
             "type": "Integrator",
             "params": {
               "initial_value": 2
             }
           },
           {
-            "id": 1982369037072,
+            "id": 2730753076560,
             "type": "Integrator",
             "params": {
               "initial_value": 0
             }
           },
           {
-            "id": 1982370156224,
+            "id": 2730752752480,
             "type": "Function",
             "params": {
               "func": {
-                "type": "lambda",
-                "name": "<lambda>",
-                "source": "lambda x1, x2: mu*(1 - x1**2)*x2 - x1",
-                "globals": {
-                  "mu": 1000
-                },
-                "closures": {}
+                "type": "dill",
+                "data": "gASVYwEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwJLAEsASwJLBEsDQyyVAFsAAAAAAAAAAABTAVUAUwItCAAALQoAAC0FAABVAS0FAABVAC0KAAAkAJROSwFLAoeUjAJtdZSFlIwCeDGUjAJ4MpSGlIxTQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9zdWJzeXN0ZW0ucHmUjAg8bGFtYmRhPpRoDkskQxqAAJxSoBGgUqgRoVWhGZleqELRHS6wEtIdM5RoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEowCbXWUTegDczAu",
+                "name": "<lambda>"
               }
             }
           },
           {
-            "id": 1982370155552,
+            "id": 2730752751808,
             "type": "Interface",
             "params": {}
           }
         ],
         "connections": [
           {
-            "id": 1982370156560,
+            "id": 2730752752816,
             "source": {
-              "block": 1982369037072,
+              "block": 2730753076560,
               "port": 0
             },
             "targets": [
               {
-                "block": 1982370155888,
+                "block": 2730752752144,
                 "port": 0
               },
               {
-                "block": 1982370156224,
+                "block": 2730752752480,
                 "port": 1
               },
               {
-                "block": 1982370155552,
+                "block": 2730752751808,
                 "port": 1
               }
             ]
           },
           {
-            "id": 1982369037712,
+            "id": 2730753077200,
             "source": {
-              "block": 1982370155888,
+              "block": 2730752752144,
               "port": 0
             },
             "targets": [
               {
-                "block": 1982370156224,
+                "block": 2730752752480,
                 "port": 0
               },
               {
-                "block": 1982370155552,
+                "block": 2730752751808,
                 "port": 0
               }
             ]
           },
           {
-            "id": 1982369038032,
+            "id": 2730753077520,
             "source": {
-              "block": 1982370156224,
+              "block": 2730752752480,
               "port": 0
             },
             "targets": [
               {
-                "block": 1982369037072,
+                "block": 2730753076560,
                 "port": 0
               }
             ]
@@ -100,7 +96,7 @@
       }
     },
     {
-      "id": 1982370155216,
+      "id": 2730752751472,
       "type": "Scope",
       "params": {
         "sampling_rate": null,
@@ -112,27 +108,27 @@
   "events": [],
   "connections": [
     {
-      "id": 1982370060608,
+      "id": 2730753704016,
       "source": {
-        "block": 1982370156896,
+        "block": 2730752753152,
         "port": 0
       },
       "targets": [
         {
-          "block": 1982370155216,
+          "block": 2730752751472,
           "port": 0
         }
       ]
     },
     {
-      "id": 1982370061216,
+      "id": 2730753704624,
       "source": {
-        "block": 1982370156896,
+        "block": 2730752753152,
         "port": 1
       },
       "targets": [
         {
-          "block": 1982370155216,
+          "block": 2730752751472,
           "port": 1
         }
       ]

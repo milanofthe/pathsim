@@ -1,45 +1,41 @@
 {
   "metadata": {
     "duration": 12,
-    "timestamp": "2025-03-14T10:07:05.219992"
+    "timestamp": "2025-03-15T11:32:05.307435"
   },
   "blocks": [
     {
-      "id": 2407636339072,
+      "id": 2025715152416,
       "type": "Source",
       "params": {
         "func": {
-          "type": "lambda",
-          "name": "<lambda>",
-          "source": "lambda t : int(t>tau)",
-          "globals": {
-            "tau": 3
-          },
-          "closures": {}
+          "type": "dill",
+          "data": "gASVaQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQyaVAFsBAAAAAAAAAABVAFsCAAAAAAAAAAA6hAAANQEAAAAAAAAkAJROhZSMA2ludJSMA3RhdZSGlIwBdJSFlIxSQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9mZWVkYmFjay5weZSMCDxsYW1iZGE+lGgOSx9DDIAAnAOYQZxjmUWcCpRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEiiMA2ludJRoAIwKX2xvYWRfdHlwZZSTlGgIhZRSlIwDdGF1lEsDdTAu",
+          "name": "<lambda>"
         }
       }
     },
     {
-      "id": 2407636339408,
+      "id": 2025715152752,
       "type": "Integrator",
       "params": {
         "initial_value": 2
       }
     },
     {
-      "id": 2407636339744,
+      "id": 2025715153088,
       "type": "Amplifier",
       "params": {
         "gain": -1
       }
     },
     {
-      "id": 2407636340080,
+      "id": 2025715153424,
       "type": "Adder",
       "params": {}
     },
     {
-      "id": 2407636340416,
+      "id": 2025715153760,
       "type": "Scope",
       "params": {
         "sampling_rate": null,
@@ -54,61 +50,61 @@
   "events": [],
   "connections": [
     {
-      "id": 2407636340752,
+      "id": 2025715154096,
       "source": {
-        "block": 2407636339072,
+        "block": 2025715152416,
         "port": 0
       },
       "targets": [
         {
-          "block": 2407636340080,
+          "block": 2025715153424,
           "port": 0
         },
         {
-          "block": 2407636340416,
+          "block": 2025715153760,
           "port": 0
         }
       ]
     },
     {
-      "id": 2407635221264,
+      "id": 2025715477840,
       "source": {
-        "block": 2407636339744,
+        "block": 2025715153088,
         "port": 0
       },
       "targets": [
         {
-          "block": 2407636340080,
+          "block": 2025715153424,
           "port": 1
         }
       ]
     },
     {
-      "id": 2407635221904,
+      "id": 2025715478480,
       "source": {
-        "block": 2407636340080,
+        "block": 2025715153424,
         "port": 0
       },
       "targets": [
         {
-          "block": 2407636339408,
+          "block": 2025715152752,
           "port": 0
         }
       ]
     },
     {
-      "id": 2407636244800,
+      "id": 2025716105296,
       "source": {
-        "block": 2407636339408,
+        "block": 2025715152752,
         "port": 0
       },
       "targets": [
         {
-          "block": 2407636339744,
+          "block": 2025715153088,
           "port": 0
         },
         {
-          "block": 2407636340416,
+          "block": 2025715153760,
           "port": 1
         }
       ]

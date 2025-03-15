@@ -131,6 +131,25 @@ class Block(Serializable):
         return self._active
 
 
+    # methods for visualization ---------------------------------------------------------
+
+    def plot(self, *args, **kwargs):
+        """Block specific visualization, enables plotting 
+        access from the simulation level.
+
+        This gets primarily used by the visualization blocks 
+        such as the 'Scope' and 'Spectrum'.
+
+        Parameters
+        ----------
+        args : tuple
+            args for the plot methods
+        kwargs : dict
+            kwargs for the plot method
+        """
+        pass
+
+
     # methods for simulation management -------------------------------------------------
 
     def on(self):

@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "duration": 3000,
+    "timestamp": "2025-03-15T11:32:27.155484"
+  },
+  "blocks": [
+    {
+      "id": 2681969653616,
+      "type": "ODE",
+      "params": {
+        "func": {
+          "type": "dill",
+          "data": "gASVAgIAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwICAZRLA0sASwBLA0sHSwNDcJUAWwAAAAAAAAAAAFICAAAAAAAAAAAAAAAAAAAAAAAAIgBVAFMBBQAAAFsEAAAAAAAAAABTAVUAUwIFAAAAUwMtCAAALQoAAC0FAABVAFMBBQAAAC0FAABVAFMCBQAAAC0KAAAvAjUBAAAAAAAAJACUKE5LAUsASwJ0lIwCbnCUjAVhcnJheZSMAm11lIeUjAF4lIwBdZSMAXSUh5SMU0M6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfdmFuZGVycG9sLnB5lIwEZnVuY5RoEUsZQz2AANwLDY84ijiQUZBxkVScMphxoDGgUaE0qBGhN5l70RsrqEGoYalE0RswsDGwUbE00Rs30BQ40ws50AQ5lEMAlCkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoEU5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoFiiMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlIwCbXWUTegDdTAu",
+          "name": "func"
+        },
+        "initial_value": {
+          "type": "object",
+          "__module__": "numpy",
+          "__class__": "ndarray",
+          "data": [
+            2,
+            0
+          ]
+        },
+        "jac": {
+          "type": "dill",
+          "data": "gASVJwIAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwICAZRLA0sASwBLA0sISwNDiJUAWwAAAAAAAAAAAFICAAAAAAAAAAAAAAAAAAAAAAAAIgBTAVMCLwJbBAAAAAAAAAAAKgBTAy0FAABVAFMBBQAAAC0FAABVAFMCBQAAAC0FAABTAi0KAABbBAAAAAAAAAAAUwJVAFMBBQAAAFMDLQgAAC0KAAAtBQAALwIvAjUBAAAAAAAAJACUKE5LAEsBSwJ0lIwCbnCUjAVhcnJheZSMAm11lIeUjAF4lIwBdZSMAXSUh5SMU0M6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfdmFuZGVycG9sLnB5lIwDamFjlGgRSx1DS4AA3AsNjziKOJBhmBGQVpxymGOgIZlloEGgYaFEmWqoEagxqRSZb6hh0R4vtBKwUbgRuDG5FLhxuRexW9ExQdAdQtAUQ9MLRNAERJRDAJQpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaBFOTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiaBYojAJucJRoAIwOX2ltcG9ydF9tb2R1bGWUk5SMBW51bXB5lIWUUpSMAm11lE3oA3UwLg==",
+          "name": "jac"
+        }
+      }
+    },
+    {
+      "id": 2681969653952,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": []
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 2681969654288,
+      "source": {
+        "block": 2681969653616,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2681969653952,
+          "port": 0
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.1,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "GEAR52A",
+    "tolerance_fpi": 1e-09,
+    "iterations_min": 1,
+    "iterations_max": 200,
+    "tolerance_lte_abs": 1e-05,
+    "tolerance_lte_rel": 0.001
+  }
+}

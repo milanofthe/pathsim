@@ -1,31 +1,29 @@
 {
   "metadata": {
     "duration": 20000.0,
-    "timestamp": "2025-03-14T10:07:26.811353"
+    "timestamp": "2025-03-15T11:34:34.982488"
   },
   "blocks": [
     {
-      "id": 2234066733440,
+      "id": 1586262849056,
       "type": "Integrator",
       "params": {
         "initial_value": 0.0001
       }
     },
     {
-      "id": 2234066733776,
+      "id": 1586262849392,
       "type": "Function",
       "params": {
         "func": {
-          "type": "lambda",
-          "name": "<lambda>",
-          "source": "lambda x: x**2 - x**3",
-          "globals": {},
-          "closures": {}
+          "type": "dill",
+          "data": "gASVKQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLA0sDQxiVAFUAUwEtCAAAVQBTAi0IAAAtCgAAJACUTksCSwOHlCmMAXiUhZSMT0M6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfZmxhbWUucHmUjAg8bGFtYmRhPpRoC0sZQxCAAJgRmEGZFKABoDGhBJoblGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gLTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYi4=",
+          "name": "<lambda>"
         }
       }
     },
     {
-      "id": 2234066734112,
+      "id": 1586262849728,
       "type": "Scope",
       "params": {
         "sampling_rate": null,
@@ -37,31 +35,31 @@
   "events": [],
   "connections": [
     {
-      "id": 2234066734448,
+      "id": 1586262850064,
       "source": {
-        "block": 2234066733440,
+        "block": 1586262849056,
         "port": 0
       },
       "targets": [
         {
-          "block": 2234066733776,
+          "block": 1586262849392,
           "port": 0
         },
         {
-          "block": 2234066734112,
+          "block": 1586262849728,
           "port": 0
         }
       ]
     },
     {
-      "id": 2234065632016,
+      "id": 1586263174480,
       "source": {
-        "block": 2234066733776,
+        "block": 1586262849392,
         "port": 0
       },
       "targets": [
         {
-          "block": 2234066733440,
+          "block": 1586262849056,
           "port": 0
         }
       ]

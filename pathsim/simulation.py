@@ -238,6 +238,30 @@ class Simulation:
         if self.log: self.logger.warning(message)
 
 
+    # visualization ---------------------------------------------------------------
+
+    def plot(self, *args, **kwargs):
+        """Plot the simulation results by calling all the blocks 
+        that have visualization capabilities such as the 'Scope' 
+        and 'Spectrum'.
+
+        This is a quality of life method. Blocks can be visualized 
+        individually due to the object oriented nature, but it might 
+        be nice to just call the plot metho globally and look at all 
+        the results at once. Also works for models loaded from an 
+        external file.
+
+        Parameters
+        ----------
+        args : tuple
+            args for the plot methods
+        kwargs : dict
+            kwargs for the plot method
+        """
+        for block in self.blocks:
+            if block: block.plot(*args, **kwargs)
+
+
     # serialization/deserialization -----------------------------------------------
 
     def save(self, path="", **metadata):

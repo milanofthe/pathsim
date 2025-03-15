@@ -1,0 +1,144 @@
+{
+  "metadata": {
+    "duration": 20,
+    "timestamp": "2025-03-15T11:33:50.051196"
+  },
+  "blocks": [
+    {
+      "id": 2189777926672,
+      "type": "ODE",
+      "params": {
+        "func": {
+          "type": "dill",
+          "data": "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",
+          "name": "reaction_rates"
+        },
+        "initial_value": {
+          "type": "object",
+          "__module__": "numpy",
+          "__class__": "ndarray",
+          "data": [
+            1.0,
+            0.0,
+            300.0
+          ]
+        },
+        "jac": null
+      }
+    },
+    {
+      "id": 2189777926336,
+      "type": "Source",
+      "params": {
+        "func": {
+          "type": "dill",
+          "data": "gASVlgEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQzqVAFMBWwAAAAAAAAAAAFICAAAAAAAAAAAAAAAAAAAAAAAAIgBTAlUALQUAADUBAAAAAAAALQAAACQAlE5HQAAAAAAAAABHP+AAAAAAAACHlIwCbnCUjANzaW6UhpSMAXSUhZSMUUM6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfcmVhY3Rvci5weZSMCDxsYW1iZGE+lGgOSypDFYAAmCOkAqcGogagc6gxoXWjDdIaLZRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEowCbnCUaACMDl9pbXBvcnRfbW9kdWxllJOUjAVudW1weZSFlFKUczAu",
+          "name": "<lambda>"
+        }
+      }
+    },
+    {
+      "id": 2189778234704,
+      "type": "Source",
+      "params": {
+        "func": {
+          "type": "dill",
+          "data": "gASVuAEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLB0sDQ0aVAFMBUwJTA1sAAAAAAAAAAABSAgAAAAAAAAAAAAAAAAAAAAAAACIAUwRVAC0FAAA1AQAAAAAAAC0FAAAtCgAALQUAACQAlChOR0BxgAAAAAAASwFHP+mZmZmZmZpHv+MzMzMzMzN0lIwCbnCUjANleHCUhpSMAXSUhZSMUUM6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfcmVhY3Rvci5weZSMCDxsYW1iZGE+lGgOSytDH4AAmCWgMaBzrFKvVqpWsES4EbFGq17RJzvRIzvSGjyUaAUpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaA5OTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiaBKMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlHMwLg==",
+          "name": "<lambda>"
+        }
+      }
+    },
+    {
+      "id": 2189777926000,
+      "type": "Scope",
+      "params": {
+        "sampling_rate": null,
+        "t_wait": 0.0,
+        "labels": [
+          "Ca",
+          "Cb",
+          "T"
+        ]
+      }
+    }
+  ],
+  "events": [],
+  "connections": [
+    {
+      "id": 2189777927008,
+      "source": {
+        "block": 2189777926672,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2189777926000,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2189778235344,
+      "source": {
+        "block": 2189777926672,
+        "port": 1
+      },
+      "targets": [
+        {
+          "block": 2189777926000,
+          "port": 1
+        }
+      ]
+    },
+    {
+      "id": 2189778235664,
+      "source": {
+        "block": 2189777926672,
+        "port": 2
+      },
+      "targets": [
+        {
+          "block": 2189777926000,
+          "port": 2
+        }
+      ]
+    },
+    {
+      "id": 2189778878544,
+      "source": {
+        "block": 2189777926336,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2189777926672,
+          "port": 0
+        }
+      ]
+    },
+    {
+      "id": 2189778879152,
+      "source": {
+        "block": 2189778234704,
+        "port": 0
+      },
+      "targets": [
+        {
+          "block": 2189777926672,
+          "port": 1
+        }
+      ]
+    }
+  ],
+  "simulation": {
+    "dt": 0.001,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "GEAR52A",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200,
+    "tolerance_lte_abs": 1e-06,
+    "tolerance_lte_rel": 0.0001
+  }
+}

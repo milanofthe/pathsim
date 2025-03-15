@@ -112,7 +112,6 @@ sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
 sim.run(365)
 
 
-
 # PLOT THE RESULTS ======================================================================
 
 # Plot solar system

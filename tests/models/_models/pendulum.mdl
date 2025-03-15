@@ -1,43 +1,43 @@
 {
   "metadata": {
     "duration": 25,
-    "timestamp": "2025-03-14T10:08:31.960598"
+    "timestamp": "2025-03-15T11:33:29.359633"
   },
   "blocks": [
     {
-      "id": 2752335907536,
+      "id": 2177642870640,
       "type": "Integrator",
       "params": {
         "initial_value": 0
       }
     },
     {
-      "id": 2752334805776,
+      "id": 2177643195728,
       "type": "Integrator",
       "params": {
         "initial_value": 2.827433388230814
       }
     },
     {
-      "id": 2752335907872,
+      "id": 2177642870976,
       "type": "Amplifier",
       "params": {
         "gain": -9.81
       }
     },
     {
-      "id": 2752335908208,
+      "id": 2177642871312,
       "type": "Function",
       "params": {
         "func": {
-          "type": "unserializable_callable",
-          "name": "sin",
-          "repr": "<ufunc 'sin'>"
+          "type": "dill",
+          "data": "gASVKQAAAAAAAACMHW51bXB5Ll9jb3JlLl9tdWx0aWFycmF5X3VtYXRolIwDc2lulJOULg==",
+          "name": "sin"
         }
       }
     },
     {
-      "id": 2752335908544,
+      "id": 2177642871648,
       "type": "Scope",
       "params": {
         "sampling_rate": null,
@@ -52,61 +52,61 @@
   "events": [],
   "connections": [
     {
-      "id": 2752335908880,
+      "id": 2177642871984,
       "source": {
-        "block": 2752335907536,
+        "block": 2177642870640,
         "port": 0
       },
       "targets": [
         {
-          "block": 2752334805776,
+          "block": 2177643195728,
           "port": 0
         },
         {
-          "block": 2752335908544,
+          "block": 2177642871648,
           "port": 0
         }
       ]
     },
     {
-      "id": 2752334806416,
+      "id": 2177643196368,
       "source": {
-        "block": 2752334805776,
+        "block": 2177643195728,
         "port": 0
       },
       "targets": [
         {
-          "block": 2752335908208,
+          "block": 2177642871312,
           "port": 0
         },
         {
-          "block": 2752335908544,
+          "block": 2177642871648,
           "port": 1
         }
       ]
     },
     {
-      "id": 2752334806736,
+      "id": 2177643196688,
       "source": {
-        "block": 2752335908208,
+        "block": 2177642871312,
         "port": 0
       },
       "targets": [
         {
-          "block": 2752335907872,
+          "block": 2177642870976,
           "port": 0
         }
       ]
     },
     {
-      "id": 2752335812928,
+      "id": 2177643823184,
       "source": {
-        "block": 2752335907872,
+        "block": 2177642870976,
         "port": 0
       },
       "targets": [
         {
-          "block": 2752335907536,
+          "block": 2177642870640,
           "port": 0
         }
       ]

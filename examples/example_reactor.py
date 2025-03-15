@@ -86,7 +86,7 @@ Sim = Simulation(
 )
 
 # Run simulation for 10 seconds
-Sim.run(20, False)  
+Sim.run(20)  
 
 # Plot results
 Sco.plot(".-", lw=1.5)
