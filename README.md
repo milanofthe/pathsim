@@ -99,7 +99,7 @@ connections = [
     ]
 
 #create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=0.05, log=True)
+Sim = Simulation(blocks, connections, dt=0.05)
 
 #run the simulation for 30 seconds
 Sim.run(duration=30.0)
@@ -110,27 +110,6 @@ Sc.plot()
 #read the results from the scope for further processing
 time, data = Sc.read();
 ```
-
-    2025-03-08 10:56:04,149 - INFO - LOGGING enabled
-    2025-03-08 10:56:04,150 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2025-03-08 10:56:04,150 - INFO - ALGEBRAIC PATH LENGTH 2
-    2025-03-08 10:56:04,151 - INFO - RESET, time -> 0.0
-    2025-03-08 10:56:04,151 - INFO - TRANSIENT duration=30.0
-    2025-03-08 10:56:04,151 - INFO - STARTING progress tracker
-    2025-03-08 10:56:04,152 - INFO - progress=0%
-    2025-03-08 10:56:04,156 - INFO - progress=10%
-    2025-03-08 10:56:04,160 - INFO - progress=20%
-    2025-03-08 10:56:04,165 - INFO - progress=30%
-    2025-03-08 10:56:04,170 - INFO - progress=40%
-    2025-03-08 10:56:04,174 - INFO - progress=50%
-    2025-03-08 10:56:04,179 - INFO - progress=60%
-    2025-03-08 10:56:04,184 - INFO - progress=70%
-    2025-03-08 10:56:04,188 - INFO - progress=80%
-    2025-03-08 10:56:04,192 - INFO - progress=90%
-    2025-03-08 10:56:04,197 - INFO - progress=100%
-    2025-03-08 10:56:04,198 - INFO - FINISHED, steps(total)=600(600), runtime=46.33ms
-    
-
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/harmonic_oscillator_result_g.png)
 
@@ -181,7 +160,6 @@ Sim = Simulation(
     blocks, 
     connections, 
     dt=0.05, 
-    log=True, 
     Solver=ESDIRK54, 
     tolerance_lte_abs=1e-5, 
     tolerance_lte_rel=1e-3
@@ -193,27 +171,6 @@ Sim.run(3*mu)
 #plot the results directly (steps highlighted)
 Sc.plot(".-");
 ```
-
-    2025-03-08 10:56:04,872 - INFO - LOGGING enabled
-    2025-03-08 10:56:04,872 - INFO - SOLVER -> ESDIRK54, adaptive=True, implicit=True
-    2025-03-08 10:56:04,872 - INFO - ALGEBRAIC PATH LENGTH 1
-    2025-03-08 10:56:04,873 - INFO - RESET, time -> 0.0
-    2025-03-08 10:56:04,873 - INFO - TRANSIENT duration=3000
-    2025-03-08 10:56:04,874 - INFO - STARTING progress tracker
-    2025-03-08 10:56:04,880 - INFO - progress=0%
-    2025-03-08 10:56:04,974 - INFO - progress=11%
-    2025-03-08 10:56:05,031 - INFO - progress=20%
-    2025-03-08 10:56:05,936 - INFO - progress=32%
-    2025-03-08 10:56:06,023 - INFO - progress=42%
-    2025-03-08 10:56:06,119 - INFO - progress=51%
-    2025-03-08 10:56:07,035 - INFO - progress=63%
-    2025-03-08 10:56:07,103 - INFO - progress=70%
-    2025-03-08 10:56:07,384 - INFO - progress=80%
-    2025-03-08 10:56:08,276 - INFO - progress=90%
-    2025-03-08 10:56:08,325 - INFO - progress=100%
-    2025-03-08 10:56:08,326 - INFO - FINISHED, steps(total)=228(397), runtime=3451.53ms
-    
-
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_result_g.png)
 
@@ -269,34 +226,14 @@ connections = [
     Connection(Int, Amp, Sco[1])
     ]
 
-#initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True)
+#initialize simulation with the blocks, connections, timestep
+Sim = Simulation(blocks, connections, dt=dt)
     
 #run the simulation for some time
 Sim.run(4*tau)
 
 Sco.plot()
 ```
-
-    2025-03-08 10:56:08,480 - INFO - LOGGING enabled
-    2025-03-08 10:56:08,481 - INFO - SOLVER -> SSPRK22, adaptive=False, implicit=False
-    2025-03-08 10:56:08,481 - INFO - ALGEBRAIC PATH LENGTH 2
-    2025-03-08 10:56:08,481 - INFO - RESET, time -> 0.0
-    2025-03-08 10:56:08,482 - INFO - TRANSIENT duration=12
-    2025-03-08 10:56:08,482 - INFO - STARTING progress tracker
-    2025-03-08 10:56:08,483 - INFO - progress=0%
-    2025-03-08 10:56:08,505 - INFO - progress=10%
-    2025-03-08 10:56:08,525 - INFO - progress=20%
-    2025-03-08 10:56:08,545 - INFO - progress=30%
-    2025-03-08 10:56:08,564 - INFO - progress=40%
-    2025-03-08 10:56:08,583 - INFO - progress=50%
-    2025-03-08 10:56:08,603 - INFO - progress=60%
-    2025-03-08 10:56:08,623 - INFO - progress=70%
-    2025-03-08 10:56:08,642 - INFO - progress=80%
-    2025-03-08 10:56:08,661 - INFO - progress=90%
-    2025-03-08 10:56:08,680 - INFO - progress=100%
-    2025-03-08 10:56:08,680 - INFO - FINISHED, steps(total)=1201(1201), runtime=198.23ms
-    
 
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/linear_feedback_result_g.png)
@@ -393,13 +330,12 @@ E1 = ZeroCrossing(
 
 events = [E1]
 
-#initialize simulation with the blocks, connections, timestep and logging enabled
+#initialize simulation with the blocks, connections, timestep
 Sim = Simulation(
     blocks, 
     connections, 
     events, 
     dt=0.1, 
-    log=True, 
     Solver=RKBS32, 
     dt_max=0.1
     )
@@ -410,27 +346,6 @@ Sim.run(20)
 #plot the recordings from the scope
 Sc.plot();
 ```
-
-    2025-03-08 10:56:11,436 - INFO - LOGGING enabled
-    2025-03-08 10:56:11,436 - INFO - SOLVER -> RKBS32, adaptive=True, implicit=False
-    2025-03-08 10:56:11,437 - INFO - ALGEBRAIC PATH LENGTH 1
-    2025-03-08 10:56:11,437 - INFO - RESET, time -> 0.0
-    2025-03-08 10:56:11,438 - INFO - TRANSIENT duration=20
-    2025-03-08 10:56:11,438 - INFO - STARTING progress tracker
-    2025-03-08 10:56:11,439 - INFO - progress=0%
-    2025-03-08 10:56:11,441 - INFO - progress=10%
-    2025-03-08 10:56:11,446 - INFO - progress=20%
-    2025-03-08 10:56:11,452 - INFO - progress=30%
-    2025-03-08 10:56:11,456 - INFO - progress=40%
-    2025-03-08 10:56:11,461 - INFO - progress=50%
-    2025-03-08 10:56:11,467 - INFO - progress=60%
-    2025-03-08 10:56:11,473 - INFO - progress=70%
-    2025-03-08 10:56:11,480 - INFO - progress=80%
-    2025-03-08 10:56:11,488 - INFO - progress=90%
-    2025-03-08 10:56:11,500 - INFO - progress=100%
-    2025-03-08 10:56:11,501 - INFO - FINISHED, steps(total)=395(496), runtime=61.73ms
-    
-
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_result_g.png)
 
@@ -456,7 +371,6 @@ ax.set_ylabel("dt [s]")
 ax.set_xlabel("time [s]")
 ax.grid(True)
 ```
-
 
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_result_timesteps_g.png)

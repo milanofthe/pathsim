@@ -119,7 +119,7 @@ class Simulation:
     iterations_max : int
         maximum allowed number of fixed-point iterations for system function evaluation
     log : bool, string
-        flag to enable logging (alternatively a path can be specified)
+        flag to enable logging (alternatively a path to a log file can be specified)
     solver_kwargs : dict
         additional parameters for numerical solvers such as abs and rel tolerance
 
