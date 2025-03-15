@@ -11,24 +11,36 @@
 
 import numpy as np
 
-import cProfile
-import pstats
-
-from functools import wraps
-
 from collections import deque
-
+from contextlib import ContextDecorator
+from functools import wraps
 from time import perf_counter
 
-from contextlib import ContextDecorator
+try:
+    import cProfile, pstats
+    PROFILE_AVAILABLE = True
+except ImportError:
+    PROFILE_AVAILABLE = False
 
 
 # CLASSES ==============================================================================
 
 class Timer:
-    """context manager that times the execution time 
+    """Context manager that times the execution time 
     of the code inside of the context in 'ms' for 
-    debugging purposes
+    debugging purposes.
+
+    Example
+    -------
+    
+    .. code-block:: python
+        
+        #time the code within the context
+        with Timer() as T:
+            complicated_function()
+            
+        #print the runtime
+        print(T.time)
     
     Parameters
     ----------
@@ -68,55 +80,19 @@ def timer(func):
         return result
     return wrap_func
 
-
-
-def track_block_runtime(cls):
-    """
-    Class decorator that adds runtime tracking to all public methods.
-    Also adds method to get runtime estimates based on rolling average.
-    """
-    
-    def wrap_method(method):
-        @wraps(method)
-        def wrapped(self, *args, **kwargs):
-
-            #initialize history dict if not exists
-            if not hasattr(self, "_runtime_history"):
-                self._runtime_history = {}
-            
-            #initialize deque for this method if not exists    
-            if method.__name__ not in self._runtime_history:
-                self._runtime_history[method.__name__] = deque(maxlen=100)
-                
-            start = perf_counter()
-            result = method(self, *args, **kwargs)
-            self._runtime_history[method.__name__].append(perf_counter() - start)
-            
-            return result
-        return wrapped
-
-    #add runtime estimate method
-    def get_runtime_estimate(self, method_name):
-        if not hasattr(self, "_runtime_history"):
-            return 0.0
-        
-        history = self._runtime_history.get(method_name, [])
-        
-        return np.mean(history) if history else 0.0
-    
-    cls.get_runtime_estimate = get_runtime_estimate
-    
-    #wrap all public methods
-    for name, method in vars(cls).items():
-        if callable(method) and not name.startswith("_"):
-            setattr(cls, name, wrap_method(method))
-    
-    return cls
-
     
 class Profiler(ContextDecorator):
 
     """Context manager for easy code profiling
+    
+    Example
+    -------
+
+    .. code-block:: python 
+    
+        #profile the code within the context
+        with Profiler():
+            complicated_function()
 
     Parameters
     ----------

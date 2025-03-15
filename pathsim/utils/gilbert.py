@@ -32,10 +32,16 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
     similarity transformation to get fully real valued matrices.
 
     pole residue form:
-        H(s) = Const + sum( Residues / (s - Poles) )
+
+    .. math::
+
+        \\mathbf{H}(s) = \\mathmf{D} + \\sum_{n=1}^N \\frac{\\mathbf{R}_n}{s - p_n} )
     
     statespace form:
-        H(s) = C * (s*I - A)^-1 * B + D 
+        
+    .. math::
+
+        \\mathbf{H}(s) = \\mathbf{C} (s \\mathbf{I} - \\mathbf{A})^{-1} * \\mathbf{B} + \\mathbf{H} 
     
     Notes
     -----  

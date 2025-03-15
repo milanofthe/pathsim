@@ -413,6 +413,27 @@ class ExplicitSolver(Solver):
 
         This method is primarily intended for testing purposes or 
         for use as a standalone numerical integrator.
+
+        Example
+        -------
+
+        This is how to directly use the solver to integrate an ODE:
+
+        .. code-block:: python
+            
+            #1st order linear ODE
+            def f(x, u, t):
+                return -x
+
+            #initial condition
+            x0 = 1
+    
+            #initialize ODE solver
+            sol = Solver(x0, f)
+
+            #integrate from 0 to 5 with timestep 0.1
+            t, x = sol.integrate(time_end=5, dt=0.1)
+
     
         Parameters
         ----------
@@ -502,11 +523,7 @@ class ImplicitSolver(Solver):
         self.eval_stages = [1.0]
 
         #initialize optimizer for solving implicit update equation
-        # self.opt = Anderson(m=5, restart=False)
         self.opt = NewtonAnderson(m=5, restart=False)
-        # self.opt = NewtonRaphsonAD()
-        # self.opt = GaussNewtonAD()
-        # self.opt = LevenbergMarquardtAD()
 
 
     def buffer(self, dt):
@@ -632,6 +649,26 @@ class ImplicitSolver(Solver):
 
         This method is primarily intended for testing purposes or 
         for use as a standalone numerical integrator.
+
+        Example
+        -------
+
+        This is how to directly use the solver to integrate an ODE:
+
+        .. code-block:: python
+            
+            #1st order linear ODE
+            def f(x, u, t):
+                return -x
+
+            #initial condition
+            x0 = 1
+    
+            #initialize ODE solver
+            sol = Solver(x0, f)
+
+            #integrate from 0 to 5 with timestep 0.1
+            t, x = sol.integrate(time_end=5, dt=0.1)
     
         Parameters
         ----------
