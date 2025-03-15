@@ -9,170 +9,206 @@
 
 # IMPORTS ==============================================================================
 
-import textwrap
+import numpy as np
+
+import importlib
 import inspect
+import base64
 import types
 import json
-import ast
-import re
+import dill
+import sys
 
 
 # SERIALIZATION ========================================================================
 
-def extract_source(func):
-    source = inspect.getsource(func)
-    tree = ast.parse(source)
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Lambda):
-            # Extract the substring corresponding to the lambda expression
-            lambda_source = source[node.col_offset:node.end_col_offset]
-            return lambda_source
-    return textwrap.dedent(source)
-    
-
 def serialize_callable(func):
-    """Serialize a callable (function or lambda) 
-    to a dictionary representation.
+    """Serialize a callable with priority for human-readable formats
     
     Parameters
     ----------
     func : callable
-        Function or lambda to serialize
-    
+        function to serialize into dict
+
     Returns
     -------
-    out : dict
-        Dictionary representation of the callable
+    dict
+        serialized function
     """
-    # Get function name and determine if it's a lambda
-    func_name = func.__name__
-    is_lambda = func_name == '<lambda>'
     
-    # Get source code
+    #case 1: built-in function
+    if isinstance(func, types.BuiltinFunctionType):
+        return {
+            "type": "builtin",
+            "module": func.__module__,
+            "name": func.__qualname__
+        }
+    
+    #case 2: module-level function or class method from standard library
+    if (hasattr(func, "__module__") and 
+        (func.__module__ in sys.modules) and 
+        not func.__module__.startswith('__main__')):
+        
+        try:
+            #verify we can resolve reference
+            module = importlib.import_module(func.__module__)
+            obj = module
+            for part in func.__qualname__.split('.'):
+                obj = getattr(obj, part)
+            
+            #make sure we got the same function back
+            if obj is func:  
+                return {
+                    "type": "reference",
+                    "module": func.__module__,
+                    "qualname": func.__qualname__
+                }
+        except (ImportError, AttributeError):
+            pass  #fall through to next method
+    
+    #case 3: last resort -> use dill
+    serialized = dill.dumps(func)
+    return {
+        "type": "dill",
+        "data": base64.b64encode(serialized).decode('ascii'),
+        "name": getattr(func, "__name__", "unknown")
+    }
+
+
+def serialize_object(obj):
+    """Serialize any object by capturing its module and class
+
+    Parameters
+    ----------
+    obj : object
+        object to serialize into dict
+
+    Returns
+    -------
+    dict
+        serialized object
+    """
+    
+    #case 1: direct serialization
     try:
-        # Try to get the source code
-        source = extract_source(func)
+        json.dumps(obj)
+        return obj
 
+    #case 2: specific strategies
+    except (TypeError, OverflowError):
         
-        # Get function globals that are referenced in the function
-        func_globals = {}
-        if func.__globals__:
+        #get module and class info from the class object, not the instance
+        if hasattr(obj, '__class__'):
 
-            # Get code object of the function
-            code = func.__code__
+            #get class info from the class itself
+            cls = obj.__class__
+            module_name = getattr(cls, '__module__', None)
+            class_name = getattr(cls, '__name__', str(cls))
+            
+            #handle basic types with simple conversion methods
+            if hasattr(obj, "tolist"):
+                return {
+                    "type": "object",
+                    "__module__": module_name,
+                    "__class__": class_name,
+                    "data": obj.tolist()
+                }
 
-            # Get names referenced in the function
-            for name in code.co_names:
-                if name in func.__globals__:
-                    glob_value = func.__globals__[name]
-
-                    # Only include serializable globals (modules and basic types)
-                    if isinstance(glob_value, (int, float, str, bool, list, dict, tuple)) or \
-                       inspect.ismodule(glob_value):
-                        # For modules, just store the name
-                        if inspect.ismodule(glob_value):
-                            func_globals[name] = {
-                                "type": "module",
-                                "name": glob_value.__name__
-                            }
-                        else:
-                            func_globals[name] = glob_value
+            elif hasattr(obj, "__list__"):
+                return {
+                    "type": "object",
+                    "__module__": module_name,
+                    "__class__": class_name,
+                    "data": list(obj)
+                }
         
-        # Get function closures (important for nested functions)
-        closures = {}
-        if func.__closure__:
-            closure_vars = inspect.getclosurevars(func)
-
-            # Get nonlocal variables
-            for name, value in closure_vars.nonlocals.items():
-
-                # Only include serializable values
-                if isinstance(value, (int, float, str, bool, list, dict, tuple)):
-                    closures[name] = value
-        
-        # Create the final representation
-        return {
-            "type": "lambda" if is_lambda else "function",
-            "name": func_name,
-            "source": source,
-            "globals": func_globals,
-            "closures": closures
-        }
-        
-    except (IOError, TypeError) as e:
-
-        # Fallback for dynamically created functions or builtins
-        return {
-            "type": "unserializable_callable",
-            "name": func_name,
-            "repr": repr(func)
-        }
+    #case 3: last resort -> use dill
+    serialized = dill.dumps(obj)
+    return {
+        "type": "dill",
+        "data": base64.b64encode(serialized).decode('ascii'),
+        "name": getattr(obj, "__name__", "unknown")
+    }
 
 
 # DESERIALIZATION ======================================================================
 
-def deserialize_callable(func_dict, global_env=None):
-    """Deserialize a callable from its dictionary representation.
-    
+def deserialize(data):
+    """Deserialize an object from dictionary representation
+
     Parameters
     ----------
-    func_dict : dict
-        Dictionary representation of the callable
-    global_env : dict, optional
-        Additional global environment to use when evaluating the function
-    
+    data : dict
+        dict to deserialize into object
+
     Returns
     -------
-    func : callable
-        Reconstructed function or lambda
+    object
+        python object recovered from dict
     """
-    if func_dict["type"] == "unserializable_callable":
+    
+    #regular values and python objects
+    if not isinstance(data, dict):
+        return data
 
-        # Can't reconstruct the function, raise an error
-        raise ValueError(f"Cannot deserialize function '{func_dict['name']}': {func_dict['repr']}")
+    #special types, builtin functions
+    if data["type"] == "builtin":
+        module = importlib.import_module(data["module"])
+        names = data["name"].split('.')
+        obj = module
+        for name in names:
+            obj = getattr(obj, name)
+        return obj
     
-    # Prepare environment for function evaluation
-    if global_env is None:
-        global_env = {}
+    #functions with reference
+    elif data["type"] == "reference":
+        module = importlib.import_module(data["module"])
+        names = data["qualname"].split('.')
+        obj = module
+        for name in names:
+            obj = getattr(obj, name)
+        return obj
     
-    # Import needed modules
-    for name, value in func_dict["globals"].items():
-        if isinstance(value, dict) and value.get("type") == "module":
+    #dill
+    elif data["type"] == "dill":
+        return dill.loads(base64.b64decode(data["data"]))
+
+    #other objects
+    elif "__module__" in data and "__class__" in data:
+
+        module_name, class_name = data["__module__"], data["__class__"]
+                
+        try:
+            #try importing the module and class
+            module = __import__(module_name, fromlist=[class_name])
+            cls = getattr(module, class_name)
+
+        except (ImportError, AttributeError) as E:
+            raise E(f"<{module_name}.{class_name}> unrecoverable")
+
+        if "data" in data:
+            
+            #get the data
+            obj_data = data["data"]
+        
+            #objects with simple initialization from list
+            if hasattr(cls, "from_list") and callable(cls.from_list):
+                return cls.from_list(obj_data)
+            
+            #numpy-like arrays
+            if module_name.startswith("numpy") and class_name.startswith("ndarray"):
+                return np.array(obj_data)
+            
             try:
-                global_env[name] = __import__(value["name"])
-            except ImportError:
-                pass  # Module can't be imported, ignore
-        else:
-            global_env[name] = value
-    
-    # Add closure variables to the environment
-    for name, value in func_dict["closures"].items():
-        global_env[name] = value
-    
-    # Handle different function types
-    if func_dict["type"] == "lambda":
+                #everything else
+                return cls(obj_data)
 
-        # For lambdas, we can just eval the source
-        source = func_dict["source"]
-        try:
-            return eval(source, global_env)
-        except Exception as e:
-            raise ValueError(f"Error deserializing lambda: {e}")
+            except (AttributeError, ValueError) as E:              
+                #data not recoverable
+                raise E(f"<{module_name}.{data}> unrecoverable, {obj_data}")
+    
     else:
-
-        # For regular functions, we need to exec the source and get the function from locals
-        source = func_dict["source"]
-        local_vars = {}
-        try:
-
-            # Execute the function definition
-            exec(source, global_env, local_vars)
-
-            # Get the function from local variables
-            return local_vars[func_dict["name"]]
-        except Exception as e:
-            raise ValueError(f"Error deserializing function: {e}")
-
+        raise AttributeError(f"<{data}> unrecoverable")
 
 
 # CLASS FOR AUTOMATIC SERIALIZATION CAPABILITIES =======================================
@@ -180,10 +216,8 @@ def deserialize_callable(func_dict, global_env=None):
 class Serializable:
     """Mixin that provides automatic serialization based on __init__ parameters 
     and loading/saving to json formatted readable files
-
     """
     
-
     def __str__(self):
         return json.dumps(self.to_dict(), indent=2, sort_keys=False)
 
@@ -229,30 +263,28 @@ class Serializable:
         """
         
         result = {
-            "id": id(self),
-            "type": self.__class__.__name__,
-            "params": {}
+            "id"     : id(self),
+            "type"   : self.__class__.__name__,
+            "params" : {}
         }
         
-        # Get parameter names from __init__ signature
+        #get parameter names from __init__ signature
         signature = inspect.signature(self.__init__)
-        param_names = [p for p in signature.parameters if p != 'self']
+        param_names = [p for p in signature.parameters if p != "self"]
         
-        # Get current values of parameters
+        #get current values of parameters
         for name in param_names:
+            
             if hasattr(self, name):
+                
                 value = getattr(self, name)
-                # Handle callable parameters
+
+                #handle callable parameters
                 if callable(value):
                     result["params"][name] = serialize_callable(value)
+
                 else:
-                    # Try standard serialization
-                    try:
-                        json.dumps(value)
-                        result["params"][name] = value
-                    except (TypeError, OverflowError):
-                        # For non-serializable objects, store their string representation
-                        result["params"][name] = str(value)
+                    result["params"][name] = serialize_object(value)
             
         return result
     
@@ -281,24 +313,16 @@ class Serializable:
         # If this is already the target class, or we couldn't find the target
         if target_cls is None or target_cls == cls:
 
-            # Deserialize parameters
+            #deserialize parameters
             params = {}
             for name, value in data["params"].items():
-                if (isinstance(value, dict) and value.get("type") 
-                	in ["lambda", "function", "unserializable_callable"]):
-                    try:
-                        params[name] = deserialize_callable(value)
-                    except ValueError:
-
-                        # Skip this parameter if we can't deserialize it
-                        continue
-                else:
-                    params[name] = value
-            
-            # Create the instance
+                params[name] = deserialize(value)
+        
+            #create the instance
             return cls(**params)
+        
         else:
-            # Let the target class handle deserialization
+            #target class handle deserialization
             return target_cls.from_dict(data)
 
 

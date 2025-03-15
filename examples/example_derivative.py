@@ -39,11 +39,15 @@ Sri = Source(lambda t: -1/omega*np.cos(omega*t))
 Srd = Source(lambda t: omega*np.cos(omega*t))
 Int = Integrator(-1/omega)
 Dif = Differentiator(f_max=100)
-Sco = Scope(labels=["sin", 
-                    "integrator", 
-                    "differentiator", 
-                    "reference integral", 
-                    "reference derivative"])
+Sco = Scope(
+    labels=[
+        "sin", 
+        "integrator", 
+        "differentiator", 
+        "reference integral", 
+        "reference derivative"
+        ]
+    )
 
 blocks = [Src, Sri, Srd, Int, Dif, Sco]
 

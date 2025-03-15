@@ -1,10 +1,10 @@
 #########################################################################################
 ##
-##                     MAIN SIMULATION ENGINE FOR TRANSIENT ANALYSIS
+##                               MAIN SIMULATION ENGINE
 ##                                   (simulation.py)
 ##
-##                 This module contains the simulation class that handles
-##                the blocks and connections and the timestepping methods.
+##                This module contains the simulation class that manages
+##            the blocks, connections, events and specific simulation methods.
 ##
 ##                                   Milan Rother 2024
 ##

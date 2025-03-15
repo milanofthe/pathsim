@@ -42,5 +42,6 @@ setup(
         "numpy",
         "matplotlib",
         "scipy",
+        "dill"
     ],
 )

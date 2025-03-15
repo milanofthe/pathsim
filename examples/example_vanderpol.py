@@ -30,8 +30,8 @@ def jac(x, u, t):
     return np.array([[0, 1], [-mu*2*x[0]*x[1]-1, mu*(1 - x[0]**2)]])
 
 #blocks that define the system
-# VDP = ODE(func, x0, jac) #jacobian improves convergence but is not needed
-VDP = ODE(func, x0)
+VDP = ODE(func, x0, jac) #jacobian improves convergence but is not needed
+# VDP = ODE(func, x0)
 Sco = Scope()
 
 blocks = [VDP, Sco]
