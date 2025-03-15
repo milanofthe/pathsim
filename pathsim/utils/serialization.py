@@ -235,13 +235,15 @@ class Serializable:
 
 
     @classmethod
-    def load(cls, path=""):
+    def load(cls, path="", **kwargs):
         """Load and instantiate an object from an external file in json format
         
         Parameters
         ----------
         path : str
             filepath to load data from
+        kwargs : dict
+            additional kwargs for object reconstruction
 
         Returns
         -------
@@ -249,7 +251,7 @@ class Serializable:
             reconstructed object from dict representation
         """
         with open(path, "r", encoding="utf-8") as file:
-            return cls.from_dict(json.load(file))
+            return cls.from_dict(json.load(file), **kwargs)
         return None
         
 
@@ -258,11 +260,11 @@ class Serializable:
         
         Returns
         -------
-        result : dict
+        data : dict
             representation of object
         """
         
-        result = {
+        data = {
             "id"     : id(self),
             "type"   : self.__class__.__name__,
             "params" : {}
@@ -281,22 +283,24 @@ class Serializable:
 
                 #handle callable parameters
                 if callable(value):
-                    result["params"][name] = serialize_callable(value)
+                    data["params"][name] = serialize_callable(value)
 
                 else:
-                    result["params"][name] = serialize_object(value)
+                    data["params"][name] = serialize_object(value)
             
-        return result
+        return data
     
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data, **kwargs):
         """Create block instance from dictionary representation.
 
         Parameters
         ----------
         data : dict
             representation of object
+        kwargs : dict
+            additional kwargs for object reconstruction
 
         Returns
         -------
@@ -317,6 +321,10 @@ class Serializable:
             params = {}
             for name, value in data["params"].items():
                 params[name] = deserialize(value)
+
+            #update optional kwargs
+            for name, value in kwargs.items():
+                params[name] = value
         
             #create the instance
             return cls(**params)

@@ -356,11 +356,14 @@ class Simulation:
                 
         #create the full model
         return {
+            "type": "Simulation",
             "metadata": metadata,
-            "blocks": blocks,
-            "events": events,
-            "connections": connections,
-            "simulation": {
+            "structure": {
+                "blocks": blocks,
+                "events": events,
+                "connections": connections
+                },
+            "params": {
                 "dt": self.dt,
                 "dt_min": self.dt_min,
                 "dt_max": self.dt_max,
@@ -371,7 +374,7 @@ class Simulation:
                 **self.solver_kwargs
                 }
             }
-        
+
 
     @classmethod
     def from_dict(cls, data, **kwargs):
@@ -390,17 +393,20 @@ class Simulation:
             instance of the Simulation class with mode definition
         """
         from . import solvers
+
+        #get system structure
+        structure = data.get("structure", {})
         
         #deserialize blocks and create block ID mapping
         blocks, id_to_block = [], {}
-        for block_data in data["blocks"]:
+        for block_data in structure.get("blocks", []):
             block = Block.from_dict(block_data)
             blocks.append(block)
             id_to_block[block_data["id"]] = block
         
         #deserialize connections
         connections = []
-        for conn_data in data["connections"]:
+        for conn_data in structure.get("connections", []):
             
             #get source block and port
             source_block = id_to_block[conn_data["source"]["block"]]
@@ -420,26 +426,26 @@ class Simulation:
         
         #deserialize events
         events = []
-        for event_data in data.get("events", []):
+        for event_data in structure.get("events", []):
             events.append(Event.from_dict(event_data))
         
         #get simulation parameters
-        sim_kwargs = data.get("simulation", {})
+        params = data.get("params", {})
 
         #get solver class
-        solver_name = sim_kwargs.get("Solver", "SSPRK22")
-        sim_kwargs["Solver"] = getattr(solvers, solver_name)
+        solver_name = params.get("Solver", "SSPRK22")
+        params["Solver"] = getattr(solvers, solver_name)
 
-        #replace with kwargs
-        for arg, val in kwargs.items():
-            sim_kwargs[arg] = val
+        #update with additional kwargs
+        for name, val in kwargs.items():
+            params[name] = val
 
         #create simulation
         return cls(
             blocks=blocks,
             connections=connections,
             events=events,
-            **sim_kwargs
+            **params
             )
 
 

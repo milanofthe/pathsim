@@ -22,8 +22,6 @@ from pathsim.blocks import (
 from pathsim.solvers import RKCK54, SSPRK33
 
 
-
-
 # MATHEMATICAL PENDULUM =================================================================
 
 #simulation timestep
