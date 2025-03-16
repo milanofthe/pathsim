@@ -42,11 +42,13 @@ class ButterworthLowpassFilter(StateSpace):
         self.Fc = Fc
         self.n = n
 
-        #use scipy.signal for filter design
-        num, den = butter(n, 2*np.pi*Fc, btype="low", analog=True, output="ba")
+        #use scipy.signal for filter design for unit frequency
+        num, den = butter(n, 1.0, btype="low", analog=True, output="ba")
+        A, B, C, D = tf2ss(num, den)
 
-        #initialize parent block
-        super().__init__(*tf2ss(num, den))
+        #rescale to actual bandwidth and make statespace model
+        omega_c = 2*np.pi*self.Fc
+        super().__init__(omega_c*A, omega_c*B, C, D)
 
 
 class ButterworthHighpassFilter(StateSpace):
@@ -71,11 +73,13 @@ class ButterworthHighpassFilter(StateSpace):
         self.Fc = Fc
         self.n = n
 
-        #use scipy.signal for filter design
-        num, den = butter(n, 2*np.pi*Fc, btype="high", analog=True, output="ba")
+        #use scipy.signal for filter design for unit frequency
+        num, den = butter(n, 1.0, btype="high", analog=True, output="ba")
+        A, B, C, D = tf2ss(num, den)
 
-        #initialize parent block
-        super().__init__(*tf2ss(num, den))
+        #rescale to actual bandwidth and make statespace model
+        omega_c = 2*np.pi*self.Fc
+        super().__init__(omega_c*A, omega_c*B, C, D)
 
 
 class ButterworthBandpassFilter(StateSpace):

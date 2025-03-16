@@ -33,7 +33,7 @@ Quickstart
     pip install pathsim
 
 
-2. **Build** a dynamical system unsing blocks and connections. Here we just integrate a cosine:
+2. **Build** a dynamical system using blocks and connections. Here we just integrate a cosine:
 
 
 .. image:: figures/sin_cos_blockdiagram.png

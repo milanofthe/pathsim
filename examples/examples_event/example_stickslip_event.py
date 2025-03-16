@@ -37,7 +37,7 @@ k = 70.0    # spring constant
 d = 10.0    # spring damping
 mu = 1.5    # friction coefficient
 g = 9.81    # gravity
-v = 3.0     # belt velocity magnitude
+v = 2.0     # belt velocity magnitude
 T = 50.0    # excitation period
 
 F_c = mu * m * g # friction force 
@@ -46,6 +46,7 @@ F_c = mu * m * g # friction force
 def v_belt(t):
     return v * np.sin(2*np.pi*t/T)
     # return v * t / T
+    # return v * (1 - np.exp(-t/T))
 
 #function for coulomb friction force
 def f_coulomb(v, vb):
@@ -111,7 +112,7 @@ def slip_to_stick_evt(t):
 def slip_to_stick_act(t):
 
     #change switch state
-    Sw.state = 1
+    Sw.select(1)
 
     I1.off()
     Fc.off()
@@ -133,7 +134,7 @@ def stick_to_slip_evt(t):
 def stick_to_slip_act(t):
 
     #change switch state
-    Sw.state = 0
+    Sw.select(0)
 
     I1.on()
     Fc.on()
@@ -178,6 +179,13 @@ Sim.run(2*T)
 
 #plot the results directly from the two scopes
 Sc1.plot("-", lw=2)
+
+for t in E_slip_to_stick:
+    Sc1.ax.axvline( t , ls="--", c="k")
+
+for t in E_stick_to_slip:
+    Sc1.ax.axvline( t , ls=":", c="k")
+
 Sc2.plot("-", lw=2)
 
 plt.show()

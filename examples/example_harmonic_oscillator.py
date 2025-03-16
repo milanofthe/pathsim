@@ -60,6 +60,6 @@ Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 Sim.run(duration=25)
 
 # Plot the results directly from the scope
-Sc.plot()
+Sc.plot(lw=2)
 
 plt.show()

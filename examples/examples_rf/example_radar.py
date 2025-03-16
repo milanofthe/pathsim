@@ -82,10 +82,10 @@ Sim = Simulation(blocks, connections, dt=dt, log=True)
 Sim.run(T)
 
 #plot the recording of the scope
-Sco.plot()
+Sco.plot(lw=2)
 
 #plot the spectrum
-Spc.plot()
+Spc.plot(lw=2)
 Spc.ax.set_xscale("log")
 Spc.ax.set_yscale("log")
 
