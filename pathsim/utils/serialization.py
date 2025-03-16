@@ -222,16 +222,18 @@ class Serializable:
         return json.dumps(self.to_dict(), indent=2, sort_keys=False)
 
 
-    def save(self, path=""):
+    def save(self, path="", **metadata):
         """Save the dictionary representation of object to an external file
         
         Parameters
         ----------
         path : str
             filepath to save data to
+        metadata : dict
+            metadata for the object
         """
         with open(path, "w", encoding="utf-8") as file:
-            json.dump(self.to_dict(), file, indent=2, ensure_ascii=False)
+            json.dump(self.to_dict(**metadata), file, indent=2, ensure_ascii=False)
 
 
     @classmethod
@@ -255,8 +257,13 @@ class Serializable:
         return None
         
 
-    def to_dict(self):
+    def to_dict(self, **metadata):
         """Convert object to dictionary representation
+
+        Parameters
+        ----------
+        metadata : dict
+            metadata for the object
         
         Returns
         -------
@@ -264,17 +271,12 @@ class Serializable:
             representation of object
         """
         
-        data = {
-            "id"     : id(self),
-            "type"   : self.__class__.__name__,
-            "params" : {}
-        }
-        
         #get parameter names from __init__ signature
         signature = inspect.signature(self.__init__)
         param_names = [p for p in signature.parameters if p != "self"]
-        
+
         #get current values of parameters
+        params = {}        
         for name in param_names:
             
             if hasattr(self, name):
@@ -283,12 +285,17 @@ class Serializable:
 
                 #handle callable parameters
                 if callable(value):
-                    data["params"][name] = serialize_callable(value)
+                    params[name] = serialize_callable(value)
 
                 else:
-                    data["params"][name] = serialize_object(value)
+                    params[name] = serialize_object(value)
             
-        return data
+        return {
+            "id"       : id(self),
+            "type"     : self.__class__.__name__,
+            "metadata" : metadata,
+            "params"   : params
+        }
     
 
     @classmethod

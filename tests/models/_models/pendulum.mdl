@@ -1,118 +1,121 @@
 {
+  "type": "Simulation",
   "metadata": {
     "duration": 25,
-    "timestamp": "2025-03-15T11:33:29.359633"
+    "timestamp": "2025-03-15T16:38:51.045395"
   },
-  "blocks": [
-    {
-      "id": 2177642870640,
-      "type": "Integrator",
-      "params": {
-        "initial_value": 0
-      }
-    },
-    {
-      "id": 2177643195728,
-      "type": "Integrator",
-      "params": {
-        "initial_value": 2.827433388230814
-      }
-    },
-    {
-      "id": 2177642870976,
-      "type": "Amplifier",
-      "params": {
-        "gain": -9.81
-      }
-    },
-    {
-      "id": 2177642871312,
-      "type": "Function",
-      "params": {
-        "func": {
-          "type": "dill",
-          "data": "gASVKQAAAAAAAACMHW51bXB5Ll9jb3JlLl9tdWx0aWFycmF5X3VtYXRolIwDc2lulJOULg==",
-          "name": "sin"
+  "structure": {
+    "blocks": [
+      {
+        "id": 2069344827584,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 0
+        }
+      },
+      {
+        "id": 2069345087440,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 2.827433388230814
+        }
+      },
+      {
+        "id": 2069344827920,
+        "type": "Amplifier",
+        "params": {
+          "gain": -9.81
+        }
+      },
+      {
+        "id": 2069344828256,
+        "type": "Function",
+        "params": {
+          "func": {
+            "type": "dill",
+            "data": "gASVKQAAAAAAAACMHW51bXB5Ll9jb3JlLl9tdWx0aWFycmF5X3VtYXRolIwDc2lulJOULg==",
+            "name": "sin"
+          }
+        }
+      },
+      {
+        "id": 2069344828592,
+        "type": "Scope",
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": [
+            "angular velocity",
+            "angle"
+          ]
         }
       }
-    },
-    {
-      "id": 2177642871648,
-      "type": "Scope",
-      "params": {
-        "sampling_rate": null,
-        "t_wait": 0.0,
-        "labels": [
-          "angular velocity",
-          "angle"
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 2069344828928,
+        "source": {
+          "block": 2069344827584,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2069345087440,
+            "port": 0
+          },
+          {
+            "block": 2069344828592,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2069345088080,
+        "source": {
+          "block": 2069345087440,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2069344828256,
+            "port": 0
+          },
+          {
+            "block": 2069344828592,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2069345088400,
+        "source": {
+          "block": 2069344828256,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2069344827920,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2069345747328,
+        "source": {
+          "block": 2069344827920,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2069344827584,
+            "port": 0
+          }
         ]
       }
-    }
-  ],
-  "events": [],
-  "connections": [
-    {
-      "id": 2177642871984,
-      "source": {
-        "block": 2177642870640,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2177643195728,
-          "port": 0
-        },
-        {
-          "block": 2177642871648,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 2177643196368,
-      "source": {
-        "block": 2177643195728,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2177642871312,
-          "port": 0
-        },
-        {
-          "block": 2177642871648,
-          "port": 1
-        }
-      ]
-    },
-    {
-      "id": 2177643196688,
-      "source": {
-        "block": 2177642871312,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2177642870976,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 2177643823184,
-      "source": {
-        "block": 2177642870976,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2177642870640,
-          "port": 0
-        }
-      ]
-    }
-  ],
-  "simulation": {
+    ]
+  },
+  "params": {
     "dt": 0.1,
     "dt_min": 1e-16,
     "dt_max": null,

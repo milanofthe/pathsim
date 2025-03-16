@@ -1,217 +1,220 @@
 {
+  "type": "Simulation",
   "metadata": {
     "duration": 50,
-    "timestamp": "2025-03-15T11:29:11.589748"
+    "timestamp": "2025-03-15T16:40:04.659159"
   },
-  "blocks": [
-    {
-      "id": 1168280466976,
-      "type": "Integrator",
-      "params": {
-        "initial_value": 0.0
-      }
-    },
-    {
-      "id": 1168280792400,
-      "type": "Integrator",
-      "params": {
-        "initial_value": 0.0
-      }
-    },
-    {
-      "id": 1168280467312,
-      "type": "Amplifier",
-      "params": {
-        "gain": 0.5
-      }
-    },
-    {
-      "id": 1168280793040,
-      "type": "Amplifier",
-      "params": {
-        "gain": 1.0
-      }
-    },
-    {
-      "id": 1168280793360,
-      "type": "Amplifier",
-      "params": {
-        "gain": -1.0
-      }
-    },
-    {
-      "id": 1168280468320,
-      "type": "Adder",
-      "params": {}
-    },
-    {
-      "id": 1168280467648,
-      "type": "Function",
-      "params": {
-        "func": {
-          "type": "dill",
-          "data": "gASVOwEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLA0sDQxqVAFsAAAAAAAAAAABVAFMBLQgAAC0FAAAkAJROSwOGlIwBZJSFlIwBeJSFlIxRQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9kdWZmaW5nLnB5lIwIPGxhbWJkYT6UaA1LMUMMgACcAZghmFGZJJoGlGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gNTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgRaAhHP/ZmZmZmZmZzMC4=",
-          "name": "<lambda>"
+  "structure": {
+    "blocks": [
+      {
+        "id": 3161064945520,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 0.0
+        }
+      },
+      {
+        "id": 3161065205712,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 0.0
+        }
+      },
+      {
+        "id": 3161064945856,
+        "type": "Amplifier",
+        "params": {
+          "gain": 0.5
+        }
+      },
+      {
+        "id": 3161065206352,
+        "type": "Amplifier",
+        "params": {
+          "gain": 1.0
+        }
+      },
+      {
+        "id": 3161065206672,
+        "type": "Amplifier",
+        "params": {
+          "gain": -1.0
+        }
+      },
+      {
+        "id": 3161064946864,
+        "type": "Adder",
+        "params": {}
+      },
+      {
+        "id": 3161064946192,
+        "type": "Function",
+        "params": {
+          "func": {
+            "type": "dill",
+            "data": "gASVOwEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLA0sDQxqVAFsAAAAAAAAAAABVAFMBLQgAAC0FAAAkAJROSwOGlIwBZJSFlIwBeJSFlIxRQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9kdWZmaW5nLnB5lIwIPGxhbWJkYT6UaA1LMUMMgACcAZghmFGZJJoGlGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gNTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgRaAhHP/ZmZmZmZmZzMC4=",
+            "name": "<lambda>"
+          }
+        }
+      },
+      {
+        "id": 3161064946528,
+        "type": "Source",
+        "params": {
+          "func": {
+            "type": "dill",
+            "data": "gASVvgEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQ0qVAFsAAAAAAAAAAABbAgAAAAAAAAAAUgQAAAAAAAAAAAAAAAAAAAAAAAAiAFsGAAAAAAAAAABVAC0FAAA1AQAAAAAAAC0FAAAkAJROhZQojAFhlIwCbnCUjANzaW6UjAVvbWVnYZR0lIwBdJSFlIxRQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9kdWZmaW5nLnB5lIwIPGxhbWJkYT6UaBBLMkMVgACUYZwCnwaaBpx1oFGZd5sP0hYnlGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gQTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgUKGgIR0AuAAAAAAAAjAVvbWVnYZRHQAAAAAAAAACMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlHUwLg==",
+            "name": "<lambda>"
+          }
+        }
+      },
+      {
+        "id": 3161064947200,
+        "type": "Scope",
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": [
+            "velocity",
+            "position"
+          ]
         }
       }
-    },
-    {
-      "id": 1168280467984,
-      "type": "Source",
-      "params": {
-        "func": {
-          "type": "dill",
-          "data": "gASVvgEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQ0qVAFsAAAAAAAAAAABbAgAAAAAAAAAAUgQAAAAAAAAAAAAAAAAAAAAAAAAiAFsGAAAAAAAAAABVAC0FAAA1AQAAAAAAAC0FAAAkAJROhZQojAFhlIwCbnCUjANzaW6UjAVvbWVnYZR0lIwBdJSFlIxRQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9kdWZmaW5nLnB5lIwIPGxhbWJkYT6UaBBLMkMVgACUYZwCnwaaBpx1oFGZd5sP0hYnlGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gQTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgUKIwCbnCUaACMDl9pbXBvcnRfbW9kdWxllJOUjAVudW1weZSFlFKUaAhHQC4AAAAAAACMBW9tZWdhlEdAAAAAAAAAAHUwLg==",
-          "name": "<lambda>"
-        }
-      }
-    },
-    {
-      "id": 1168280468656,
-      "type": "Scope",
-      "params": {
-        "sampling_rate": null,
-        "t_wait": 0.0,
-        "labels": [
-          "velocity",
-          "position"
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 3161065914448,
+        "source": {
+          "block": 3161064945520,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161065205712,
+            "port": 0
+          },
+          {
+            "block": 3161064945856,
+            "port": 0
+          },
+          {
+            "block": 3161064947200,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 3161065206992,
+        "source": {
+          "block": 3161065205712,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161064946192,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 3161065207312,
+        "source": {
+          "block": 3161064946192,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161064946864,
+            "port": 2
+          }
+        ]
+      },
+      {
+        "id": 3161065865600,
+        "source": {
+          "block": 3161064946528,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161064946864,
+            "port": 3
+          }
+        ]
+      },
+      {
+        "id": 3161065866512,
+        "source": {
+          "block": 3161065205712,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161065206352,
+            "port": 0
+          },
+          {
+            "block": 3161064947200,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 3161065931984,
+        "source": {
+          "block": 3161064945856,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161064946864,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 3161065317760,
+        "source": {
+          "block": 3161065206352,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161064946864,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 3161065318032,
+        "source": {
+          "block": 3161064946864,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161065206672,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 3161039591248,
+        "source": {
+          "block": 3161065206672,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 3161064945520,
+            "port": 0
+          }
         ]
       }
-    }
-  ],
-  "events": [],
-  "connections": [
-    {
-      "id": 1168280468992,
-      "source": {
-        "block": 1168280466976,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280792400,
-          "port": 0
-        },
-        {
-          "block": 1168280467312,
-          "port": 0
-        },
-        {
-          "block": 1168280468656,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 1168280793680,
-      "source": {
-        "block": 1168280792400,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280467648,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 1168280794000,
-      "source": {
-        "block": 1168280467648,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280468320,
-          "port": 2
-        }
-      ]
-    },
-    {
-      "id": 1168281419856,
-      "source": {
-        "block": 1168280467984,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280468320,
-          "port": 3
-        }
-      ]
-    },
-    {
-      "id": 1168281420464,
-      "source": {
-        "block": 1168280792400,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280793040,
-          "port": 0
-        },
-        {
-          "block": 1168280468656,
-          "port": 1
-        }
-      ]
-    },
-    {
-      "id": 1168281469872,
-      "source": {
-        "block": 1168280467312,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280468320,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 1168280839552,
-      "source": {
-        "block": 1168280793040,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280468320,
-          "port": 1
-        }
-      ]
-    },
-    {
-      "id": 1168280839824,
-      "source": {
-        "block": 1168280468320,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280793360,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 1168255113040,
-      "source": {
-        "block": 1168280793360,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 1168280466976,
-          "port": 0
-        }
-      ]
-    }
-  ],
-  "simulation": {
+    ]
+  },
+  "params": {
     "dt": 0.05,
     "dt_min": 1e-16,
     "dt_max": null,

@@ -18,6 +18,8 @@ import json
 import datetime
 import logging
 
+from ._version import __version__
+
 from ._constants import (
     SIM_TIMESTEP,
     SIM_TIMESTEP_MIN,
@@ -304,6 +306,9 @@ class Simulation:
         metadata : dict
             metadata for the simulation model
         """
+
+        #add current pathsim version
+        metadata["version"] = __version__
 
         #add current timestamp
         metadata["timestamp"] = datetime.datetime.now().isoformat()

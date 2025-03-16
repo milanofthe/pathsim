@@ -1,156 +1,159 @@
 {
+  "type": "Simulation",
   "metadata": {
     "duration": 25,
-    "timestamp": "2025-03-15T11:34:14.563130"
+    "timestamp": "2025-03-15T16:39:14.022009"
   },
-  "blocks": [
-    {
-      "id": 2197548578336,
-      "type": "Integrator",
-      "params": {
-        "initial_value": 5
+  "structure": {
+    "blocks": [
+      {
+        "id": 2822757627760,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 5
+        }
+      },
+      {
+        "id": 2822757806352,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 2
+        }
+      },
+      {
+        "id": 2822757628096,
+        "type": "Amplifier",
+        "params": {
+          "gain": 0.2
+        }
+      },
+      {
+        "id": 2822757806992,
+        "type": "Amplifier",
+        "params": {
+          "gain": 1.5
+        }
+      },
+      {
+        "id": 2822757807312,
+        "type": "Amplifier",
+        "params": {
+          "gain": -1.25
+        }
+      },
+      {
+        "id": 2822757628432,
+        "type": "Adder",
+        "params": {}
+      },
+      {
+        "id": 2822757628768,
+        "type": "Scope",
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": [
+            "velocity",
+            "position"
+          ]
+        }
       }
-    },
-    {
-      "id": 2197548854928,
-      "type": "Integrator",
-      "params": {
-        "initial_value": 2
-      }
-    },
-    {
-      "id": 2197548578672,
-      "type": "Amplifier",
-      "params": {
-        "gain": 0.2
-      }
-    },
-    {
-      "id": 2197548855568,
-      "type": "Amplifier",
-      "params": {
-        "gain": 1.5
-      }
-    },
-    {
-      "id": 2197548855888,
-      "type": "Amplifier",
-      "params": {
-        "gain": -1.25
-      }
-    },
-    {
-      "id": 2197548579008,
-      "type": "Adder",
-      "params": {}
-    },
-    {
-      "id": 2197548579344,
-      "type": "Scope",
-      "params": {
-        "sampling_rate": null,
-        "t_wait": 0.0,
-        "labels": [
-          "velocity",
-          "position"
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 2822757629104,
+        "source": {
+          "block": 2822757627760,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2822757806352,
+            "port": 0
+          },
+          {
+            "block": 2822757628096,
+            "port": 0
+          },
+          {
+            "block": 2822757628768,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2822757807632,
+        "source": {
+          "block": 2822757806352,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2822757806992,
+            "port": 0
+          },
+          {
+            "block": 2822757628768,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2822757807952,
+        "source": {
+          "block": 2822757628096,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2822757628432,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2822758547840,
+        "source": {
+          "block": 2822757806992,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2822757628432,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2822758548752,
+        "source": {
+          "block": 2822757628432,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2822757807312,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2822758597552,
+        "source": {
+          "block": 2822757807312,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2822757627760,
+            "port": 0
+          }
         ]
       }
-    }
-  ],
-  "events": [],
-  "connections": [
-    {
-      "id": 2197548579680,
-      "source": {
-        "block": 2197548578336,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2197548854928,
-          "port": 0
-        },
-        {
-          "block": 2197548578672,
-          "port": 0
-        },
-        {
-          "block": 2197548579344,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 2197548856208,
-      "source": {
-        "block": 2197548854928,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2197548855568,
-          "port": 0
-        },
-        {
-          "block": 2197548579344,
-          "port": 1
-        }
-      ]
-    },
-    {
-      "id": 2197548856528,
-      "source": {
-        "block": 2197548578672,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2197548579008,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 2197549531216,
-      "source": {
-        "block": 2197548855568,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2197548579008,
-          "port": 1
-        }
-      ]
-    },
-    {
-      "id": 2197549531824,
-      "source": {
-        "block": 2197548579008,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2197548855888,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 2197549564560,
-      "source": {
-        "block": 2197548855888,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2197548578336,
-          "port": 0
-        }
-      ]
-    }
-  ],
-  "simulation": {
+    ]
+  },
+  "params": {
     "dt": 0.1,
     "dt_min": 1e-16,
     "dt_max": null,

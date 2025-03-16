@@ -97,6 +97,8 @@ Sim = Simulation(
     tolerance_fpi=1e-8
     )
 
+Sim.save("test.mdl")
+
 #run simulation for some number of seconds
 Sim.run(2*mu)
 

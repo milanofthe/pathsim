@@ -1,0 +1,345 @@
+{
+  "type": "Simulation",
+  "metadata": {
+    "version": "0.6.0",
+    "timestamp": "2025-03-16T09:55:51.697857"
+  },
+  "structure": {
+    "blocks": [
+      {
+        "id": 1467477719504,
+        "type": "Subsystem",
+        "params": {
+          "blocks": [
+            {
+              "id": 1467478426352,
+              "type": "Integrator",
+              "params": {
+                "initial_value": 2
+              },
+              "metadata": {}
+            },
+            {
+              "id": 1467477719184,
+              "type": "Integrator",
+              "params": {
+                "initial_value": 0
+              },
+              "metadata": {}
+            },
+            {
+              "id": 1467478426016,
+              "type": "Subsystem",
+              "params": {
+                "blocks": [
+                  {
+                    "id": 1467477407936,
+                    "type": "Multiplier",
+                    "params": {},
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477408272,
+                    "type": "Constant",
+                    "params": {
+                      "value": 1
+                    },
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477408608,
+                    "type": "Amplifier",
+                    "params": {
+                      "gain": 1000
+                    },
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477716944,
+                    "type": "Amplifier",
+                    "params": {
+                      "gain": -1
+                    },
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477717584,
+                    "type": "Amplifier",
+                    "params": {
+                      "gain": -1
+                    },
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477408944,
+                    "type": "Adder",
+                    "params": {},
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477717904,
+                    "type": "Adder",
+                    "params": {},
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477409280,
+                    "type": "Function",
+                    "params": {
+                      "func": {
+                        "type": "dill",
+                        "data": "gASVHwEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLAksDQwyVAFUAUwEtCAAAJACUTksChpQpjAF4lIWUjFtDOlxVc2Vyc1xtaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlX25lc3RlZF9zdWJzeXN0ZW1zLnB5lIwIPGxhbWJkYT6UaAtLKEMIgACYAZgxmgSUaAUpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaAtOTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiLg==",
+                        "name": "<lambda>"
+                      }
+                    },
+                    "metadata": {}
+                  },
+                  {
+                    "id": 1467477407600,
+                    "type": "Interface",
+                    "params": {},
+                    "metadata": {}
+                  }
+                ],
+                "connections": [
+                  {
+                    "id": 1467478425680,
+                    "source": {
+                      "block": 1467477407600,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477716944,
+                        "port": 0
+                      },
+                      {
+                        "block": 1467477409280,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467477718224,
+                    "source": {
+                      "block": 1467477407600,
+                      "port": 1
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477407936,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467477718544,
+                    "source": {
+                      "block": 1467477409280,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477717584,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467478327680,
+                    "source": {
+                      "block": 1467477717584,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477717904,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467478328592,
+                    "source": {
+                      "block": 1467477408272,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477717904,
+                        "port": 1
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467478410160,
+                    "source": {
+                      "block": 1467477717904,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477407936,
+                        "port": 1
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467477779840,
+                    "source": {
+                      "block": 1467477407936,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477408608,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467477780112,
+                    "source": {
+                      "block": 1467477408608,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477408944,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467452053328,
+                    "source": {
+                      "block": 1467477716944,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477408944,
+                        "port": 1
+                      }
+                    ]
+                  },
+                  {
+                    "id": 1467477911376,
+                    "source": {
+                      "block": 1467477408944,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 1467477407600,
+                        "port": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "id": 1467477718864,
+              "type": "Interface",
+              "params": {},
+              "metadata": {}
+            }
+          ],
+          "connections": [
+            {
+              "id": 1467477818688,
+              "source": {
+                "block": 1467477719184,
+                "port": 0
+              },
+              "targets": [
+                {
+                  "block": 1467478426352,
+                  "port": 0
+                },
+                {
+                  "block": 1467478426016,
+                  "port": 1
+                },
+                {
+                  "block": 1467477718864,
+                  "port": 1
+                }
+              ]
+            },
+            {
+              "id": 1467477818928,
+              "source": {
+                "block": 1467478426352,
+                "port": 0
+              },
+              "targets": [
+                {
+                  "block": 1467478426016,
+                  "port": 0
+                },
+                {
+                  "block": 1467477718864,
+                  "port": 0
+                }
+              ]
+            },
+            {
+              "id": 1467478360816,
+              "source": {
+                "block": 1467478426016,
+                "port": 0
+              },
+              "targets": [
+                {
+                  "block": 1467477719184,
+                  "port": 0
+                }
+              ]
+            }
+          ]
+        },
+        "metadata": {}
+      },
+      {
+        "id": 1467478426688,
+        "type": "Scope",
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": []
+        },
+        "metadata": {}
+      }
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 1467478361488,
+        "source": {
+          "block": 1467477719504,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 1467478426688,
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  "params": {
+    "dt": 0.01,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "GEAR52A",
+    "tolerance_fpi": 1e-08,
+    "iterations_min": 1,
+    "iterations_max": 200,
+    "tolerance_lte_abs": 1e-06,
+    "tolerance_lte_rel": 0.001
+  }
+}

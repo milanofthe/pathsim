@@ -1,116 +1,119 @@
 {
+  "type": "Simulation",
   "metadata": {
     "duration": 12,
-    "timestamp": "2025-03-15T11:32:05.307435"
+    "timestamp": "2025-03-15T16:39:49.407455"
   },
-  "blocks": [
-    {
-      "id": 2025715152416,
-      "type": "Source",
-      "params": {
-        "func": {
-          "type": "dill",
-          "data": "gASVaQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQyaVAFsBAAAAAAAAAABVAFsCAAAAAAAAAAA6hAAANQEAAAAAAAAkAJROhZSMA2ludJSMA3RhdZSGlIwBdJSFlIxSQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9mZWVkYmFjay5weZSMCDxsYW1iZGE+lGgOSx9DDIAAnAOYQZxjmUWcCpRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEiiMA2ludJRoAIwKX2xvYWRfdHlwZZSTlGgIhZRSlIwDdGF1lEsDdTAu",
-          "name": "<lambda>"
+  "structure": {
+    "blocks": [
+      {
+        "id": 2970125154160,
+        "type": "Source",
+        "params": {
+          "func": {
+            "type": "dill",
+            "data": "gASVaQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQyaVAFsBAAAAAAAAAABVAFsCAAAAAAAAAAA6hAAANQEAAAAAAAAkAJROhZSMA2ludJSMA3RhdZSGlIwBdJSFlIxSQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9mZWVkYmFjay5weZSMCDxsYW1iZGE+lGgOSx9DDIAAnAOYQZxjmUWcCpRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEiiMA3RhdZRLA4wDaW50lGgAjApfbG9hZF90eXBllJOUaAiFlFKUdTAu",
+            "name": "<lambda>"
+          }
+        }
+      },
+      {
+        "id": 2970125154496,
+        "type": "Integrator",
+        "params": {
+          "initial_value": 2
+        }
+      },
+      {
+        "id": 2970125154832,
+        "type": "Amplifier",
+        "params": {
+          "gain": -1
+        }
+      },
+      {
+        "id": 2970125155168,
+        "type": "Adder",
+        "params": {}
+      },
+      {
+        "id": 2970125155504,
+        "type": "Scope",
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": [
+            "step",
+            "response"
+          ]
         }
       }
-    },
-    {
-      "id": 2025715152752,
-      "type": "Integrator",
-      "params": {
-        "initial_value": 2
-      }
-    },
-    {
-      "id": 2025715153088,
-      "type": "Amplifier",
-      "params": {
-        "gain": -1
-      }
-    },
-    {
-      "id": 2025715153424,
-      "type": "Adder",
-      "params": {}
-    },
-    {
-      "id": 2025715153760,
-      "type": "Scope",
-      "params": {
-        "sampling_rate": null,
-        "t_wait": 0.0,
-        "labels": [
-          "step",
-          "response"
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 2970125155840,
+        "source": {
+          "block": 2970125154160,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2970125155168,
+            "port": 0
+          },
+          {
+            "block": 2970125155504,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2970125414352,
+        "source": {
+          "block": 2970125154832,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2970125155168,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2970125414992,
+        "source": {
+          "block": 2970125155168,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2970125154496,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2970126074240,
+        "source": {
+          "block": 2970125154496,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2970125154832,
+            "port": 0
+          },
+          {
+            "block": 2970125155504,
+            "port": 1
+          }
         ]
       }
-    }
-  ],
-  "events": [],
-  "connections": [
-    {
-      "id": 2025715154096,
-      "source": {
-        "block": 2025715152416,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2025715153424,
-          "port": 0
-        },
-        {
-          "block": 2025715153760,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 2025715477840,
-      "source": {
-        "block": 2025715153088,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2025715153424,
-          "port": 1
-        }
-      ]
-    },
-    {
-      "id": 2025715478480,
-      "source": {
-        "block": 2025715153424,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2025715152752,
-          "port": 0
-        }
-      ]
-    },
-    {
-      "id": 2025716105296,
-      "source": {
-        "block": 2025715152752,
-        "port": 0
-      },
-      "targets": [
-        {
-          "block": 2025715153088,
-          "port": 0
-        },
-        {
-          "block": 2025715153760,
-          "port": 1
-        }
-      ]
-    }
-  ],
-  "simulation": {
+    ]
+  },
+  "params": {
     "dt": 0.01,
     "dt_min": 1e-16,
     "dt_max": null,
