@@ -11,7 +11,8 @@
 
 import numpy as np
 import functools
-import threading
+
+from collections import defaultdict
 
 
 # HELPER FUNCTIONS ======================================================================
@@ -126,9 +127,14 @@ def add_funcs(cls):
     def create_method(fnc, grd):
         @functools.wraps(fnc)
         def method(self, *args, **kwargs):
-            val = fnc(self.val, *args, **kwargs)
             grad_val = grd(self.val, *args, **kwargs)
-            return cls(val=val, grad={k: grad_val * v for k, v in self.grad.items()})
+            return cls(
+                val=fnc(self.val, *args, **kwargs), 
+                grad=defaultdict(
+                    float, 
+                    {k: grad_val * v for k, v in self.grad.items()}
+                )
+            )
         return method
 
     # Add methods to class
@@ -156,7 +162,7 @@ class Value:
     ----------
     val  : float, int, complex
         The numerical value.
-    grad : dict, None
+    grad : defaultdict, None
         The gradient dictionary. If None, initializes with self derivative.
 
     Attributes
@@ -169,10 +175,6 @@ class Value:
     #restrict attributes, makes access faster
     __slots__ = ["val", "grad", "_id"] 
 
-    #keep id counter thread safe
-    _id_lock = threading.Lock()
-    _id_counter = 0
-
 
     def __init__(self, val=0.0, grad=None):
 
@@ -184,13 +186,11 @@ class Value:
 
         #initialize fresh gradients
         if grad is None:
-            with Value._id_lock:
-                self._id = Value._id_counter
-                Value._id_counter += 1
-            self.grad = {self._id:1.0} 
+            self._id = id(self)
+            self.grad = defaultdict(float, {self._id: 1.0})
         else:
-            self.grad = grad
             self._id = None
+            self.grad = grad
 
 
     # dynamic properties ------------------------------------------------------------------------
@@ -199,7 +199,7 @@ class Value:
     def real(self):
         return Value(
             val=np.real(self.val), 
-            grad={k: np.real(v) for k, v in self.grad.items()}
+            grad=defaultdict(float, {k: np.real(v) for k, v in self.grad.items()})
             ) 
 
 
@@ -207,7 +207,7 @@ class Value:
     def imag(self):
         return Value(
             val=np.imag(self.val), 
-            grad={k: np.imag(v) for k, v in self.grad.items()}
+            grad=defaultdict(float, {k: np.imag(v) for k, v in self.grad.items()})
             ) 
 
 
@@ -271,7 +271,7 @@ class Value:
         out : float
             The partial derivative value
         """
-        if isinstance(other, Value): return self.grad.get(other._id, 0.0)
+        if isinstance(other, Value): return self.grad[other._id]
         else: return 0.0
 
 
@@ -362,14 +362,14 @@ class Value:
     def __neg__(self):
         return Value(
             val=-self.val, 
-            grad={k: -v for k, v in self.grad.items()}
+            grad=defaultdict(float, {k: -v for k, v in self.grad.items()})
             )
 
 
     def __abs__(self):
         return Value(
             val=abs(self.val), 
-            grad={k: v * np.sign(self.val) for k, v in self.grad.items()}
+            grad=defaultdict(float, {k: v * np.sign(self.val) for k, v in self.grad.items()})
             )
 
 
@@ -377,10 +377,11 @@ class Value:
 
     def __add__(self, other):
         if isinstance(other, Value):
+            new_grad = defaultdict(float, self.grad)
+            for k, v in other.grad.items(): new_grad[k] += v
             return Value(
                 val=self.val + other.val, 
-                grad={k: self.grad.get(k, 0) + other.grad.get(k, 0) 
-                      for k in set(self.grad) | set(other.grad)}
+                grad=new_grad
                 )
         elif isinstance(other, np.ndarray):
             return np.array([self + x for x in other])
@@ -398,8 +399,7 @@ class Value:
     def __iadd__(self, other):
         if isinstance(other, Value):
             self.val += other.val
-            self.grad = {k: self.grad.get(k, 0) + other.grad.get(k, 0) 
-                         for k in set(self.grad) | set(other.grad)}
+            for k, v in other.grad.items(): self.grad[k] += v
             return self
         else:
             self.val += other
@@ -408,17 +408,19 @@ class Value:
 
     def __mul__(self, other):
         if isinstance(other, Value):
+            new_grad = defaultdict(float)
+            for k, v in self.grad.items(): new_grad[k] += v * other.val
+            for k, v in other.grad.items(): new_grad[k] += v * self.val
             return Value(
                 val=self.val * other.val, 
-                grad={k: self.grad.get(k, 0) * other.val + self.val * other.grad.get(k, 0) 
-                      for k in set(self.grad) | set(other.grad)}
+                grad=new_grad
                 )
         elif isinstance(other, np.ndarray):
             return np.array([self * x for x in other])
         else:
             return Value(
                 val=self.val * other, 
-                grad={k: v * other for k, v in self.grad.items()}
+                grad=defaultdict(float, {k: v * other for k, v in self.grad.items()})
                 )
 
 
@@ -429,8 +431,8 @@ class Value:
     def __imul__(self, other):
         if isinstance(other, Value):
             self.val *= other.val
-            self.grad = {k: self.grad.get(k, 0) * other.val + self.val * other.grad.get(k, 0) 
-                         for k in set(self.grad) | set(other.grad)}
+            for k, v in self.grad.items(): self.grad[k] *= other.val 
+            for k, v in other.grad.items(): self.grad[k] += v * self.val
             return self
         else:
             self.val *= other
@@ -439,10 +441,11 @@ class Value:
 
     def __sub__(self, other):
         if isinstance(other, Value):
+            new_grad = defaultdict(float, self.grad)
+            for k, v in other.grad.items(): new_grad[k] -= v
             return Value(
                 val=self.val - other.val, 
-                grad={k: self.grad.get(k, 0) - other.grad.get(k, 0) 
-                      for k in set(self.grad) | set(other.grad)}
+                grad=new_grad
                 )
         elif isinstance(other, np.ndarray):
             return np.array([self - x for x in other])
@@ -460,8 +463,7 @@ class Value:
     def __isub__(self, other):
         if isinstance(other, Value):
             self.val -= other.val
-            self.grad = {k: self.grad.get(k, 0) - other.grad.get(k, 0) 
-                         for k in set(self.grad) | set(other.grad)}
+            for k, v in other.grad.items(): self.grad[k] -= v
             return self
         else:
             self.val -= other
@@ -470,17 +472,21 @@ class Value:
 
     def __truediv__(self, other):
         if isinstance(other, Value):
+            new_grad = defaultdict(float)
+            if other.val != 0.0:
+                a, b = self.val/other.val**2, 1/other.val
+                for k, v in self.grad.items(): new_grad[k] += v*b
+                for k, v in other.grad.items(): new_grad[k] -= v*a
             return Value(
                 val=self.val / other.val, 
-                grad={k: (self.grad.get(k, 0) * other.val - self.val * other.grad.get(k, 0)) / (other.val ** 2) 
-                      if other.val != 0.0 else 0.0 for k in set(self.grad) | set(other.grad)}
+                grad=new_grad
                 )
         if isinstance(other, np.ndarray):
             return np.array([self / x for x in other])
         else:
             return Value(
                 val=self.val / other, 
-                grad={k: v / other for k, v in self.grad.items()}
+                grad=defaultdict(float, {k: v / other for k, v in self.grad.items()})
                 )
 
 
@@ -488,25 +494,31 @@ class Value:
         if isinstance(other, Value):
             return other / self
         else:
+            new_grad = defaultdict(float)
+            if self.val != 0.0:
+                a = -other / (self.val ** 2)
+                for k, v in self.grad.items(): new_grad[k] += v*a
             return Value(
                 val=other / self.val, 
-                grad={k: -other * v / (self.val ** 2) if self.val != 0.0 else 0.0
-                      for k, v in self.grad.items()}
+                grad=new_grad
                 )
 
 
     def __pow__(self, power):
         if isinstance(power, Value):
             new_val = self.val ** power.val
+            new_grad = defaultdict(float)
+            a, b = new_val * power.val / self.val, new_val * np.log(self.val)
+            for k, v in self.grad.items(): new_grad[k] += v*a
+            for k, v in power.grad.items(): new_grad[k] += v*b 
             return Value(
                 val=new_val, 
-                grad={k: new_val * (power.val * self.grad.get(k, 0) / self.val + np.log(self.val) * power.grad.get(k, 0))
-                      for k in set(self.grad) | set(power.grad)}
+                grad=new_grad
                 )
         else:
             return Value(
                 val=self.val ** power, 
-                grad={k: power * (self.val ** (power - 1)) * v for k, v in self.grad.items()}
+                grad=defaultdict(float, {k: power * (self.val ** (power - 1)) * v for k, v in self.grad.items()})
                 )
 
 
@@ -514,5 +526,5 @@ class Value:
         new_val = base ** self.val
         return Value(
             val=new_val, 
-            grad={k: new_val * np.log(base) * v for k, v in self.grad.items()}
+            grad=defaultdict(float, {k: new_val * np.log(base) * v for k, v in self.grad.items()})
             )
