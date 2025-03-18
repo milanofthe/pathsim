@@ -10,6 +10,7 @@ There is a more comprehensive collection of examples availabe in the `GitHub rep
 
    examples/linear_feedback
    examples/harmonic_oscillator
+   examples/pendulum
    examples/bouncing_ball
    examples/thermostat
    examples/fmcw_radar

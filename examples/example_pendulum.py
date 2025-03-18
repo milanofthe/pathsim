@@ -50,15 +50,37 @@ connections = [
     Connection(Amp, In1)
     ]
 
-# Create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54, tolerance_lte_rel=1e-6)
+#simulation instance from the blocks and connections
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=dt, 
+    log=True, 
+    Solver=RKCK54, 
+    tolerance_lte_rel=1e-6, 
+    tolerance_lte_abs=1e-8
+    )
 
-# Run the simulation for 25 seconds
-Sim.run(duration=25)
+#run the simulation for 15 seconds
+Sim.run(duration=15)
 
-# Plot the results directly from the scope
-# Sco.plot(".-")
-Sco.plot(lw=2)
+#plot the results directly from the scope
+Sco.plot(".-")
+
+
+
+#lets look at the timesteps
+
+#read the recordings from the scope
+time, *_ = Sco.read()
+
+fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
+
+ax.plot(time[:-1], np.diff(time), lw=2)
+
+ax.set_ylabel("dt [s]")
+ax.set_xlabel("time [s]")
+ax.grid(True)
 
 
 plt.show()
