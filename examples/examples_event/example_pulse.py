@@ -25,7 +25,7 @@ B, n = 5, 4
 
 #pulse parameters
 tau1 = 1.0
-tau2 = 1.04
+tau2 = 1.05
 
 #blocks that define the system
 Src = Source(lambda t: int(t-tau1>=0) - int(t-tau2>=0))

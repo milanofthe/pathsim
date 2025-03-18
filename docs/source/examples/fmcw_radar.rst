@@ -5,13 +5,21 @@ In this example we simulate a simple frequency modulated continuous wave (FMCW) 
 
 You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/examples_rf/example_radar.py>`_.
 
+Below we have a very simplistic image of a radar system, it consists of a signal generator, transmitter/reciever chain and directed antennas. The fundamental working principle of a FMCW radar is that if we multiply a chirp signal (linearly frequency modulated sinusoid) with a delayed version of itself, we get a signal that has at each time two frequency components (sum and diffrerence). The low frequency component then is directly proportional to the phase shift between the two signals and this the time delay. This can be used to reconstruct the target distance from the frequency domain spectrum. 
+
+.. image:: figures/fmcw.png
+   :width: 700
+   :align: center
+   :alt: radar system
+
+
+The figure below shows the block diagram of a very basic FMCW radar system consisting of a chirp source (sinusoid with a linearly time dependent frequency), a delay (to model the signal propagation), a multiplier (to model a mixer), a low pass filter and of course blocks for time series and frequency domain data recording.
+
 .. image:: figures/fmcw_blockdiagram.png
    :width: 700
    :align: center
    :alt: block diagram of simple fmcw radar system
 
-
-The figure above shows the block diagram of a very basic FMCW radar system consisting of a chirp source (sinusoid with a linearly time dependent frequency), a delay (to model the signal propagation), a multiplier (to model a mixer), a low pass filter and of course blocks for time series and frequency domain data recording.
 
 Lets start by importing the requred classes from `PathSim`:
 

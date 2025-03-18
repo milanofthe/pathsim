@@ -57,7 +57,8 @@ Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54, tolerance_
 Sim.run(duration=25)
 
 # Plot the results directly from the scope
-Sco.plot(".-")
+# Sco.plot(".-")
+Sco.plot(lw=2)
 
 
 plt.show()

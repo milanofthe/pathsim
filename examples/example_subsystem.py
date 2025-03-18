@@ -51,7 +51,7 @@ blocks = [VDP, Sco]
 #the connections between the blocks in the main system
 connections = [
     Connection(VDP, Sco),
-    Connection(VDP[1], Sco[1])
+    # Connection(VDP[1], Sco[1])
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
@@ -62,12 +62,12 @@ Sim = Simulation(
     log=True, 
     Solver=GEAR52A, 
     tolerance_lte_abs=1e-5, 
-    tolerance_lte_rel=1e-3,
+    tolerance_lte_rel=1e-2,
     tolerance_fpi=1e-9
     )
 
 #run simulation for some number of seconds
-Sim.run(2*mu)
+Sim.run(3*mu)
 
 Sco.plot(".-", lw=1.5)
 

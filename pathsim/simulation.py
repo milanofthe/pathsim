@@ -101,19 +101,19 @@ class Simulation:
     Parameters
     ----------
     blocks : list[Block] 
-        blocks that make up the system
+        blocks that define the system
     connections : list[Connection] 
         connections that connect the blocks
     events : list[Event]
-        list of event trackers (zero crossing detection)
+        list of event trackers (zero crossing detection, schedule, etc.)
     dt : float
         transient simulation timestep in time units
     dt_min : float
-        lower bound for timestep, default '0.0'
+        lower bound for transient simulation timestep, default '0.0'
     dt_max : float
-        upper bound for timestep, default 'None'
+        upper bound for transient simulation timestep, default 'None'
     Solver : Solver 
-        solver for numerical integration from pathsim.solvers
+        solver class for numerical integration from pathsim.solvers
     tolerance_fpi : float
         absolute tolerance for convergence of fixed-point iterations
     iterations_min : int
@@ -236,7 +236,7 @@ class Simulation:
         #initialize the logger
         self.logger = logging.Logger("PathSim_Simulation_Logger")
 
-        #check if logging is selected
+        #check if logging is enabled
         if self.log:    
 
             #if a filename for logging is specified
@@ -642,7 +642,7 @@ class Simulation:
         the block inputs and outputs.
         """
 
-        self._logger_info("RESET, time -> 0.0")
+        self._logger_info("RESET -> time=0.0")
 
         #reset simulation time
         self.time = 0.0
@@ -834,7 +834,7 @@ class Simulation:
         self._set_solver(SteadyState)    
 
         #log message begin of steady state solver
-        self._logger_info(f"STEADYSTATE start, reset={reset}")
+        self._logger_info(f"STEADYSTATE -> start, reset={reset}")
 
         #solve for steady state at current time
         with Timer(verbose=False) as T:
@@ -843,7 +843,8 @@ class Simulation:
         #catch non convergence
         if not success:
             self._logger_error(
-                "STEADYSTATE not converged, evals={}, iters={}, runtime={}".format(
+                "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
+                    success,
                     evals, 
                     iters, 
                     T.readout
@@ -856,7 +857,8 @@ class Simulation:
 
         #log message 
         self._logger_info(
-            "STEADYSTATE success, evals={}, iters={}, runtime={}".format(
+            "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
+                success,
                 evals, 
                 iters, 
                 T.readout
@@ -1256,8 +1258,8 @@ class Simulation:
         #select simulation stepping method
         adaptive = adaptive and self.engine.is_adaptive
 
-        #log message solver selection
-        self._logger_info(f"TRANSIENT duration={duration}")
+        #log message for transient analysis
+        self._logger_info(f"TRANSIENT -> duration={duration}")
 
         #simulation start and end time
         start_time, end_time = self.time, self.time + duration
