@@ -23,7 +23,7 @@ With some algebraic manipulations we can translate the system equation into a bl
    :alt: block diagram of thermostat system
 
 
-Lets start by importing the `Simulation` and `Connection` classes and the required blocks from the block library. In addition to this we also need to define events to detect the threshold crossings for the regulator.
+Lets start by importing the :class:`.Simulation` and :class:`.Connection` classes and the required blocks from the block library. In addition to this we also need to define events to detect the threshold crossings for the regulator.
 
 .. code-block:: python
 
@@ -60,7 +60,7 @@ Now we can construct the continuous dynamic part of the system (its just a linea
     blocks = [sco, integ, feedback, heater, ambient, add]
 
 
-Afterwards, the connections between the blocks can be defined. The first argument of the `Connection` class is the source block and its port. The following blocks are the target blocks and their target ports: 
+Afterwards, the connections between the blocks can be defined. The first argument of the :class:`.Connection` class is the source block and its port. The following blocks are the target blocks and their target ports: 
 
 .. code-block:: python
 
@@ -110,9 +110,9 @@ Next we need to implement the event managers for the threshold based switching b
     events = [E1, E2]
 
 
-Finally we can instantiate the `Simulation` with the blocks, connections, events and some additional parameters such as the timestep. 
+Finally we can instantiate the :class:`.Simulation` with the blocks, connections, events and some additional parameters such as the timestep. 
 
-To enable backtracking for the event manager, we need to use an adaptive timestep integrator. Here we go for `RKBS32` which is a 3rd order Runge-Kutta method and essentially the same as Matlabs `ode23`. 
+To enable backtracking for the event manager, we need to use an adaptive timestep integrator. Here we go for :class:`.RKBS32` which is a 3rd order Runge-Kutta method and essentially the same as Matlabs `ode23`. 
 
 .. code-block:: python
     
@@ -139,7 +139,7 @@ Then we can run the simulation for some duration and see what happens.
     Sim.run(30)
 
 
-Due to the object oriented and decentralized nature of `PathSim`, the `Scope` block holds the recorded time series data from the simulation internally. It can be plotted directly in an external matplotlib window using the `plot` method
+Due to the object oriented and decentralized nature of `PathSim`, the :class:`.Scope` block holds the recorded time series data from the simulation internally. It can be plotted directly in an external matplotlib window using the `plot` method
 
 .. code-block:: python
 

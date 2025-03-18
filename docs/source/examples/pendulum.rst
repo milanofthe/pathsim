@@ -55,7 +55,7 @@ We can directly translate the block diagram above to `PathSim` blocks and connec
    In1 = Integrator(omega0) 
    In2 = Integrator(phi0) 
    Amp = Amplifier(-g/l) 
-   Fnc = Function(np.sin) 
+   Fnc = Function(np.sin)  # <- function blocks just take callables
    Sco = Scope(labels=["angular velocity", "angle"])
 
    blocks = [In1, In2, Amp, Fnc, Sco]
@@ -69,7 +69,7 @@ We can directly translate the block diagram above to `PathSim` blocks and connec
        ]
 
 
-The simulation is initialized with the blocks and connections. In this case we dont use the default solver but an adaptive integrator `RKCK54` to ensure accuracy. Its an adaptive runge-kutta method from Cash and Karp, similar to Matlabs `ode45`, which is from Dormand and Prince and `RKDP54` in `PathSim`. The tolerances we set here, are also for the integrator. The adaptive method controls the timestep such that the local truncation error (lte) stays below the set tolerances.
+The simulation is initialized with the blocks and connections. In this case we dont use the default solver but an adaptive integrator :class:`.RKCK54` to ensure accuracy. Its an adaptive runge-kutta method from Cash and Karp, similar to Matlabs `ode45`, which is from Dormand and Prince and :class:`.RKDP54` in `PathSim`. The tolerances we set here, are also for the integrator. The adaptive method controls the timestep such that the local truncation error (lte) stays below the set tolerances.
 
 .. code-block:: python
 

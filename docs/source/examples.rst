@@ -1,9 +1,12 @@
+.. _ref-examples:
+
 Examples
 ========
 
-Here we show a range of full examples utilizing `PathSim` and how to implement them step by step starting from the system definition.
+Here we show a range of examples utilizing `PathSim` to simulate different dynamical systems and how to implement them step by step, starting from the system definition. For more fine grained explanations of the different analysis methods, settings, functionalities of `PathSim`, have a look at the :ref:`ref-tutorials`.
 
-There is a more comprehensive collection of examples availabe in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples>`_. 
+There is an even more comprehensive collection of example dynamical system simulations availabe in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples>`_. 
+
 
 .. toctree::
    :maxdepth: 3

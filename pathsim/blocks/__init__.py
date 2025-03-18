@@ -6,7 +6,7 @@ from .function import *
 from .spectrum import *
 from .sources import *
 from .switch import *
-from .adder import*
+from .adder import *
 from .scope import *
 from .delay import *
 from .lti import *

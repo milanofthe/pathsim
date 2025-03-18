@@ -76,7 +76,7 @@ And the stick state where the velocity is clamped and the position is just deter
    :alt: block diagram of stick slip system, stick state
 
 
-Now lets implement this hybrid dynamical system into `PathSim` starting with importing the `Simulation` and `Connection` classes and the required blocks from the block library:
+Now lets implement this hybrid dynamical system into `PathSim` starting with importing the :class:`.Simulation` and :class:`.Connection` classes and the required blocks from the block library:
 
 .. code-block:: python
        
@@ -95,7 +95,7 @@ Now lets implement this hybrid dynamical system into `PathSim` starting with imp
     from pathsim.solvers import RKBS32
 
 
-Next are the system parameters, including the function definitions for the `Source` and the `Function` blocks:
+Next are the system parameters, including the function definitions for the :class:`.Source` and the :class:`.Function` blocks:
 
 .. code-block:: python
 
@@ -155,7 +155,7 @@ Now we can construct the system by instantiating the blocks we need with their c
     blocks = [Sr, I1, I2, A1, A2, A3, Fc, P1, Sw, Sc1, Sc2]
 
 
-Afterwards, the connections between the blocks can be defined. The first argument of the `Connection` class is the source block and its port (`Src[0]` would be port `0` of the instance of the `Source` block, which is also the default port). 
+Afterwards, the connections between the blocks can be defined. The first argument of the :class:`.Connection` class is the source block and its port (`Src[0]` would be port `0` of the instance of the :class:`.Source` block, which is also the default port). 
 
 .. code-block:: python
 
@@ -175,7 +175,7 @@ Afterwards, the connections between the blocks can be defined. The first argumen
         ]
 
 
-Next we need to define the two event managers for the state transitions of the system. They are of type `ZeroCrossing`:
+Next we need to define the two event managers for the state transitions of the system. They are of type :class:`.ZeroCrossing`:
 
 
 .. code-block:: python
@@ -238,7 +238,7 @@ Next we need to define the two event managers for the state transitions of the s
     events = [E_slip_to_stick, E_stick_to_slip]
 
 
-Finally we can instantiate the `Simulation` with the blocks, connections, events and some additional parameters such as the timestep. We use an adaptive timestep ODE solver `RKBS32` (its essentially the same as Matlabs `ode23`) so the event managemant system can use backtracking to accurately locate the events. Then we can run the simulation for some duration which is set as `2*T` (two periods of the source term) in this example.
+Finally we can instantiate the :class:`.Simulation` with the blocks, connections, events and some additional parameters such as the timestep. We use an adaptive timestep ODE solver :class:`.RKBS32` (its essentially the same as Matlabs `ode23`) so the event managemant system can use backtracking to accurately locate the events. Then we can run the simulation for some duration which is set as `2*T` (two periods of the source term) in this example.
 
 .. code-block:: python
 

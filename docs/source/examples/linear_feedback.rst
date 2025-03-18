@@ -11,7 +11,7 @@ You can also find this example as a single file in the `GitHub repository <https
    :alt: block diagram of linear feedback system
 
 
-The block diagramm above can be translated to a netlist by using the blocks and the connection class provided by `PathSim`. First lets import the `Simulation` and `Connection` classes and the required blocks from the block library:
+The block diagramm above can be translated to a netlist by using the blocks and the connection class provided by `PathSim`. First lets import the :class:`.Simulation` and :class:`.Connection` classes and the required blocks from the block library:
 
 .. code-block:: python
 
@@ -61,7 +61,7 @@ Afterwards, the connections between the blocks can be defined. The first argumen
         ]
 
 
-Finally we can instantiate the `Simulation` with the blocks, connections and some additional parameters such as the timestep. In this case, no special ODE solver is specified, so `PathSim` uses the default `SSPRK22` integrator which is a fixed step 2nd order explicit Runge-Kutta method. A good starting point. Then we can run the simulation for some duration which is set as `4*tau` in this example.
+Finally we can instantiate the `Simulation` with the blocks, connections and some additional parameters such as the timestep. In this case, no special ODE solver is specified, so `PathSim` uses the default :class:`.SSPRK22` integrator which is a fixed step 2nd order explicit Runge-Kutta method. A good starting point. Then we can run the simulation for some duration which is set as `4*tau` in this example.
 
 .. code-block:: python
 
@@ -72,7 +72,7 @@ Finally we can instantiate the `Simulation` with the blocks, connections and som
     Sim.run(4*tau)
 
 
-Due to the object oriented and decentralized nature of `PathSim`, the `Scope` block holds the recorded time series data from the simulation internally. It can be accessed by the `read` method
+Due to the object oriented and decentralized nature of `PathSim`, the :class:`Scope` block holds the recorded time series data from the simulation internally. It can be accessed by the `read` method
 
 
 .. code-block:: python

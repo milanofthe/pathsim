@@ -34,7 +34,7 @@ Lets start by importing the requred classes from `PathSim`:
     from pathsim.blocks.rf import ChirpSource, ButterworthLowpassFilter
 
 
-Now lets define the system parameters starting with the chirp source, which is defined by the starting frequency, the bandwith and the ramp duration. 
+Now lets define the system parameters starting with the :class:`.ChirpSource`, which is defined by the starting frequency, the bandwith and the ramp duration. 
 
 .. code-block:: python
 

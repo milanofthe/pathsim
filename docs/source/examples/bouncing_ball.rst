@@ -23,7 +23,7 @@ We can translate the dynamics of the system into a block diagram. Note the event
    :alt: block diagram of the bouncing ball system
 
 
-To simulate the bouncing ball, lets start by importing the required blocks from block library. In this case integrators and a constant for gravity. And of course the zero crossing event manager from the event library.
+To simulate the bouncing ball, lets start by importing the required blocks from block library. In this case integrators and a constant for gravity. And of course the :class:`.ZeroCrossing` event manager from the event library.
 
 .. code-block:: python
 
@@ -96,7 +96,7 @@ Here the event function just watches the state of the integrator `Ix`, i.e. the 
     events = [E1]
 
 
-Now the hybrid dynamical system consisting of the blocks, connections and discrete events is fully defined. Next, we can initialize the simulation and set some tolerances. We use an adaptive timestep ODE solver `RKBS32` (its essentially the same as Matlabs `ode23`) so the event managemant system can use backtracking to accurately locate the events. Finally we can run the simulation for some duration.
+Now the hybrid dynamical system consisting of the blocks, connections and discrete events is fully defined. Next, we can initialize the simulation and set some tolerances. We use an adaptive timestep ODE solver :class:`.RKBS32` (its essentially the same as Matlabs `ode23`) so the event managemant system can use backtracking to accurately locate the events. Finally we can run the simulation for some duration.
 
 .. code-block:: python
     

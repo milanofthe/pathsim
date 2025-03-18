@@ -21,7 +21,7 @@ The equation of motion that defines the harmonic oscillator it is given by
 
 where `c` is the damping, `k` the spring constant (stiffness) and `m` the mass. The corresponding block diagramm can be translated into a netlist by using the blocks and the connection class provided by `PathSim`. 
 
-First lets import the `Simulation` and `Connection` classes and the required blocks from the block library:
+First lets import the :class:`.Simulation` and :class:`.Connection` classes and the required blocks from the block library:
 
 .. code-block:: python
 
@@ -56,7 +56,7 @@ Now we can construct the system by instantiating the blocks we need (from the bl
     blocks = [I1, I2, A1, A2, A3, P1, Sc]
 
 
-Afterwards, the connections between the blocks can be defined. The first argument of the `Connection` class is the source block and its port (`Sc[1]` would be port `1` of the instance of the `Scope` block). 
+Afterwards, the connections between the blocks can be defined. The first argument of the :class:`.Connection` class is the source block and its port (`Sc[1]` would be port `1` of the instance of the :class:`.Scope` block). 
 
 .. code-block:: python
 
@@ -71,7 +71,7 @@ Afterwards, the connections between the blocks can be defined. The first argumen
         ]
 
 
-Finally we can instantiate the `Simulation` with the blocks, connections and some additional parameters such as the timestep. In this case, no special ODE solver is specified, so `PathSim` uses the default `SSPRK22` integrator which is a fixed step 2nd order explicit Runge-Kutta method. A good starting point for non stiff linear systems like this. 
+Finally we can instantiate the `Simulation` with the blocks, connections and some additional parameters such as the timestep. In this case, no special ODE solver is specified, so `PathSim` uses the default :class:`.SSPRK22` integrator which is a fixed step 2nd order explicit Runge-Kutta method. A good starting point for non stiff linear systems like this. 
 
 .. code-block:: python
 
@@ -87,7 +87,7 @@ Then we can run the simulation for some duration:
     Sim.run(duration=25)
 
 
-Due to the object oriented and decentralized nature of `PathSim`, the `Scope` block holds the recorded time series data from the simulation internally. It can be plotted directly in an external matplotlib window using the `plot` method
+Due to the object oriented and decentralized nature of `PathSim`, the :class:`.Scope` block holds the recorded time series data from the simulation internally. It can be plotted directly in an external matplotlib window using the `plot` method
 
 .. code-block:: python
 
