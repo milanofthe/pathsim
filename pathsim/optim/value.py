@@ -158,6 +158,61 @@ class Value:
     This is realized by a dictionary that handles the reference tracking via the id 
     of the 'Value' instances.
 
+    Example
+    -------
+    Automatic differentiation of numpy functions:
+
+    .. code-block:: python
+    
+        import numpy as np
+
+        v = Value(3)
+    
+        #AD
+        w = np.sin(v)
+    
+        #reference
+        dw_dv = np.cos(v)
+
+        print(dw_dv == w(v))
+        #True    
+    
+    Automatic differentiation of concatenations:
+
+    .. code-block:: python
+    
+        import numpy as np
+
+        v = Value(2)
+        
+        #AD
+        w = np.exp(np.sin(v) + v**3)
+        
+        #reference
+        dw_dv = np.exp(np.sin(v) + v**3) * (np.cos(v) + 3*v**2)
+
+        print(dw_dv == w(v))
+        #True
+
+    Automatic differentiation with multiple values:
+
+    .. code-block:: python
+    
+        import numpy as np
+    
+        u = Value(0.5)
+        v = Value(2)
+        
+        #AD
+        w = u * v + np.sin(u + v)
+        
+        #references
+        dw_du = v + np.cos(u + v)
+        dw_dv = u + np.cos(u + v)
+
+        print(dw_du == w(u), dw_dv == w(v))
+        #True True
+
     Parameters
     ----------
     val  : float, int, complex
@@ -240,7 +295,25 @@ class Value:
         
         For Value entries, their numeric values are used to 
         create a new Value instance.
-    
+
+        Example
+        -------
+        Instantiate multiple values from 1d array:
+
+        .. code-block:: python
+
+            a, b, c = Value.array([1, 2, 3])
+
+        Instantiate numpy array filled with values:
+
+        .. code-block:: python
+            
+            import numpy as np
+
+            A_num = np.random.rand(3, 5)
+
+            A = Value.array(A_num)
+
         Parameters
         ----------  
         arr : array[obj]

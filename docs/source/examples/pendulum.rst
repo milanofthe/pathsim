@@ -3,7 +3,7 @@ Pendulum
 
 In this example we have a look at the mathematical pendulum.
 
-You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/examples_rf/example_pendulum.py>`_.
+You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/example_pendulum.py>`_.
 
 
 .. image:: figures/pendulum_blockdiagram.png

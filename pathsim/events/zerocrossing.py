@@ -24,12 +24,18 @@ class ZeroCrossing(Event):
     
     Monitors system state by evaluating an event function (func_evt) with scalar output and 
     testing for zero crossings (sign changes). 
+    
+    .. code-block::
 
         func_evt(time) -> event?
 
+
     If an event is detected, some action (func_act) is performed on the system state.
 
+    .. code-block::
+
         func_evt(time) == 0 -> event -> func_act(time)
+    
     
     Parameters
     ----------
