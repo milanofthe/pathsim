@@ -108,6 +108,11 @@ class Source(Block):
         """update system equation fixed point loop 
         by evaluating the internal function 'func'
 
+        Note
+        ----
+        No direct passthrough, so the 'update' method 
+        is optimized
+
         Parameters
         ----------
         t : float

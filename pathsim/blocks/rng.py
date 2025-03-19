@@ -32,6 +32,8 @@ class RNG(Block):
     ----------
     n_samples : int
         internal sample counter
+    val : float
+        internal random number state
     """
 
     def __init__(self, sampling_rate=None):
@@ -39,6 +41,7 @@ class RNG(Block):
 
         self.sampling_rate = sampling_rate 
         self.n_samples = 0
+        self.val = 0.0
 
 
     def __len__(self):
@@ -64,5 +67,28 @@ class RNG(Block):
         """
         if (self.sampling_rate is None or 
             self.n_samples < t * self.sampling_rate):
-            self.outputs[0] = 2.0*np.random.rand() - 1.0
+            self.val = 2.0*np.random.rand() - 1.0
             self.n_samples += 1
+
+
+    def update(self, t):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+    
+        Note
+        ----
+        no direct passthrough, so the 'update' method 
+        is optimized for this case        
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
+        """
+        self.outputs[0] = self.val
+        return 0.0

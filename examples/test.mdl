@@ -1,0 +1,345 @@
+{
+  "type": "Simulation",
+  "metadata": {
+    "version": "0.6.0",
+    "timestamp": "2025-03-19T16:43:41.914257"
+  },
+  "structure": {
+    "blocks": [
+      {
+        "id": 2658269332256,
+        "type": "Subsystem",
+        "metadata": {},
+        "params": {
+          "blocks": [
+            {
+              "id": 2658269332016,
+              "type": "Integrator",
+              "metadata": {},
+              "params": {
+                "initial_value": 2
+              }
+            },
+            {
+              "id": 2658269332064,
+              "type": "Integrator",
+              "metadata": {},
+              "params": {
+                "initial_value": 0
+              }
+            },
+            {
+              "id": 2658269331968,
+              "type": "Subsystem",
+              "metadata": {},
+              "params": {
+                "blocks": [
+                  {
+                    "id": 2657818979568,
+                    "type": "Multiplier",
+                    "metadata": {},
+                    "params": {}
+                  },
+                  {
+                    "id": 2658267344880,
+                    "type": "Constant",
+                    "metadata": {},
+                    "params": {
+                      "value": 1
+                    }
+                  },
+                  {
+                    "id": 2658267346176,
+                    "type": "Amplifier",
+                    "metadata": {},
+                    "params": {
+                      "gain": 1000
+                    }
+                  },
+                  {
+                    "id": 2658250012048,
+                    "type": "Amplifier",
+                    "metadata": {},
+                    "params": {
+                      "gain": -1
+                    }
+                  },
+                  {
+                    "id": 2658269101616,
+                    "type": "Amplifier",
+                    "metadata": {},
+                    "params": {
+                      "gain": -1
+                    }
+                  },
+                  {
+                    "id": 2658269102000,
+                    "type": "Adder",
+                    "metadata": {},
+                    "params": {}
+                  },
+                  {
+                    "id": 2658269102048,
+                    "type": "Adder",
+                    "metadata": {},
+                    "params": {}
+                  },
+                  {
+                    "id": 2658269331536,
+                    "type": "Function",
+                    "metadata": {},
+                    "params": {
+                      "func": {
+                        "type": "dill",
+                        "data": "gAWVIQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLAksDQwyXAHwAZAF6CAAAUwCUTksChpQpjAF4lIWUjFtDOlxVc2Vyc1xNaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlX25lc3RlZF9zdWJzeXN0ZW1zLnB5lIwIPGxhbWJkYT6UaAtLKEMKgACYAZgxmQSAAJRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoC05OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGIu",
+                        "name": "<lambda>"
+                      }
+                    }
+                  },
+                  {
+                    "id": 2657818979376,
+                    "type": "Interface",
+                    "metadata": {},
+                    "params": {}
+                  }
+                ],
+                "connections": [
+                  {
+                    "id": 2658268923568,
+                    "source": {
+                      "block": 2657818979376,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2658250012048,
+                        "port": 0
+                      },
+                      {
+                        "block": 2658269331536,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658268936960,
+                    "source": {
+                      "block": 2657818979376,
+                      "port": 1
+                    },
+                    "targets": [
+                      {
+                        "block": 2657818979568,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331584,
+                    "source": {
+                      "block": 2658269331536,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2658269101616,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331632,
+                    "source": {
+                      "block": 2658269101616,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2658269102048,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331680,
+                    "source": {
+                      "block": 2658267344880,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2658269102048,
+                        "port": 1
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331728,
+                    "source": {
+                      "block": 2658269102048,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2657818979568,
+                        "port": 1
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331776,
+                    "source": {
+                      "block": 2657818979568,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2658267346176,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331824,
+                    "source": {
+                      "block": 2658267346176,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2658269102000,
+                        "port": 0
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331872,
+                    "source": {
+                      "block": 2658250012048,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2658269102000,
+                        "port": 1
+                      }
+                    ]
+                  },
+                  {
+                    "id": 2658269331920,
+                    "source": {
+                      "block": 2658269102000,
+                      "port": 0
+                    },
+                    "targets": [
+                      {
+                        "block": 2657818979376,
+                        "port": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": 2658246777728,
+              "type": "Interface",
+              "metadata": {},
+              "params": {}
+            }
+          ],
+          "connections": [
+            {
+              "id": 2658269332112,
+              "source": {
+                "block": 2658269332064,
+                "port": 0
+              },
+              "targets": [
+                {
+                  "block": 2658269332016,
+                  "port": 0
+                },
+                {
+                  "block": 2658269331968,
+                  "port": 1
+                },
+                {
+                  "block": 2658246777728,
+                  "port": 1
+                }
+              ]
+            },
+            {
+              "id": 2658269332160,
+              "source": {
+                "block": 2658269332016,
+                "port": 0
+              },
+              "targets": [
+                {
+                  "block": 2658269331968,
+                  "port": 0
+                },
+                {
+                  "block": 2658246777728,
+                  "port": 0
+                }
+              ]
+            },
+            {
+              "id": 2658269332208,
+              "source": {
+                "block": 2658269331968,
+                "port": 0
+              },
+              "targets": [
+                {
+                  "block": 2658269332064,
+                  "port": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 2658269332304,
+        "type": "Scope",
+        "metadata": {},
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": []
+        }
+      }
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 2658269332352,
+        "source": {
+          "block": 2658269332256,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2658269332304,
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  "params": {
+    "dt": 0.01,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "GEAR52A",
+    "tolerance_fpi": 1e-08,
+    "iterations_min": 1,
+    "iterations_max": 200,
+    "tolerance_lte_abs": 1e-06,
+    "tolerance_lte_rel": 0.001
+  }
+}

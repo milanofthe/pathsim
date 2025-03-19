@@ -67,7 +67,12 @@ def serialize_callable(func):
             pass  #fall through to next method
     
     #case 3: last resort -> use dill
-    serialized = dill.dumps(func, recurse=True, byref=False)
+    serialized = dill.dumps(
+        func, 
+        recurse=True, 
+        byref=False,
+        protocol=dill.HIGHEST_PROTOCOL
+        )
     return {
         "type": "dill",
         "data": base64.b64encode(serialized).decode('ascii'),
@@ -123,7 +128,12 @@ def serialize_object(obj):
                 }
         
     #case 3: last resort -> use dill
-    serialized = dill.dumps(obj, recurse=True, byref=False)
+    serialized = dill.dumps(
+        obj, 
+        recurse=True, 
+        byref=False,
+        protocol=dill.HIGHEST_PROTOCOL
+        )
     return {
         "type": "dill",
         "data": base64.b64encode(serialized).decode('ascii'),

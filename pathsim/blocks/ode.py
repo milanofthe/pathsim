@@ -12,6 +12,9 @@
 import numpy as np
 
 from ._block import Block
+ 
+from ..optim.value import Value, jac
+from ..optim.numerical import num_jac
 
 from ..utils.utils import (
     dict_to_array, 
@@ -95,7 +98,7 @@ class ODE(Block):
         ):
 
         super().__init__()
-          
+        
         #right hand side function of ODE
         self.func = func
 
@@ -110,6 +113,24 @@ class ODE(Block):
         return 0
 
 
+    def _func_dyn(self, x, u, t):
+        return self.func(x, u, t)
+
+
+    def _jac_dyn(self, x, u, t):
+        #use jacobian if defined, otherwise different strategy
+        if self.jac is None: 
+            try:  
+                #try using AD for jacobian                
+                _x = Value.array(x)
+                return jac(self.func(_x, u, t), _x)
+            except:
+                #fallback to numerical jacobian
+                return num_jac(lambda _x: self.func(_x, u, t), x)
+        else: 
+            return self.jac(x, u, t)
+
+
     def set_solver(self, Solver, **solver_args):
         """set the internal numerical integrator
 
@@ -122,7 +143,7 @@ class ODE(Block):
         """
         if self.engine is None:
             #initialize the integration engine with right hand side
-            self.engine = Solver(self.initial_value, self.func, self.jac, **solver_args)
+            self.engine = Solver(self.initial_value, self._func_dyn, self._jac_dyn, **solver_args)
         else:
             #change solver if already initialized
             self.engine = Solver.cast(self.engine, **solver_args)
@@ -131,6 +152,11 @@ class ODE(Block):
     def update(self, t):
         """update system equation for fixed point loop, 
         here just setting the outputs
+    
+        Note
+        ----
+        the ODE block has no direct passthrough, so the 
+        'update' method is optimized for this case        
 
         Parameters
         ----------

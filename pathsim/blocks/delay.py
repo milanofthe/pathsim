@@ -40,6 +40,11 @@ class Delay(Block):
         #no passthrough by definition
         return 0
 
+    
+    def _func_alg(self, x, u, t):
+        #retrieve value from buffer
+        return self._buffer.get(t)
+
 
     def reset(self):
         #reset inputs and outputs
@@ -53,6 +58,11 @@ class Delay(Block):
     def update(self, t):
         """Evaluation of the buffer at different times.
 
+        Note
+        ----
+        The buffer is SISO and the 'update' method therefore 
+        is performance optimized.
+
         Parameters
         ----------
         t : float
@@ -65,9 +75,8 @@ class Delay(Block):
         """
 
         #retrieve value from buffer
-        self.outputs[0] = self._buffer.get(t)
-
-        return 0.0
+        _out, self.outputs[0] = self.outputs[0], self._func_alg(0, 0, t)
+        return abs(_out - self.outputs[0])
 
 
     def sample(self, t):

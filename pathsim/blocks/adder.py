@@ -27,8 +27,16 @@ class Adder(Block):
 
     """
 
+    def _func_alg(self, x, u, t):
+        return sum(u)
+
+
     def update(self, t):
         """update system equation in fixed point loop
+
+        Note
+        ----
+        This is a MISO block with an optimized 'update' method for this case
 
         Parameters
         ----------
@@ -38,8 +46,7 @@ class Adder(Block):
         Returns
         -------
         error : float
-            relative error to previous iteration for convergence control
+            absolute error to previous iteration for convergence control
         """
-        prev_output = self.outputs[0]
-        self.outputs[0] = sum(v for v in self.inputs.values())
-        return abs(prev_output - self.outputs[0])
+        _out, self.outputs[0] = self.outputs[0], self._func_alg(0, self.inputs.values(), t)
+        return abs(_out - self.outputs[0])

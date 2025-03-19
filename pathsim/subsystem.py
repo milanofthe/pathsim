@@ -14,6 +14,7 @@
 
 import numpy as np
 
+from .connection import Connection
 from .blocks._block import Block
 from .utils.utils import path_length_dfs, dict_to_array
 
@@ -178,6 +179,26 @@ class Subsystem(Block):
         return _inputs, _outputs, np.hstack(_states)
 
 
+    def __contains__(self, other):
+        """Check if blocks and connections are already part of the subsystem
+
+        Paramters
+        ---------
+        other : obj
+            object to check if its part of subsystem
+
+        Returns
+        -------
+        bool
+        """
+        if isinstance(other, Block): 
+            return other in self.blocks
+        elif isinstance(other, Connection): 
+            return other in self.connections
+        else: 
+            return False
+
+
     def _check_connections(self):
         """Check if connections are valid and if there is no input port 
         that recieves multiple outputs and could be overwritten unintentionally.
@@ -210,7 +231,7 @@ class Subsystem(Block):
             kwargs for the plot method
         """
         for block in self.blocks:
-            if block: block.plot(*args, **kwargs)
+            block.plot(*args, **kwargs)
 
 
     # system management ---------------------------------------------------------------------

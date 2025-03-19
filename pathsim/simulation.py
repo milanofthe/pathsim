@@ -36,6 +36,7 @@ from .utils.progresstracker import ProgressTracker
 from .solvers import SSPRK22, SteadyState
 
 from .blocks._block import Block
+from .events._event import Event
 
 from .connection import Connection
 
@@ -224,6 +225,29 @@ class Simulation:
         dict model format and readable json formatting
         """
         return json.dumps(self.to_dict(), indent=2, sort_keys=False)
+
+
+    def __contains__(self, other):
+        """Check if blocks, connections or events are 
+        already part of the simulation 
+
+        Paramters
+        ---------
+        other : obj
+            object to check if its part of simulation
+
+        Returns
+        -------
+        bool
+        """
+        if isinstance(other, Block): 
+            return other in self.blocks
+        elif isinstance(other, Connection): 
+            return other in self.connections
+        elif isinstance(other, Event): 
+            return other in self.events
+        else: 
+            return False
 
 
     # logger methods --------------------------------------------------------------

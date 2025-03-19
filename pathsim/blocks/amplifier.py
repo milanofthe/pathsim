@@ -34,8 +34,16 @@ class Amplifier(Block):
         self.gain = gain
 
 
+    def _func_alg(self, x, u, t):
+        return self.gain * u
+
+
     def update(self, t):
         """update system equation in fixed point loop
+
+        Note
+        ----
+        SISO block has optimized 'update' method
 
         Parameters
         ----------
@@ -47,6 +55,5 @@ class Amplifier(Block):
         error : float
             deviation to previous iteration for convergence control
         """
-        prev_output = self.outputs[0]
-        self.outputs[0]  = self.gain * self.inputs[0]
-        return abs(prev_output - self.outputs[0])
+        _out, self.outputs[0] = self.outputs[0], self._func_alg(0, self.inputs[0], t)
+        return abs(_out - self.outputs[0])

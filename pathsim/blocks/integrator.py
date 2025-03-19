@@ -63,6 +63,10 @@ class Integrator(Block):
         return 0
 
 
+    def _func_dyn(self, x, u, t):
+        return u
+
+
     def set_solver(self, Solver, **solver_args):
         """set the internal numerical integrator
 
@@ -80,12 +84,16 @@ class Integrator(Block):
             return #quit early
             
         #initialize the integration engine
-        def _f(x, u, t): return u
-        self.engine = Solver(self.initial_value, _f, None, **solver_args)
-        
+        self.engine = Solver(self.initial_value, self._func_dyn, None, **solver_args)
+
 
     def update(self, t):
         """update system equation fixed point loop
+
+        Note
+        ----
+        integrator does not have passthrough, therefore this 
+        method is performance optimized for this case
 
         Parameters
         ----------

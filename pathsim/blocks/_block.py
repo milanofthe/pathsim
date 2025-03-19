@@ -13,7 +13,9 @@
 
 # IMPORTS ===============================================================================
 
-from ..utils.utils import dict_to_array
+import numpy as np
+
+from ..utils.utils import dict_to_array, array_to_dict, max_error_dicts
 from ..utils.serialization import Serializable
 
 
@@ -105,30 +107,114 @@ class Block(Serializable):
 
 
     def __call__(self):
-        """The '__call__' method returns internal states of engine 
-        (if available) and the block inputs and outputs as arrays for 
-        use outside. 
-
-        Either for monitoring, postprocessing or event detection. 
-        In any case this enables easy access to the current block state.
-
-        Returns
-        -------
-        inputs : array
-            block input register
-        outputs : array
-            block output register
-        states : array
-            internal states of the block
-        """
-        _inputs  = dict_to_array(self.inputs)
-        _outputs = dict_to_array(self.outputs)
-        _states  = self.engine.get() if self.engine else []
-        return _inputs, _outputs, _states
+        """The '__call__' is a nalias for the 'get_all' method."""
+        return self.get_all()
 
 
     def __bool__(self):
         return self._active
+
+
+    # methods for block behaviour interface ---------------------------------------------
+
+    def _func_alg(self, x, u, t):
+        """The algebraic (passthrough) component of the block
+
+        .. math::
+
+            y = \\f_\\mathrm{alg}(x, u, t)
+
+        This method provides a unified interface for blocks 
+        with algebraic passthroughs. It is used primarily 
+        for the 'update' method.
+
+        Note
+        ----
+        Might be utilized in the future for performance 
+        enhancements through jit compilation.
+    
+        Parameters
+        ----------
+        x : array[numeric], numeric
+            internal block state
+        u : array[numeric], numeric
+            block inputs
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        y : array[numeric], numeric
+            block output
+        """
+        return 0.0
+
+
+    def _func_dyn(self, x, u, t):
+        """The dynamical (ODE) component of the block. 
+
+        This method provides a unified interface for blocks 
+        with internal integration engines. It is used primarily 
+        internally for the solver instances.
+
+        .. math::
+
+            \\dot{x} = \\f_\\mathrm{dyn}(x, u, t)
+
+        Note
+        ----
+        Might be utilized in the future for performance 
+        enhancements through jit compilation.
+    
+        Parameters
+        ----------
+        x : array[numeric], numeric
+            internal block state
+        u : array[numeric], numeric
+            block inputs
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        dx : array[numeric], numeric
+            dynamic block component evaluated
+        """
+        return 0.0
+
+
+    def _jac_dyn(self, x, u, t):
+        """Jacobian of the dynamical (ODE) component of the block 
+        with respect to the internal state 'x'. 
+
+        This method provides a unified interface for blocks 
+        with internal integration engines. It is used primarily 
+        internally for the solver instances.
+
+        .. math::
+
+            \\mathbf{J}_{\\mathrm{dyn}, x}(x, u, t)
+
+        Note
+        ----
+        Might be utilized in the future for performance 
+        enhancements through jit compilation.
+    
+        Parameters
+        ----------
+        x : array[numeric], numeric
+            internal block state
+        u : array[numeric], numeric
+            block inputs
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        J : array[numeric], numeric
+            jacobian of dynamic block component evaluated
+        """
+        return 0.0
 
 
     # methods for visualization ---------------------------------------------------------
@@ -260,6 +346,28 @@ class Block(Serializable):
 
     # methods for inter-block data transfer ---------------------------------------------
 
+    def get_all(self):
+        """Retrieves and returns internal states of engine (if available) 
+        and the block inputs and outputs as arrays for use outside. 
+
+        Either for monitoring, postprocessing or event detection. 
+        In any case this enables easy access to the current block state.
+
+        Returns
+        -------
+        inputs : array
+            block input register
+        outputs : array
+            block output register
+        states : array
+            internal states of the block
+        """
+        _inputs  = dict_to_array(self.inputs)
+        _outputs = dict_to_array(self.outputs)
+        _states  = self.engine.get() if self.engine else []
+        return _inputs, _outputs, _states
+
+
     def set(self, port, value):
         """Set the value of an input port of the block.
 
@@ -305,6 +413,12 @@ class Block(Serializable):
         the previous output (before the step) to track convergence of the fixed-point 
         iteration.
 
+        Note
+        ----
+        The implementation of the 'update' method in the base 'Block' class is intended 
+        as a fallback and is not performance optimized. Special blocks might reimplement 
+        this method differently for higher performance, for example SISO or MISO blocks.
+
         Parameters
         ----------
         t : float
@@ -315,7 +429,24 @@ class Block(Serializable):
         error : float
             relative error to previous iteration for convergence control
         """
-        return 0.0 
+        
+        #get internal state from engine if available
+        x = self.engine.get() if self.engine else 0.0
+        
+        #get array representation of inputs
+        u = dict_to_array(self.inputs)    
+
+        #compute new algebraic output
+        y = self._func_alg(x, u, t)
+
+        #if no passthrough -> early exit
+        if len(self) == 0:
+            self.outputs = array_to_dict(y)
+            return 0.0
+
+        #set outputs to new values
+        _outputs, self.outputs = self.outputs, array_to_dict(y)
+        return max_error_dicts(_outputs, self.outputs)
 
 
     def solve(self, t, dt):

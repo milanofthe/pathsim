@@ -87,29 +87,5 @@ class Function(Block):
         self.func = func
 
 
-    def update(self, t):
-        """update system equation fixed point loop
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-
-        Returns
-        -------
-        error : float
-            relative error to previous iteration for convergence control
-        """
-
-        #compute function output
-        output = self.func(*dict_to_array(self.inputs))
-
-        #check if the output is scalar
-        if np.isscalar(output):
-            prev_output = self.outputs[0]
-            self.outputs[0] = output
-            return abs(prev_output - self.outputs[0])
-        else:
-            prev_outputs = self.outputs.copy()
-            self.outputs = array_to_dict(output)
-            return max_error_dicts(prev_outputs, self.outputs)
+    def _func_alg(self, x, u, t):
+        return self.func(*u)

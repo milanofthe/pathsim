@@ -210,6 +210,28 @@ class Scope(Block):
                 wrt.writerow(sample)
 
 
+    def update(self, t):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+    
+        Note
+        ----
+        Scope has no passthrough, so the 'update' method 
+        is optimized for this case        
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
+        """
+        return 0.0
+
+
 
 
 class RealtimeScope(Scope):

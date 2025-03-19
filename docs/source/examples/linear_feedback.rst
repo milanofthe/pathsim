@@ -72,8 +72,7 @@ Finally we can instantiate the `Simulation` with the blocks, connections and som
     Sim.run(4*tau)
 
 
-Due to the object oriented and decentralized nature of `PathSim`, the :class:`Scope` block holds the recorded time series data from the simulation internally. It can be accessed by the `read` method
-
+Due to the object oriented and decentralized nature of `PathSim`, the :class:`.Scope` block holds the recorded time series data from the simulation internally. It can be accessed by its `read` method
 
 .. code-block:: python
 

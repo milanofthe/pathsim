@@ -102,9 +102,13 @@ class SquareWaveSource(Block):
         self.phase = phase
 
 
-    def update(self, t):
+    def _func_alg(self, x, u, t):
         tau = self.phase/(2*np.pi*self.frequency)
-        self.outputs[0] = self.amplitude * square_wave(t + tau, self.frequency)
+        return self.amplitude * square_wave(t + tau, self.frequency)
+
+
+    def update(self, t):
+        self.outputs[0] = self._func_alg(0, 0, t)
         return 0.0
 
 
@@ -129,9 +133,13 @@ class TriangleWaveSource(Block):
         self.phase = phase
 
 
-    def update(self, t):
+    def _func_alg(self, x, u, t):
         tau = self.phase/(2*np.pi*self.frequency)
-        self.outputs[0] = self.amplitude * triangle_wave(t + tau, self.frequency)
+        return self.amplitude * triangle_wave(t + tau, self.frequency)
+
+
+    def update(self, t):
+        self.outputs[0] = self._func_alg(0, 0, t)
         return 0.0
 
 
@@ -156,9 +164,13 @@ class SinusoidalSource(Block):
         self.phase = phase
 
 
-    def update(self, t):
+    def _func_alg(self, x, u, t):
         omega = 2*np.pi*self.frequency
-        self.outputs[0] = self.amplitude * np.sin(omega*t + self.phase)
+        return self.amplitude * np.sin(omega*t + self.phase)
+
+
+    def update(self, t):
+        self.outputs[0] = self._func_alg(0, 0, t)
         return 0.0
 
 
@@ -183,8 +195,12 @@ class GaussianPulseSource(Block):
         self.tau = tau
 
 
+    def _func_alg(self, x, u, t):
+        return self.amplitude * gaussian(t-self.tau, self.f_max)
+
+
     def update(self, t):
-        self.outputs[0] = self.amplitude * gaussian(t-self.tau, self.f_max)
+        self.outputs[0] = self._func_alg(0, 0, t)
         return 0.0
 
 
@@ -206,8 +222,12 @@ class StepSource(Block):
         self.tau = tau
 
 
+    def _func_alg(self, x, u, t):
+        return self.amplitude * float(t > self.tau)
+
+
     def update(self, t):
-        self.outputs[0] = self.amplitude * float(t > self.tau)
+        self.outputs[0] = self._func_alg(0, 0, t)
         return 0.0
 
 

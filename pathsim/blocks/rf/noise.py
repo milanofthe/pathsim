@@ -29,6 +29,8 @@ class WhiteNoise(Block):
     ----------
     spectral_density : float
         noise spectral density
+    noise : float
+        internal noise value
     sampling_rate : float, None
         frequency with which the noise is sampled 
 
@@ -47,6 +49,7 @@ class WhiteNoise(Block):
         self.sampling_rate = sampling_rate 
         self.sigma = np.sqrt(spectral_density)
         self.n_samples = 0
+        self.noise = 0.0
 
 
     def reset(self):
@@ -56,6 +59,7 @@ class WhiteNoise(Block):
 
         #reset noise samples
         self.n_samples = 0
+        self.noise = 0.0
 
 
     def sample(self, t):
@@ -68,8 +72,31 @@ class WhiteNoise(Block):
         """
         if (self.sampling_rate is None or 
             self.n_samples < t * self.sampling_rate):
-            self.outputs[0] = np.random.normal(0, 1)* self.sigma 
+            self.noise = np.random.normal(0, 1) * self.sigma 
             self.n_samples += 1
+
+
+    def update(self, t):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+    
+        Note
+        ----
+        no direct passthrough, so the 'update' method 
+        is optimized for this case        
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
+        """
+        self.outputs[0] = self.noise
+        return 0.0
 
 
 class PinkNoise(Block):
@@ -93,6 +120,8 @@ class PinkNoise(Block):
         sqrt of spectral density normalized to number of octaves
     n_samples : int
         internal sample counter 
+    noise : float
+        internal noise value
     octaves_values : array[float]
         internal random numbers for octaves in the Voss-McCartney algorithm
     """
@@ -104,6 +133,7 @@ class PinkNoise(Block):
         self.num_octaves = num_octaves
         self.sampling_rate = sampling_rate
         self.n_samples = 0
+        self.noise = 0.0
 
         # Calculate the normalization factor sigma
         self.sigma = np.sqrt(spectral_density/num_octaves)
@@ -119,6 +149,7 @@ class PinkNoise(Block):
 
         # Reset counters and octave values
         self.n_samples = 0
+        self.noise = 0.0
         self.octave_values = np.random.normal(0, 1, self.num_octaves)
 
 
@@ -151,9 +182,30 @@ class PinkNoise(Block):
             pink_sample = np.sum(self.octave_values)
 
             # Normalize by sigma to maintain consistent amplitude
-            self.outputs[0] = pink_sample * self.sigma
+            self.noise = pink_sample * self.sigma
 
             
+    def update(self, t):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+    
+        Note
+        ----
+        no direct passthrough, so the 'update' method 
+        is optimized for this case        
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
+        """
+        self.outputs[0] = self.noise
+        return 0.0
 
 
 class SinusoidalPhaseNoiseSource(Block):

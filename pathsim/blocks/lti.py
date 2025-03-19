@@ -79,7 +79,22 @@ class StateSpace(Block):
         #check if direct passthrough exists
         return int(np.any(self.D)) if self._active else 0
 
-    
+
+    def _func_alg(self, x, u, t):
+        if np.any(self.D):
+            return np.dot(self.C, x) + np.dot(self.D, u)
+        else:
+            return np.dot(self.C, x)
+
+
+    def _func_dyn(self, x, u, t):
+        return np.dot(self.A, x) + np.dot(self.B, u)
+
+
+    def _jac_dyn(self, x, u, t):
+        return self.A
+
+
     def set_solver(self, Solver, **solver_args):
         """set the internal numerical integrator
 
@@ -92,40 +107,12 @@ class StateSpace(Block):
         """
         
         if self.engine is None:
-
-            def _f(x, u, t): 
-                return np.dot(self.A, x) + np.dot(self.B, u) 
-            def _jac(x, u, t): 
-                return self.A
-
             #initialize the integration engine with right hand side
-            self.engine = Solver(self.initial_value, _f, _jac, **solver_args)
+            self.engine = Solver(self.initial_value, self._func_dyn, self._jac_dyn, **solver_args)
 
         else:
-
             #change solver if already initialized
             self.engine = Solver.cast(self.engine, **solver_args)
-
-
-    def update(self, t):
-        """update system equation fixed point loop
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-
-        Returns
-        -------
-        error : float
-            relative error to previous iteration for convergence control
-        """
-        prev_outputs = self.outputs.copy()
-        u = dict_to_array(self.inputs)
-        y_D = np.dot(self.D, u) if np.any(self.D) else 0.0
-        y_C = np.dot(self.C, self.engine.get())
-        self.outputs = array_to_dict(y_C + y_D)
-        return max_error_dicts(prev_outputs, self.outputs)
 
 
     def solve(self, t, dt):

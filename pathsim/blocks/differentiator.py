@@ -48,6 +48,19 @@ class Differentiator(Block):
         return 1 if self._active else 0
 
 
+    def _func_alg(self, x, u, t):
+        #algebraic component of differentiator approximation
+        return self.f_max * (u - x)
+
+
+    def _func_dyn(self, x, u, t):
+        return self.f_max * (u - x)
+
+
+    def _jac_dyn(self, x, u, t):
+        return -self.f_max
+
+
     def set_solver(self, Solver, **solver_args):
         """set the internal numerical integrator
 
@@ -65,13 +78,16 @@ class Differentiator(Block):
             return #quit early
 
         #initialize the numerical integration engine with kernel
-        def _f(x, u, t): return - self.f_max * (x - u) 
-        def _jac(x, u, t): return - self.f_max
-        self.engine = Solver(0.0, _f, _jac, **solver_args)
+        self.engine = Solver(0.0, self._func_dyn, self._jac_dyn, **solver_args)
 
 
     def update(self, t):
         """update system equation fixed point loop
+    
+        Note
+        ----
+        This block is SISO and the 'update' method is performance optimized 
+        for this case, compared to the base class.
 
         Parameters
         ----------
@@ -81,11 +97,10 @@ class Differentiator(Block):
         Returns
         -------
         error : float
-            relative error to previous iteration for convergence control
+            absolute error to previous iteration for convergence control
         """
-        prev_output = self.outputs[0]
-        self.outputs[0] = -self.f_max * (self.engine.get() - self.inputs[0])
-        return abs(prev_output - self.outputs[0])
+        _out, self.outputs[0] = self.outputs[0], self._func_alg(self.engine.get(), self.inputs[0], t)
+        return abs(_out - self.outputs[0])
 
 
     def solve(self, t, dt):

@@ -68,11 +68,14 @@ class Switch(Block):
     def update(self, t):
         """Update switch output depending on inputs
 
+        Note
+        ----
+        MISO block has optimized 'update' method 
+
         Parameters
         ----------
         t : float
             evaluation time
         """
-
-        self.outputs[0] = self.inputs.get(self.state, 0.0)
-        return 0.0
+        _out, self.outputs[0] = self.outputs[0], self.inputs.get(self.state, 0.0)
+        return abs(_out - self.outputs[0])

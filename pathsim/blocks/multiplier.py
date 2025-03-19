@@ -10,11 +10,9 @@
 
 # IMPORTS ===============================================================================
 
-import numpy as np
+from math import prod
 
 from ._block import Block
-
-from ..utils.utils import dict_to_array
 
 
 # MISO BLOCKS ===========================================================================
@@ -28,8 +26,16 @@ class Multiplier(Block):
 
     """
 
+    def _func_alg(self, x, u, t):
+        return prod(u)
+
+
     def update(self, t):
-        """update system equation fixed point loop
+        """update system equation in fixed point loop
+
+        Note
+        ----
+        This is a MISO block with an optimized 'update' method for this case
 
         Parameters
         ----------
@@ -39,8 +45,7 @@ class Multiplier(Block):
         Returns
         -------
         error : float
-            relative error to previous iteration for convergence control
+            absolute error to previous iteration for convergence control
         """
-        prev_output = self.outputs[0]
-        self.outputs[0] = np.prod(dict_to_array(self.inputs), axis=0)
-        return abs(prev_output - self.outputs[0])
+        _out, self.outputs[0] = self.outputs[0], self._func_alg(0, self.inputs.values(), t)
+        return abs(_out - self.outputs[0])
