@@ -328,6 +328,16 @@ class Value:
         return np.array([cls(a) for a in _arr.ravel()]).reshape(_arr.shape).squeeze()
 
 
+    # convenience static methods ----------------------------------------------------------------
+
+    def der(self, arr, val):
+        return der(arr, val)
+
+
+    def jac(self, arr, vals):
+        return jac(arr, vals)
+
+
     # overload builtins -------------------------------------------------------------------------
 
     def __call__(self, other):
