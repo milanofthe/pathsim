@@ -76,12 +76,23 @@ class Operator(object):
     jac : callable, optional
         Optional analytical Jacobian of func. If None, automatic or numerical
         differentiation will be used.
+
+    Attributes
+    ----------
+    x0 : array_like
+        operating point
+    f0 : array_like
+        function evaluation at operating point
+    J : array_like
+        jacobian matrix at operating point
+
     """
 
     def __init__(self, func, jac=None):
         self._func = func
         self._jac = jac
         self.x0 = None
+        self.f0 = None
         self.J = None
         
         
@@ -109,7 +120,7 @@ class Operator(object):
             Function value or linear approximation
         """
         if self.x0 is None: return self._func(x)
-        return self.x0 + np.dot(self.J, x - self.x0)
+        return self.f0 + np.dot(self.J, x - self.x0)
         
 
     def jac(self, x):
@@ -155,7 +166,7 @@ class Operator(object):
         x : array_like
             Point at which to linearize the function
         """
-        self.x0, self.J = self._func(x), self.jac(x)
+        self.x0, self.f0, self.J = x, self._func(x), self.jac(x)
         
 
     def reset(self):
@@ -164,4 +175,4 @@ class Operator(object):
         Clears the stored linearization point and Jacobian, causing the
         operator to evaluate the function directly on subsequent calls.
         """
-        self.x0, self.J = None, None
+        self.x0, self.f0, self.J = None, None, None
