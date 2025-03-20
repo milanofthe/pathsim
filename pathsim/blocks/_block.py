@@ -18,8 +18,6 @@ import numpy as np
 from ..utils.utils import dict_to_array, array_to_dict, max_error_dicts
 from ..utils.serialization import Serializable
 
-# from ..optim.operators import DynamicOperator
-
 
 # BASE BLOCK CLASS ======================================================================
 
@@ -27,12 +25,34 @@ class Block(Serializable):
     """Base 'Block' object that defines the inputs, outputs and the connect method.
 
     Block interconnections are handeled via the io interface of the blocks. 
-    It is realized by dicts for the 'inputs' and for the 'outputs', where 
-    the key of the dict is the input/output channel and the corresponding 
-    value is the input/output value. 
+    It is realized by dicts for the 'inputs' and for the 'outputs', where the 
+    key of the dict is the input/output channel and the corresponding value is 
+    the input/output value. 
 
     The block can spawn discrete events that are handled by the main simulation 
     for triggers, discrete time blocks, etc.
+
+    Mathematically the block behaviour is defined by two operators in most cases
+
+    .. math::
+    
+        \\begin{equnarray}
+        \\dot{x} &= f_\\mathrm{dyn}(x, u, t)\\\\
+               y &= f_\\mathrm{alg}(x, u, t)
+        \\end{equnarray}
+
+
+    they are algebraic operators for the algebraic path of the block and for the 
+    dynamic path that feeds into the internal numerical integration engine.
+
+    There are special cases where one or both of them are not defined, also for 
+    purely algebraic blocks such as multipliers and functions, there exists a 
+    simplified operator definition:
+    
+    .. math::
+
+        y = f_\\mathrm{alg}(u)
+    
 
     Notes
     -----
@@ -51,6 +71,10 @@ class Block(Serializable):
         list of internal events, for mixed signal blocks
     _active : bool
         flag that sets the block active or inactive   
+    op_alg : Operator, DynamicOperator, None
+        internal callable operator for algebraic components of block
+    op_dyn : DynamicOperator, None
+        internal callable operator for dynamic (ODE) components of block
     """
 
     def __init__(self):
@@ -121,108 +145,6 @@ class Block(Serializable):
         return self._active
 
 
-    # methods for block behaviour interface ---------------------------------------------
-
-    def _func_alg(self, x, u, t):
-        """The algebraic (passthrough) component of the block
-
-        .. math::
-
-            y = \\f_\\mathrm{alg}(x, u, t)
-
-        This method provides a unified interface for blocks 
-        with algebraic passthroughs. It is used primarily 
-        for the 'update' method.
-
-        Note
-        ----
-        Might be utilized in the future for performance 
-        enhancements through jit compilation.
-    
-        Parameters
-        ----------
-        x : array[numeric], numeric
-            internal block state
-        u : array[numeric], numeric
-            block inputs
-        t : float
-            evaluation time
-
-        Returns
-        -------
-        y : array[numeric], numeric
-            block output
-        """
-        return 0.0
-
-
-    def _func_dyn(self, x, u, t):
-        """The dynamical (ODE) component of the block. 
-
-        This method provides a unified interface for blocks 
-        with internal integration engines. It is used primarily 
-        internally for the solver instances.
-
-        .. math::
-
-            \\dot{x} = \\f_\\mathrm{dyn}(x, u, t)
-
-        Note
-        ----
-        Might be utilized in the future for performance 
-        enhancements through jit compilation.
-    
-        Parameters
-        ----------
-        x : array[numeric], numeric
-            internal block state
-        u : array[numeric], numeric
-            block inputs
-        t : float
-            evaluation time
-
-        Returns
-        -------
-        dx : array[numeric], numeric
-            dynamic block component evaluated
-        """
-        return 0.0
-
-
-    def _jac_dyn(self, x, u, t):
-        """Jacobian of the dynamical (ODE) component of the block 
-        with respect to the internal state 'x'. 
-
-        This method provides a unified interface for blocks 
-        with internal integration engines. It is used primarily 
-        internally for the solver instances.
-
-        .. math::
-
-            \\mathbf{J}_{\\mathrm{dyn}, x}(x, u, t)
-
-        Note
-        ----
-        Might be utilized in the future for performance 
-        enhancements through jit compilation.
-    
-        Parameters
-        ----------
-        x : array[numeric], numeric
-            internal block state
-        u : array[numeric], numeric
-            block inputs
-        t : float
-            evaluation time
-
-        Returns
-        -------
-        J : array[numeric], numeric
-            jacobian of dynamic block component evaluated
-        """
-        return 0.0
-
-
     # methods for visualization ---------------------------------------------------------
 
     def plot(self, *args, **kwargs):
@@ -273,6 +195,37 @@ class Block(Serializable):
 
         #reset engine if block has solver
         if self.engine: self.engine.reset()
+
+        #reset operators if defined
+        if self.op_alg: self.op_alg.reset()
+        if self.op_dyn: self.op_dyn.reset()
+
+
+    def linearize(self, t):
+        """Linearize the algebraic and dynamic components of the block.
+
+        This is done by linearizing the internal 'Operator' and 'DynamicOperator' 
+        instances in the current system operating point. The operators create 
+        1st order tayler approximations internally and use them on subsequent 
+        calls after linarization.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time
+        """
+
+        #get current state
+        u, _, x = self.get_all()
+        
+        #no internal state
+        if len(x) == 0: 
+            #linearize only algebraic operator -> stateless
+            if self.op_alg: self.op_alg.linearize(u)
+        else:
+            #linearize algebraic and dynamic operators
+            if self.op_alg: self.op_alg.linearize(x, u, t)
+            if self.op_dyn: self.op_dyn.linearize(x, u, t)
 
 
     # methods for blocks with discrete events -------------------------------------------
@@ -435,22 +388,24 @@ class Block(Serializable):
         error : float
             absolute error to previous iteration for convergence control
         """
-        
-        #get internal state from engine if available
-        x = self.engine.get() if self.engine else 0.0
-        
-        #get array representation of inputs
-        u = dict_to_array(self.inputs)    
 
-        #compute new algebraic output
-        y = self.op_alg(x, u, t)
+        #no internal algebraic operator -> early exit
+        if self.op_alg is None:
+            return 0.0
 
-        #if no passthrough -> early exit
+        #get full block state
+        u, _, x = self.get_all()
+
+        #no internal state -> standard 'Operator'
+        if len(x) == 0: y = self.op_alg(u)
+        else: y = self.op_alg(x, u, t)
+
+        #no passthrough -> early exit
         if len(self) == 0:
             self.outputs = array_to_dict(y)
             return 0.0
 
-        #set outputs to new values
+        #set outputs to new values and check convergence
         _outputs, self.outputs = self.outputs, array_to_dict(y)
         return max_error_dicts(_outputs, self.outputs)
 

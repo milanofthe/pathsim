@@ -266,6 +266,26 @@ class Subsystem(Block):
         self.reset()
 
 
+    def linearize(self, t):
+        """Linearize the algebraic and dynamic components of the internal blocks.
+
+        This is done by linearizing the internal 'Operator' and 'DynamicOperator' 
+        instances of all the internal blocks of the subsystem in the current system 
+        operating point. The operators create 1st order tayler approximations 
+        internally and use them on subsequent calls after linarization.
+    
+        Recursively traverses down the hierarchy for nested subsystems and linearizes 
+        all of them.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time
+        """
+        for block in self.blocks: 
+            block.linearize(t)
+
+
     # serialization / deserialization -------------------------------------------------------
     
     def to_dict(self):

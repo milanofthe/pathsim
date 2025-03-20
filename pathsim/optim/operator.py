@@ -95,11 +95,15 @@ class Operator(object):
         self.x0 = None
         self.J = None
         
+
+    def __bool__(self):
+        return True
         
+
     def __call__(self, x):
         """Evaluate the function or its linear approximation.
         
-        If the operator has been linearized (x0 is not None), returns the linear
+        If the operator has been linearized (f0 is not None), returns the linear
         approximation 
     
         .. math::
@@ -270,12 +274,16 @@ class DynamicOperator(object):
         self.u0 = None
         self.Jx = None
         self.Ju = None
+
+
+    def __bool__(self):
+        return True
         
         
     def __call__(self, x, u, t):
         """Evaluate the function or its linear approximation.
         
-        If the operator has been linearized (x0 is not None), returns the linear
+        If the operator has been linearized (f0 is not None), returns the linear
         approximation 
     
         .. math::
