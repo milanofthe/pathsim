@@ -393,12 +393,15 @@ class Block(Serializable):
         if self.op_alg is None:
             return 0.0
 
-        #get full block state
-        u, _, x = self.get_all()
+        #block input
+        u = dict_to_array(self.inputs)
 
         #no internal state -> standard 'Operator'
-        if len(x) == 0: y = self.op_alg(u)
-        else: y = self.op_alg(x, u, t)
+        if not self.engine: 
+            y = self.op_alg(u)
+        else: 
+            x = self.engine.get()
+            y = self.op_alg(x, u, t)
 
         #no passthrough -> early exit
         if len(self) == 0:

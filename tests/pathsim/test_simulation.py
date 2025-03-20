@@ -19,6 +19,16 @@ from pathsim.blocks._block import Block
 from pathsim.connection import Connection
 
 
+from pathsim._constants import (
+    SIM_TIMESTEP,
+    SIM_TIMESTEP_MIN,
+    SIM_TIMESTEP_MAX,
+    SIM_TOLERANCE_FPI,
+    SIM_ITERATIONS_MIN,
+    SIM_ITERATIONS_MAX
+    )
+
+
 
 # TESTS ================================================================================
 
@@ -35,13 +45,13 @@ class TestSimulation(unittest.TestCase):
         Sim = Simulation(log=False)
         self.assertEqual(Sim.blocks, [])
         self.assertEqual(Sim.connections, [])
-        self.assertEqual(Sim.dt, 0.01)
-        self.assertEqual(Sim.dt_min, 1e-16)
-        self.assertEqual(Sim.dt_max, None)
+        self.assertEqual(Sim.dt, SIM_TIMESTEP)
+        self.assertEqual(Sim.dt_min, SIM_TIMESTEP_MIN)
+        self.assertEqual(Sim.dt_max, SIM_TIMESTEP_MAX)
         self.assertEqual(str(Sim.Solver()), "SSPRK22")
-        self.assertEqual(Sim.tolerance_fpi, 1e-12)
-        self.assertEqual(Sim.iterations_min, 1) # <-- determined from internal path length
-        self.assertEqual(Sim.iterations_max, 200)
+        self.assertEqual(Sim.tolerance_fpi, SIM_TOLERANCE_FPI)
+        self.assertEqual(Sim.iterations_min, SIM_ITERATIONS_MIN) 
+        self.assertEqual(Sim.iterations_max, SIM_ITERATIONS_MAX)
         self.assertFalse(Sim.log)
 
         #test specific initialization
@@ -68,7 +78,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_min, 0.001)
         self.assertEqual(Sim.dt_max, 0.1)
         self.assertEqual(Sim.tolerance_fpi, 1e-9)
-        self.assertEqual(Sim.solver_args, {"tolerance_lte_rel":1e-4, "tolerance_lte_abs":1e-6})
+        self.assertEqual(Sim.solver_kwargs, {"tolerance_lte_rel":1e-4, "tolerance_lte_abs":1e-6})
         self.assertEqual(Sim.iterations_min, 3) # <-- determined from internal path length
         self.assertEqual(Sim.iterations_max, 100)
 

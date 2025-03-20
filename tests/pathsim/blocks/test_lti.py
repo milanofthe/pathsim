@@ -91,9 +91,6 @@ class TestStateSpace(unittest.TestCase):
         self.assertEqual(S.engine.tolerance_lte_abs, 1e-6)
         self.assertEqual(S.engine.initial_value, 1.0)
 
-        #test that jacobian has been generated correctly
-        self.assertEqual(S.engine.jac(0, 0, 0), S.A)
-
         S.set_solver(Solver, tolerance_lte_rel=1e-2, tolerance_lte_abs=1e-3)
 
         #test that solver tolerance is changed

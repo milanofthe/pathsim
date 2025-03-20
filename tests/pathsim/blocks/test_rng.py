@@ -69,6 +69,7 @@ class TestRNG(unittest.TestCase):
             old = R.get(0)
 
             R.sample(t)
+            R.update(t)
 
             #test if new random value is sampled
             self.assertNotEqual(old, R.get(0))
@@ -85,6 +86,7 @@ class TestRNG(unittest.TestCase):
             old = R.get(0)
 
             R.sample(t)
+            R.update(t)
 
             if t%2 == 0:
                 #test if value remains the same is sampled

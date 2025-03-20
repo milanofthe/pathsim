@@ -25,6 +25,8 @@ from pathsim.solvers import (
     RKCK54
     )
 
+from pathsim.utils.debugging import Timer
+
 
 # DUFFING OSCILLATOR ====================================================================
 
@@ -70,7 +72,13 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
 #run the simulation
-Sim.run(duration=30)
+Sim.run(duration=20)
+
+#linearize the whole system
+Sim.linearize()
+
+#run the linarized system 
+Sim.run(duration=20, reset=False)
 
 #plot the results directly from the scope
 Sc.plot()

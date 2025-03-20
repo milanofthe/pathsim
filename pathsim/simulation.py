@@ -1335,6 +1335,7 @@ class Simulation:
             function_evaluations=initial_evals
             )
 
+
         #iterate progress tracker generator until 'progress >= 1.0' is reached
         for _ in tracker:
 

@@ -32,8 +32,8 @@ class TestAdaptiveBuffer(unittest.TestCase):
 
         #test initialization
         self.assertEqual(buffer.delay, d)
-        self.assertEqual(len(buffer.buffer), 0)
-        self.assertEqual(buffer.counter, 0)
+        self.assertEqual(len(buffer.buffer_t), 0)
+        self.assertEqual(len(buffer.buffer_v), 0)
 
 
     def test_add(self):
@@ -44,10 +44,12 @@ class TestAdaptiveBuffer(unittest.TestCase):
 
         for i in range(10*d):
 
-            #test the counter
-            self.assertLessEqual(buffer.counter, buffer.clean_every+1)
-
             buffer.add(i, i)
+
+            #test the counter
+            self.assertLessEqual(len(buffer.buffer_t), min(i+1, d+2))
+
+            
 
 
     def test_get_empty(self):
@@ -101,8 +103,8 @@ class TestAdaptiveBuffer(unittest.TestCase):
         buffer.clear()
 
         #test buffer clearing
-        self.assertEqual(len(buffer.buffer), 0)
-        self.assertEqual(buffer.counter, 0)
+        self.assertEqual(len(buffer.buffer_t), 0)
+        self.assertEqual(len(buffer.buffer_v), 0)
 
 
 # RUN TESTS LOCALLY ====================================================================
