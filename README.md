@@ -23,16 +23,17 @@ All of that with minimal dependencies, only `numpy`, `scipy` and `matplotlib`!
 
 Key Features:
 
-- **Hot-swappable** blocks and solvers during simulation
+- **Dynamic system modification** at simulation runtime, i.e. triggered through events
+- Automatic block- and system-level **linearization** at runtime
 - Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
 - Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
 - **Modular and hierarchical** modeling with (nested) subsystems
 - **Event handling** system to detect and resolve discrete events (zero-crossing detection)
-- Automatic differentiation for **fully differentiable** system simulations
+- Automatic differentiation for end-to-end **differentiable** system simulations
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
 
-For the full **documentation**, tutorials and API-reference visit [readthedocs](https://pathsim.readthedocs.io/en/latest/)!
+For the full **documentation**, tutorials and API-reference visit [Read the Docs](https://pathsim.readthedocs.io/en/latest/)!
 
 The source code can be found in the [GitHub repository](https://github.com/milanofthe/pathsim) and is fully open source under **MIT license**. Consider starring PathSim to support its development.
 
@@ -46,7 +47,7 @@ pip install pathsim
 
 ## Example - Harmonic Oscillator
 
-There are lots of [examples](https://github.com/milanofthe/pathsim/tree/master/examples) of dynamical system simulations in the GitHub repository. 
+There are lots of [examples](https://github.com/milanofthe/pathsim/tree/master/examples) of dynamical system simulations in the GitHub repository that showcase PathSim's capabilities. 
 
 But first, lets have a look at how we can simulate the harmonic oscillator (a spring mass damper 2nd order system) using PathSim. The system and its corresponding equivalent block diagram are shown in the figure below:
 
@@ -384,8 +385,7 @@ PathSim is in active development and your feedback is highly appreciated! Dont s
 
 Some of the possible directions for future PathSim are:
 
-- block level parallelization (fork-join) with Python 3.13 free-threading, batching based on execution cost
-- linearization of blocks and subsystems with the AD framework, linear surrogate models, system wide linearization
+- block level parallelization (fork-join) with Python 3.13 free-threading
 - improved / more robust steady state solver and algebraic loop solver
 - methods for periodic steady state analysis
 - more extensive testing and validation (as always)
