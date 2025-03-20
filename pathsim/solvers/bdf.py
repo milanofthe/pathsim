@@ -98,15 +98,15 @@ class BDF(ImplicitSolver):
             self.B.pop(0)
 
 
-    def solve(self, u, t, dt):
+    def solve(self, f, J, dt):
         """Solves the implicit update equation using the optimizer of the engine.
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
+        J : array_like
+            evaluation of jacobian of function
         dt : float 
             integration timestep
 
@@ -120,18 +120,15 @@ class BDF(ImplicitSolver):
         n = min(len(self.B), self.n)
 
         #fixed-point function update
-        g = self.F[n] * dt * self.func(self.x, u, t) 
+        g = self.F[n]*dt*f
         for b, k in zip(self.B, self.K[n]):
             g = g + b*k
 
         #use the jacobian
-        if self.jac is not None:
-
-            #compute jacobian
-            jac_g = self.F[n] * dt * self.jac(self.x, u, t)
+        if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, jac_g)
+            self.x, err = self.opt.step(self.x, g, self.F[n]*dt*J)
 
         else:
             #optimizer step (pure)

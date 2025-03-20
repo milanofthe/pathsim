@@ -125,16 +125,14 @@ class ExplicitRungeKutta(ExplicitSolver):
         return success, error_norm, timestep_rescale
 
 
-    def step(self, u, t, dt):
+    def step(self, f, dt):
         """Performs the (explicit) timestep at the intermediate RK stages 
         for (t+dt) based on the state and input at (t)
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : numeric, array[numeric]
+            evaluation of function
         dt : float 
             integration timestep
 
@@ -149,7 +147,7 @@ class ExplicitRungeKutta(ExplicitSolver):
         """
 
         #buffer intermediate slope
-        self.Ks[self.stage] = self.func(self.x, u, t)
+        self.Ks[self.stage] = f
 
         #compute slope at stage, faster then 'sum' comprehension
         slope = 0.0
@@ -276,15 +274,15 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         return success, error_norm, timestep_rescale
 
 
-    def solve(self, u, t, dt):
+    def solve(self, f, J, dt):
         """Solves the implicit update equation using the optimizer of the engine.
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
+        J : array_like
+            evaluation of jacobian of function
         dt : float 
             integration timestep
 
@@ -299,24 +297,21 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             return 0.0
             
         #update timestep weighted slope 
-        self.Ks[self.stage] = self.func(self.x, u, t)
+        self.Ks[self.stage] = f
 
         #compute slope (this is faster then 'sum' comprehension)
         slope = 0.0
         for i, a in enumerate(self.BT[self.stage]):
-            slope = slope + self.Ks[i] * a
+            slope = slope + self.Ks[i]*a
 
         #use the jacobian
-        if self.jac is not None:
+        if J is not None:
 
             #most recent butcher coefficient
             b = self.BT[self.stage][self.stage]
 
-            #compute jacobian of fixed-point equation
-            jac_g = dt * b * self.jac(self.x, u, t)
-
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, dt*slope + self.x_0, jac_g)
+            self.x, err = self.opt.step(self.x, dt*slope + self.x_0, dt*b*J)
 
         else:
             #optimizer step (pure)
@@ -326,16 +321,14 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         return err
 
 
-    def step(self, u, t, dt):
+    def step(self, f, dt):
         """performs the (explicit) timestep at the intermediate RK stages 
         for (t+dt) based on the state and input at (t)
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
         dt : float 
             integration timestep
 
@@ -351,7 +344,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
 
         #first stage is explicit -> ESDIRK
         if self.stage == 0 and self.BT[self.stage] is None:
-            self.Ks[self.stage] = self.func(self.x, u, t)
+            self.Ks[self.stage] = f
 
         #increment stage counter
         self.stage += 1

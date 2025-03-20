@@ -46,11 +46,6 @@ class Solver:
     ----------
     initial_value : float, array
         initial condition / integration constant
-    func : callable
-        function to integrate with state 'x', input 'u' and time 't' dependency
-    jac : callable, None
-        jacobian of 'func' with respect to 'x', depending on 'x', 'u' and 't', 
-        if 'None', no jacobian is used
     tolerance_lte_abs : float
         absolute tolerance for local truncation error (for solvers with error estimate)
     tolerance_lte_rel : float
@@ -72,21 +67,15 @@ class Solver:
         rations for evaluation times of intermediate stages
     """
 
-    def __init__(self, 
-                 initial_value=0, 
-                 func=lambda x, u, t: u, 
-                 jac=None, 
-                 tolerance_lte_abs=SOL_TOLERANCE_LTE_ABS, 
-                 tolerance_lte_rel=SOL_TOLERANCE_LTE_REL):
+    def __init__(
+        self, 
+        initial_value=0, 
+        tolerance_lte_abs=SOL_TOLERANCE_LTE_ABS, 
+        tolerance_lte_rel=SOL_TOLERANCE_LTE_REL
+        ):
 
         #set buffer, state and initial condition    
         self.x_0 = self.x = self.initial_value = initial_value
-
-        #right hand side function for integration
-        self.func = func
-
-        #jacobian of right hand side function
-        self.jac = jac
 
         #tolerances for local truncation error (for adaptive solvers)
         self.tolerance_lte_abs = tolerance_lte_abs  
@@ -207,7 +196,7 @@ class Solver:
 
 
     @classmethod
-    def cast(cls, other, **solver_args):
+    def cast(cls, other, **solver_kwargs):
         """Cast the integration engine to the new type and initialize 
         with previous solver arguments so it can continue from where 
         the 'old' solver stopped.
@@ -216,7 +205,7 @@ class Solver:
         ----------
         other : Solver
             solver instance to cast to new solver type
-        solver_args : dict
+        solver_kwargs : dict
             additional args for the new solver
 
         Returns
@@ -232,10 +221,8 @@ class Solver:
         #create new solver instance
         engine = cls(
             initial_value=other.initial_value, 
-            func=other.func, 
-            jac=other.jac, 
-            tolerance_lte_rel=solver_args.get("tolerance_lte_rel", other.tolerance_lte_rel),
-            tolerance_lte_abs=solver_args.get("tolerance_lte_abs", other.tolerance_lte_abs)
+            tolerance_lte_rel=solver_kwargs.get("tolerance_lte_rel", other.tolerance_lte_rel),
+            tolerance_lte_abs=solver_kwargs.get("tolerance_lte_abs", other.tolerance_lte_abs)
             )
         
         #set internal state of new engine from other
@@ -279,7 +266,7 @@ class Solver:
 
     # methods for timestepping ---------------------------------------------------------
 
-    def step(self, u, t, dt):
+    def step(self, f, dt):
         """Performs the explicit timestep for (t+dt) based 
         on the state and input at (t).
 
@@ -288,10 +275,8 @@ class Solver:
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : numeric, array[numeric]
+            evaluation of rhs function
         dt : float 
             integration timestep
 
@@ -368,13 +353,15 @@ class ExplicitSolver(Solver):
 
     # method for direct integration ----------------------------------------------------
 
-    def integrate_singlestep(self, time=0.0, dt=SIM_TIMESTEP):
-        """Directly integrate the function 'func' for a single timestep 'dt' with 
+    def integrate_singlestep(self, func, time=0.0, dt=SIM_TIMESTEP):
+        """Directly integrate the function for a single timestep 'dt' with 
         explicit solvers. This method is primarily intended for testing purposes.
         
         Parameters
         ----------  
-        time_start : float
+        func : callable
+            function to integrate f(x, t)
+        time : float
             starting time for timestep
         dt : float
             integration timestep
@@ -394,13 +381,15 @@ class ExplicitSolver(Solver):
 
         #iterate solver stages (explicit updates)
         for t in self.stages(time, dt):
-            success, error_norm, scale = self.step(0.0, t, dt)
+            f = func(self.x, t)
+            success, error_norm, scale = self.step(f, dt)
 
         return success, error_norm, scale
 
 
     def integrate(
         self, 
+        func,
         time_start=0.0, 
         time_end=1.0, 
         dt=SIM_TIMESTEP, 
@@ -429,14 +418,16 @@ class ExplicitSolver(Solver):
             x0 = 1
     
             #initialize ODE solver
-            sol = Solver(x0, f)
+            sol = Solver(x0)
 
             #integrate from 0 to 5 with timestep 0.1
-            t, x = sol.integrate(time_end=5, dt=0.1)
+            t, x = sol.integrate(f, time_end=5, dt=0.1)
 
     
         Parameters
         ----------
+        func : callable
+            function to integrate f(x, t)
         time_start : float
             starting time for integration
         time_end : float
@@ -469,7 +460,7 @@ class ExplicitSolver(Solver):
         while time < time_end + dt:
 
             #perform single timestep
-            success, error_norm, scale = self.integrate_singlestep(time, dt)
+            success, error_norm, scale = self.integrate_singlestep(func, time, dt)
 
             #check if timestep was successful
             if adaptive and not success:
@@ -550,17 +541,17 @@ class ImplicitSolver(Solver):
 
     # methods for timestepping ---------------------------------------------------------
 
-    def solve(self, u, t, dt):
+    def solve(self, j, J, dt):
         """Advances the solution of the implicit update equation of the solver 
         with the optimizer of the engine and tracks the evolution of the 
         solution by providing the residual norm of the fixed-point solution.
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : numeric, array[numeric]
+            evaluation of rhs function
+        J : array[numeric]
+            evaluation of jacobian of rhs function 
         dt : float 
             integration timestep
 
@@ -576,16 +567,23 @@ class ImplicitSolver(Solver):
 
     def integrate_singlestep(
         self, 
+        func,
+        jac,
         time=0.0, 
         dt=SIM_TIMESTEP, 
         tolerance_fpi=SOL_TOLERANCE_FPI, 
-        max_iterations=SOL_ITERATIONS_MAX):
+        max_iterations=SOL_ITERATIONS_MAX
+        ):
         """
         Directly integrate the function 'func' for a single timestep 'dt' with 
         implicit solvers. This method is primarily intended for testing purposes.
 
         Parameters
         ----------  
+        func : callable
+            function to integrate f(x, t)
+        jac : callable
+            jacobian of f w.r.t. x
         time_start : float
             starting time for timestep
         dt : float
@@ -619,7 +617,8 @@ class ImplicitSolver(Solver):
             
             #iteratively solve implicit update equation
             for _ in range(max_iterations):
-                error_sol = self.solve(0.0, t, dt)
+                f, J = func(self.x, t), jac(self.x, t)
+                error_sol = self.solve(f, J, dt)
                 if error_sol < tolerance_fpi: 
                     break
 
@@ -628,13 +627,16 @@ class ImplicitSolver(Solver):
                 if success_sol: success_sol = False
             
             #perform explicit component of timestep
-            success, error_norm, scale = self.step(0.0, t, dt)
+            f = func(self.x, t)
+            success, error_norm, scale = self.step(f, dt)
 
         return success, success_sol, error_norm, scale 
 
 
     def integrate(
         self, 
+        func, 
+        jac,
         time_start=0.0, 
         time_end=1.0, 
         dt=SIM_TIMESTEP, 
@@ -658,20 +660,24 @@ class ImplicitSolver(Solver):
         .. code-block:: python
             
             #1st order linear ODE
-            def f(x, u, t):
+            def f(x, t):
                 return -x
 
             #initial condition
             x0 = 1
     
             #initialize ODE solver
-            sol = Solver(x0, f)
+            sol = Solver(x0)
 
             #integrate from 0 to 5 with timestep 0.1
-            t, x = sol.integrate(time_end=5, dt=0.1)
+            t, x = sol.integrate(f, time_end=5, dt=0.1)
     
         Parameters
         ----------
+        func : callable
+            function to integrate f(x, t)
+        jac : callable
+            jacobian of f w.r.t. x
         time_start : float
             starting time for integration
         time_end : float
@@ -710,6 +716,8 @@ class ImplicitSolver(Solver):
 
             #integrate for single timestep
             success, success_sol, error_norm, scale = self.integrate_singlestep(
+                func, 
+                jac,
                 time, 
                 dt, 
                 tolerance_fpi, 

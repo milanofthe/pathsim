@@ -11,6 +11,8 @@
 
 from ._block import Block
 
+from ..optim.operator import Operator
+
 
 # SISO BLOCKS ===========================================================================
 
@@ -33,9 +35,10 @@ class Amplifier(Block):
         super().__init__()
         self.gain = gain
 
-
-    def _func_alg(self, x, u, t):
-        return self.gain * u
+        self.op_alg = Operator(
+            func=lambda x: self.gain*x, 
+            jac=lambda x: self.gain
+            )
 
 
     def update(self, t):
@@ -55,5 +58,5 @@ class Amplifier(Block):
         error : float
             deviation to previous iteration for convergence control
         """
-        _out, self.outputs[0] = self.outputs[0], self._func_alg(0, self.inputs[0], t)
+        _out, self.outputs[0] = self.outputs[0], self.op_alg(self.inputs[0])
         return abs(_out - self.outputs[0])

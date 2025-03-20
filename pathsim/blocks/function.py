@@ -19,6 +19,9 @@ from ..utils.utils import (
     )
 
 
+from ..optim.operator import Operator
+
+
 # MIMO BLOCKS ===========================================================================
 
 class Function(Block):
@@ -85,7 +88,26 @@ class Function(Block):
         
         #function defining the block update
         self.func = func
+        self.op_alg = Operator(func=lambda x: func(*x))
 
 
-    def _func_alg(self, x, u, t):
-        return self.func(*u)
+    def update(self, t):
+        """Evaluate function block
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            absolute error to previous iteration for convergence control
+        """
+                
+        #apply operator to get output
+        y = self.op_alg(dict_to_array(self.inputs))
+
+        #set outputs to new values
+        _outputs, self.outputs = self.outputs, array_to_dict(y)
+        return max_error_dicts(_outputs, self.outputs)

@@ -13,6 +13,8 @@ import numpy as np
 
 from ._block import Block
 
+from ..optim.operator import DynamicOperator
+
 
 # BLOCKS ================================================================================
 
@@ -43,22 +45,18 @@ class Differentiator(Block):
         #maximum frequency for differentiator approximation
         self.f_max = f_max
 
+        self.op_dyn = DynamicOperator(
+            func=lambda x, u, t: self.f_max * (u - x),
+            jac_x=lambda x, u, t: -self.f_max
+            )
+        self.op_alg = DynamicOperator(
+            func=lambda x, u, t: self.f_max * (u - x),
+            jac_x=lambda x, u, t: -self.f_max,
+            jac_u=lambda x, u, t: self.f_max,
+            )
 
     def __len__(self):
         return 1 if self._active else 0
-
-
-    def _func_alg(self, x, u, t):
-        #algebraic component of differentiator approximation
-        return self.f_max * (u - x)
-
-
-    def _func_dyn(self, x, u, t):
-        return self.f_max * (u - x)
-
-
-    def _jac_dyn(self, x, u, t):
-        return -self.f_max
 
 
     def set_solver(self, Solver, **solver_args):
@@ -78,7 +76,7 @@ class Differentiator(Block):
             return #quit early
 
         #initialize the numerical integration engine with kernel
-        self.engine = Solver(0.0, self._func_dyn, self._jac_dyn, **solver_args)
+        self.engine = Solver(0.0, **solver_args)
 
 
     def update(self, t):
@@ -99,7 +97,8 @@ class Differentiator(Block):
         error : float
             absolute error to previous iteration for convergence control
         """
-        _out, self.outputs[0] = self.outputs[0], self._func_alg(self.engine.get(), self.inputs[0], t)
+        x, u = self.engine.get(), self.inputs[0]
+        _out, self.outputs[0] = self.outputs[0], self.op_alg(x, u, t)
         return abs(_out - self.outputs[0])
 
 
@@ -118,7 +117,9 @@ class Differentiator(Block):
         error : float
             solver residual norm
         """
-        return self.engine.solve(self.inputs[0], t, dt)
+        x, u = self.engine.get(), self.inputs[0]
+        f, J = self.op_dyn(x, u, t), self.op_dyn.jac(x, u, t)
+        return self.engine.solve(f, J, dt)
 
 
     def step(self, t, dt):
@@ -140,4 +141,6 @@ class Differentiator(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        return self.engine.step(self.inputs[0], t, dt)
+        x, u = self.engine.get(), self.inputs[0]
+        f = self.op_dyn(x, u, t)
+        return self.engine.step(f, dt)

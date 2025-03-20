@@ -24,6 +24,8 @@ from ..utils.gilbert import (
     gilbert_realization
     )
 
+from ..optim.operator import DynamicOperator
+
 
 # LTI BLOCKS ============================================================================
 
@@ -74,25 +76,22 @@ class StateSpace(Block):
         #initial condition
         self.initial_value = np.zeros(n) if initial_value is None else initial_value
 
+        #operators
+        self.op_dyn = DynamicOperator(
+            func=lambda x, u, t: np.dot(self.A, x) + np.dot(self.B, u),
+            jac_x=lambda x, u, t: self.A,
+            jac_u=lambda x, u, t: self.B
+            )
+        self.op_alg = DynamicOperator(
+            func=lambda x, u, t: np.dot(self.C, x) + np.dot(self.D, u),
+            jac_x=lambda x, u, t: self.C,
+            jac_u=lambda x, u, t: self.D
+            )
+
 
     def __len__(self):
         #check if direct passthrough exists
         return int(np.any(self.D)) if self._active else 0
-
-
-    def _func_alg(self, x, u, t):
-        if np.any(self.D):
-            return np.dot(self.C, x) + np.dot(self.D, u)
-        else:
-            return np.dot(self.C, x)
-
-
-    def _func_dyn(self, x, u, t):
-        return np.dot(self.A, x) + np.dot(self.B, u)
-
-
-    def _jac_dyn(self, x, u, t):
-        return self.A
 
 
     def set_solver(self, Solver, **solver_args):
@@ -108,7 +107,7 @@ class StateSpace(Block):
         
         if self.engine is None:
             #initialize the integration engine with right hand side
-            self.engine = Solver(self.initial_value, self._func_dyn, self._jac_dyn, **solver_args)
+            self.engine = Solver(self.initial_value, **solver_args)
 
         else:
             #change solver if already initialized
@@ -130,7 +129,9 @@ class StateSpace(Block):
         error : float
             solver residual norm
         """
-        return self.engine.solve(dict_to_array(self.inputs), t, dt)
+        x, u = self.engine.get(), dict_to_array(self.inputs)
+        f, J = self.op_dyn(x, u, t), self.op_dyn.jac_x(x, u, t)
+        return self.engine.solve(f, J, dt)
 
 
     def step(self, t, dt):
@@ -152,7 +153,9 @@ class StateSpace(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        return self.engine.step(dict_to_array(self.inputs), t, dt)
+        x, u = self.engine.get(), dict_to_array(self.inputs)
+        f = self.op_dyn(x, u, t)
+        return self.engine.step(f, dt)
 
 
 class TransferFunction(StateSpace):

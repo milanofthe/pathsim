@@ -246,16 +246,15 @@ class SinusoidalPhaseNoiseSource(Block):
         self.noise_2 = np.random.normal() 
 
 
-    def set_solver(self, Solver, **solver_args):
+    def set_solver(self, Solver, **solver_kwargs):
         
         #change solver if already initialized
         if self.engine is not None:
-            self.engine = Solver.cast(self.engine, **solver_args)
+            self.engine = Solver.cast(self.engine, **solver_kwargs)
             return #quit early
 
-        #initialize the numerical integration engine with kernel
-        def _f(x, u, t): return u
-        self.engine = Solver(0.0, _f, None, **solver_args)
+        #initialize the numerical integration engine 
+        self.engine = Solver(0.0, **solver_kwargs)
 
 
     def reset(self):
@@ -293,14 +292,16 @@ class SinusoidalPhaseNoiseSource(Block):
 
 
     def solve(self, t, dt):
-        #advance solution of implicit update equation
-        self.engine.solve(self.noise_2, t, dt)
+        #advance solution of implicit update equation (no jacobian)
+        f = self.noise_2
+        self.engine.solve(f, None, dt)
         return 0.0
 
 
     def step(self, t, dt):
         #compute update step with integration engine
-        self.engine.step(self.noise_2, t, dt)
+        f = self.noise_2
+        self.engine.step(f, dt)
 
         #no error control for noise source
         return True, 0.0, 1.0

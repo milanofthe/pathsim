@@ -23,6 +23,7 @@ delta = 0.0001
 #blocks that define the system
 Int = Integrator(delta)
 Fnc = Function(lambda x: x**2 - x**3)
+
 Sco = Scope()
 
 blocks = [Int, Fnc, Sco]

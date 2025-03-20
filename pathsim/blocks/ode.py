@@ -12,14 +12,13 @@
 import numpy as np
 
 from ._block import Block
- 
-from ..optim.value import Value, jac
-from ..optim.numerical import num_jac
 
 from ..utils.utils import (
     dict_to_array, 
     array_to_dict
     )
+
+from ..optim.operator import DynamicOperator
 
 
 # BLOCKS ================================================================================
@@ -107,28 +106,16 @@ class ODE(Block):
 
         #jacobian of 'func'
         self.jac = jac
+
+        #operators
+        self.op_dyn = DynamicOperator(
+            func=func,
+            jac_x=jac
+            )
         
 
     def __len__(self):
         return 0
-
-
-    def _func_dyn(self, x, u, t):
-        return self.func(x, u, t)
-
-
-    def _jac_dyn(self, x, u, t):
-        #use jacobian if defined, otherwise different strategy
-        if self.jac is None: 
-            try:  
-                #try using AD for jacobian                
-                _x = Value.array(x)
-                return jac(self.func(_x, u, t), _x)
-            except:
-                #fallback to numerical jacobian
-                return num_jac(lambda _x: self.func(_x, u, t), x)
-        else: 
-            return self.jac(x, u, t)
 
 
     def set_solver(self, Solver, **solver_args):
@@ -143,7 +130,7 @@ class ODE(Block):
         """
         if self.engine is None:
             #initialize the integration engine with right hand side
-            self.engine = Solver(self.initial_value, self._func_dyn, self._jac_dyn, **solver_args)
+            self.engine = Solver(self.initial_value, **solver_args)
         else:
             #change solver if already initialized
             self.engine = Solver.cast(self.engine, **solver_args)
@@ -187,7 +174,9 @@ class ODE(Block):
         error : float
             solver residual norm
         """
-        return self.engine.solve(dict_to_array(self.inputs), t, dt)
+        x, u = self.engine.get(), dict_to_array(self.inputs)
+        f, J = self.op_dyn(x, u, t), self.op_dyn.jac_x(x, u, t)
+        return self.engine.solve(f, J, dt)
 
 
     def step(self, t, dt):
@@ -209,4 +198,6 @@ class ODE(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        return self.engine.step(dict_to_array(self.inputs), t, dt)
+        x, u = self.engine.get(), dict_to_array(self.inputs)
+        f = self.op_dyn(x, u, t)
+        return self.engine.step(f, dt)

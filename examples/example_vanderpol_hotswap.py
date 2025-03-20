@@ -32,6 +32,7 @@ def jac(x, u, t):
 
 #blocks that define the system
 VDP = ODE(func, x0, jac) 
+# VDP = ODE(func, x0) 
 Sco = Scope()
 
 blocks = [VDP, Sco]

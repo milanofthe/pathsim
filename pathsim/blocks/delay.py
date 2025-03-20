@@ -40,11 +40,6 @@ class Delay(Block):
         #no passthrough by definition
         return 0
 
-    
-    def _func_alg(self, x, u, t):
-        #retrieve value from buffer
-        return self._buffer.get(t)
-
 
     def reset(self):
         #reset inputs and outputs
@@ -75,7 +70,7 @@ class Delay(Block):
         """
 
         #retrieve value from buffer
-        _out, self.outputs[0] = self.outputs[0], self._func_alg(0, 0, t)
+        _out, self.outputs[0] = self.outputs[0], self._buffer.get(t)
         return abs(_out - self.outputs[0])
 
 

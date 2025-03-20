@@ -91,35 +91,30 @@ class Spectrum(Block):
     def __len__(self):
         return 0
 
+    
+    def _kernel(self, x, u, t):
+        if self.alpha == 0: return np.kron(u, np.exp(-1j * self.omega * t))
+        return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
 
-    def set_solver(self, Solver, **solver_args):
+
+    def set_solver(self, Solver, **solver_kwargs):
         """set the internal numerical integrator for the RFT
 
         Parameters
         ----------
         Solver : Solver
             numerical integration solver class
-        solver_args : dict
+        solver_kwargs : dict
             parameters for solver initialization
         """
         
         if self.engine is None:
-            
-            #initialize the numerical integration engine with kernel
-            def _f(x, u, t):
-                return np.kron(u, np.exp(-1j * self.omega * t))
-
-            def _f_decay(x, u, t):
-                return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
-
-            #initialize depending on forgetting factor
-            if self.alpha == 0.0: self.engine = Solver(0.0, _f, None, **solver_args)
-            else: self.engine = Solver(0.0, _f_decay, None, **solver_args)
+            #initialize 
+            self.engine = Solver(0.0, **solver_kwargs)
 
         else:
-
             #change solver if already initialized
-            self.engine = Solver.cast(self.engine, **solver_args)
+            self.engine = Solver.cast(self.engine, **solver_kwargs)
 
         
     def reset(self):
@@ -193,8 +188,9 @@ class Spectrum(Block):
             #update local integtration time
             self.time = _t
             
-            #advance solution of implicit update equation
-            return self.engine.solve(dict_to_array(self.inputs), _t, dt)
+            #advance solution of implicit update equation (no jacobian)
+            f = self._kernel(self.engine.get(), dict_to_array(self.inputs), _t)
+            return self.engine.solve(f, None, dt)
 
         #no error 
         return 0.0
@@ -228,7 +224,8 @@ class Spectrum(Block):
             self.time = _t
             
             #compute update step with integration engine
-            return self.engine.step(dict_to_array(self.inputs), _t, dt)
+            f = self._kernel(self.engine.get(), dict_to_array(self.inputs), _t)
+            return self.engine.step(f, dt)
 
         #no error estimate
         return True, 0.0, 1.0

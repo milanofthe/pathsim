@@ -14,6 +14,8 @@ from math import prod
 
 from ._block import Block
 
+from ..optim.operator import Operator
+
 
 # MISO BLOCKS ===========================================================================
 
@@ -25,9 +27,13 @@ class Multiplier(Block):
         y(t) = \\prod_i u_i(t)
 
     """
+    def __init__(self):
+        super().__init__()
 
-    def _func_alg(self, x, u, t):
-        return prod(u)
+        self.op_alg = Operator(
+            func=lambda x: prod(x), 
+            jac=lambda x: np.array([prod(x[:i]+x[i+1:]) for i in range(len(x))])
+            )
 
 
     def update(self, t):
@@ -47,5 +53,5 @@ class Multiplier(Block):
         error : float
             absolute error to previous iteration for convergence control
         """
-        _out, self.outputs[0] = self.outputs[0], self._func_alg(0, self.inputs.values(), t)
+        _out, self.outputs[0] = self.outputs[0], self.op_alg(self.inputs.values())
         return abs(_out - self.outputs[0])

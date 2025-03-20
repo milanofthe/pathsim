@@ -222,15 +222,15 @@ class GEAR(ImplicitSolver):
 
     # methods for timestepping ---------------------------------------------------------
 
-    def solve(self, u, t, dt):
+    def solve(self, f, J, dt):
         """Solves the implicit update equation using the optimizer of the engine.
         
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
+        J : array_like
+            evaluation of jacobian of function
         dt : float 
             integration timestep
 
@@ -245,18 +245,15 @@ class GEAR(ImplicitSolver):
         n = min(self.n, len(self.B))
         
         #fixed-point function update (faster then sum comprehension)
-        g = self.F[n] * dt * self.func(self.x, u, t) 
+        g = self.F[n]*dt*f
         for b, k in zip(self.B, self.K[n]):
             g = g + b*k
 
         #use the jacobian
-        if self.jac is not None:
-
-            #compute jacobian
-            jac_g = self.F[n] * dt * self.jac(self.x, u, t)
+        if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, jac_g)
+            self.x, err = self.opt.step(self.x, g, self.F[n]*dt*J)
 
         else:
             #optimizer step (pure)
@@ -266,17 +263,15 @@ class GEAR(ImplicitSolver):
         return err
 
 
-    def step(self, u, t, dt):
+    def step(self, f, dt):
         """Finalizes the timestep by resetting the solver for the implicit 
         update equation and computing the lower order estimate of the 
         solution for error control.
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
         dt : float 
             integration timestep
 
@@ -295,7 +290,7 @@ class GEAR(ImplicitSolver):
             return True, 0.0, 1.0
 
         #estimate truncation error from lower order solution
-        tr = self.x - self.F[self.m] * dt * self.func(self.x, u, t) 
+        tr = self.x - self.F[self.m]*dt*f
         for b, k in zip(self.B, self.K[self.m]):
             tr = tr - b*k
 
@@ -484,7 +479,7 @@ class GEAR52A(GEAR):
 
     # methods for timestepping ---------------------------------------------------------
 
-    def step(self, u, t, dt):
+    def step(self, f, dt):
         """Finalizes the timestep by resetting the solver for the implicit 
         update equation and computing the lower and higher order estimate 
         of the solution. 
@@ -493,10 +488,8 @@ class GEAR52A(GEAR):
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
         dt : float 
             integration timestep
 
@@ -518,12 +511,12 @@ class GEAR52A(GEAR):
         n_m, n_p = self.n-1, self.n+1 
 
         #estimate truncation error from lower order solution
-        tr_m = self.x - self.F[n_m] * dt * self.func(self.x, u, t) 
+        tr_m = self.x - self.F[n_m]*dt*f
         for b, k in zip(self.B, self.K[n_m]):
             tr_m = tr_m - b*k
 
         #estimate truncation error from higher order solution
-        tr_p = self.x - self.F[n_p] * dt * self.func(self.x, u, t) 
+        tr_p = self.x - self.F[n_p]*dt*f
         for b, k in zip(self.B, self.K[n_p]):
             tr_p = tr_p - b*k
 

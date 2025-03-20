@@ -18,6 +18,8 @@ from ..utils.utils import (
     array_to_dict
     )
 
+from ..optim.operator import DynamicOperator
+
 
 # BLOCKS ================================================================================
 
@@ -58,6 +60,12 @@ class Integrator(Block):
         #save initial value
         self.initial_value = initial_value
 
+        self.op_dyn = DynamicOperator(
+            func=lambda x, u, t: u,
+            jac_x=lambda x, u, t: 0.0,
+            jac_u=lambda x, u, t: 1.0
+            )
+
 
     def __len__(self):
         return 0
@@ -84,7 +92,7 @@ class Integrator(Block):
             return #quit early
             
         #initialize the integration engine
-        self.engine = Solver(self.initial_value, self._func_dyn, None, **solver_args)
+        self.engine = Solver(self.initial_value, **solver_args)
 
 
     def update(self, t):
@@ -124,7 +132,9 @@ class Integrator(Block):
         error : float
             solver residual norm
         """
-        return self.engine.solve(dict_to_array(self.inputs), t, dt)
+        x, u = self.engine.get(), dict_to_array(self.inputs)
+        f = self.op_dyn(x, u, t)
+        return self.engine.solve(f, None, dt)
 
 
     def step(self, t, dt):
@@ -146,4 +156,6 @@ class Integrator(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        return self.engine.step(dict_to_array(self.inputs), t, dt)
+        x, u = self.engine.get(), dict_to_array(self.inputs)
+        f = self.op_dyn(x, u, t)
+        return self.engine.step(f, dt)

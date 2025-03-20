@@ -21,16 +21,16 @@ class SteadyState(ImplicitSolver):
     by forcing the derivatives to zero, i.e. f(x,u,t) = 0.
     """
         
-    def solve(self, u, t, dt):
+    def solve(self, f, J, dt):
         """Solve for steady state by finding x where f(x,u,t) = 0
         using the fixed point equation x = x + f(x,u,t).
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
+        J : array_like
+            evaluation of jacobian of function
         dt : float 
             integration timestep
 
@@ -41,12 +41,12 @@ class SteadyState(ImplicitSolver):
         """
 
         #fixed point equation g(x) = x + f(x,u,t)
-        g = self.x + self.func(self.x, u, t)
+        g = self.x + f
         
-        if self.jac is not None:
+        if J is not None:
 
             #jacobian of g is I + df/dx
-            jac_g = np.eye(len(self.x)) + self.jac(self.x, u, t)
+            jac_g = np.eye(len(self.x)) + J
 
             #optimizer step with block local jacobian
             self.x, err = self.opt.step(self.x, g, jac_g)

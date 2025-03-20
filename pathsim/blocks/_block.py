@@ -18,6 +18,8 @@ import numpy as np
 from ..utils.utils import dict_to_array, array_to_dict, max_error_dicts
 from ..utils.serialization import Serializable
 
+# from ..optim.operators import DynamicOperator
+
 
 # BASE BLOCK CLASS ======================================================================
 
@@ -65,6 +67,10 @@ class Block(Serializable):
 
         #internal discrete events (for mixed signal blocks)
         self.events = []
+
+        #operators for algebraic and dynamic components
+        self.op_alg = None
+        self.op_dyn = None
 
 
     def __len__(self):
@@ -427,7 +433,7 @@ class Block(Serializable):
         Returns
         -------
         error : float
-            relative error to previous iteration for convergence control
+            absolute error to previous iteration for convergence control
         """
         
         #get internal state from engine if available
@@ -437,7 +443,7 @@ class Block(Serializable):
         u = dict_to_array(self.inputs)    
 
         #compute new algebraic output
-        y = self._func_alg(x, u, t)
+        y = self.op_alg(x, u, t)
 
         #if no passthrough -> early exit
         if len(self) == 0:

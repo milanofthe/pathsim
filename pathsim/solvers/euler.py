@@ -22,16 +22,14 @@ class EUF(ExplicitSolver):
     or multistep/multistage methods cant be used. 
     """
 
-    def step(self, u, t, dt):
+    def step(self, f, dt):
         """performs the explicit forward timestep for (t+dt) 
         based on the state and input at (t)
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
         dt : float 
             integration timestep
 
@@ -46,7 +44,7 @@ class EUF(ExplicitSolver):
         """
 
         #update state with euler step
-        self.x = self.x_0 + dt * self.func(self.x, u, t)
+        self.x = self.x_0 + dt * f
 
         #no error estimate available
         return True, 0.0, 1.0
@@ -61,16 +59,16 @@ class EUB(ImplicitSolver):
     that dont require super high accuracy.
     """
 
-    def solve(self, u, t, dt):
+    def solve(self, f, J, dt):
         """Solves the implicit update equation 
         using the internal optimizer.
 
         Parameters
         ----------
-        u : numeric, array[numeric]
-            function 'func' input value
-        t : float
-            evaluation time of function 'func'
+        f : array_like
+            evaluation of function
+        J : array_like
+            evaluation of jacobian of function
         dt : float 
             integration timestep
 
@@ -81,16 +79,13 @@ class EUB(ImplicitSolver):
         """
 
         #update the fixed point equation
-        g = self.x_0 + dt * self.func(self.x, u, t)
+        g = self.x_0 + dt*f
 
         #use the numerical jacobian
-        if self.jac is not None:
-
-            #compute numerical jacobian
-            jac_g = dt * self.jac(self.x, u, t)
+        if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, jac_g)
+            self.x, err = self.opt.step(self.x, g, dt*J)
 
         else:
             #optimizer step (pure)
