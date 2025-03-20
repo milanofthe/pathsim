@@ -8,3 +8,4 @@ pathsim.optim
    pathsim.optim.newton
    pathsim.optim.value
    pathsim.optim.numerical
+   pathsim.optim.operator

@@ -36,10 +36,10 @@ class Block(Serializable):
 
     .. math::
     
-        \\begin{equnarray}
+        \\begin{eqnarray}
         \\dot{x} &= f_\\mathrm{dyn}(x, u, t)\\\\
                y &= f_\\mathrm{alg}(x, u, t)
-        \\end{equnarray}
+        \\end{eqnarray}
 
 
     they are algebraic operators for the algebraic path of the block and for the 
