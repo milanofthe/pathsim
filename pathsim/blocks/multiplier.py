@@ -13,7 +13,7 @@
 from math import prod
 
 from ._block import Block
-
+from ..utils.utils import dict_to_array
 from ..optim.operator import Operator
 
 
@@ -53,5 +53,6 @@ class Multiplier(Block):
         error : float
             absolute error to previous iteration for convergence control
         """
-        _out, self.outputs[0] = self.outputs[0], self.op_alg(self.inputs.values())
+        u = dict_to_array(self.inputs)
+        _out, self.outputs[0] = self.outputs[0], self.op_alg(u)
         return abs(_out - self.outputs[0])

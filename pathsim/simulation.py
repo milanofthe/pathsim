@@ -683,6 +683,28 @@ class Simulation:
         self._update(0.0)
 
 
+    # linearization ---------------------------------------------------------------
+
+    def linearize(self):
+        """Linearize the full system in the current simulation state 
+        at the current simulation time.
+        
+        This is achieved by linearizing algebraic and dynamic operators 
+        of the internal blocks. See definition of the 'Block' class.
+    
+        Before linearization, the global system function is evaluated 
+        to get the blocks into the current simulation state. 
+        This is only really relevant if no solving attempt has been 
+        happened before.
+        """
+        #evaluate system function
+        self._update(self.time)
+
+        #linearize all internal blocks
+        for block in self.blocks:
+            block.linearize(self.time)
+
+
     # event system ----------------------------------------------------------------
 
     def _events(self, t):

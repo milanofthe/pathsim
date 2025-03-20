@@ -59,20 +59,20 @@ connections = [
     Connection(I2, F1), 
     Connection(F1, P1[2]), 
     Connection(Sr, P1[3]), 
-    Connection(I2, A2, Sc[1]),
+    Connection(I2, A2, Sc[1]), 
     Connection(A1, P1), 
     Connection(A2, P1[1]), 
-    Connection(P1, A3),
+    Connection(P1, A3), 
     Connection(A3, I1)
     ]
 
-# Create a simulation instance from the blocks and connections
+#create a simulation instance from the blocks and connections
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
-# Run the simulation
-Sim.run(duration=50)
+#run the simulation
+Sim.run(duration=30)
 
-# Plot the results directly from the scope
+#plot the results directly from the scope
 Sc.plot()
 
 plt.show()

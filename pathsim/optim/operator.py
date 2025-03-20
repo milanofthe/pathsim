@@ -123,8 +123,10 @@ class Operator(object):
         value : array_like
             Function value or linear approximation
         """
-        if self.f0 is None: return self._func(x)
-        return self.f0 + np.dot(self.J, x - self.x0)
+        if self.f0 is None: 
+            return self._func(x)
+        dx = np.atleast_1d(x - self.x0)
+        return self.f0 + np.dot(self.J, dx)
         
 
     def jac(self, x):
@@ -338,17 +340,16 @@ class DynamicOperator(object):
             Jacobian matrix with respect to x
         """
         if self._jac_x is None:
+            # Keep u and t as is
+            def func_x(_x):
+                return self._func(_x, u, t)
+
             try:
                 # Try automatic differentiation
                 _x = Value.array(x)
-                # Keep u and t as is
-                def func_x(_x):
-                    return self._func(_x, u, t)
                 return Value.jac(func_x(_x), _x)
             except:
                 # Fallback to numerical differentiation
-                def func_x(_x):
-                    return self._func(_x, u, t)
                 return num_jac(func_x, x)
         else:
             # Use analytical jacobian
@@ -378,17 +379,16 @@ class DynamicOperator(object):
             Jacobian matrix with respect to u
         """
         if self._jac_u is None:
+            # Keep x and t as is
+            def func_u(_u):
+                return self._func(x, _u, t)
+
             try:
                 # Try automatic differentiation
                 _u = Value.array(u)
-                # Keep x and t as is
-                def func_u(_u):
-                    return self._func(x, _u, t)
                 return Value.jac(func_u(_u), _u)
             except:
                 # Fallback to numerical differentiation
-                def func_u(_u):
-                    return self._func(x, _u, t)
                 return num_jac(func_u, u)
         else:
             # Use analytical jacobian

@@ -29,7 +29,10 @@ def dict_to_array(a):
     out : array[int, float, complex]
         converted array
     """
-    return np.array([a[k] for k in sorted(a.keys())])
+    return np.array(
+        [a[k].item() if hasattr(a[k], "item") else a[k] 
+            for k in sorted(a.keys())]
+        )
 
 
 def array_to_dict(a):
