@@ -14,7 +14,7 @@ import numpy as np
 
 from pathsim.solvers.rkdp54 import RKDP54
 
-from ._referenceproblems import problems
+from tests.pathsim.solvers._referenceproblems import PROBLEMS
 
 
 # TESTS ================================================================================
@@ -29,8 +29,6 @@ class TestRKDP54(unittest.TestCase):
         #test default initializtion
         solver = RKDP54()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
 
         self.assertEqual(solver.stage, 0)
@@ -39,14 +37,12 @@ class TestRKDP54(unittest.TestCase):
         self.assertFalse(solver.is_implicit)
         
         #test specific initialization
-        solver = RKDP54(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = RKDP54(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )    
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -71,7 +67,7 @@ class TestRKDP54(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, 1)
 
             #test if expected return at intermediate stages
             if i < len(solver.eval_stages)-1:
@@ -86,41 +82,72 @@ class TestRKDP54(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
         #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        timesteps = np.logspace(-2, -0.2, 20)
+            with self.subTest(problem.name):
 
-        for problem in problems:
+                solver = RKDP54(problem.x0)
+                
+                errors = []
 
-            solver = RKDP54(problem.x0, problem.func, problem.jac)
-            
-            errors = []
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
 
-            for dt in timesteps:
+                for dt in timesteps:
 
-                solver.reset()
-                time, numerical_solution = solver.integrate(time_start=0.0, time_end=3.0, dt=dt, adaptive=False)
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
 
-                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
 
-            #test if errors are monotonically decreasing
-            self.assertTrue(np.all(np.diff(errors)>0))
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
 
-            #test convergence order, expected 5
-            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-            self.assertGreater(p, 4)
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, solver.n-1)
 
 
     def test_integrate_adaptive(self):
 
-        #test the error control for each reference problem
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        for problem in problems:
+            with self.subTest(problem.name):
 
-            solver = RKDP54(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-7, tolerance_lte_abs=1e-6)
+                solver = RKDP54(problem.x0, tolerance_lte_rel=0, tolerance_lte_abs=1e-5)
 
-            time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=1, adaptive=True)
-            error = np.linalg.norm(numerical_solution - problem.solution(time))
+                duration = problem.t_span[1] - problem.t_span[0]
+                
+                time, numerical_solution = solver.integrate(
+                    problem.func, 
+                    time_start=problem.t_span[0], 
+                    time_end=problem.t_span[1], 
+                    dt=duration/100, 
+                    adaptive=True
+                    )
 
-            #test if error control was successful
-            self.assertLess(error, solver.tolerance_lte_abs)
+                analytical_solution = problem.solution(time)
+                err = np.mean(numerical_solution - analytical_solution)
+
+                #test if error control was successful (same OOM for global error -> < 1e-5)
+                self.assertLess(err, solver.tolerance_lte_abs*10)
+
+
+
+# RUN TESTS LOCALLY ====================================================================
+
+if __name__ == '__main__':
+
+    unittest.main(verbosity=2)

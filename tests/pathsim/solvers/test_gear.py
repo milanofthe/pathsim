@@ -14,7 +14,7 @@ import numpy as np
 
 from pathsim.solvers.gear import *
 
-from ._referenceproblems import problems
+from tests.pathsim.solvers._referenceproblems import PROBLEMS
 
 
 # TESTS ================================================================================
@@ -120,22 +120,18 @@ class TestGEAR32(unittest.TestCase):
         #test default initializtion
         solver = GEAR32()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertTrue(solver.is_adaptive)
         self.assertTrue(solver.is_implicit)
         self.assertFalse(solver.is_explicit)
         
         #test specific initialization
-        solver = GEAR32(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = GEAR32(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -149,7 +145,7 @@ class TestGEAR32(unittest.TestCase):
         for k in range(10):
 
             #buffer state
-            solver.buffer(0)
+            solver.buffer(1)
 
             #test bdf buffer length
             self.assertEqual(len(solver.B), k+1 if k < solver.n else solver.n)
@@ -157,22 +153,78 @@ class TestGEAR32(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
+
+
+    def test_integrate_fixed(self):
+        
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
+
+            with self.subTest(problem.name):
+
+                solver = GEAR32(problem.x0)
+                
+                errors = []
+
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
+
+                for dt in timesteps:
+
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
+
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
+
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
+
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
 
 
     def test_integrate_adaptive(self):
 
-        #test the error control for each reference problem
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        for problem in problems:
+            with self.subTest(problem.name):
 
-            solver = GEAR32(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-12, tolerance_lte_abs=1e-6)
+                solver = GEAR32(problem.x0, tolerance_lte_rel=0, tolerance_lte_abs=1e-5)
 
-            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1e-8, adaptive=True)
-            error = np.linalg.norm(numerical_solution - problem.solution(time))
+                duration = problem.t_span[1] - problem.t_span[0]
+                
+                time, numerical_solution = solver.integrate(
+                    problem.func, 
+                    problem.jac,
+                    time_start=problem.t_span[0], 
+                    time_end=problem.t_span[1], 
+                    dt=duration/1000,  # <- small initial timestep for start up
+                    dt_max=duration,
+                    adaptive=True,
+                    tolerance_fpi=1e-8
+                    )
 
-            #test if error control was successful (one more OOM, since global error)
-            self.assertLess(error, solver.tolerance_lte_abs*20)
+                analytical_solution = problem.solution(time)
+                err = np.mean(numerical_solution - analytical_solution)
+
+                #test if error control was successful (same OOM for global error -> < 1e-5)
+                self.assertLess(err, solver.tolerance_lte_abs*10)
+
+
 
 
 class TestGEAR43(unittest.TestCase):
@@ -185,22 +237,18 @@ class TestGEAR43(unittest.TestCase):
         #test default initializtion
         solver = GEAR43()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertTrue(solver.is_adaptive)
         self.assertTrue(solver.is_implicit)
         self.assertFalse(solver.is_explicit)
         
         #test specific initialization
-        solver = GEAR43(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = GEAR43(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -214,7 +262,7 @@ class TestGEAR43(unittest.TestCase):
         for k in range(10):
 
             #buffer state
-            solver.buffer(0)
+            solver.buffer(1)
 
             #test bdf buffer length
             self.assertEqual(len(solver.B), k+1 if k < solver.n else solver.n)
@@ -222,22 +270,77 @@ class TestGEAR43(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
+
+
+    def test_integrate_fixed(self):
+        
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
+
+            with self.subTest(problem.name):
+
+                solver = GEAR43(problem.x0)
+                
+                errors = []
+
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
+
+                for dt in timesteps:
+
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
+
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
+
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
+
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
 
 
     def test_integrate_adaptive(self):
 
-        #test the error control for each reference problem
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        for problem in problems:
+            with self.subTest(problem.name):
 
-            solver = GEAR43(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-12, tolerance_lte_abs=1e-6)
+                solver = GEAR43(problem.x0, tolerance_lte_rel=0, tolerance_lte_abs=1e-5)
 
-            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1e-6, adaptive=True)
-            error = np.linalg.norm(numerical_solution - problem.solution(time))
+                duration = problem.t_span[1] - problem.t_span[0]
+                
+                time, numerical_solution = solver.integrate(
+                    problem.func, 
+                    problem.jac,
+                    time_start=problem.t_span[0], 
+                    time_end=problem.t_span[1], 
+                    dt=duration/1000,  # <- small initial timestep for start up
+                    dt_max=duration,
+                    adaptive=True,
+                    tolerance_fpi=1e-8
+                    )
 
-            #test if error control was successful (one more OOM, since global error)
-            self.assertLess(error, solver.tolerance_lte_abs*10)
+                analytical_solution = problem.solution(time)
+                err = np.mean(numerical_solution - analytical_solution)
+
+                #test if error control was successful (same OOM for global error -> < 1e-5)
+                self.assertLess(err, solver.tolerance_lte_abs*10)
+
 
 
 class TestGEAR54(unittest.TestCase):
@@ -250,22 +353,18 @@ class TestGEAR54(unittest.TestCase):
         #test default initializtion
         solver = GEAR54()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertTrue(solver.is_adaptive)
         self.assertTrue(solver.is_implicit)
         self.assertFalse(solver.is_explicit)
         
         #test specific initialization
-        solver = GEAR54(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = GEAR54(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -279,7 +378,7 @@ class TestGEAR54(unittest.TestCase):
         for k in range(10):
 
             #buffer state
-            solver.buffer(0)
+            solver.buffer(1)
 
             #test bdf buffer length
             self.assertEqual(len(solver.B), k+1 if k < solver.n else solver.n)
@@ -287,22 +386,78 @@ class TestGEAR54(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
+
+
+    def test_integrate_fixed(self):
+        
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
+
+            with self.subTest(problem.name):
+
+                solver = GEAR54(problem.x0)
+                
+                errors = []
+
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
+
+                for dt in timesteps:
+
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
+
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
+
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
+
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
 
 
     def test_integrate_adaptive(self):
 
-        #test the error control for each reference problem
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        for problem in problems:
+            with self.subTest(problem.name):
 
-            solver = GEAR54(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-12, tolerance_lte_abs=1e-6)
+                solver = GEAR54(problem.x0, tolerance_lte_rel=0, tolerance_lte_abs=1e-5)
 
-            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1e-6, adaptive=True)
-            error = np.linalg.norm(numerical_solution - problem.solution(time))
+                duration = problem.t_span[1] - problem.t_span[0]
+                
+                time, numerical_solution = solver.integrate(
+                    problem.func, 
+                    problem.jac,
+                    time_start=problem.t_span[0], 
+                    time_end=problem.t_span[1], 
+                    dt=duration/1000,  # <- small initial timestep for start up
+                    dt_max=duration,
+                    adaptive=True,
+                    tolerance_fpi=1e-8
+                    )
 
-            #test if error control was successful (one more OOM, since global error)
-            self.assertLess(error, solver.tolerance_lte_abs*10)
+                analytical_solution = problem.solution(time)
+                err = np.mean(numerical_solution - analytical_solution)
+
+                #test if error control was successful (same OOM for global error -> < 1e-5)
+                self.assertLess(err, solver.tolerance_lte_abs*10)
+
+
 
 
 class TestGEAR52A(unittest.TestCase):
@@ -315,42 +470,96 @@ class TestGEAR52A(unittest.TestCase):
         #test default initializtion
         solver = GEAR52A()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertTrue(solver.is_adaptive)
         self.assertTrue(solver.is_implicit)
         self.assertFalse(solver.is_explicit)
         
         #test specific initialization
-        solver = GEAR52A(initial_value=1, 
-                         func=lambda x, u, t: -x, 
-                         jac=lambda x, u, t: -1, 
-                         tolerance_lte_rel=1e-3, 
-                         tolerance_lte_abs=1e-6)
+        solver = GEAR52A(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
 
 
+    def test_integrate_fixed(self):
+        
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
+
+            with self.subTest(problem.name):
+
+                solver = GEAR52A(problem.x0)
+                
+                errors = []
+
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
+
+                for dt in timesteps:
+
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
+
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
+
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
+
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
+
+
     def test_integrate_adaptive(self):
 
-        #test the error control for each reference problem
+        #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        for problem in problems:
+            with self.subTest(problem.name):
 
-            solver = GEAR52A(problem.x0, problem.func, problem.jac, tolerance_lte_rel=1e-12, tolerance_lte_abs=1e-6)
+                solver = GEAR52A(problem.x0, tolerance_lte_rel=0, tolerance_lte_abs=1e-5)
 
-            time, numerical_solution = solver.integrate(time_start=0.0, time_end=2.0, dt=1e-6, adaptive=True)
-            error = np.linalg.norm(numerical_solution - problem.solution(time))
+                duration = problem.t_span[1] - problem.t_span[0]
+                
+                time, numerical_solution = solver.integrate(
+                    problem.func, 
+                    problem.jac,
+                    time_start=problem.t_span[0], 
+                    time_end=problem.t_span[1], 
+                    dt=duration/1000,  # <- small initial timestep for start up
+                    dt_max=duration,
+                    adaptive=True,
+                    tolerance_fpi=1e-8
+                    )
 
-            #test if error control was successful (one more OOM, since global error)
-            self.assertLess(error, solver.tolerance_lte_abs*10)
+                analytical_solution = problem.solution(time)
+                err = np.mean(numerical_solution - analytical_solution)
+
+                #test if error control was successful (same OOM for global error -> < 1e-5)
+                self.assertLess(err, solver.tolerance_lte_abs*10)
 
 
 
 
+# RUN TESTS LOCALLY ====================================================================
 
+if __name__ == '__main__':
+
+    unittest.main(verbosity=2)

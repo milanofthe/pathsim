@@ -15,16 +15,8 @@ import numpy as np
 from pathsim.solvers._solver import (
     Solver, 
     ExplicitSolver, 
-    ImplicitSolver)
-
-
-# HELPER FUNCTIONS =====================================================================
-
-def simple_func(x, u, t):
-    return u - x
-
-def simple_jac(x, u, t):
-    return -1
+    ImplicitSolver
+    )
 
 
 # TESTS ================================================================================
@@ -35,14 +27,12 @@ class TestBaseSolver(unittest.TestCase):
     """
 
     def setUp(self):
-        self.solver = Solver(initial_value=1.0, func=simple_func, jac=simple_jac)
+        self.solver = Solver(initial_value=1.0)
 
     def test_init(self):
         self.assertEqual(self.solver.x, 1.0)
         self.assertEqual(self.solver.x_0, 1.0)
         self.assertEqual(self.solver.initial_value, 1.0)
-        self.assertEqual(self.solver.func, simple_func)
-        self.assertEqual(self.solver.jac, simple_jac)
         self.assertFalse(self.solver.is_adaptive)
 
     def test_str(self):
@@ -77,20 +67,24 @@ class ExplicitSolverTest(unittest.TestCase):
     Test the implementation of the 'ExplicitSolver' base class
     """
     def setUp(self):
-        self.solver = ExplicitSolver(initial_value=1.0, func=simple_func, jac=simple_jac)
+        self.solver = ExplicitSolver(initial_value=1.0)
 
     def test_init(self):
         self.assertTrue(self.solver.is_explicit)
         self.assertFalse(self.solver.is_implicit)
 
     def test_integrate_singlestep(self):
-        success, err, scale = self.solver.integrate_singlestep(time=0, dt=0.1)
+        def func(x, t):
+            return -x
+        success, err, scale = self.solver.integrate_singlestep(func, time=0, dt=0.1)
         self.assertTrue(success)
         self.assertEqual(err, 0.0)
         self.assertEqual(scale, 1.0)
 
     def test_integrate(self):
-        times, states = self.solver.integrate(time_start=0, time_end=1, dt=0.1)
+        def func(x, t):
+            return -x
+        times, states = self.solver.integrate(func, time_start=0, time_end=1, dt=0.1)
         self.assertEqual(len(times), len(states))
         self.assertGreater(len(times), 1)
         self.assertEqual(times[0], 0)
@@ -102,7 +96,7 @@ class ImplicitSolverTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.solver = ImplicitSolver(initial_value=1.0, func=simple_func, jac=simple_jac)
+        self.solver = ImplicitSolver(initial_value=1.0)
 
     def test_init(self):
         self.assertFalse(self.solver.is_explicit)

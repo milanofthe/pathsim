@@ -12,6 +12,7 @@
 import numpy as np
 
 from .._constants import (
+    TOLERANCE,
     SIM_TIMESTEP,
     SIM_TIMESTEP_MIN,
     SIM_TIMESTEP_MAX,
@@ -460,7 +461,7 @@ class ExplicitSolver(Solver):
         while time < time_end + dt:
 
             #perform single timestep
-            success, error_norm, scale = self.integrate_singlestep(func, time, dt)
+            success, _, scale = self.integrate_singlestep(func, time, dt)
 
             #check if timestep was successful
             if adaptive and not success:
@@ -598,19 +599,15 @@ class ImplicitSolver(Solver):
         -------
         success : bool
             True if the timestep was successful
-        success_sol : bool
-            True if optimizer successfully solved implicit update equation
         error_norm : float
-            estimated error of the internal error controller
+            estimated error of the internal error controller 
+            or solver when not converged
         scale : float
             estimated timestep rescale factor for error control
         """
 
         #buffer current state
         self.buffer(dt)
-
-        #flag for solver success
-        success_sol = True
 
         #iterate solver stages (implicit updates)
         for t in self.stages(time, dt):
@@ -622,15 +619,15 @@ class ImplicitSolver(Solver):
                 if error_sol < tolerance_fpi: 
                     break
 
-            #catch convergence error 
+            #catch convergence error -> early exit, half timestep
             if error_sol > tolerance_fpi:
-                if success_sol: success_sol = False
+                return False, error_sol, 0.5
             
             #perform explicit component of timestep
             f = func(self.x, t)
             success, error_norm, scale = self.step(f, dt)
 
-        return success, success_sol, error_norm, scale 
+        return success, error_norm, scale 
 
 
     def integrate(
@@ -715,7 +712,7 @@ class ImplicitSolver(Solver):
         while time < time_end + dt:
 
             #integrate for single timestep
-            success, success_sol, error_norm, scale = self.integrate_singlestep(
+            success, _, scale = self.integrate_singlestep(
                 func, 
                 jac,
                 time, 
@@ -724,8 +721,9 @@ class ImplicitSolver(Solver):
                 max_iterations
                 )
 
+
             #check if timestep was successful and adaptive
-            if adaptive and not (success and success_sol):
+            if adaptive and not success:
                 self.revert()
             else:
                 time += dt

@@ -14,7 +14,7 @@ import numpy as np
 
 from pathsim.solvers.bdf import *
 
-from ._referenceproblems import problems
+from tests.pathsim.solvers._referenceproblems import PROBLEMS
 
 
 # TESTS ================================================================================
@@ -29,8 +29,6 @@ class TestBDF2(unittest.TestCase):
         #test default initializtion
         solver = BDF2()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertEqual(solver.stage, 0)
         self.assertFalse(solver.is_adaptive)
@@ -39,14 +37,12 @@ class TestBDF2(unittest.TestCase):
         self.assertEqual(solver.n, 2)
         
         #test specific initialization
-        solver = BDF2(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = BDF2(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -78,7 +74,7 @@ class TestBDF2(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
 
 
     def test_step(self):
@@ -90,7 +86,7 @@ class TestBDF2(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
@@ -100,29 +96,43 @@ class TestBDF2(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
         #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        timesteps = np.logspace(-2, -1, 10)
+            with self.subTest(problem.name):
 
-        for problem in problems:
+                solver = BDF2(problem.x0)
+                
+                errors = []
 
-            solver = BDF2(problem.x0, problem.func, problem.jac)
-            
-            errors = []
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
 
-            for dt in timesteps:
+                for dt in timesteps:
 
-                solver.reset()
-                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
 
-                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
 
-            #test if errors are monotonically decreasing
-            self.assertTrue(np.all(np.diff(errors)>0))
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
 
-            #test convergence order, expected 1
-            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-            self.assertGreater(p, 1)
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
+
 
 
 
@@ -136,8 +146,6 @@ class TestBDF3(unittest.TestCase):
         #test default initializtion
         solver = BDF3()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertEqual(solver.stage, 0)
         self.assertFalse(solver.is_adaptive)
@@ -146,14 +154,12 @@ class TestBDF3(unittest.TestCase):
         self.assertEqual(solver.n, 3)
         
         #test specific initialization
-        solver = BDF3(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = BDF3(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -185,7 +191,7 @@ class TestBDF3(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
 
 
     def test_step(self):
@@ -197,7 +203,7 @@ class TestBDF3(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
@@ -207,29 +213,42 @@ class TestBDF3(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
         #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        timesteps = np.logspace(-2, -1, 10)
+            with self.subTest(problem.name):
 
-        for problem in problems:
+                solver = BDF3(problem.x0)
+                
+                errors = []
 
-            solver = BDF3(problem.x0, problem.func, problem.jac)
-            
-            errors = []
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
 
-            for dt in timesteps:
+                for dt in timesteps:
 
-                solver.reset()
-                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
 
-                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
 
-            #test if errors are monotonically decreasing
-            self.assertTrue(np.all(np.diff(errors)>0))
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
 
-            #test convergence order, expected 1
-            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-            self.assertGreater(p, 1)
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
 
 
 
@@ -243,8 +262,6 @@ class TestBDF4(unittest.TestCase):
         #test default initializtion
         solver = BDF4()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertEqual(solver.stage, 0)
         self.assertFalse(solver.is_adaptive)
@@ -253,14 +270,12 @@ class TestBDF4(unittest.TestCase):
         self.assertEqual(solver.n, 4)
         
         #test specific initialization
-        solver = BDF4(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = BDF4(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -292,7 +307,7 @@ class TestBDF4(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
 
 
     def test_step(self):
@@ -304,7 +319,7 @@ class TestBDF4(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
@@ -314,30 +329,42 @@ class TestBDF4(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
         #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        timesteps = np.logspace(-2, -1, 10)
+            with self.subTest(problem.name):
 
-        for problem in problems:
+                solver = BDF4(problem.x0)
+                
+                errors = []
 
-            solver = BDF4(problem.x0, problem.func, problem.jac)
-            
-            errors = []
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
 
-            for dt in timesteps:
+                for dt in timesteps:
 
-                solver.reset()
-                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
 
-                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
 
-            #test if errors are monotonically decreasing
-            self.assertTrue(np.all(np.diff(errors)>0))
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
 
-            #test convergence order, expected 1
-            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-            self.assertGreater(p, 1)
-
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
 
 
 
@@ -351,8 +378,6 @@ class TestBDF5(unittest.TestCase):
         #test default initializtion
         solver = BDF5()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertEqual(solver.stage, 0)
         self.assertFalse(solver.is_adaptive)
@@ -361,14 +386,12 @@ class TestBDF5(unittest.TestCase):
         self.assertEqual(solver.n, 5)
         
         #test specific initialization
-        solver = BDF5(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = BDF5(
+            initial_value=1, 
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -400,7 +423,7 @@ class TestBDF5(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
 
 
     def test_step(self):
@@ -412,7 +435,7 @@ class TestBDF5(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
@@ -422,29 +445,42 @@ class TestBDF5(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
         #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        timesteps = np.logspace(-2, -1, 10)
+            with self.subTest(problem.name):
 
-        for problem in problems:
+                solver = BDF5(problem.x0)
+                
+                errors = []
 
-            solver = BDF5(problem.x0, problem.func, problem.jac)
-            
-            errors = []
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
 
-            for dt in timesteps:
+                for dt in timesteps:
 
-                solver.reset()
-                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
 
-                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
 
-            #test if errors are monotonically decreasing
-            self.assertTrue(np.all(np.diff(errors)>0))
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
 
-            #test convergence order, expected 1
-            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-            self.assertGreater(p, 1)
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
 
 
 class TestBDF6(unittest.TestCase):
@@ -457,8 +493,6 @@ class TestBDF6(unittest.TestCase):
         #test default initializtion
         solver = BDF6()
 
-        self.assertTrue(callable(solver.func))
-        self.assertEqual(solver.jac, None)
         self.assertEqual(solver.initial_value, 0)
         self.assertEqual(solver.stage, 0)
         self.assertFalse(solver.is_adaptive)
@@ -467,14 +501,12 @@ class TestBDF6(unittest.TestCase):
         self.assertEqual(solver.n, 6)
         
         #test specific initialization
-        solver = BDF6(initial_value=1, 
-                        func=lambda x, u, t: -x, 
-                        jac=lambda x, u, t: -1, 
-                        tolerance_lte_rel=1e-3, 
-                        tolerance_lte_abs=1e-6)
+        solver = BDF6(
+            initial_value=1,  
+            tolerance_lte_rel=1e-3, 
+            tolerance_lte_abs=1e-6
+            )
 
-        self.assertEqual(solver.func(2, 0, 0), -2)
-        self.assertEqual(solver.jac(2, 0, 0), -1)
         self.assertEqual(solver.initial_value, 1)
         self.assertEqual(solver.tolerance_lte_rel, 1e-3)
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
@@ -506,7 +538,7 @@ class TestBDF6(unittest.TestCase):
             
             #make one step
             for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, t, 1)
+                success, err, scale = solver.step(0.0, 1)
 
 
     def test_step(self):
@@ -518,7 +550,7 @@ class TestBDF6(unittest.TestCase):
             #test if stage incrementation works
             self.assertEqual(solver.stage, i)
 
-            success, err, scale = solver.step(0.0, t, 1)
+            success, err, scale = solver.step(0.0, 1)
 
             #test if expected return at intermediate stages
             self.assertTrue(success)
@@ -528,28 +560,46 @@ class TestBDF6(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #divisons of integration duration
+        divisions = np.logspace(1, 2, 10)
+
         #integrate test problem and assess convergence order
+        for problem in PROBLEMS:
 
-        timesteps = np.logspace(-2, -1, 10)
+            with self.subTest(problem.name):
 
-        for problem in problems:
+                solver = BDF6(problem.x0)
+                
+                errors = []
 
-            solver = BDF6(problem.x0, problem.func, problem.jac)
-            
-            errors = []
+                timesteps = (problem.t_span[1] - problem.t_span[0]) / divisions
 
-            for dt in timesteps:
+                for dt in timesteps:
 
-                solver.reset()
-                time, numerical_solution = solver.integrate(time_start=0.0, time_end=1.0, dt=dt, adaptive=False)
+                    solver.reset()
+                    time, numerical_solution = solver.integrate(
+                        problem.func, 
+                        problem.jac,
+                        time_start=problem.t_span[0], 
+                        time_end=problem.t_span[1], 
+                        dt=dt, 
+                        adaptive=False
+                        )
 
-                errors.append(np.linalg.norm(numerical_solution - problem.solution(time)))
+                    analytical_solution = problem.solution(time)
+                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    errors.append(err)
 
-            #test if errors are monotonically decreasing
-            self.assertTrue(np.all(np.diff(errors)>0))
+                #test if errors are monotonically decreasing
+                self.assertTrue(np.all(np.diff(errors)<0))
 
-            #test convergence order, expected 1
-            p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-            self.assertGreater(p, 1)
+                #test convergence order, expected n-1 (global)
+                p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
+                self.assertGreater(p, 1) # <- due to startup
 
-            
+
+# RUN TESTS LOCALLY ====================================================================
+
+if __name__ == '__main__':
+
+    unittest.main(verbosity=2)
