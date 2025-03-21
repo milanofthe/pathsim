@@ -10,6 +10,8 @@
 
 # IMPORTS ===============================================================================
 
+import numpy as np
+
 from math import prod
 
 from ._block import Block
@@ -31,8 +33,10 @@ class Multiplier(Block):
         super().__init__()
 
         self.op_alg = Operator(
-            func=lambda x: prod(x), 
-            jac=lambda x: np.array([prod(x[:i]+x[i+1:]) for i in range(len(x))])
+            func=prod, 
+            jac=lambda x: np.array([
+                prod(np.delete(x, i)) for i in range(len(x))
+                ])
             )
 
 
