@@ -19,13 +19,12 @@
 
 **PathSim** is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism! It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
 
-All of that with minimal dependencies, only `numpy`, `scipy` and `matplotlib`!
+All of that with minimal dependencies, only `numpy`, `scipy` and `matplotlib` (and `dill` if you want to use serialization)!
 
 Key Features:
 
 - **Dynamic system modification** at simulation runtime, i.e. triggered through events
 - Automatic block- and system-level **linearization** at runtime
-- Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
 - Wide range of **numerical integrators** (implicit, explicit, high order, adaptive), able to handle [stiff systems](#stiff-systems)
 - **Modular and hierarchical** modeling with (nested) subsystems
 - [Event handling](#event-detection) system to detect and resolve **discrete events** (zero-crossing detection)
@@ -36,6 +35,7 @@ Key Features:
 For the full **documentation**, tutorials and API-reference visit [Read the Docs](https://pathsim.readthedocs.io/en/latest/)!
 
 The source code can be found in the [GitHub repository](https://github.com/milanofthe/pathsim) and is fully open source under **MIT license**. Consider starring PathSim to support its development.
+
 
 ## Installation
 
