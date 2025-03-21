@@ -286,6 +286,12 @@ class Subsystem(Block):
             block.linearize(t)
 
 
+    def delinearize(self):
+        """Revert the linearization of the internal blocks."""
+        for block in self.blocks: 
+            block.delinearize()
+
+
     # serialization / deserialization -------------------------------------------------------
     
     def to_dict(self):

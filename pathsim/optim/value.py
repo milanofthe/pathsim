@@ -330,11 +330,13 @@ class Value:
 
     # convenience static methods ----------------------------------------------------------------
 
-    def der(self, arr, val):
+    @staticmethod
+    def der(arr, val):
         return der(arr, val)
 
 
-    def jac(self, arr, vals):
+    @staticmethod
+    def jac(arr, vals):
         return jac(arr, vals)
 
 

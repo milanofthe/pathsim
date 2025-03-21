@@ -13,7 +13,7 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
 
 #optimization module
-from pathsim.optim import Value, der
+from pathsim.optim import Value
 
 from pathsim.solvers import RKBS32
 
@@ -69,9 +69,9 @@ time, [_, res] = Sco.read()
 
 fig, ax = plt.subplots(nrows=1, figsize=(8, 4), tight_layout=True, dpi=120)
 
-ax.plot(time, der(res, a), label="$dx/da$")
-ax.plot(time, der(res, b), label="$dx/db$")
-ax.plot(time, der(res, z), label="$dx/dx_0$")
+ax.plot(time, Value.der(res, a), label="$dx/da$")
+ax.plot(time, Value.der(res, b), label="$dx/db$")
+ax.plot(time, Value.der(res, z), label="$dx/dx_0$")
 
 ax.set_xlabel("time [s]")
 

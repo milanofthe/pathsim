@@ -228,6 +228,18 @@ class Block(Serializable):
             if self.op_dyn: self.op_dyn.linearize(x, u, t)
 
 
+    def delinearize(self):
+        """Revert the linearization of the blocks algebraic and dynamic components.
+        
+        This is resets the internal 'Operator' and 'DynamicOperator' instances, 
+        deleting the linear surrogate model and using the original function for 
+        subsequent calls.
+        """
+        #reset algebraic and dynamic operators
+        if self.op_alg: self.op_alg.reset()
+        if self.op_dyn: self.op_dyn.reset()
+
+
     # methods for blocks with discrete events -------------------------------------------
 
     def get_events(self):

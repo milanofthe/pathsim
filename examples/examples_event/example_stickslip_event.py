@@ -188,4 +188,5 @@ for t in E_stick_to_slip:
 
 Sc2.plot("-", lw=2)
 
+
 plt.show()

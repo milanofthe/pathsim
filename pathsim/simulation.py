@@ -697,12 +697,23 @@ class Simulation:
         This is only really relevant if no solving attempt has been 
         happened before.
         """
-        #evaluate system function
+        #evaluate system function at current time
         self._update(self.time)
 
-        #linearize all internal blocks
-        for block in self.blocks:
-            block.linearize(self.time)
+        #linearize all internal blocks and time it
+        with Timer(verbose=False) as T:
+            for block in self.blocks:
+                block.linearize(self.time)
+
+        self._logger_info(f"LINEARIZED -> runtime={T.readout}")
+
+
+    def delinearize(self):
+        """Revert the linearization of the full system."""
+        for block in self.blocks: 
+            block.delinearize()
+
+        self._logger_info("DELINEARIZED")
 
 
     # event system ----------------------------------------------------------------
