@@ -26,10 +26,10 @@ Key Features:
 - **Dynamic system modification** at simulation runtime, i.e. triggered through events
 - Automatic block- and system-level **linearization** at runtime
 - Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
-- Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
+- Wide range of **numerical integrators** (implicit, explicit, high order, adaptive), able to handle [stiff systems](#stiff-systems)
 - **Modular and hierarchical** modeling with (nested) subsystems
-- **Event handling** system to detect and resolve discrete events (zero-crossing detection)
-- Automatic differentiation for end-to-end **differentiable** system simulations
+- [Event handling](#event-detection) system to detect and resolve **discrete events** (zero-crossing detection)
+- **Automatic differentiation** for end-to-end [differentiable simulations](#differentiable-simulation)
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
 
