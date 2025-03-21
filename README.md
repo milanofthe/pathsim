@@ -381,11 +381,4 @@ ax.grid(True)
 
 PathSim is in active development and your feedback is highly appreciated! Dont shy away from filing issues or requests! If you want to contribute in a mayor way, send me a message and we can discuss how!
 
-## Roadmap
 
-Some of the possible directions for future PathSim are:
-
-- block level parallelization (fork-join) with Python 3.13 free-threading
-- improved / more robust steady state solver and algebraic loop solver
-- methods for periodic steady state analysis
-- more extensive testing and validation (as always)
