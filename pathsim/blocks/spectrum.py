@@ -77,8 +77,8 @@ class Spectrum(Block):
             freq=np.array([0, 0.5, 20, 1e3])
             )
 
-    Notes
-    -----
+    Note
+    ----
     This block is relatively slow! But it is valuable for long running simulations 
     with few evaluation frequencies, where just FFT'ing the time series data 
     wouldnt be efficient OR if only the evaluation at weirdly spaced frequencies 
@@ -416,8 +416,8 @@ class RealtimeSpectrum(Spectrum):
     
     Otherwise implements the same functionality as the regular 'Spectrum' block.
         
-    Notes
-    -----
+    Note
+    ----
     Due to the plotting being relatively expensive, including this block slows down 
     the simulation significantly but may still be valuable for debugging and testing.
 

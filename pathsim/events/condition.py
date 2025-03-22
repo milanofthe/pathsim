@@ -20,7 +20,9 @@ class Condition(Event):
     """Subclass of base 'Event' that triggers if the event function evaluates to 'True', 
     i.e. the condition is satisfied.
     
-    Monitors system state by evaluating an event function (func_evt) with boolean output.
+    Monitors system state by evaluating an event function (func_evt) with boolean output. 
+    The event is considered detected when the event function evaluates to 'True' for the 
+    first time. Subsequent evaluations to 'True' are not considered unless the event is reset.
     
     .. code-block::
 
@@ -31,6 +33,32 @@ class Condition(Event):
     .. code-block::
 
         func_evt(time) == True -> event -> func_act(time)
+
+    Note
+    ----
+    Condition event functions evaluate to boolean and are therefore not smooth. 
+    Therefore uses bisection method for event location instead of secant method.
+
+    Example
+    -------
+    Initialize a conditional event handler like this:
+
+    .. code-block:: python
+
+        #define the event function
+        def evt(t):
+            return t > 10
+        
+        #define the action function (callback)
+        def act(t):
+            #do something at event resolution
+            pass
+    
+        #initialize the event manager
+        E = Condition(
+            func_evt=evt,  #the event function
+            func_act=act   #the action function
+            )    
 
     """
 
@@ -70,3 +98,26 @@ class Condition(Event):
 
         #half the stepsize to creep closer to event (bisection)
         return result, False, 0.5
+
+
+    def resolve(self, t):
+        """Resolve the event and record the time (t) at which it occurs. 
+        Resolves event using the action function (func_act) if it is defined. 
+
+        Deactivates the event tracking upon first resolution.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for event resolution 
+        """
+
+        #save the time of event resolution
+        self._times.append(t)
+
+        #action function for event resolution
+        if self.func_act is not None:
+            self.func_act(t)
+
+        #deactivate condition tracking
+        self.off()

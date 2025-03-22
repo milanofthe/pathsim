@@ -29,13 +29,33 @@ class ZeroCrossing(Event):
 
         func_evt(time) -> event?
 
-
     If an event is detected, some action (func_act) is performed on the system state.
 
     .. code-block::
 
         func_evt(time) == 0 -> event -> func_act(time)
+
+    Example
+    -------
+    Initialize a zero-crossing event handler like this:
+
+    .. code-block:: python
+
+        #define the event function
+        def evt(t):
+            #here we have a zero-crossing at 't==10'
+            return t - 10
+        
+        #define the action function (callback)
+        def act(t):
+            #do something at event resolution
+            pass
     
+        #initialize the event manager
+        E = ZeroCrossing(
+            func_evt=evt,  #the event function
+            func_act=act   #the action function
+            )    
     
     Parameters
     ----------

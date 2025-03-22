@@ -27,6 +27,25 @@ class Schedule(Event):
     .. code-block::
 
         time == next_schedule_time -> event
+
+    Example
+    -------
+    Initialize a scheduled event handler like this:
+
+    .. code-block:: python
+
+        #define the action function (callback)
+        def act(t):
+            #do something at event resolution
+            pass
+    
+        #initialize the event manager
+        E = Schedule(
+            t_start=0,    #starting at t=0
+            t_end=None,   #never ending
+            t_period=3,   #triggering every 3 time units
+            func_act=act  #resulting in a callback
+            )   
     
     Parameters
     ----------

@@ -240,7 +240,7 @@ class RealtimeScope(Scope):
 
     Otherwise implements the same functionality as the regular 'Scope' block.
 
-    Notes
+    Note
     -----
     Due to the plotting being relatively expensive, including this block 
     slows down the simulation significantly but may still be valuable for 

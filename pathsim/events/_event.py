@@ -122,10 +122,11 @@ class Event(Serializable):
     def reset(self):
         """
         Reset the recorded event times. Resetting the history is not 
-        required because of the 'buffer' method.
+        required because of the 'buffer' method. Reactivates event tracking.
         """
         self._history = None, 0.0
         self._times = []
+        self._active = True
 
 
     def buffer(self, t):

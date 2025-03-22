@@ -19,11 +19,6 @@ from ._block import Block
 class Constant(Block):
     """Produces a constant output signal (SISO)
         
-    Notes
-    -----
-    same as 'Source' with func=lambda t:value, 
-    therefore one could argue that it is redundant
-
     Parameters
     ----------
     value : float
@@ -58,7 +53,7 @@ class Source(Block):
 
     .. math::
     
-        \\y(t) = \\mathrm{func}(t)
+        y(t) = \\mathrm{func}(t)
 
     Example
     -------

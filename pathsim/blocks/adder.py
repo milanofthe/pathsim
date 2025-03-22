@@ -101,10 +101,6 @@ class Adder(Block):
     def update(self, t):
         """update system equation in fixed point loop
 
-        Note
-        ----
-        This is a MISO block with an optimized 'update' method for this case
-
         Parameters
         ----------
         t : float

@@ -47,7 +47,7 @@ class Delay(Block):
         delay time constant
 
 
-    Attribures
+    Attributes
     ----------
     _buffer : AdaptiveBuffer
         internal interpolatable adaptive rolling buffer
@@ -80,11 +80,6 @@ class Delay(Block):
 
     def update(self, t):
         """Evaluation of the buffer at different times.
-
-        Note
-        ----
-        The buffer is SISO and the 'update' method therefore 
-        is performance optimized.
 
         Parameters
         ----------

@@ -28,7 +28,7 @@ class Differentiator(Block):
 
     The approximation holds for signals up to a frequency of approximately f_max.
 
-    Notes
+    Note
     -----
     Depending on 'f_max', the resulting system might become stiff or ill conditioned!
     As a practical choice set f_max to 3x the highest expected signal frequency.
@@ -99,11 +99,6 @@ class Differentiator(Block):
     def update(self, t):
         """update system equation fixed point loop
     
-        Note
-        ----
-        This block is SISO and the 'update' method is performance optimized 
-        for this case, compared to the base class.
-
         Parameters
         ----------
         t : float

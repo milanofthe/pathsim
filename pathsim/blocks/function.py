@@ -35,10 +35,10 @@ class Function(Block):
     and for multi output, the aoutputs have to be provided as a 
     tuple or list. 
 
-    Notes
+    Note
     -----
-    If the outputs are provided as a single numpy array,
-    they are considered a single output
+    If the outputs are provided as a single numpy array, they are 
+    considered a single output. For MIMO, output has to be tuple.
     
     Example
     -------

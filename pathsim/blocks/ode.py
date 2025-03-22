@@ -31,8 +31,8 @@ class ODE(Block):
     .. math::
 
         \\begin{eqnarray}
-            \\dot{x}(t) &= \\mathrm{func}(x(t), u(t), t) \\\\
-                   y(t) &= x(t) 
+            \\dot{x}(t) =& \\mathrm{func}(x(t), u(t), t) \\\\
+                   y(t) =& x(t) 
         \\end{eqnarray}
 
     with inhomogenity (input) `u` and state vector `x`. The function 
@@ -47,8 +47,6 @@ class ODE(Block):
 
     .. code-block:: python
         
-        from pathsim.blocks import ODE
-        
         ode = ODE(lambda x, u, t: -x)
 
     Or something more complex like the `Van der Pol` system, where it makes 
@@ -58,7 +56,6 @@ class ODE(Block):
     .. code-block:: python
         
         import numpy as np
-        from pathsim.blocks import ODE
             
         #initial condition
         x0 = np.array([2, 0])
