@@ -35,11 +35,6 @@ class Function(Block):
     and for multi output, the aoutputs have to be provided as a 
     tuple or list. 
 
-    Parameters
-    ---------- 
-    func : callable
-        MIMO function that defines block IO behaviour
-
     Notes
     -----
     If the outputs are provided as a single numpy array,
@@ -76,6 +71,16 @@ class Function(Block):
         a**2 -> outputs[0]
         a*b  -> outputs[1]
         b/c  -> outputs[2]
+
+    Parameters
+    ---------- 
+    func : callable
+        MIMO function that defines block IO behaviour
+
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator that wraps 'func'
     
     """
 

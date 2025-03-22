@@ -19,11 +19,39 @@ from ..utils.adaptivebuffer import AdaptiveBuffer
 class Delay(Block):
     """Delays the input signal by a time constant 'tau' in seconds
     using an adaptive rolling buffer.
+
+    Mathematically this block creates a time delay of the input signal like this:
+
+    .. math::
+    
+        y(t) = 
+        \\begin{cases}
+        x(t - \\tau) & , t \\geq \\tau \\\\
+        0            & , t < \\tau
+        \\end{cases}
+
+
+    Example
+    -------
+    The block is initialized like this:
+
+    .. code-block:: python
+        
+        #5 time units delay
+        D = Delay(tau=5)
+
     
     Parameters
     ----------
     tau : float
         delay time constant
+
+
+    Attribures
+    ----------
+    _buffer : AdaptiveBuffer
+        internal interpolatable adaptive rolling buffer
+
     """
 
     def __init__(self, tau=1e-3):

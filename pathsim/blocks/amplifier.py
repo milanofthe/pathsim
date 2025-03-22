@@ -23,12 +23,25 @@ class Amplifier(Block):
     .. math::
         
         y(t) = \\mathrm{gain} \\cdot u(t)
+        
+    Example
+    -------
+    The block is initialized like this:
 
-    
+    .. code-block:: python
+        
+        #amplification by factor 5
+        A = Amplifier(gain=5)
+
     Parameters
     ----------
     gain : float
         amplifier gain
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
     """
 
     def __init__(self, gain=1.0):
@@ -36,7 +49,7 @@ class Amplifier(Block):
         self.gain = gain
 
         self.op_alg = Operator(
-            func=lambda x: self.gain*x, 
+            func=lambda x: x*self.gain, 
             jac=lambda x: self.gain
             )
 

@@ -46,7 +46,7 @@ class Constant(Block):
         Returns
         -------
         error : float
-            relative error to previous iteration for convergence control
+            absolute error to previous iteration for convergence control
         """
         self.outputs[0] = self.value
         return 0.0
@@ -60,10 +60,8 @@ class Source(Block):
     
         \\y(t) = \\mathrm{func}(t)
 
-
     Example
     -------
-
     For example a ramp:
 
     .. code-block:: python
@@ -87,7 +85,6 @@ class Source(Block):
             return np.sin(omega * t)
 
         src = Source(f)
-
 
     Parameters
     ---------- 

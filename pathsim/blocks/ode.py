@@ -29,14 +29,16 @@ class ODE(Block):
     defined by its right hand side
 
     .. math::
-    
-        \\dot{x}(t) = \\mathrm{func}(x(t), u(t), t)
 
-    with inhomogenity (input) 'u' and state vector 'x'. The function 
+        \\begin{eqnarray}
+            \\dot{x}(t) &= \\mathrm{func}(x(t), u(t), t) \\\\
+                   y(t) &= x(t) 
+        \\end{eqnarray}
+
+    with inhomogenity (input) `u` and state vector `x`. The function 
     can be nonlinear and the ODE can be of arbitrary order. 
     The block utilizes the integration engine to solve the ODE 
-    by integrating the 'func', which is the right hand side function.
-
+    by integrating the `func`, which is the right hand side function.
 
     Example
     -------
@@ -49,8 +51,7 @@ class ODE(Block):
         
         ode = ODE(lambda x, u, t: -x)
 
-
-    Or something more complex like the vanderpol system, where it makes 
+    Or something more complex like the `Van der Pol` system, where it makes 
     sense to also specify the jacobian, which improves convergence for 
     implicit solvers but is not needed in most cases: 
 
@@ -77,8 +78,7 @@ class ODE(Block):
     
         #finally the block
         vdp = ODE(func, x0, jac) 
-                
-
+        
     Parameters
     ----------
     func : callable
@@ -87,6 +87,11 @@ class ODE(Block):
         initial state / initial condition
     jac : callable, None
         jacobian of 'func' or 'None'
+
+    Attributes
+    ----------
+    op_dyn : DynamicOperator
+        internal dynamic operator for ODE right hand side 'func'
     """
 
     def __init__(

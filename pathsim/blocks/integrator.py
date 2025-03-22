@@ -30,16 +30,21 @@ class Integrator(Block):
 
         y(t) = \\int_0^t u(\\tau) \\ d \\tau
     
+    or in differential form like this:
+
+    .. math::
+        \\begin{eqnarray}
+            \\dot{x}(t) &= u(t) \\\\
+                   y(t) &= x(t) 
+        \\end{eqnarray}
+
     The Integrator block is inherently MIMO capable, so `u` and `y` can be vectors.
     
     Example
     -------
-    
     This is how to initialize the integrator: 
 
     .. code-block:: python
-    
-        from pathsim.blocks import Integrator
     
         #initial value 0.0
         i1 = Integrator()
@@ -60,19 +65,9 @@ class Integrator(Block):
         #save initial value
         self.initial_value = initial_value
 
-        self.op_dyn = DynamicOperator(
-            func=lambda x, u, t: u,
-            jac_x=lambda x, u, t: 0.0,
-            jac_u=lambda x, u, t: 1.0
-            )
-
 
     def __len__(self):
         return 0
-
-
-    def _func_dyn(self, x, u, t):
-        return u
 
 
     def set_solver(self, Solver, **solver_args):
@@ -132,8 +127,7 @@ class Integrator(Block):
         error : float
             solver residual norm
         """
-        x, u = self.engine.get(), dict_to_array(self.inputs)
-        f = self.op_dyn(x, u, t)
+        f = dict_to_array(self.inputs)
         return self.engine.solve(f, None, dt)
 
 
@@ -156,6 +150,5 @@ class Integrator(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        x, u = self.engine.get(), dict_to_array(self.inputs)
-        f = self.op_dyn(x, u, t)
+        f = dict_to_array(self.inputs)
         return self.engine.step(f, dt)

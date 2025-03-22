@@ -28,7 +28,12 @@ class Multiplier(Block):
         
         y(t) = \\prod_i u_i(t)
 
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator that wraps 'prod'
     """
+
     def __init__(self):
         super().__init__()
 
@@ -42,10 +47,6 @@ class Multiplier(Block):
 
     def update(self, t):
         """update system equation in fixed point loop
-
-        Note
-        ----
-        This is a MISO block with an optimized 'update' method for this case
 
         Parameters
         ----------

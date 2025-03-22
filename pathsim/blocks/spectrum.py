@@ -47,10 +47,39 @@ class Spectrum(Block):
     where 'u' is the input signal and 'x' is the state variable that represents the 
     complex fourier coefficient to the frequency 'omega'. The ODE is integrated using the 
     numerical integration engine of the block.
+    
+    Example
+    -------
+    This is how to initialize it: 
+
+    .. code-block:: python
+    
+        import numpy as np
+        
+        #linear frequencies (0Hz, DC -> 1kHz)
+        sp1 = Spectrum(
+            freq=np.linspace(0, 1e3, 100),
+            labels=['x1', 'x2'] #labels for two inputs
+            )
+
+        #log frequencies (1Hz -> 1kHz)
+        sp2 = Spectrum(
+            freq=np.logspace(0, 3, 100)
+            )
+        
+        #log frequencies including DC (0Hz, DC + 1Hz -> 1kHz)
+        sp3 = Spectrum(
+            freq=np.hstack([0.0, np.logspace(0, 3, 100)])
+            )
+
+        #arbitrary frequencies
+        sp4 = Spectrum(
+            freq=np.array([0, 0.5, 20, 1e3])
+            )
 
     Notes
     -----
-    This block is very slow! But it is valuable for long running simulations 
+    This block is relatively slow! But it is valuable for long running simulations 
     with few evaluation frequencies, where just FFT'ing the time series data 
     wouldnt be efficient OR if only the evaluation at weirdly spaced frequencies 
     is required. Otherwise its more efficient to just do an FFT on the time 
@@ -130,6 +159,25 @@ class Spectrum(Block):
 
     def read(self):
         """Read the recorded spectrum
+
+        Example
+        -------
+        This is how to get the recorded spectrum:
+
+        .. code-block:: python
+
+            import numpy as np
+            
+            #linear frequencies (0Hz, DC -> 1kHz)
+            spc = Spectrum(
+                freq=np.linspace(0, 1e3, 100),
+                labels=['x1', 'x2'] #labels for two inputs
+                )
+            
+            #... run the simulation ...
+            
+            #read the complex spectra of x1 and x2
+            freq, [X1, X2] = spc.read()
 
         Returns
         -------

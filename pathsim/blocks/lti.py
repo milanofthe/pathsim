@@ -40,15 +40,48 @@ class StateSpace(Block):
                    y &= \\mathbf{C} x + \\mathbf{D} u 
         \\end{eqnarray}
 
-    where A, B, C and D are the state space matrices, x is the state, 
-    u the input and y the output vector.
+    where `A`, `B`, `C` and `D` are the state space matrices, `x` is the state, 
+    `u` the input and `y` the output vector.
+    
+    Example
+    -------
+    A SISO state space block with two internal states can be initialized 
+    like this:
+
+    .. code-block:: python
+
+        S = StateSpace(
+            A=-np.eye(2), 
+            B=np.ones((2, 1)), 
+            C=np.ones((1, 2)), 
+            D=1.0
+            )
+
+    and a MIMO (2 in, 2 out) state space block with three internal states 
+    can be initialized like this:
+
+    .. code-block:: python
+
+        S = StateSpace(
+            A=-np.eye(3), 
+            B=np.ones((3, 2)), 
+            C=np.ones((2, 3)), 
+            D=np.ones((2, 2))
+            )
 
     Parameters
     ----------
-    A, B, C, D : array
+    A, B, C, D : array_like
         state space matrices
-    initial_value : array, None
+    initial_value : array_like, None
         initial state / initial condition
+
+    Attributes
+    ----------
+    op_dyn : DynamicOperator
+        internal dynamic operator for state equation
+    op_alg : DynamicOperator
+        internal algebraic operator for mapping to outputs
     """
 
     def __init__(self, 

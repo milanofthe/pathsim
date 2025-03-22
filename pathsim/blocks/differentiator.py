@@ -33,10 +33,27 @@ class Differentiator(Block):
     Depending on 'f_max', the resulting system might become stiff or ill conditioned!
     As a practical choice set f_max to 3x the highest expected signal frequency.
     
+    Example
+    -------
+    The block is initialized like this:
+
+    .. code-block:: python
+        
+        #cutoff at 1kHz
+        D = Differentiator(f_max=1e3)
+
     Parameters
     ----------
     f_max : float
         highest expected signal frequency
+
+    Attributes
+    ----------
+    op_dyn : DynamicOperator
+        internal dynamic operator for ODE component
+    op_alg : DynamicOperator
+        internal algebraic operator
+
     """
 
     def __init__(self, f_max=1e2):

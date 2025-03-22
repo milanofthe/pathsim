@@ -17,16 +17,33 @@ from ._block import Block
 class Switch(Block):
     """Switch block that selects between its inputs and copies 
     one of them to the output. 
+
+    Example
+    -------
+    The block is initialized like this:
+
+    .. code-block:: python 
+        
+        #default None -> no passthrough 
+        s1 = Switch()
+
+        #selecting port 2 as passthrough
+        s2 = Switch(2)
+    
+        #change the state of the switch to port 3
+        s2.select(3)
     
     Sets block output depending on `self.state` like this:
 
-        state = None -> outputs[0] = 0
+    .. code-block::
 
-        state = 0 -> outputs[0] = inputs[0]
+        state == None -> outputs[0] = 0
 
-        state = 1 -> outputs[0] = inputs[1]
+        state == 0 -> outputs[0] = inputs[0]
 
-        state = 2 -> outputs[0] = inputs[2]
+        state == 1 -> outputs[0] = inputs[1]
+
+        state == 2 -> outputs[0] = inputs[2]
     
         ...
 
