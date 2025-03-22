@@ -19,10 +19,10 @@ This is a preliminary roadmap for PathSim's development. To be fair, its more a 
 
 ## API
 
-- separate transient and steady state analysis resuts for scope and spectrum
+- separate transient and steady state analysis results for scope and spectrum
 
 
 ## Testing
 
 - complete testing for all the blocks (currently testing is mostly second order) including linearization
-
+- test automatic differentiation through `Value` with every block and with linearization

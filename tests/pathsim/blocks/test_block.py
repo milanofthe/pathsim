@@ -36,6 +36,10 @@ class TestBlock(unittest.TestCase):
         #is active
         self.assertTrue(B._active)
 
+        #operators
+        self.assertEqual(B.op_alg, None)
+        self.assertEqual(B.op_dyn, None)
+
 
     def test_len(self):
 

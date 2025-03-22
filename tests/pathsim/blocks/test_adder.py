@@ -14,6 +14,8 @@ import numpy as np
 
 from pathsim.blocks.adder import Adder
 
+from tests.pathsim.blocks._embedding import Embedding
+
 
 # TESTS ================================================================================
 
@@ -43,6 +45,18 @@ class TestAdder(unittest.TestCase):
 
         #test error, now should be 0
         self.assertEqual(err, 0)
+
+
+    def test_embedding(self):
+
+        A = Adder()
+
+        def src(t): return np.cos(t), np.sin(t), 3.0, t
+        def ref(t): return np.cos(t) + np.sin(t) + 3.0 + t
+
+        E = Embedding(A, src, ref)
+        
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
 
 
     def test_update_multi(self):

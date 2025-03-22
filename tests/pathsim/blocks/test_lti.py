@@ -17,6 +17,8 @@ from pathsim.blocks.lti import StateSpace, TransferFunction
 #base solver for testing
 from pathsim.solvers._solver import Solver 
 
+from tests.pathsim.blocks._embedding import Embedding
+
 
 # TESTS ================================================================================
 
@@ -24,6 +26,7 @@ class TestStateSpace(unittest.TestCase):
     """
     Test the implementation of the 'StateSpace' block class
     """
+
 
     def test_init(self):
 
@@ -35,21 +38,25 @@ class TestStateSpace(unittest.TestCase):
         self.assertEqual(S.outputs, {0:0.0})
 
         #test special initialization (siso)
-        S = StateSpace(A=np.eye(2), 
-                       B=np.ones(2), 
-                       C=np.ones(2), 
-                       D=1, 
-                       initial_value=None)
+        S = StateSpace(
+            A=np.eye(2), 
+            B=np.ones(2), 
+            C=np.ones(2), 
+            D=1, 
+            initial_value=None
+            )
         self.assertTrue(np.all(S.initial_value == np.zeros(2)))
         self.assertEqual(S.inputs, {0:0.0})
         self.assertEqual(S.outputs, {0:0.0})
 
         #test special initialization (mimo)
-        S = StateSpace(A=np.eye(2), 
-                       B=np.ones((2, 2)), 
-                       C=np.ones((2, 2)), 
-                       D=np.ones((2, 2)), 
-                       initial_value=np.ones(2))
+        S = StateSpace(
+            A=np.eye(2), 
+            B=np.ones((2, 2)), 
+            C=np.ones((2, 2)), 
+            D=np.ones((2, 2)), 
+            initial_value=np.ones(2)
+            )
         self.assertTrue(np.all(S.initial_value == np.ones(2)))
         self.assertEqual(S.inputs, {0:0.0, 1:0.0})
         self.assertEqual(S.outputs, {0:0.0, 1:0.0})
@@ -114,6 +121,44 @@ class TestStateSpace(unittest.TestCase):
 
         #test if engine state is calculated correctly
         self.assertAlmostEqual(S.get(0), 2.2, 8)
+
+
+    def test_embedding_siso(self):
+
+        S = StateSpace(
+            A=np.eye(2), 
+            B=np.ones(2), 
+            C=np.ones(2), 
+            D=0.5, 
+            initial_value=None
+            )    
+        S.set_solver(Solver)
+        
+        def src(t): return np.sin(t)
+        def ref(t): return 0.5*np.sin(t)
+
+        E = Embedding(S, src, ref)
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+
+    def test_embedding_mimo(self):
+
+        S = StateSpace(
+            A=np.eye(2), 
+            B=np.ones((2, 2)), 
+            C=np.ones((2, 2)), 
+            D=np.ones((2, 2)), 
+            initial_value=None
+            )    
+        S.set_solver(Solver)
+        
+        def src(t): return [np.sin(t), np.cos(t)]
+        def ref(t): return np.array([np.sin(t) + np.cos(t), np.sin(t) + np.cos(t)])
+
+        E = Embedding(S, src, ref)
+        for t in range(10): 
+            s, r = E.check_MIMO(t)
+            self.assertTrue(np.all(s==r))
 
 
 class TestTransferFunction(unittest.TestCase):

@@ -308,14 +308,20 @@ class DynamicOperator(object):
         value : array_like
             Function value or linear approximation
         """
+        #no linearization available
         if self.f0 is None:
             return self._func(x, u, t)
+
+        #linearization in x available
+        if self.x0 is None: _fx = 0.0
+        else: _fx = np.dot(self.Jx, np.atleast_1d(x - self.x0))
+
+        #linearization in u available
+        if self.u0 is None: _fu = 0.0
+        else: _fu = np.dot(self.Ju, np.atleast_1d(u - self.u0))
         
-        dx = np.atleast_1d(x - self.x0)
-        du = np.atleast_1d(u - self.u0)
-        
-        return self.f0 + np.dot(self.Jx, dx) + np.dot(self.Ju, du)
-        
+        return self.f0 + _fx + _fu
+
 
     def jac_x(self, x, u, t):
         """Compute the Jacobian matrix with respect to x.
@@ -393,7 +399,7 @@ class DynamicOperator(object):
         else:
             # Use analytical jacobian
             return self._jac_u(x, u, t)
-            
+        
 
     def linearize(self, x, u, t):
         """Linearize the function at point (x, u, t).
@@ -412,8 +418,10 @@ class DynamicOperator(object):
             Time
         """
         self.f0 = self._func(x, u, t)
-        self.x0, self.Jx = np.atleast_1d(x), self.jac_x(x, u, t)
-        self.u0, self.Ju = np.atleast_1d(u), self.jac_u(x, u, t)
+        if x is not None:
+            self.x0, self.Jx = np.atleast_1d(x), self.jac_x(x, u, t)
+        if u is not None:
+            self.u0, self.Ju = np.atleast_1d(u), self.jac_u(x, u, t)
         
 
     def reset(self):

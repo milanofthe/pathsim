@@ -15,6 +15,8 @@ import numpy as np
 from pathsim.blocks.delay import Delay
 from pathsim.utils.adaptivebuffer import AdaptiveBuffer
 
+from tests.pathsim.blocks._embedding import Embedding
+
 
 # TESTS ================================================================================
 
@@ -30,6 +32,13 @@ class TestDelay(unittest.TestCase):
 
         self.assertTrue(isinstance(D._buffer, AdaptiveBuffer))
         self.assertEqual(D.tau, 1)
+
+
+    def test_embedding(self):
+
+        D = Delay(tau=10)
+        E = Embedding(D, np.sin, lambda t: np.sin(t-10) if t>10 else 0.0)
+        for t in range(100): self.assertEqual(*E.check_SISO(t))
 
 
     def test_len(self):
@@ -78,10 +87,6 @@ class TestDelay(unittest.TestCase):
             D.sample(t)
 
             err = D.update(t)
-
-
-            #test if error returns correctly
-            # self.assertEqual(err, 0)
 
             #test if delay is correctly applied
             self.assertEqual(D.get(0), max(0, t-10))

@@ -14,6 +14,8 @@ import numpy as np
 
 from pathsim.blocks.function import Function
 
+from tests.pathsim.blocks._embedding import Embedding
+
 
 # TESTS ================================================================================
 
@@ -24,8 +26,7 @@ class TestFunction(unittest.TestCase):
 
     def test_init(self):
 
-        def f(a):
-            return a**2
+        def f(a): return a**2
         
         F = Function(func=f)
 
@@ -35,8 +36,44 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(F.func(3), f(3))
 
         #test input validation
-        with self.assertRaises(ValueError): 
-            F = Function(func=2)
+        for v in [2, 0.3, 1j, np.ones(3)]:
+            with self.assertRaises(ValueError): 
+                F = Function(func=v)
+
+
+    def test_embedding_siso(self):
+
+        def f(a): return a**2
+        
+        F = Function(func=f)
+        
+        def src(t): return np.sin(t)
+        def ref(t): return np.sin(t)**2
+        
+        E = Embedding(F, src, ref)
+        
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+        def src(t): return np.tanh(t)
+        def ref(t): return np.tanh(t)**2
+
+        E = Embedding(F, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+
+    def test_embedding_miso(self):
+
+        def f(a, b, c): return a**2 + b - c
+        
+        F = Function(func=f)
+
+        def src(t): return np.sin(t), np.cos(t), np.tanh(t)
+        def ref(t): return np.sin(t)**2 + np.cos(t) - np.tanh(t)
+        
+        E = Embedding(F, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
 
 
     def test_update_siso(self):
