@@ -43,17 +43,25 @@ Ns1 = PinkNoise(spectral_density=0.05)
 Ns2 = WhiteNoise(spectral_density=0.02)
 FLT = ButterworthBandpassFilter((f-f/10, f+f/10), 4)
 Add = Adder()
-Sco = Scope(labels=["squarewave", 
-                    "filter", 
-                    "adder", 
-                    "pink noise", 
-                    "white noise"])
-Spc = Spectrum(freq=np.linspace(0, 5, 500), 
-               labels=["squarewave", 
-                       "filter", 
-                       "adder", 
-                       "pink noise", 
-                       "white noise"])
+Sco = Scope(
+    labels=[
+        "squarewave", 
+        "filter", 
+        "adder", 
+        "pink noise", 
+        "white noise"
+        ]
+    )
+Spc = Spectrum(
+    freq=np.linspace(0, 5, 500), 
+    labels=[
+        "squarewave", 
+        "filter", 
+        "adder", 
+        "pink noise", 
+        "white noise"
+        ]
+    )
 
 blocks = [Src, Ns1, Ns2, Add, FLT, Sco, Spc]
 

@@ -24,6 +24,23 @@ class TestAdder(unittest.TestCase):
     Test the implementation of the 'Adder' block class
     """
 
+    def test_init(self):
+        
+        #default initialization
+        A = Adder()
+        self.assertEqual(A.operations, None)
+
+        #input validation
+        for a in [0.4, 3, [1, -1, 0], "a", "10"]:
+            with self.assertRaises(ValueError):
+                A = Adder(a)
+
+        #special initialization
+        A = Adder("+-")
+        self.assertEqual(A.operations, "+-")
+        
+
+
     def test_update_single(self):
         
         A = Adder()
@@ -53,6 +70,24 @@ class TestAdder(unittest.TestCase):
 
         def src(t): return np.cos(t), np.sin(t), 3.0, t
         def ref(t): return np.cos(t) + np.sin(t) + 3.0 + t
+
+        E = Embedding(A, src, ref)
+        
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+        A = Adder("+-")
+
+        def src(t): return np.cos(t), np.sin(t), 3.0, t
+        def ref(t): return np.cos(t) - np.sin(t) 
+
+        E = Embedding(A, src, ref)
+        
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+        A = Adder("++-0")
+
+        def src(t): return np.cos(t), np.sin(t), 3.0, t
+        def ref(t): return np.cos(t) + np.sin(t) - 3
 
         E = Embedding(A, src, ref)
         

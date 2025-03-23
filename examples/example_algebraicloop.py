@@ -26,7 +26,7 @@ dt = 0.1
 a = -0.2
 
 #blocks that define the system
-Src = Source(lambda t: 2*np.sin(t))
+Src = Source(lambda t: 2*np.cos(t))
 Amp = Amplifier(a)
 Add = Adder()
 Sco = Scope(labels=["src", "amp", "add"])
@@ -48,7 +48,8 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True)
     
 #run the simulation for some time
-print(Sim.run(5))
+Sim.run(5)
+# Sim.steadystate()
 
 Sco.plot(".-")
 

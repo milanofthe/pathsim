@@ -29,3 +29,17 @@ SOL_BETA = 0.9                 # savety for timestep control (adaptive solvers)
 
 # Event default constants
 EVT_TOLERANCE = 1e-4         # tolerance for event detection
+
+# Colors for visualization
+COLOR_RED = "#e41a1c"
+COLOR_BLUE = "#377eb8"
+COLOR_GREEN = "#4daf4a"
+COLOR_PURPLE = "#984ea3"
+COLOR_ORANGE = "#ff7f00"
+COLORS_ALL = [
+	COLOR_RED, 
+	COLOR_BLUE, 
+	COLOR_GREEN, 
+	COLOR_PURPLE, 
+	COLOR_ORANGE
+	]

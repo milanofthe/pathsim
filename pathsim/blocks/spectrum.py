@@ -17,6 +17,7 @@ from ._block import Block
 from ..utils.utils import dict_to_array
 from ..utils.realtimeplotter import RealtimePlotter
 
+from .._constants import COLORS_ALL
 
 
 # BLOCKS FOR DATA RECORDING =============================================================
@@ -304,7 +305,7 @@ class Spectrum(Block):
         self.fig, self.ax = plt.subplots(nrows=1, ncols=1, figsize=(8,4), tight_layout=True, dpi=120)
 
         #custom colors
-        self.ax.set_prop_cycle(color=["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"])
+        self.ax.set_prop_cycle(color=COLORS_ALL)
 
         #plot magnitude in dB and add label
         for p, d in enumerate(data):
