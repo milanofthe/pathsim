@@ -13,6 +13,7 @@
 ![GitHub Release](https://img.shields.io/github/v/release/milanofthe/pathsim)
 [![Documentation Status](https://readthedocs.org/projects/pathsim/badge/?version=latest)](https://pathsim.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Downloads](https://img.shields.io/pypi/dw/pathsim)
+[![codecov](https://codecov.io/gh/milanofthe/pathsim/branch/master/graph/badge.svg)](https://codecov.io/gh/pathsim/pathsim)
 
 
 ## Overview
