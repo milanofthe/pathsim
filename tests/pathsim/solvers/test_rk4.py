@@ -76,7 +76,7 @@ class TestRK4(unittest.TestCase):
     def test_integrate_fixed(self):
         
         #divisons of integration duration
-        divisions = np.logspace(2, 3, 10)
+        divisions = np.logspace(1, 3, 30)
 
         #integrate test problem and assess convergence order
         for problem in PROBLEMS:
@@ -101,7 +101,7 @@ class TestRK4(unittest.TestCase):
                         )
 
                     analytical_solution = problem.solution(time)
-                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
 
                 #test if errors are monotonically decreasing

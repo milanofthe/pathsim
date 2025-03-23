@@ -118,9 +118,6 @@ class TestExampleLinearFeedback(unittest.TestCase):
         self.assertEqual(dta[-1], 1.0)
 
 
-
-
-
 # RUN TESTS LOCALLY ====================================================================
 
 if __name__ == '__main__':

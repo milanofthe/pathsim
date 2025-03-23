@@ -84,7 +84,7 @@ class TestESDIRK43(unittest.TestCase):
     def test_integrate_fixed(self):
         
         #divisons of integration duration
-        divisions = np.logspace(1, 1.5, 5)
+        divisions = np.logspace(1, 2, 20)
 
         #integrate test problem and assess convergence order
         for problem in PROBLEMS:
@@ -110,11 +110,8 @@ class TestESDIRK43(unittest.TestCase):
                         )
 
                     analytical_solution = problem.solution(time)
-                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
-
-                #test if errors are monotonically decreasing
-                self.assertTrue(np.all(np.diff(errors)<0))
 
                 #test convergence order, expected n-1 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)

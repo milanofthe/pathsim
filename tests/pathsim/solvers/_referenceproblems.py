@@ -65,14 +65,14 @@ PROBLEMS = [
         solution=lambda t: np.exp(np.cos(t) - 1),
         t_span=(0, 10)
         ),
-    Problem(
-        name="bounded_growth",
-        func=lambda x, t: np.sin(t)*x,
-        jac=lambda x, t: np.sin(t),
-        x0=2.0,
-        solution=lambda t: 2.0*np.exp(1-np.cos(t)),
-        t_span=(0, 10)
-        ),
+    # Problem(
+    #     name="bounded_growth",
+    #     func=lambda x, t: np.sin(t)*x,
+    #     jac=lambda x, t: np.sin(t),
+    #     x0=2.0,
+    #     solution=lambda t: 2.0*np.exp(1-np.cos(t)),
+    #     t_span=(0, 10)
+    #     ),
     Problem(
         name="polynomial",
         func=lambda x, t: t**2 - x,

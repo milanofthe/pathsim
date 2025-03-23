@@ -27,12 +27,6 @@ from ..optim.anderson import (
     NewtonAnderson
     )
 
-from ..optim.newton import (
-    LevenbergMarquardtAD,
-    NewtonRaphsonAD, 
-    GaussNewtonAD
-    )
-
 
 # BASE SOLVER CLASS ====================================================================
 

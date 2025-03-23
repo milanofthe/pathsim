@@ -115,9 +115,9 @@ class TestOperator(unittest.TestCase):
         op = Operator(func)
         
         x = 1.0
-        expected_jac = np.array([2.0, np.cos(1.0)])
-
+        expected_jac = np.array([[2.0], [np.cos(1.0)]])
         result_jac = op.jac(x)
+
         self.assertTrue(np.allclose(result_jac, expected_jac))
         
     def test_linearize(self):

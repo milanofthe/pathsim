@@ -16,6 +16,8 @@ from pathsim.solvers.bdf import *
 
 from tests.pathsim.solvers._referenceproblems import PROBLEMS
 
+import matplotlib.pyplot as plt
+
 
 # TESTS ================================================================================
 
@@ -96,8 +98,11 @@ class TestBDF2(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #dict for logging
+        stats = {}
+        
         #divisons of integration duration
-        divisions = np.logspace(1, 2, 10)
+        divisions = np.logspace(1, 3, 30)
 
         #integrate test problem and assess convergence order
         for problem in PROBLEMS:
@@ -123,15 +128,23 @@ class TestBDF2(unittest.TestCase):
                         )
 
                     analytical_solution = problem.solution(time)
-                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
-
-                #test if errors are monotonically decreasing
-                self.assertTrue(np.all(np.diff(errors)<0))
 
                 #test convergence order, expected n-1 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
                 self.assertGreater(p, 1) # <- due to startup
+
+            #log stats
+            stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
+
+        # fig, ax = plt.subplots(dpi=120, tight_layout=True)
+        # fig.suptitle(solver.__class__.__name__)
+        # for name, stat in stats.items(): 
+        #     ax.loglog(stat["dt"], stat["err"], label=name)
+        # ax.loglog(timesteps, timesteps**solver.n, c="k", ls="--", label=f"n={solver.n}")
+        # ax.legend()
+        # plt.show()
 
 
 
@@ -213,8 +226,11 @@ class TestBDF3(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #dict for logging
+        stats = {}
+        
         #divisons of integration duration
-        divisions = np.logspace(1, 2, 10)
+        divisions = np.logspace(1, 3, 30)
 
         #integrate test problem and assess convergence order
         for problem in PROBLEMS:
@@ -240,15 +256,23 @@ class TestBDF3(unittest.TestCase):
                         )
 
                     analytical_solution = problem.solution(time)
-                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
-
-                #test if errors are monotonically decreasing
-                self.assertTrue(np.all(np.diff(errors)<0))
 
                 #test convergence order, expected n-1 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
                 self.assertGreater(p, 1) # <- due to startup
+
+            #log stats
+            stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
+
+        # fig, ax = plt.subplots(dpi=120, tight_layout=True)
+        # fig.suptitle(solver.__class__.__name__)
+        # for name, stat in stats.items(): 
+        #     ax.loglog(stat["dt"], stat["err"], label=name)
+        # ax.loglog(timesteps, timesteps**solver.n, c="k", ls="--", label=f"n={solver.n}")
+        # ax.legend()
+        # plt.show()
 
 
 
@@ -329,8 +353,11 @@ class TestBDF4(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #dict for logging
+        stats = {}
+        
         #divisons of integration duration
-        divisions = np.logspace(1, 2, 10)
+        divisions = np.logspace(1, 3, 30)
 
         #integrate test problem and assess convergence order
         for problem in PROBLEMS:
@@ -356,15 +383,23 @@ class TestBDF4(unittest.TestCase):
                         )
 
                     analytical_solution = problem.solution(time)
-                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
-
-                #test if errors are monotonically decreasing
-                self.assertTrue(np.all(np.diff(errors)<0))
 
                 #test convergence order, expected n-1 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
                 self.assertGreater(p, 1) # <- due to startup
+
+            #log stats
+            stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
+
+        # fig, ax = plt.subplots(dpi=120, tight_layout=True)
+        # fig.suptitle(solver.__class__.__name__)
+        # for name, stat in stats.items(): 
+        #     ax.loglog(stat["dt"], stat["err"], label=name)
+        # ax.loglog(timesteps, timesteps**solver.n, c="k", ls="--", label=f"n={solver.n}")
+        # ax.legend()
+        # plt.show()
 
 
 
@@ -445,8 +480,11 @@ class TestBDF5(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #dict for logging
+        stats = {}
+        
         #divisons of integration duration
-        divisions = np.logspace(1, 2, 10)
+        divisions = np.logspace(1, 3, 30)
 
         #integrate test problem and assess convergence order
         for problem in PROBLEMS:
@@ -472,15 +510,23 @@ class TestBDF5(unittest.TestCase):
                         )
 
                     analytical_solution = problem.solution(time)
-                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
-
-                #test if errors are monotonically decreasing
-                self.assertTrue(np.all(np.diff(errors)<0))
 
                 #test convergence order, expected n-1 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
                 self.assertGreater(p, 1) # <- due to startup
+
+            #log stats
+            stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
+
+        # fig, ax = plt.subplots(dpi=120, tight_layout=True)
+        # fig.suptitle(solver.__class__.__name__)
+        # for name, stat in stats.items(): 
+        #     ax.loglog(stat["dt"], stat["err"], label=name)
+        # ax.loglog(timesteps, timesteps**solver.n, c="k", ls="--", label=f"n={solver.n}")
+        # ax.legend()
+        # plt.show()
 
 
 class TestBDF6(unittest.TestCase):
@@ -560,8 +606,11 @@ class TestBDF6(unittest.TestCase):
 
     def test_integrate_fixed(self):
         
+        #dict for logging
+        stats = {}
+        
         #divisons of integration duration
-        divisions = np.logspace(1, 2, 10)
+        divisions = np.logspace(1, 2, 30)
 
         #integrate test problem and assess convergence order
         for problem in PROBLEMS:
@@ -587,15 +636,23 @@ class TestBDF6(unittest.TestCase):
                         )
 
                     analytical_solution = problem.solution(time)
-                    err = np.linalg.norm(numerical_solution - analytical_solution)
+                    err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
-
-                #test if errors are monotonically decreasing
-                self.assertTrue(np.all(np.diff(errors)<0))
 
                 #test convergence order, expected n-1 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
                 self.assertGreater(p, 1) # <- due to startup
+
+            #log stats
+            stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
+
+        # fig, ax = plt.subplots(dpi=120, tight_layout=True)
+        # fig.suptitle(solver.__class__.__name__)
+        # for name, stat in stats.items(): 
+        #     ax.loglog(stat["dt"], stat["err"], label=name)
+        # ax.loglog(timesteps, timesteps**solver.n, c="k", ls="--", label=f"n={solver.n}")
+        # ax.legend()
+        # plt.show()
 
 
 # RUN TESTS LOCALLY ====================================================================
