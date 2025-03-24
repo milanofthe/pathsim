@@ -1,7 +1,7 @@
 ########################################################################################
 ##
-##                           DEBUGGING AND EVALUATION TOOLS  
-##                                (utils/debugging.py)
+##                            DEBUGGING AND EVALUATION TOOLS  
+##                                 (utils/analysis.py)
 ##
 ##                                  Milan Rother 2024
 ##
@@ -9,12 +9,9 @@
 
 # IMPORTS ==============================================================================
 
-import numpy as np
-
-from collections import deque
-from contextlib import ContextDecorator
-from functools import wraps
 from time import perf_counter
+from functools import wraps
+from contextlib import ContextDecorator
 
 try:
     import cProfile, pstats
@@ -25,7 +22,7 @@ except ImportError:
 
 # CLASSES ==============================================================================
 
-class Timer:
+class Timer(ContextDecorator):
     """Context manager that times the execution time 
     of the code inside of the context in 'ms' for 
     debugging purposes.
@@ -39,8 +36,8 @@ class Timer:
         with Timer() as T:
             complicated_function()
             
-        #print the runtime
-        print(T.time)
+        #print the runtime in ms
+        print(T)
     
     Parameters
     ----------
@@ -49,16 +46,22 @@ class Timer:
     """
     def __init__(self, verbose=True):
         self.verbose = verbose
+        self.time = None
+
+
+    def __repr__(self):
+        if self.time is None: return None
+        return f"{self.time*1e3:.3f}ms" 
+        
 
     def __enter__(self):
-        self.start = perf_counter()
+        self._start = perf_counter()
         return self
 
+
     def __exit__(self, type, value, traceback):
-        self.time = perf_counter() - self.start
-        self.readout = f"{self.time*1e3:.3f}ms"
-        if self.verbose:
-            print("runtime:", self.readout)
+        self.time = perf_counter() - self._start
+        if self.verbose: print(self)
 
 
 def timer(func):
@@ -105,12 +108,17 @@ class Profiler(ContextDecorator):
     def __init__(self, top_n=50, sort_by="cumulative"):
         self.top_n = top_n
         self.sort_by = sort_by
+        if not PROFILE_AVAILABLE:
+            _msg = "'Profiler' not available, make sure 'cProfile' and 'pstats' is installed!"
+            raise ImportError(_msg)
         self.profiler = cProfile.Profile()
     
+
     def __enter__(self):
         self.profiler.enable()
         return self
     
+
     def __exit__(self, *exc):
         self.profiler.disable()
         stats = pstats.Stats(self.profiler)

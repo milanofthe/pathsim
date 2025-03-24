@@ -30,7 +30,7 @@ from ._constants import (
     )
 
 from .utils.utils import path_length_dfs
-from .utils.debugging import Timer
+from .utils.analysis import Timer
 from .utils.progresstracker import ProgressTracker
 
 from .solvers import SSPRK22, SteadyState
@@ -705,7 +705,7 @@ class Simulation:
             for block in self.blocks:
                 block.linearize(self.time)
 
-        self._logger_info(f"LINEARIZED -> runtime={T.readout}")
+        self._logger_info(f"LINEARIZED -> runtime={T}")
 
 
     def delinearize(self):
@@ -800,14 +800,12 @@ class Simulation:
 
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
-                return iteration + 1
+                return iteration+1
 
         #not converged
         self._logger_error(
             "fixed-point loop in '_update' not converged, iters={}, err={}".format(
-                iteration + 1, 
-                max_error
-                ), 
+                iteration+1, max_error), 
             RuntimeError
             )
 
@@ -901,11 +899,7 @@ class Simulation:
         if not success:
             self._logger_error(
                 "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
-                    success,
-                    evals, 
-                    iters, 
-                    T.readout
-                    ), 
+                    success, evals, iters, T), 
                 RuntimeError
                 )
 
@@ -915,11 +909,7 @@ class Simulation:
         #log message 
         self._logger_info(
             "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
-                success,
-                evals, 
-                iters, 
-                T.readout
-                )
+                success, evals, iters, T)
             )
 
         #switch back to original solver

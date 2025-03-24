@@ -5,7 +5,7 @@ pathsim.utils
    :maxdepth: 4
 
    pathsim.utils.adaptivebuffer
-   pathsim.utils.debugging
+   pathsim.utils.analysis
    pathsim.utils.gilbert
    pathsim.utils.progresstracker
    pathsim.utils.realtimeplotter
