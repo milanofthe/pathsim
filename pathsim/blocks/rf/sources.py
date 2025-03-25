@@ -79,8 +79,8 @@ def square_wave(t, f):
 class SquareWaveSource(Block):
     """Source block that generates an analog square wave
     
-    Notes
-    -----
+    Note
+    ----
     This block is purely analog with no internal events. 
     Not to be confused with a clock that has internal scheduled events
     

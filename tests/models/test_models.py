@@ -35,14 +35,15 @@ def for_each_model():
                 #load simulation duration from metadata
                 with open(file_path, "r", encoding="utf-8") as file:
                     data = json.load(file)
-                    duration = data["metadata"].get("duration", 1.0)
+                    metadata = data["metadata"]
+                    duration = metadata.get("duration", 1.0)
                 
                 #load the simulation from file
                 sim = Simulation.load(file_path, log=False)
             
                 #run the simulation for duration from metadata
-                sim.run(duration)
-            
+                sim.run(duration)     
+
             return test
         
         #create a test method for each file matching pattern

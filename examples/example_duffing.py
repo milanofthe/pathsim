@@ -25,8 +25,6 @@ from pathsim.solvers import (
     RKCK54
     )
 
-from pathsim.utils.debugging import Timer
-
 
 # DUFFING OSCILLATOR ====================================================================
 
