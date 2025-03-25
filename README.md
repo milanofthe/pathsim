@@ -126,7 +126,13 @@ $$
 \ddot{x} + \mu (1 - x^2) \dot{x} + x = 0
 $$
 
-Below, the Van der Pol system is built with two discrete `Integrator` blocks and a `Function` block. The parameter is set to $\mu = 1000$ which means severe stiffness. 
+The Van der Pol ODE can be translated into a block diagram like the one below, where the two states are handled by two distinct integrators.
+
+
+![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_blockdiagram_g.png)
+
+
+Lets translate it to PathSim using two `Integrator` blocks and a `Function` block. The parameter is set to $\mu = 1000$ which means severe stiffness. 
 
 
 ```python
