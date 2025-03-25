@@ -877,7 +877,7 @@ class Simulation:
         reset : bool
             reset the simulation before solving for steady state
         """
-    
+
         #reset the simulation before solving
         if reset:
             self.reset()
@@ -1061,6 +1061,9 @@ class Simulation:
             total number of implicit solver iterations
         """
 
+        #successful by default
+        success = True
+
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
@@ -1086,12 +1089,18 @@ class Simulation:
                 #solve implicit update equation and get iteration count
                 success, evals, solver_its = self._solve(time, dt)
 
+                #warning if implicit solver didnt converge in timestep
+                if not success:
+                    self._logger_warning(
+                        f"implicit solver not converged in {solver_its} iterations!"
+                        )
+
                 #count solver iterations and function evaluations
                 total_solver_its += solver_its
                 total_evals += evals
 
             #timestep for dynamical blocks (with internal states)
-            success, error_norm, scale = self._step(time, dt)
+            _1, error_norm, _3 = self._step(time, dt)
 
         #system time after timestep
         time_dt = self.time + dt
@@ -1115,7 +1124,7 @@ class Simulation:
         self.time = time_dt 
 
         #max local truncation error, timestep rescale, successful step
-        return success, error_norm, scale, total_evals, total_solver_its
+        return success, error_norm, 1.0, total_evals, total_solver_its
 
 
     def step_adaptive(self, dt=None):

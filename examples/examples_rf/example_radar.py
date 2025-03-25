@@ -18,7 +18,8 @@ from pathsim.blocks import (
     Scope, 
     Adder,
     Spectrum,
-    Delay
+    Delay,
+    RealtimeScope
     )
 
 #special blocks (for example from 'rf' module) are imported like this

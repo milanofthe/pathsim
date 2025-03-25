@@ -477,9 +477,10 @@ class RealtimeSpectrum(Spectrum):
                 #update realtime plotter
                 _, data = self.read()
                 self.plotter.update_all(self.freq, abs(data))
-            
-            #compute update step with integration engine
-            return self.engine.step(dict_to_array(self.inputs), _t, dt)
 
+            #compute update step with integration engine
+            f = self._kernel(self.engine.get(), dict_to_array(self.inputs), _t)
+            return self.engine.step(f, dt)
+            
         #no error estimate
         return True, 0.0, 1.0

@@ -82,6 +82,9 @@ Sim = Simulation(
 #run the simulation
 Sim.run(10)
 
+
+Sim.save("bouncingball.mdl", duration=10)
+
 #read the recordings from the scope
 time, [x] = Sc.read()
 

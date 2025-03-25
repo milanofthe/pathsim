@@ -18,6 +18,8 @@ import numpy as np
 import time
 from collections import deque
 
+from .._constants import COLORS_ALL
+
 
 # PLOTTER CLASS =========================================================================
 
@@ -64,11 +66,7 @@ class RealtimePlotter:
                                          dpi=120)
         
         #custom colors
-        self.ax.set_prop_cycle(color=["#e41a1c", 
-                                      "#377eb8", 
-                                      "#4daf4a", 
-                                      "#984ea3", 
-                                      "#ff7f00"])
+        self.ax.set_prop_cycle(color=COLORS_ALL)
         
         #plot settings
         self.ax.set_xlabel(self.x_label)

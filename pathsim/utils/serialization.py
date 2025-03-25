@@ -227,6 +227,7 @@ class Serializable:
     """Mixin that provides automatic serialization based on __init__ parameters 
     and loading/saving to json formatted readable files
     """
+
     
     def __str__(self):
         return json.dumps(self.to_dict(), indent=2, sort_keys=False)
@@ -265,48 +266,7 @@ class Serializable:
         with open(path, "r", encoding="utf-8") as file:
             return cls.from_dict(json.load(file), **kwargs)
         return None
-        
 
-    def to_dict(self, **metadata):
-        """Convert object to dictionary representation
-
-        Parameters
-        ----------
-        metadata : dict
-            metadata for the object
-        
-        Returns
-        -------
-        data : dict
-            representation of object
-        """
-        
-        #get parameter names from __init__ signature
-        signature = inspect.signature(self.__init__)
-        param_names = [p for p in signature.parameters if p != "self"]
-
-        #get current values of parameters
-        params = {}        
-        for name in param_names:
-            
-            if hasattr(self, name):
-                
-                value = getattr(self, name)
-
-                #handle callable parameters
-                if callable(value):
-                    params[name] = serialize_callable(value)
-
-                else:
-                    params[name] = serialize_object(value)
-            
-        return {
-            "id"       : id(self),
-            "type"     : self.__class__.__name__,
-            "metadata" : metadata,
-            "params"   : params
-        }
-    
 
     @classmethod
     def from_dict(cls, data, **kwargs):
@@ -324,48 +284,97 @@ class Serializable:
         out : obj
             reconstructed object from dict representation            
         """
-
-        # Use the class specified in the data
+        # Use the class and module specified in the data
         block_type = data.get("type")
+        module_name = data.get("module")
         
-        # Find the class in the module hierarchy
-        target_cls = cls._find_class(block_type)
+        if module_name and block_type:
         
-        # If this is already the target class, or we couldn't find the target
-        if target_cls is None or target_cls == cls:
+            # Try direct import if module name is available
+            try:
+                module = importlib.import_module(module_name)
+                target_cls = getattr(module, block_type)
+            except (ImportError, AttributeError):
+                pass
 
-            #deserialize parameters
+        else:
+        
+            # Find the class in the module hierarchy, considering module name
+            target_cls = cls._find_class(block_type, module_name)
+        
+        # We couldn't find the target class
+        if target_cls is None:
+            raise ValueError(f"'{block_type}' cannot be found for deserialization!")
+
+        # If this is already the target class
+        if target_cls == cls:
+
+            # Deserialize parameters
             params = {}
             for name, value in data["params"].items():
                 params[name] = deserialize(value)
 
-            #update optional kwargs
+            # Update optional kwargs
             for name, value in kwargs.items():
                 params[name] = value
-        
-            #create the instance
+
+            # Create the instance
             return cls(**params)
         
         else:
-            #target class handle deserialization
+            # Target class handle deserialization
             return target_cls.from_dict(data)
 
 
+    def to_dict(self, **metadata):
+        """Convert object to dictionary representation"""
+        
+        # get parameter names from __init__ signature
+        signature = inspect.signature(self.__init__)
+        param_names = [p for p in signature.parameters if p != "self"]
+
+        # get current values of parameters
+        params = {}        
+        for name in param_names:
+            
+            if hasattr(self, name):
+                
+                value = getattr(self, name)
+
+                # handle callable parameters
+                if callable(value):
+                    params[name] = serialize_callable(value)
+                else:
+                    params[name] = serialize_object(value)
+            
+        return {
+            "id"       : id(self),
+            "type"     : self.__class__.__name__,
+            "module"   : self.__class__.__module__,  
+            "metadata" : metadata,
+            "params"   : params
+        }
+        
+
     @classmethod
-    def _find_class(cls, class_name):
-        """Find a class by name in the module hierarchy"""
+    def _find_class(cls, class_name, module_name=None):
+        """Find a class by name and optionally module name in the module hierarchy"""
         
-        #first check if this is the class we're looking for
+        # First check if this is the class we're looking for
         if cls.__name__ == class_name:
-            return cls
+            # If module name is provided, verify it matches
+            if module_name is None or cls.__module__ == module_name:
+                return cls
         
-        #if not, check all subclasses recursively
+        # If not, check all subclasses recursively
         for subclass in cls.__subclasses__():
             if subclass.__name__ == class_name:
-                return subclass
+                # If module name is provided, verify it matches
+                if module_name is None or subclass.__module__ == module_name:
+                    return subclass
             
-            #recursively check subclasses of this subclass
-            found = subclass._find_class(class_name)
+            # Recursively check subclasses of this subclass
+            found = subclass._find_class(class_name, module_name)
             if found:
                 return found
         
