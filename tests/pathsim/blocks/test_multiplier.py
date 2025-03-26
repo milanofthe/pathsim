@@ -25,6 +25,82 @@ class TestMultiplier(unittest.TestCase):
     """
 
 
+    def test_embedding(self):
+
+        M = Multiplier()
+
+        def src(t): return np.cos(t), np.sin(t), 3.0, t
+        def ref(t): return np.cos(t) * np.sin(t) * 3.0 * t
+
+        E = Embedding(M, src, ref)
+        
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+
+        M = Multiplier()
+
+        def src(t): return np.cos(t)
+        def ref(t): return np.cos(t)
+
+        E = Embedding(M, src, ref)
+        
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+
+    def test_linearization(self):
+        """test linearization and delinearization"""
+
+        M = Multiplier()
+
+        def src(t): return np.cos(t), t, 3.0
+        def ref(t): return np.cos(t) * t * 3.0 
+
+        E = Embedding(M, src, ref)
+
+        for t in range(10): 
+            self.assertEqual(*E.check_MIMO(t))
+
+        #linearize block
+        M.linearize(t)
+
+        a, b = E.check_MIMO(t)
+        self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #delinearize
+        M.delinearize()
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+
+    def test_sensitivity(self):
+        """test compatibility with AD framework"""
+
+        from pathsim.optim.value import Value
+
+        a, b, c = Value.array([3.2, -0.003, 2031.9])
+
+        M = Multiplier()
+
+        def src(t): return a, b, c
+        def ref(t): return -3.2*0.003*2031.9 
+
+        E = Embedding(M, src, ref)
+        self.assertEqual(*E.check_MIMO(0))
+
+        y, _ = E.check_MIMO(0)
+        self.assertEqual(Value.der(y, a), -0.003*2031.9)
+        self.assertEqual(Value.der(y, b), 3.2*2031.9)
+        self.assertEqual(Value.der(y, c), -3.2*0.003)
+
+        #sensitivity with linearization
+        M.linearize(0)
+
+        y, _ = E.check_MIMO(0)
+        self.assertEqual(Value.der(y, a), -0.003*2031.9)
+        self.assertEqual(Value.der(y, b), 3.2*2031.9)
+        self.assertEqual(Value.der(y, c), -3.2*0.003)
+
+
     def test_update_single(self):
         
         M = Multiplier()
@@ -46,18 +122,6 @@ class TestMultiplier(unittest.TestCase):
 
         #test error, now should be 0
         self.assertEqual(err, 0)
-
-
-    def test_embedding(self):
-
-        M = Multiplier()
-
-        def src(t): return np.cos(t), np.sin(t), 3.0, t
-        def ref(t): return np.cos(t) * np.sin(t) * 3.0 * t
-
-        E = Embedding(M, src, ref)
-        
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
 
 
     def test_update_multi(self):

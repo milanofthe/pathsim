@@ -29,3 +29,9 @@ This is a preliminary roadmap for PathSim's development. To be fair, its more a 
 
 - complete testing for all the blocks (currently testing is mostly second order) including linearization
 - test automatic differentiation through `Value` with every block and with linearization
+
+
+## Integration
+
+- support for Modelica / FMI models, import as special blocks
+- special circuit blocks, generated from SPICE netlists

@@ -76,6 +76,94 @@ class TestFunction(unittest.TestCase):
         for t in range(10): self.assertEqual(*E.check_MIMO(t))
 
 
+
+    def test_linearization_miso(self):
+        """test linearization and delinearization"""
+
+        def f(a, b, c): return a**2 + b - c
+        
+        F = Function(func=f)
+
+        def src(t): return np.cos(t), t, 3.0
+        def ref(t): return np.cos(t)**2 + t - 3.0 
+
+        E = Embedding(F, src, ref)
+
+        for t in range(10): 
+            self.assertEqual(*E.check_MIMO(t))
+
+        #linearize block
+        F.linearize(t)
+
+        a, b = E.check_MIMO(t)
+        self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #delinearize
+        F.delinearize()
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+
+    def test_linearization_mimo(self):
+        """test linearization and delinearization"""
+
+        def f(a, b, c): return a**2 + b - c, 4*np.sin(b*c)
+        
+        F = Function(func=f)
+
+        def src(t): return np.cos(t), t, 3.0
+        def ref(t): return np.cos(t)**2 + t - 3.0, 4*np.sin(t*3) 
+
+        E = Embedding(F, src, ref)
+
+        for t in range(10): 
+            y, r = E.check_MIMO(t)
+            self.assertEqual(y[0], r[0])
+            self.assertEqual(y[1], r[1])
+
+        #linearize block
+        F.linearize(t)
+
+        y, r = E.check_MIMO(t)
+        self.assertEqual(y[0], r[0])
+        self.assertEqual(y[1], r[1])
+
+        #delinearize
+        F.delinearize()
+
+        for t in range(10): 
+            y, r = E.check_MIMO(t)
+            self.assertEqual(y[0], r[0])
+            self.assertEqual(y[1], r[1])
+
+
+    def test_sensitivity(self):
+        """test compatibility with AD framework"""
+
+        from pathsim.optim.value import Value
+
+        a, b, c = Value.array([3, 0.5, -1])
+
+        def f(a, b, c): return a**2 + b - c
+        
+        F = Function(func=f)
+
+        def src(t): return a, b, c
+        def ref(t): return 10.5
+
+        E = Embedding(F, src, ref)
+
+        y, r = E.check_MIMO(0)
+        self.assertEqual(y, r)
+
+        #check derivatives
+        self.assertEqual(Value.der(y, a), 6)
+        self.assertEqual(Value.der(y, b), 1)
+        self.assertEqual(Value.der(y, c), -1)
+
+
+
+
     def test_update_siso(self):
 
         def f(a):

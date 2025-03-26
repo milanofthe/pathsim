@@ -38,33 +38,10 @@ class TestAdder(unittest.TestCase):
         #special initialization
         A = Adder("+-")
         self.assertEqual(A.operations, "+-")
-        
-
-
-    def test_update_single(self):
-        
-        A = Adder()
-
-        #set block inputs
-        A.set(0, 1)
-
-        #update block
-        err = A.update(None)
-
-        #test if update was correct
-        self.assertEqual(A.get(0), 1)
-
-        #test if error was computed correctly
-        self.assertGreater(err, 0)
-
-        #update block again
-        err = A.update(None)
-
-        #test error, now should be 0
-        self.assertEqual(err, 0)
 
 
     def test_embedding(self):
+        """test algebraic components via embedding"""
 
         A = Adder()
 
@@ -92,6 +69,130 @@ class TestAdder(unittest.TestCase):
         E = Embedding(A, src, ref)
         
         for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+
+    def test_linearization(self):
+        """test linearization and delinearization"""
+
+        A = Adder()
+
+        def src(t): return np.cos(t), np.sin(t), 3.0, t
+        def ref(t): return np.cos(t) + np.sin(t) + 3.0 + t
+
+        E = Embedding(A, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+        #linearize block
+        A.linearize(3)
+
+        for t in range(10): 
+            a, b = E.check_MIMO(t)
+            self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #linearize at differnt point in time block
+        A.linearize(12)
+
+        for t in range(10): 
+            a, b = E.check_MIMO(t)
+            self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #delinearize
+        A.delinearize()
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+
+        A = Adder("+-0+")
+
+        def src(t): return np.cos(t), np.sin(t), 3.0, t
+        def ref(t): return np.cos(t) - np.sin(t) + t
+
+        E = Embedding(A, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+        #linearize block
+        A.linearize(3)
+
+        for t in range(10): 
+            a, b = E.check_MIMO(t)
+            self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #linearize at differnt point in time block
+        A.linearize(12)
+
+        for t in range(10): 
+            a, b = E.check_MIMO(t)
+            self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #delinearize
+        A.delinearize()
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+
+    def test_sensitivity(self):
+        """test compatibility with AD framework"""
+
+        from pathsim.optim.value import Value
+
+
+        a, b, c = Value.array([3.2, -0.3, 1000])
+
+        A = Adder()
+
+        def src(t): return a, b, c
+        def ref(t): return a + b + c
+
+        E = Embedding(A, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+        for t in range(10): 
+            y, _ = E.check_MIMO(t)
+            self.assertEqual(Value.der(y, a), 1.0)
+            self.assertEqual(Value.der(y, b), 1.0)
+            self.assertEqual(Value.der(y, c), 1.0)
+
+
+        A = Adder("+-0")
+
+        def src(t): return a, b, c
+        def ref(t): return a - b
+
+        E = Embedding(A, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+
+        for t in range(10): 
+            y, _ = E.check_MIMO(t)
+            self.assertEqual(Value.der(y, a), 1.0)
+            self.assertEqual(Value.der(y, b), -1.0)
+            self.assertEqual(Value.der(y, c), 0.0)
+        
+
+    def test_update_single(self):
+        
+        A = Adder()
+
+        #set block inputs
+        A.set(0, 1)
+
+        #update block
+        err = A.update(None)
+
+        #test if update was correct
+        self.assertEqual(A.get(0), 1)
+
+        #test if error was computed correctly
+        self.assertGreater(err, 0)
+
+        #update block again
+        err = A.update(None)
+
+        #test error, now should be 0
+        self.assertEqual(err, 0)
 
 
     def test_update_multi(self):

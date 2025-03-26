@@ -110,7 +110,7 @@ Sim.run(duration=30.0)
 Sc.plot()
 
 #read the results from the scope for further processing
-time, data = Sc.read();
+time, data = Sc.read()
 ```
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/harmonic_oscillator_result_g.png)
@@ -177,7 +177,7 @@ Sim = Simulation(
 Sim.run(3*mu)
 
 #plot the results directly (steps highlighted)
-Sc.plot(".-");
+Sc.plot(".-")
 ```
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_result_g.png)
@@ -265,7 +265,7 @@ ax.plot(time, der(data, b), label=r"$\partial x / \partial b$")
 
 ax.set_xlabel("time [s]")
 ax.grid(True)
-ax.legend(fancybox=False);
+ax.legend(fancybox=False)
 ```
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/linear_feedback_result_sensitivity_g.png)
@@ -352,7 +352,7 @@ Sim = Simulation(
 Sim.run(20)
 
 #plot the recordings from the scope
-Sc.plot();
+Sc.plot()
 ```
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_result_g.png)

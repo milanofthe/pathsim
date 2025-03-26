@@ -39,6 +39,7 @@ class TestAmplifier(unittest.TestCase):
 
 
     def test_embedding(self):
+        """test algebraic component via embedding"""
 
         A = Amplifier(gain=5)
         E = Embedding(A, np.sin, lambda t: 5 * np.sin(t))
@@ -51,6 +52,69 @@ class TestAmplifier(unittest.TestCase):
         A = Amplifier(gain=-1e6)
         E = Embedding(A, np.exp, lambda t: -1e6 * np.exp(t))
         for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+
+    def test_linearization(self):
+        """test linearization and delinearization"""
+
+        A = Amplifier(gain=5)
+
+        def src(t): return np.cos(t)
+        def ref(t): return 5*np.cos(t)
+
+        E = Embedding(A, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+        #linearize block
+        A.linearize(3)
+
+        for t in range(10): 
+            a, b = E.check_SISO(t)
+            self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #linearize at differnt point in time block
+        A.linearize(12)
+
+        for t in range(10): 
+            a, b = E.check_SISO(t)
+            self.assertAlmostEqual(np.linalg.norm(a-b), 0, 8)
+
+        #delinearize
+        A.delinearize()
+
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+
+    def test_sensitivity(self):
+        """test compatibility with AD framework"""
+
+        from pathsim.optim.value import Value
+
+        a = Value(3.2)
+
+        A = Amplifier(gain=a)
+
+        def src(t): return np.cos(t)
+        def ref(t): return 3.2*np.cos(t)
+
+        E = Embedding(A, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+        #compute derivative
+        for t in range(10): 
+            y, _ = E.check_SISO(t)
+            self.assertEqual(Value.der(y, a), np.cos(t))
+
+
+        #sensitivity with linearization
+        A.linearize(23.2)
+
+        for t in range(10): 
+            y, _ = E.check_SISO(t)
+            dy_da = Value.der(y, a)
+            self.assertAlmostEqual(np.linalg.norm(dy_da - np.cos(t)), 0, 8)
 
 
     def test_update(self):
@@ -74,60 +138,6 @@ class TestAmplifier(unittest.TestCase):
 
         #test error, now should be 0
         self.assertEqual(err, 0)
-
-
-    def test_linearize(self):
-
-        A = Amplifier(gain=5)
-
-        #set block inputs
-        A.set(0, 1)
-        err = A.update(None)
-
-        #test if update was correct
-        self.assertEqual(A.get(0), 5)
-
-        #linearize gain (its already linear)
-        A.linearize(3)
-
-        #set block inputs
-        A.set(0, 1)
-        err = A.update(None)
-
-        #test if update was correct
-        self.assertEqual(A.get(0), 5)
-
-
-    def test_linearize(self):
-
-        A = Amplifier(gain=5)
-
-        #set block inputs
-        A.set(0, 1)
-        err = A.update(None)
-
-        #test if update was correct
-        self.assertEqual(A.get(0), 5)
-
-        #linearize gain (its already linear)
-        A.linearize(3)
-
-        #set block inputs
-        A.set(0, 3)
-        err = A.update(None)
-
-        #test if update was correct
-        self.assertEqual(A.get(0), 15)
-
-        #reset linearization
-        A.delinearize()
-
-        #set block inputs
-        A.set(0, 0.1)
-        err = A.update(None)
-
-        #test if update was correct
-        self.assertEqual(A.get(0), 0.5)
 
 
 
