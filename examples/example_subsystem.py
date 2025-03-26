@@ -66,9 +66,14 @@ Sim = Simulation(
     tolerance_fpi=1e-9
     )
 
-#run simulation for some number of seconds
-Sim.run(3*mu)
 
-Sco.plot(".-", lw=1.5)
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    #run simulation for some number of seconds
+    Sim.run(3*mu)
+
+    Sco.plot(".-", lw=1.5)
+
+    plt.show()

@@ -62,10 +62,15 @@ Sim = Simulation(
     tolerance_fpi=1e-9
     )
 
-#run the simulation for some time
-Sim.run(2*T)
 
-#plot the result directly from the scope
-Sc.plot()
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    #run the simulation for some time
+    Sim.run(2*T)
+
+    #plot the result directly from the scope
+    Sc.plot()
+
+    plt.show()

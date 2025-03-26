@@ -42,11 +42,15 @@ connections = [
 #initialize simulation
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
-#run simulation
-Sim.run(100)
 
-#plot the results from the scope directly
-Sc.plot()
+# Run Example ===========================================================================
 
+if __name__ == "__main__":
 
-plt.show()
+    #run simulation
+    Sim.run(100)
+
+    #plot the results from the scope directly
+    Sc.plot()
+
+    plt.show()

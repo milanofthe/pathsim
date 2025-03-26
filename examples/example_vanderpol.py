@@ -54,9 +54,14 @@ Sim = Simulation(
     tolerance_fpi=1e-8
     )
 
-Sim.run(4*mu)
 
-#plotting
-Sco.plot(".-")
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    Sim.run(4*mu)
+
+    #plotting
+    Sco.plot(".-")
+
+    plt.show()

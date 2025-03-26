@@ -57,25 +57,31 @@ Sim = Simulation(
     Solver=RKBS32
     )
     
-#run the simulation for some time
-Sim.run(4*tau)
-
-Sco.plot(".-")
 
 
-#plot derivatives -----------------------------------------------------------------------
+# Run Example ===========================================================================
 
-time, [_, res] = Sco.read()
+if __name__ == "__main__":
 
-fig, ax = plt.subplots(nrows=1, figsize=(8, 4), tight_layout=True, dpi=120)
+    #run the simulation for some time
+    Sim.run(4*tau)
 
-ax.plot(time, Value.der(res, a), label="$dx/da$")
-ax.plot(time, Value.der(res, b), label="$dx/db$")
-ax.plot(time, Value.der(res, z), label="$dx/dx_0$")
+    Sco.plot(".-")
 
-ax.set_xlabel("time [s]")
 
-ax.grid(True)
-ax.legend()
+    #plot derivatives -------------------------------------------------------------------
 
-plt.show()
+    time, [_, res] = Sco.read()
+
+    fig, ax = plt.subplots(nrows=1, figsize=(8, 4), tight_layout=True, dpi=120)
+
+    ax.plot(time, Value.der(res, a), label="$dx/da$")
+    ax.plot(time, Value.der(res, b), label="$dx/db$")
+    ax.plot(time, Value.der(res, z), label="$dx/dx_0$")
+
+    ax.set_xlabel("time [s]")
+
+    ax.grid(True)
+    ax.legend()
+
+    plt.show()

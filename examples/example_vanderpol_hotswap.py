@@ -54,13 +54,16 @@ Sim = Simulation(
     tolerance_fpi=1e-9
     )
 
+# Run Example ===========================================================================
 
-#change solver and continue
-for SOL in [ESDIRK32, ESDIRK43, ESDIRK54, GEAR21, GEAR32, GEAR43, GEAR52A]:
-    Sim._set_solver(Solver=SOL)
-    Sim.run(3*mu, reset=False)
+if __name__ == "__main__":
 
-#plotting
-Sco.plot(".-")
+    #change solver and continue
+    for SOL in [ESDIRK32, ESDIRK43, ESDIRK54, GEAR21, GEAR32, GEAR43, GEAR52A]:
+        Sim._set_solver(Solver=SOL)
+        Sim.run(3*mu, reset=False)
 
-plt.show()
+    #plotting
+    Sco.plot(".-")
+
+    plt.show()

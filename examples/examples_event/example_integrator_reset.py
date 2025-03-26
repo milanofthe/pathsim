@@ -50,11 +50,16 @@ events = [E1]
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, events, dt=0.06, log=True)
 
-#run simulation for some number of seconds
-Sim.run(10)
 
-Sc.plot(".-", lw=1.5)
+# Run Example ===========================================================================
 
-for e in E1: Sc.ax.axvline(e, ls="--", c="k")
+if __name__ == "__main__":
 
-plt.show()
+    #run simulation for some number of seconds
+    Sim.run(10)
+
+    Sc.plot(".-", lw=1.5)
+
+    for e in E1: Sc.ax.axvline(e, ls="--", c="k")
+
+    plt.show()

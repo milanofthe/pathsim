@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Integrator, Adder, Function
-from pathsim.solvers import ESDIRK43, GEAR52A
+from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR52A
 
 
 
@@ -39,16 +39,19 @@ Sim = Simulation(
     blocks, 
     connections, 
     dt=0.1, 
-    log=True, 
     Solver=ESDIRK43, 
     tolerance_lte_abs=1e-6, 
     tolerance_lte_rel=1e-4
     )
 
 
-Sim.run(2/delta)
+# Run Example ===========================================================================
 
-#plotting
-Sco.plot(".-")
+if __name__ == "__main__":
 
-plt.show()
+    Sim.run(2/delta)
+
+    #plotting
+    Sco.plot(".-")
+
+    plt.show()

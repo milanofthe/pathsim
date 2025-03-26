@@ -56,10 +56,16 @@ connections = [
 # Create a simulation instance from the blocks and connections
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 
-# Run the simulation for 25 seconds
-Sim.run(duration=25)
 
-# Plot the results directly from the scope
-Sc.plot(lw=2)
 
-plt.show()
+# Run Example ===========================================================================
+
+if __name__ == "__main__":
+
+    # Run the simulation for 25 seconds
+    Sim.run(duration=25)
+
+    # Plot the results directly from the scope
+    Sc.plot(lw=2)
+
+    plt.show()

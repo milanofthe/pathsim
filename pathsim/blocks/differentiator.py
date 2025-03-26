@@ -130,7 +130,7 @@ class Differentiator(Block):
             solver residual norm
         """
         x, u = self.engine.get(), self.inputs[0]
-        f, J = self.op_dyn(x, u, t), self.op_dyn.jac(x, u, t)
+        f, J = self.op_dyn(x, u, t), self.op_dyn.jac_x(x, u, t)
         return self.engine.solve(f, J, dt)
 
 

@@ -50,9 +50,14 @@ Sim = Simulation(
     tolerance_lte_rel=1e-6
     )
 
-Sim.run(3)
 
-#plotting
-Sco.plot(".-")
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    Sim.run(3)
+
+    #plotting
+    Sco.plot(".-")
+
+    plt.show()

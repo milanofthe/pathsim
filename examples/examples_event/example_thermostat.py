@@ -85,13 +85,18 @@ Sim = Simulation(
     Solver=RKBS32
     )
 
-#run simulation for some number of seconds
-Sim.run(30)
 
-sco.plot(lw=2)
+# Run Example ===========================================================================
 
-# #thermostat switching events
-for e in E1: sco.ax.axvline(e, ls="--", c="k")
-for e in E2: sco.ax.axvline(e, ls="-.", c="k")
+if __name__ == "__main__":
 
-plt.show()
+    #run simulation for some number of seconds
+    Sim.run(30)
+
+    sco.plot(lw=2)
+
+    # #thermostat switching events
+    for e in E1: sco.ax.axvline(e, ls="--", c="k")
+    for e in E2: sco.ax.axvline(e, ls="-.", c="k")
+
+    plt.show()

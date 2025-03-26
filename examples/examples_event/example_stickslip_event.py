@@ -171,22 +171,27 @@ Sim = Simulation(
     tolerance_lte_rel=1e-4
     )
 
-#run the simulation for some time
-Sim.run(2*T)
+
+# Run Example ===========================================================================
+
+if __name__ == "__main__":
+
+    #run the simulation for some time
+    Sim.run(2*T)
 
 
-# visualization -------------------------------------------------------------------------
+    # visualization ---------------------------------------------------------------------
 
-#plot the results directly from the two scopes
-Sc1.plot("-", lw=2)
+    #plot the results directly from the two scopes
+    Sc1.plot("-", lw=2)
 
-for t in E_slip_to_stick:
-    Sc1.ax.axvline( t , ls="--", c="k")
+    for t in E_slip_to_stick:
+        Sc1.ax.axvline( t , ls="--", c="k")
 
-for t in E_stick_to_slip:
-    Sc1.ax.axvline( t , ls=":", c="k")
+    for t in E_stick_to_slip:
+        Sc1.ax.axvline( t , ls=":", c="k")
 
-Sc2.plot("-", lw=2)
+    Sc2.plot("-", lw=2)
 
 
-plt.show()
+    plt.show()

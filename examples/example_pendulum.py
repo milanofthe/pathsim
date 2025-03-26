@@ -61,26 +61,33 @@ Sim = Simulation(
     tolerance_lte_abs=1e-8
     )
 
-#run the simulation for 15 seconds
-Sim.run(duration=15)
-
-#plot the results directly from the scope
-Sco.plot(".-")
 
 
+# Run Example ===========================================================================
 
-#lets look at the timesteps
-
-#read the recordings from the scope
-time, *_ = Sco.read()
-
-fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
-
-ax.plot(time[:-1], np.diff(time), lw=2)
-
-ax.set_ylabel("dt [s]")
-ax.set_xlabel("time [s]")
-ax.grid(True)
+if __name__ == "__main__":
 
 
-plt.show()
+    #run the simulation for 15 seconds
+    Sim.run(duration=15)
+
+    #plot the results directly from the scope
+    Sco.plot(".-")
+
+
+
+    #lets look at the timesteps
+
+    #read the recordings from the scope
+    time, *_ = Sco.read()
+
+    fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
+
+    ax.plot(time[:-1], np.diff(time), lw=2)
+
+    ax.set_ylabel("dt [s]")
+    ax.set_xlabel("time [s]")
+    ax.grid(True)
+
+
+    plt.show()

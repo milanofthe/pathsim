@@ -56,11 +56,16 @@ connections = [
 ]
 
 # Simulation initialization
-sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
+Sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
 
-#run the simulation for some time
-sim.run(100)
 
-scope.plot()
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    #run the simulation for some time
+    Sim.run(100)
+
+    scope.plot()
+
+    plt.show()

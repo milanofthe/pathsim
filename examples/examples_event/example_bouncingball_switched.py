@@ -111,15 +111,20 @@ Sim = Simulation(
     tolerance_lte_abs=1e-5
     )
 
-#run the simulation
-Sim.run(15)
 
-#plot the recordings from the scope
-Sc.plot(".-", lw=2)
+# Run Example ===========================================================================
 
-#add detected events to scope plot
-for t in E1: Sc.ax.axvline(t, ls="--", c="k")
-for t in E2: Sc.ax.axvline(t, ls="-.", c="k")
-for t in E3: Sc.ax.axvline(t, ls="-", c="k", lw=3)
+if __name__ == "__main__":
 
-plt.show()
+    #run the simulation
+    Sim.run(15)
+
+    #plot the recordings from the scope
+    Sc.plot(".-")
+
+    #add detected events to scope plot
+    for t in E1: Sc.ax.axvline(t, ls="--", c="k")
+    for t in E2: Sc.ax.axvline(t, ls="-.", c="k")
+    for t in E3: Sc.ax.axvline(t, ls="-", c="k", lw=2)
+
+    plt.show()

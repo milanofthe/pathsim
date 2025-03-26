@@ -47,9 +47,14 @@ connections = [
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
-#run the simulation for some time
-Sim.run(4*tau)
 
-Sco.plot()
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    #run the simulation for some time
+    Sim.run(4*tau)
+
+    Sco.plot()
+
+    plt.show()

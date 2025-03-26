@@ -92,47 +92,52 @@ Sim = Simulation(
     tolerance_lte_abs=1e-4
     )
 
-#run the simulation
-Sim.run(8)
 
-#read the recordings from the scope
-time, [x] = Sc.read()
+# Run Example ===========================================================================
 
-#plot the recordings from the scope
-Sc.plot(".-", lw=2)
+if __name__ == "__main__":
 
-#add detected events to scope plot
-for t in E1: Sc.ax.axvline(t, ls="--", c="k")
+    #run the simulation
+    Sim.run(8)
 
+    #read the recordings from the scope
+    time, [x] = Sc.read()
 
-# timesteps -----------------------------------------------------------------------------
+    #plot the recordings from the scope
+    Sc.plot(".-", lw=2)
 
-fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
-
-for t in E1: ax.axvline(t, ls="--", c="k")
-
-ax.plot(time[:-1], np.diff(time), lw=2)
-
-ax.set_yscale("log")
-ax.set_ylabel("dt [s]")
-ax.set_xlabel("time [s]")
-ax.grid(True)
+    #add detected events to scope plot
+    for t in E1: Sc.ax.axvline(t, ls="--", c="k")
 
 
-# derivatives ---------------------------------------------------------------------------
+    # timesteps -----------------------------------------------------------------------------
 
-fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
+    fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 
-for t in E1: ax.axvline(t, ls="--", c="k")
+    for t in E1: ax.axvline(t, ls="--", c="k")
 
-ax.plot(time, der(x, k), lw=2, label="$dx/dk$")
-ax.plot(time, der(x, g), lw=2, label="$dx/dg$")
-ax.plot(time, der(x, b), lw=2, label="$dx/db$")
-ax.plot(time, der(x, v0), lw=2, label="$dx/dv_0$")
-ax.plot(time, der(x, x0), lw=2, label="$dx/dx_0$")
+    ax.plot(time[:-1], np.diff(time), lw=2)
 
-ax.set_xlabel("time [s]")
-ax.legend()
-ax.grid(True)
+    ax.set_yscale("log")
+    ax.set_ylabel("dt [s]")
+    ax.set_xlabel("time [s]")
+    ax.grid(True)
 
-plt.show()
+
+    # derivatives ---------------------------------------------------------------------------
+
+    fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
+
+    for t in E1: ax.axvline(t, ls="--", c="k")
+
+    ax.plot(time, der(x, k), lw=2, label="$dx/dk$")
+    ax.plot(time, der(x, g), lw=2, label="$dx/dg$")
+    ax.plot(time, der(x, b), lw=2, label="$dx/db$")
+    ax.plot(time, der(x, v0), lw=2, label="$dx/dv_0$")
+    ax.plot(time, der(x, x0), lw=2, label="$dx/dx_0$")
+
+    ax.set_xlabel("time [s]")
+    ax.legend()
+    ax.grid(True)
+
+    plt.show()

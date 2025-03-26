@@ -106,55 +106,60 @@ for i, b in enumerate(bodies):
     ])
 
 # Create simulation
-sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
-
-# Run simulation for some number of days
-sim.run(365)
+Sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
 
 
-# PLOT THE RESULTS ======================================================================
+# Run Example ===========================================================================
 
-# Plot solar system
-fig = plt.figure(figsize=(12, 10), dpi=120)
-ax = fig.add_subplot(111, projection="3d")
+if __name__ == "__main__":
 
-for b in bodies:
-    t, data = b.scope.read()
-    line, = ax.plot(*data, alpha=0.5)
-    s = (10 + np.log10(b.mass**1/3))*1.2
-    ax.plot(*b.pos, "o", markersize=s, color=line.get_color(), label=b.name)
-
-ax.set_xlabel("X (AU)")
-ax.set_ylabel("Y (AU)")
-ax.set_zlabel("Z (AU)")
-ax.set_aspect("equal")
-ax.legend(loc="upper right", frameon=False)
-ax.set_title(f"Solar System Orbits - {sim.time} days")
+    # Run simulation for some number of days
+    Sim.run(365)
 
 
-# Plot Earth-Moon system
-fig, ax = plt.subplots(figsize=(6, 6), dpi=120, tight_layout=True)
+    # PLOT THE RESULTS ==================================================================
 
-earth = next(b for b in bodies if b.name=="Earth")
-moon = next(b for b in bodies if b.name=="Moon")
+    # Plot solar system
+    fig = plt.figure(figsize=(12, 10), dpi=120)
+    ax = fig.add_subplot(111, projection="3d")
 
-_, data_earth = earth.scope.read()
-_, data_moon = moon.scope.read()
+    for b in bodies:
+        t, data = b.scope.read()
+        line, = ax.plot(*data, alpha=0.5)
+        s = (10 + np.log10(b.mass**1/3))*1.2
+        ax.plot(*b.pos, "o", markersize=s, color=line.get_color(), label=b.name)
 
-#earth
-s = (10 + np.log10(earth.mass**1/3))*3
-ax.plot(0.0, 0.0, "o", markersize=s, label="Earth")
-
-#moon and orbit
-line, = ax.plot(*(data_moon-data_earth)[:2], alpha=0.5)
-s = (10 + np.log10(moon.mass**1/3))*4
-ax.plot(*(moon.pos-earth.pos)[:2], "o", markersize=s, color=line.get_color(), label="Moon")
-
-ax.set_xlabel("X (AU)")
-ax.set_ylabel("Y (AU)")
-ax.set_aspect("equal")
-ax.legend(loc="upper right", frameon=False)
-ax.set_title(f"Earth-Moon Orbit - {sim.time} days")
+    ax.set_xlabel("X (AU)")
+    ax.set_ylabel("Y (AU)")
+    ax.set_zlabel("Z (AU)")
+    ax.set_aspect("equal")
+    ax.legend(loc="upper right", frameon=False)
+    ax.set_title(f"Solar System Orbits - {Sim.time} days")
 
 
-plt.show()
+    # Plot Earth-Moon system
+    fig, ax = plt.subplots(figsize=(6, 6), dpi=120, tight_layout=True)
+
+    earth = next(b for b in bodies if b.name=="Earth")
+    moon = next(b for b in bodies if b.name=="Moon")
+
+    _, data_earth = earth.scope.read()
+    _, data_moon = moon.scope.read()
+
+    #earth
+    s = (10 + np.log10(earth.mass**1/3))*3
+    ax.plot(0.0, 0.0, "o", markersize=s, label="Earth")
+
+    #moon and orbit
+    line, = ax.plot(*(data_moon-data_earth)[:2], alpha=0.5)
+    s = (10 + np.log10(moon.mass**1/3))*4
+    ax.plot(*(moon.pos-earth.pos)[:2], "o", markersize=s, color=line.get_color(), label="Moon")
+
+    ax.set_xlabel("X (AU)")
+    ax.set_ylabel("Y (AU)")
+    ax.set_aspect("equal")
+    ax.legend(loc="upper right", frameon=False)
+    ax.set_title(f"Earth-Moon Orbit - {Sim.time} days")
+
+
+    plt.show()

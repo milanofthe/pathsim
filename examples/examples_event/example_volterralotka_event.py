@@ -88,17 +88,22 @@ Sim = Simulation(
     tolerance_lte_abs=1e-6
     )
 
-#run the simulation
-Sim.run(20)
 
-Sc.plot(".-")
+# Run Example ===========================================================================
 
-#add detected events to scope plot
-for e in E1: Sc.ax.axvline(e, ls="--", c="k")
-for e in E2: Sc.ax.axvline(e, ls=":", c="k")
-for e in E3: Sc.ax.axvline(e, ls="--", c="k")
-for e in E4: Sc.ax.axvline(e, ls=":", c="k")
+if __name__ == "__main__":
 
-plt.show()
+    #run the simulation
+    Sim.run(20)
 
-    
+    Sc.plot(".-")
+
+    #add detected events to scope plot
+    for e in E1: Sc.ax.axvline(e, ls="--", c="k")
+    for e in E2: Sc.ax.axvline(e, ls=":", c="k")
+    for e in E3: Sc.ax.axvline(e, ls="--", c="k")
+    for e in E4: Sc.ax.axvline(e, ls=":", c="k")
+
+    plt.show()
+
+        

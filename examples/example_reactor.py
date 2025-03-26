@@ -12,6 +12,7 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import ODE, Source, Scope
 from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR52A
 
+
 # CSTR WITH CONSECUTIVE REACTIONS INITIAL VALUE PROBLEM =================================
 
 # Initial conditions
@@ -85,10 +86,15 @@ Sim = Simulation(
     tolerance_lte_rel=1e-4
 )
 
-# Run simulation for 10 seconds
-Sim.run(20)  
 
-# Plot results
-Sco.plot(".-", lw=1.5)
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    # Run simulation for 10 seconds
+    Sim.run(20)  
+
+    # Plot results
+    Sco.plot(".-", lw=1.5)
+
+    plt.show()

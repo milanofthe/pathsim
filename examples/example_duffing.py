@@ -69,16 +69,21 @@ connections = [
 #create a simulation instance from the blocks and connections
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
-#run the simulation
-Sim.run(duration=20)
 
-#linearize the whole system
-Sim.linearize()
+# Run Example ===========================================================================
 
-#run the linarized system 
-Sim.run(duration=20, reset=False)
+if __name__ == "__main__":
 
-#plot the results directly from the scope
-Sc.plot()
+    #run the simulation
+    Sim.run(duration=20)
 
-plt.show()
+    #linearize the whole system
+    Sim.linearize()
+
+    #run the linarized system 
+    Sim.run(duration=20, reset=False)
+
+    #plot the results directly from the scope
+    Sc.plot()
+
+    plt.show()

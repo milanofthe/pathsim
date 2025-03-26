@@ -51,14 +51,18 @@ E = Schedule(
 events = [E]
 # E.off() #switch event tracking
 
-
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, events, dt=dt, log=True, Solver=RKCK54)
 
-#run the simulation 
-Sim.run(2)
 
-#plot the results from the scope directly
-Sco.plot(".-")
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    #run the simulation 
+    Sim.run(2)
+
+    #plot the results from the scope directly
+    Sco.plot(".-")
+
+    plt.show()

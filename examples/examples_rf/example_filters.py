@@ -38,10 +38,15 @@ connections = [
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 
-#run the simulation 
-Sim.run(10)
 
-#plot the results from the scope directly
-Sco.plot()
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    #run the simulation 
+    Sim.run(10)
+
+    #plot the results from the scope directly
+    Sco.plot()
+
+    plt.show()

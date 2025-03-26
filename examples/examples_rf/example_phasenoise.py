@@ -39,10 +39,14 @@ connections = [
 
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
-Sim.run(100/f)
 
-sco.plot()
-spc.plot()
+# Run Example ===========================================================================
 
+if __name__ == "__main__":
 
-plt.show()
+    Sim.run(100/f)
+
+    sco.plot()
+    spc.plot()
+
+    plt.show()

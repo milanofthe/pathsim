@@ -63,9 +63,14 @@ connections = [
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
-#run the simulation for some time
-Sim.run(20/f)
 
-Sco.plot()
+# Run Example ===========================================================================
 
-plt.show()
+if __name__ == "__main__":
+
+    #run the simulation for some time
+    Sim.run(20/f)
+
+    Sco.plot()
+
+    plt.show()

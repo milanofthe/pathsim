@@ -58,36 +58,42 @@ Sim = Simulation(
     tolerance_lte_abs=1e-7
     )
 
-#run the simulation for some time
-Sim.run(3)
 
-#plot the simulation results
-Sco.plot()
-Spc.plot()
+# Run Example ===========================================================================
 
-#recover frequency response from spectrum block
-freq, (G_pulse, G_filt) = Spc.read()
-H_filt_sim = G_filt / G_pulse
-
-#ideal frequency response from filter
-def H(s):
-    return np.dot(FLT.C, np.linalg.solve((s*np.eye(FLT.n) - FLT.A), FLT.B)) + FLT.D
-
-H_filt_ideal = np.array([H(2j*np.pi*f) for f in freq]).flatten()
-
-#plot the frequency domain responses (ideal and recovered)
-fig, ax = plt.subplots(nrows=2, tight_layout=True, dpi=120)
-ax[0].plot(freq, abs(H_filt_sim), label="recovered")
-ax[0].plot(freq, abs(H_filt_ideal), "--", label="ideal")
-ax[0].set_xlabel("freq")
-ax[0].set_ylabel("mag")
-ax[0].legend()
-
-ax[1].plot(freq, np.angle(H_filt_sim), label="recovered")
-ax[1].plot(freq, np.angle(H_filt_ideal), "--", label="ideal")
-ax[1].set_xlabel("freq")
-ax[1].set_ylabel("phase")
-ax[1].legend()
+if __name__ == "__main__":
 
 
-plt.show()
+    #run the simulation for some time
+    Sim.run(3)
+
+    #plot the simulation results
+    Sco.plot()
+    Spc.plot()
+
+    #recover frequency response from spectrum block
+    freq, (G_pulse, G_filt) = Spc.read()
+    H_filt_sim = G_filt / G_pulse
+
+    #ideal frequency response from filter
+    def H(s):
+        return np.dot(FLT.C, np.linalg.solve((s*np.eye(FLT.n) - FLT.A), FLT.B)) + FLT.D
+
+    H_filt_ideal = np.array([H(2j*np.pi*f) for f in freq]).flatten()
+
+    #plot the frequency domain responses (ideal and recovered)
+    fig, ax = plt.subplots(nrows=2, tight_layout=True, dpi=120)
+    ax[0].plot(freq, abs(H_filt_sim), label="recovered")
+    ax[0].plot(freq, abs(H_filt_ideal), "--", label="ideal")
+    ax[0].set_xlabel("freq")
+    ax[0].set_ylabel("mag")
+    ax[0].legend()
+
+    ax[1].plot(freq, np.angle(H_filt_sim), label="recovered")
+    ax[1].plot(freq, np.angle(H_filt_ideal), "--", label="ideal")
+    ax[1].set_xlabel("freq")
+    ax[1].set_ylabel("phase")
+    ax[1].legend()
+
+
+    plt.show()

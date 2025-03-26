@@ -79,34 +79,36 @@ Sim = Simulation(
     tolerance_lte_abs=1e-7
     )
 
-#run the simulation
-Sim.run(10)
+
+# Run Example ===========================================================================
+
+if __name__ == "__main__":
+
+    #run the simulation
+    Sim.run(10)
+
+    #read the recordings from the scope
+    time, [x] = Sc.read()
+
+    #plot the recordings from the scope
+    Sc.plot(".-", lw=2)
+
+    #add detected events to scope plot
+    for t in E1: Sc.ax.axvline(t, ls="--", c="k")
 
 
-Sim.save("bouncingball.mdl", duration=10)
+    # timesteps -----------------------------------------------------------------------------
 
-#read the recordings from the scope
-time, [x] = Sc.read()
+    fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 
-#plot the recordings from the scope
-Sc.plot(".-", lw=2)
+    for t in E1: ax.axvline(t, ls="--", c="k")
 
-#add detected events to scope plot
-for t in E1: Sc.ax.axvline(t, ls="--", c="k")
+    ax.plot(time[:-1], np.diff(time), lw=2)
 
-
-# timesteps -----------------------------------------------------------------------------
-
-fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
-
-for t in E1: ax.axvline(t, ls="--", c="k")
-
-ax.plot(time[:-1], np.diff(time), lw=2)
-
-ax.set_yscale("log")
-ax.set_ylabel("dt [s]")
-ax.set_xlabel("time [s]")
-ax.grid(True)
+    ax.set_yscale("log")
+    ax.set_ylabel("dt [s]")
+    ax.set_xlabel("time [s]")
+    ax.grid(True)
 
 
-plt.show()
+    plt.show()

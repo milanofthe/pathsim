@@ -79,17 +79,22 @@ connections = [
 #initialize simulation
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
-#run simulation for one chirp period
-Sim.run(T)
 
-#plot the recording of the scope
-Sco.plot(lw=2)
+# Run Example ===========================================================================
 
-#plot the spectrum
-Spc.plot(lw=2)
-Spc.ax.set_xscale("log")
-Spc.ax.set_yscale("log")
+if __name__ == "__main__":
 
-Spc.ax.axvline(f_trg, ls="--", c="k")
+    #run simulation for one chirp period
+    Sim.run(T)
 
-plt.show()
+    #plot the recording of the scope
+    Sco.plot(lw=2)
+
+    #plot the spectrum
+    Spc.plot(lw=2)
+    Spc.ax.set_xscale("log")
+    Spc.ax.set_yscale("log")
+
+    Spc.ax.axvline(f_trg, ls="--", c="k")
+
+    plt.show()

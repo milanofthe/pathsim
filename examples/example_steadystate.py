@@ -50,15 +50,20 @@ connections = [
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True)
     
-#run the simulation for some time
-Sim.run(2*tau)
 
-#then force to steady state
-Sim.steadystate(reset=False)
+# Run Example ===========================================================================
 
-#then run some more 
-Sim.run(tau, reset=False)
+if __name__ == "__main__":
 
-Sco.plot()
+    #run the simulation for some time
+    Sim.run(2*tau)
 
-plt.show()
+    #then force to steady state
+    Sim.steadystate(reset=False)
+
+    #then run some more 
+    Sim.run(tau, reset=False)
+
+    Sco.plot()
+
+    plt.show()

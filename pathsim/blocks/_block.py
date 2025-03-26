@@ -206,7 +206,7 @@ class Block(Serializable):
 
         This is done by linearizing the internal 'Operator' and 'DynamicOperator' 
         instances in the current system operating point. The operators create 
-        1st order tayler approximations internally and use them on subsequent 
+        1st order taylor approximations internally and use them on subsequent 
         calls after linarization.
 
         Parameters
@@ -405,15 +405,14 @@ class Block(Serializable):
         if self.op_alg is None:
             return 0.0
 
-        #block input
-        u = dict_to_array(self.inputs)
+        #block input and internal state
+        u, _, x = self.get_all()
 
         #no internal state -> standard 'Operator'
-        if not self.engine: 
-            y = self.op_alg(u)
-        else: 
-            x = self.engine.get()
+        if self.engine: 
             y = self.op_alg(x, u, t)
+        else: 
+            y = self.op_alg(u)            
 
         #no passthrough -> early exit
         if len(self) == 0:
