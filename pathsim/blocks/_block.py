@@ -217,10 +217,10 @@ class Block(Serializable):
 
         #get current state
         u, _, x = self.get_all()
-        
-        #no internal state
-        if len(x) == 0: 
-            #linearize only algebraic operator -> stateless
+
+        #no engine -> stateless
+        if not self.engine:
+            #linearize only algebraic operator 
             if self.op_alg: self.op_alg.linearize(u)
         else:
             #linearize algebraic and dynamic operators
