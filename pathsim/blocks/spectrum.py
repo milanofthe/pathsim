@@ -292,6 +292,13 @@ class Spectrum(Block):
             args for ax.plot
         kwargs : dict
             kwargs for ax.plot
+
+        Returns
+        -------
+        fig : matplotlib.figure
+            internal figure instance
+        ax : matplotlib.axis
+            internal axis instance
         """
 
         #just return 'None' if no engine initialized
@@ -345,6 +352,9 @@ class Spectrum(Block):
 
         #show the plot without blocking following code
         plt.show(block=False)
+
+        #return figure and axis for outside manipulation
+        return self.fig, self.ax
 
 
     def save(self, path="spectrum.csv"):

@@ -19,7 +19,7 @@ from pathsim.events import ZeroCrossing, Condition
 # BOUNCING BALL SYSTEM ==================================================================
 
 #simulation timestep
-dt = 0.01
+dt = 0.01 
 
 #gravitational acceleration
 g = 9.81
@@ -52,12 +52,12 @@ connections = [
     Connection(Cn, Ad[0]),
     Connection(Fr, Ad[1]),
     Connection(Ad, Iv),
-    Connection(Iv, Ix, Fr, Sc[1]),
+    Connection(Iv, Ix, Fr),# Sc[1]),
     Connection(Ix, Sc[0])
     ]
 
 
-#events (zero crossing)
+# event managers ------------------------------------------------------------------------
 
 def func_evt_1(t):
     *_, x = Ix()
@@ -70,8 +70,8 @@ def func_act_1(t):
     Iv.engine.set(-b*v)
 
 E1 = ZeroCrossing(
-    func_evt=func_evt_1, # event function for zero crossing detection
-    func_act=func_act_1, # action function for state transformation
+    func_evt=func_evt_1, 
+    func_act=func_act_1, 
     tolerance=1e-4
     )
 
@@ -87,28 +87,27 @@ def func_act_2(t):
     Iv.engine.set(-b*v)
 
 E2 = ZeroCrossing(
-    func_evt=func_evt_2, # event function for zero crossing detection
-    func_act=func_act_2, # action function for state transformation
+    func_evt=func_evt_2, 
+    func_act=func_act_2, 
     tolerance=1e-4
     )
 
 E3 = Condition(
-    func_evt=lambda *_: len(E1) >= 13,       # number of events 'E1' (bounces)
+    func_evt=lambda *_: len(E1) >= 10,       # number of events 'E1' (bounces)
     func_act=lambda *_: [E1.off(), E3.off()] # callback switches event tracking
     )
 
-events = [E1, E2, E3]
 
-#initialize simulation with the blocks, connections, timestep and logging enabled
+#initialize simulation
 Sim = Simulation(
     blocks, 
     connections, 
-    events, 
+    events=[E1, E2, E3], 
     dt=dt, 
     log=True, 
     Solver=RKBS32, 
-    tolerance_lte_rel=1e-3, 
-    tolerance_lte_abs=1e-5
+    tolerance_lte_abs=1e-6, 
+    tolerance_lte_rel=1e-4
     )
 
 
@@ -120,7 +119,7 @@ if __name__ == "__main__":
     Sim.run(15)
 
     #plot the recordings from the scope
-    Sc.plot(".-")
+    Sc.plot(lw=2)
 
     #add detected events to scope plot
     for t in E1: Sc.ax.axvline(t, ls="--", c="k")
