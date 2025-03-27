@@ -54,6 +54,7 @@ Sim = Simulation(
     tolerance_fpi=1e-9
     )
 
+
 # Run Example ===========================================================================
 
 if __name__ == "__main__":
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     #change solver and continue
     for SOL in [ESDIRK32, ESDIRK43, ESDIRK54, GEAR21, GEAR32, GEAR43, GEAR52A]:
         Sim._set_solver(Solver=SOL)
-        Sim.run(3*mu, reset=False)
+        Sim.run(3*mu)
 
     #plotting
     Sco.plot(".-")

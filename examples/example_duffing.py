@@ -74,14 +74,19 @@ Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
 if __name__ == "__main__":
 
-    #run the simulation
-    Sim.run(duration=20)
+    for _ in range(5):
 
-    #linearize the whole system
-    Sim.linearize()
+        #linearize the whole system
+        Sim.linearize()
 
-    #run the linarized system 
-    Sim.run(duration=20, reset=False)
+        #run the linarized system
+        Sim.run(20)
+
+        #delinearize the whole system
+        Sim.delinearize()
+
+        #run the nonlinear system 
+        Sim.run(20)
 
     #plot the results directly from the scope
     Sc.plot()

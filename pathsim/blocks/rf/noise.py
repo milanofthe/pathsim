@@ -245,6 +245,10 @@ class SinusoidalPhaseNoiseSource(Block):
         self.noise_1 = np.random.normal() 
         self.noise_2 = np.random.normal() 
 
+        #bin counter
+        self.n_samples = 0
+        self.t_max = 0
+
 
     def set_solver(self, Solver, **solver_kwargs):
         
@@ -262,7 +266,7 @@ class SinusoidalPhaseNoiseSource(Block):
         self.inputs  = {0:0.0}  
         self.outputs = {0:0.0}
 
-        #reset bin counter
+        #reset 
         self.n_samples = 0
         self.t_max = 0
 

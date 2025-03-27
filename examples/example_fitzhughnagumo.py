@@ -50,7 +50,7 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=0.1, 
+    dt=0.01, 
     Solver=RKCK54, 
     tolerance_lte_abs=1e-6, 
     tolerance_lte_rel=1e-4
@@ -63,7 +63,8 @@ if __name__ == "__main__":
 
     Sim.run(200)
 
+
     #plotting
-    Sc.plot(".-")
+    Sc.plot(lw=2)
 
     plt.show()

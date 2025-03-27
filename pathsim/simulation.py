@@ -662,6 +662,9 @@ class Simulation:
         For recording blocks such as 'Scope', their recorded 
         data is also reset. 
 
+        Resets linearization automatically, since resetting the blocks 
+        resets their internal operators.
+
         Afterwards the system function os evaluated with '_update' to update
         the block inputs and outputs.
         """
@@ -863,7 +866,7 @@ class Simulation:
         return False, total_evals, iteration + 1
 
 
-    def steadystate(self, reset=True): 
+    def steadystate(self, reset=False): 
         """Find steady state solution (DC operating point) of the system 
         by switching all blocks to steady state solver, solving the 
         fixed point equations, then switching back.
@@ -875,7 +878,7 @@ class Simulation:
         Parameters
         ----------
         reset : bool
-            reset the simulation before solving for steady state
+            reset the simulation before solving for steady state (default False)
         """
 
         #reset the simulation before solving
@@ -1280,7 +1283,7 @@ class Simulation:
             return self.step_fixed(dt)
 
 
-    def run(self, duration=10, reset=True, adaptive=True):
+    def run(self, duration=10, reset=False, adaptive=True):
         """Perform multiple simulation timesteps for a given 'duration'.
         
         Tracks the total number of block evaluations (proxy for function 
@@ -1297,9 +1300,9 @@ class Simulation:
         duration : float
             simulation time (in time units)
         reset : bool
-            reset the simulation before running
+            reset the simulation before running (default False)
         adaptive : bool
-            use adaptive timesteps if solver is adaptive
+            use adaptive timesteps if solver is adaptive (default True)
 
         Returns
         -------
