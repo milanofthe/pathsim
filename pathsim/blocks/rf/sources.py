@@ -214,10 +214,29 @@ class StepSource(Block):
 class ChirpSource(Block):
     """Chirp source, sinusoid with frequency ramp up and ramp down.
 
-    This works by using a time dependent triangle wave for the 
-    frequency and integrating it with a numerical integration 
-    engine to get a continuous phase. This phase is then used 
-    to evaluate a sinusoid. 
+    This works by using a time dependent triangle wave for the frequency 
+    and integrating it with a numerical integration engine to get a 
+    continuous phase. This phase is then used to evaluate a sinusoid.
+
+    Additionally the chirp source can have white and cumulative phase noise. 
+    Mathematically it looks like this for the contributions to the phase from 
+    the triangular wave:
+
+    .. math::
+
+        \\varphi_t(t) = \\int_0^t \\mathrm{tri}_{f_0, B, T}(\\tau) \\, d\\tau
+    
+    And from the white (w) and cumulative (c) noise:
+
+    .. math::
+
+        \\varphi_n(t) = \\sigma_w \\, \\mathrm{RNG}_w(t) + \\sigma_c \\int_0^t \\mathrm{RNG}_c(\\tau) \\, d\\tau
+    
+    The phase contributions are then used to evaluate a sinusoid to get the final chirp signal:
+
+    .. math::
+
+        y(t) = A \\sin(\\varphi_t(t) + \\varphi_n(t) + \\varphi_0)
 
     Parameters
     ----------
@@ -229,39 +248,94 @@ class ChirpSource(Block):
         bandwidth of the frequency ramp of the chirp signal
     T : float
         period of the frequency ramp of the chirp signal
+    phase : float
+        phase of sinusoid (initial)
+    sig_cum : float
+        weight for cumulative phase noise contribution
+    sig_white : float
+        weight for white phase noise contribution
+    sampling_rate : float
+        number of samples per unit time for the internal random number generators
     """
 
-    def __init__(self, amplitude=1, f0=1, BW=1, T=1):
+    def __init__(
+        self, 
+        amplitude=1, 
+        f0=1, 
+        BW=1, 
+        T=1, 
+        phase=0, 
+        sig_cum=0, 
+        sig_white=0, 
+        sampling_rate=10
+        ):
         super().__init__()
 
         #parameters of chirp signal
         self.amplitude = amplitude
+        self.phase = phase
         self.f0 = f0
         self.BW = BW
         self.T = T
 
+        #parameters for phase noise
+        self.sig_cum = sig_cum
+        self.sig_white = sig_white
+        self.sampling_rate = sampling_rate
+
+        #initial noise sampling
+        self.noise_1 = np.random.normal() 
+        self.noise_2 = np.random.normal() 
+
+        #bin counter
+        self.n_samples = 0
+        self.t_max = 0
+
+
+    def reset(self):
+        #reset inputs and outputs
+        self.inputs  = {0:0.0}  
+        self.outputs = {0:0.0}
+
+        #reset 
+        self.n_samples = 0
+        self.t_max = 0
+
+        #reset engine
+        self.engine.reset()
+
 
     def set_solver(self, Solver, **solver_kwargs):
-        
-        #change solver if already initialized
-        if self.engine is not None:
+        if self.engine is None:
+            #initialize the numerical integration engine
+            self.engine = Solver(self.f0, **solver_kwargs)
+        else:
+            #change solver if already initialized
             self.engine = Solver.cast(self.engine, **solver_kwargs)
-            return #quit early
 
-        #initialize the numerical integration engine
-        self.engine = Solver(self.f0, **solver_kwargs)
+
+    def sample(self, t):
+        """Sample from a normal distribution after successful timestep 
+        to update internal noise samples
+        """
+        if (self.sampling_rate is None or 
+            self.n_samples < t * self.sampling_rate):
+            self.noise_1 = np.random.normal() 
+            self.noise_2 = np.random.normal() 
+            self.n_samples += 1
 
 
     def update(self, t):
-        #compute implicit balancing update
-        phase = 2 * np.pi * self.engine.get()
-        self.outputs[0] = self.amplitude * np.sin(phase)
+        """update the block output, assebble phase and evaluate the sinusoid"""
+        _phase = 2 * np.pi * (self.engine.get() + self.sig_white * self.noise_1) + self.phase
+        self.outputs[0] = self.amplitude * np.sin(_phase)
         return 0.0
 
 
     def solve(self, t, dt):
-        #advance solution of implicit update equation
-        f = self.BW * (1 + triangle_wave(t, 1/self.T))/2
+        """advance implicit solver of implicit integration engine, evaluate 
+        the triangle wave and cumulative noise RNG"""
+        f = self.BW * (1 + triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
         self.engine.solve(f, None, dt)
 
         #no error for chirp source
@@ -269,8 +343,9 @@ class ChirpSource(Block):
 
 
     def step(self, t, dt):
-        #compute update step with integration engine
-        f = self.BW * (1 + triangle_wave(t, 1/self.T))/2
+        """compute update step with integration engine, evaluate the triangle wave 
+        and cumulative noise RNG"""
+        f = self.BW * (1 + triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
         self.engine.step(f, dt)
 
         #no error control for chirp source

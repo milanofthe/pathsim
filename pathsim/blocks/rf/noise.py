@@ -223,11 +223,19 @@ class SinusoidalPhaseNoiseSource(Block):
         weight for cumulative phase noise contribution
     sig_white : float
         weight for white phase noise contribution
-    samplig_rate : float
+    sampling_rate : float
         number of samples per unit time for the internal RNG 
     """
 
-    def __init__(self, frequency=1, amplitude=1, phase=0, sig_cum=0, sig_white=0, sampling_rate=10):
+    def __init__(
+        self, 
+        frequency=1, 
+        amplitude=1, 
+        phase=0, 
+        sig_cum=0, 
+        sig_white=0, 
+        sampling_rate=10
+        ):
         super().__init__()
 
         self.amplitude = amplitude

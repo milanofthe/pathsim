@@ -35,7 +35,7 @@ phi0, omega0 = 0.99*np.pi, 0.0
 g, l = 9.81, 1
 
 #bounceback for sensitivity
-b = Value(0.95)
+b = Value(0.9)
 
 #blocks that define the system
 In1 = Integrator(omega0) 
@@ -92,13 +92,13 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(duration=50)
+    Sim.run(duration=30)
 
     #plot the results directly from the scope
     Sco.plot()
 
     #add the events to scope plot
-    for t in E1: Sco.ax.axvline(t, c="k", ls="--")
+    # for t in E1: Sco.ax.axvline(t, c="k", ls="--")
 
     #read the recordings from the scope
     time, [om, ph] = Sco.read()
@@ -109,8 +109,8 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 
-    ax.plot(time, dom_db, label=r"$\partial \omega / \partial b$")
-    ax.plot(time, dph_db, label=r"$\partial \phi / \partial b$")
+    ax.plot(time, dom_db, c="tab:red", label=r"$\partial \omega / \partial b$")
+    ax.plot(time, dph_db, c="tab:blue", label=r"$\partial \phi / \partial b$")
 
     ax.set_xlabel("time [s]")
     ax.legend()

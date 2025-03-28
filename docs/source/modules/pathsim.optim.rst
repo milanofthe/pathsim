@@ -5,7 +5,6 @@ pathsim.optim
    :maxdepth: 4
 
    pathsim.optim.anderson
-   pathsim.optim.newton
    pathsim.optim.value
    pathsim.optim.numerical
    pathsim.optim.operator
