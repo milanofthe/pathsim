@@ -92,10 +92,10 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(duration=30)
+    Sim.run(duration=20)
 
     #plot the results directly from the scope
-    Sco.plot()
+    Sco.plot(lw=2)
 
     #add the events to scope plot
     # for t in E1: Sco.ax.axvline(t, c="k", ls="--")
@@ -109,8 +109,8 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
 
-    ax.plot(time, dom_db, c="tab:red", label=r"$\partial \omega / \partial b$")
-    ax.plot(time, dph_db, c="tab:blue", label=r"$\partial \phi / \partial b$")
+    ax.plot(time, dom_db, lw=2, c="tab:red", label=r"$\partial \omega / \partial b$")
+    ax.plot(time, dph_db, lw=2, c="tab:blue", label=r"$\partial \phi / \partial b$")
 
     ax.set_xlabel("time [s]")
     ax.legend()
