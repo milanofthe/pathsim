@@ -53,9 +53,29 @@ def jac(arr, vals):
     -------
     jac : array[float]
         partial derivatives w.r.t. all values in 'vals', effectively the jacobian
-    
     """
     return np.array([der(arr, val) for val in np.atleast_1d(vals)]).T
+
+
+def var(arr, vals):
+    """Compute the variance of an array of 'Value' objects with respect 
+    to all the 'Value' objects in 'vals' using the standard deviations 
+    of the values and a first order taylor approximation using the 
+    partial derivatives.
+
+    Parameters
+    ----------
+    arr : array[Value]
+        array or list of Values
+    vals : array[Value]
+        array or list of Values
+    
+    Returns
+    -------
+    var : array[float]
+        variance from taylor expansion w.r.t. all values in 'vals'
+    """
+    return sum((val.sig*der(arr, val))**2 for val in np.atleast_1d(vals))
 
 
 def autojac(fnc):
@@ -219,6 +239,8 @@ class Value:
         The numerical value.
     grad : defaultdict, None
         The gradient dictionary. If None, initializes with self derivative.
+    sig : float, int, complex
+        Standard deviation of value for uncertainty analysis (optional)
 
     Attributes
     ----------
@@ -228,10 +250,10 @@ class Value:
     """
 
     #restrict attributes, makes access faster
-    __slots__ = ["val", "grad", "_id"] 
+    __slots__ = ["val", "grad", "sig", "_id"] 
 
 
-    def __init__(self, val=0.0, grad=None):
+    def __init__(self, val=0.0, grad=None, sig=0.0):
 
         #catch instantiating with Value
         if isinstance(val, Value):
@@ -246,6 +268,9 @@ class Value:
         else:
             self._id = None
             self.grad = grad
+
+        #standard deviation
+        self.sig = sig
 
 
     # dynamic properties ------------------------------------------------------------------------
@@ -338,6 +363,11 @@ class Value:
     @staticmethod
     def jac(arr, vals):
         return jac(arr, vals)
+
+
+    @staticmethod
+    def var(arr, vals):
+        return var(arr, vals)
 
 
     # overload builtins -------------------------------------------------------------------------

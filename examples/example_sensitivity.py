@@ -20,8 +20,10 @@ from pathsim.solvers import RKBS32
 
 # 1st ORDER FEEDBACK SYSTEM =============================================================
 
-#parameters
-x0, a, s = Value.array([2, -1, 1])
+#parameters and standard deviations
+x0 = Value(2, sig=0.5)
+a  = Value(-1, sig=0.1)
+s  = Value(1, sig=0.05)
 
 #step delay
 tau = 3
@@ -77,29 +79,19 @@ if __name__ == "__main__":
     ax.grid(True)
     ax.legend()
 
-
     #extract the sensitivities
     dx_da = Value.der(res, a)
     dx_ds = Value.der(res, s)
     dx_dx0 = Value.der(res, x0)
 
-    #parameter uncertainties
-    sigma_a = 0.1    # Standard deviation in feedback gain
-    sigma_s = 0.05   # Standard deviation in input amplitude
-    sigma_x0 = 0.25  # Standard deviation in initial condition
-
     #output variance contribution at each time point
-    var_x = (dx_da**2 * sigma_a**2 + 
-             dx_ds**2 * sigma_s**2 + 
-             dx_dx0**2 * sigma_x0**2)
+    var_x = Value.var(res, [a, s, x0])
 
     #standard deviation bounds
     upper_bound = Value.numeric(res) + np.sqrt(var_x)
     lower_bound = Value.numeric(res) - np.sqrt(var_x)
 
-
     #plot with uncertainty bounds
-    
     fig, ax = plt.subplots(nrows=1, figsize=(8, 4), tight_layout=True, dpi=120)
 
     ax.plot(time, stp, lw=2, c="tab:red", label="s(t)")
