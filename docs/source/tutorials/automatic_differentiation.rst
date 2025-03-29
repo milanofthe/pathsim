@@ -3,11 +3,11 @@
 Automatic Differentiation
 =========================
 
-PathSim has an integrated framework for automatic differentiation within the :mod:`.optim` module. It mainly consists of the :class:`.Value` class that implements arithmetic operations and numpy ufuncs via operator overloading to propagate gradients through a computational graph. 
+PathSim has an integrated framework for automatic differentiation (forward mode AD) within the :mod:`.optim` module. It mainly consists of the :class:`.Value` class that implements arithmetic operations and numpy ufuncs via operator overloading to propagate gradients through a computational graph. 
 
 For a dynamical system simulation framework such as PathSim, this is very consequential. All the operations in the simulation loop, all solver steps, all algebraic and dynamic updates are purely algebraic on the numerics side. 
 
-This means, that when the simulation loop is sufficiently adaptable to handle all kinds of python objects as long as they implement the core arithmetic operations needed, they can be used instead of regular floating point numbers.
+This means, that when the simulation loop is sufficiently robust to handle all kinds of python objects (as long as they implement the core arithmetic operations needed), they can be used instead of regular floating point numbers to advance the simulation.
 
 
 Value class and derivatives
