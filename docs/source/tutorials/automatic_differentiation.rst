@@ -133,8 +133,10 @@ Translating the block diagram to PathSim looks like this:
    #step delay
    tau = 3 
 
-   #parameters for AD (the only difference to regular simulation setup)
-   a, s, x0 = Value.array([-1, 1, 2])
+   #parameters for AD and standard deviations (the only difference to regular simulation setup)
+   a  = Value(-1, sig=0.1)
+   s  = Value(1, sig=0.05)
+   x0 = Value(2, sig=0.5)
 
    #step function with delay
    def step(t): 
@@ -174,7 +176,7 @@ Now, after the simulation has finished, the results that the :class:`.Scope` has
 .. code-block:: python  
 
    #get the simulation results
-   time, [s, x] = sco.read()
+   time, [_, x] = sco.read()
 
    #extract the sensitivities
    dx_da = Value.der(x, a)
@@ -213,19 +215,12 @@ For a parameter :math:`p` with uncertainty :math:`\sigma_p`, the corresponding c
 
 This is particularly valuable in engineering applications where parameters often have associated measurement or estimation uncertainties.
 
-We can extend our linear feedback example to incorporate uncertainty:
+We can extend our linear feedback example to incorporate uncertainty. The :meth:`.Value.var` staticmethod can be used to approximate the total variance of the output signal from the individual standard deviations of the parameters using the propagated partial derivatives.
 
 .. code-block:: python
 
-   #parameter uncertainties
-   sigma_a = 0.1    # Standard deviation in feedback gain
-   sigma_s = 0.05   # Standard deviation in input amplitude
-   sigma_x0 = 0.25  # Standard deviation in initial condition
-   
-   #output variance contribution at each time point
-   var_x = (dx_da**2 * sigma_a**2 + 
-            dx_ds**2 * sigma_s**2 + 
-            dx_dx0**2 * sigma_x0**2)
+   #extract output variance at each time point
+   var_x = Value.var(x, [a, s, x0])
    
    #standard deviation bounds
    x_upper = x + np.sqrt(var_x)
