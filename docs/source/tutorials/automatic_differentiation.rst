@@ -219,8 +219,8 @@ We can extend our linear feedback example to incorporate uncertainty:
 
    #parameter uncertainties
    sigma_a = 0.1    # Standard deviation in feedback gain
-   sigma_s = 0.2    # Standard deviation in input amplitude
-   sigma_x0 = 0.05  # Standard deviation in initial condition
+   sigma_s = 0.05   # Standard deviation in input amplitude
+   sigma_x0 = 0.25  # Standard deviation in initial condition
    
    #output variance contribution at each time point
    var_x = (dx_da**2 * sigma_a**2 + 
@@ -234,10 +234,10 @@ We can extend our linear feedback example to incorporate uncertainty:
    #plotting, etc.
 
 
-
 .. image:: figures/linear_feedback_result_uncertainty.png
    :width: 700
    :align: center
    :alt: uncertainties of linear feedback system
 
 
+It should be noted that this kind of uncertainty analysis using taylor approximations only really makes sense in linear systems or in nonlinear systems for small uncertainties (comparable to a small signal analysis, its still an approximation). Otherwise the linearization will not be sufficiently accurate. In the simple feedback system of our example, its not an issue however, because its inherently linear.

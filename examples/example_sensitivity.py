@@ -86,7 +86,7 @@ if __name__ == "__main__":
     #parameter uncertainties
     sigma_a = 0.1    # Standard deviation in feedback gain
     sigma_s = 0.05   # Standard deviation in input amplitude
-    sigma_x0 = 0.5   # Standard deviation in initial condition
+    sigma_x0 = 0.25  # Standard deviation in initial condition
 
     #output variance contribution at each time point
     var_x = (dx_da**2 * sigma_a**2 + 
