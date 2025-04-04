@@ -79,11 +79,6 @@ if __name__ == "__main__":
     ax.grid(True)
     ax.legend()
 
-    #extract the sensitivities
-    dx_da = Value.der(res, a)
-    dx_ds = Value.der(res, s)
-    dx_dx0 = Value.der(res, x0)
-
     #output variance contribution at each time point
     var_x = Value.var(res, [a, s, x0])
 

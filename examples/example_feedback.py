@@ -22,7 +22,7 @@ from pathsim.blocks import (
 # 1st ORDER SYSTEM ======================================================================
 
 #simulation timestep
-dt = 0.01
+dt = 0.025
 
 #step delay
 tau = 3
@@ -55,6 +55,6 @@ if __name__ == "__main__":
     #run the simulation for some time
     Sim.run(4*tau)
 
-    Sco.plot()
+    Sco.plot(lw=2)
 
     plt.show()

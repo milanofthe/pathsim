@@ -9,6 +9,7 @@ from .switch import *
 from .adder import *
 from .scope import *
 from .delay import *
+from .ctrl import *
 from .lti import *
 from .ode import *
 from .rng import *

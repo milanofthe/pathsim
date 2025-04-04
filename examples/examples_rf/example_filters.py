@@ -13,6 +13,7 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import Scope
 from pathsim.blocks.rf import SquareWaveSource, ButterworthLowpassFilter
 from pathsim.solvers import SSPRK33, RKCK54
+from pathsim.optim import Value
 
 
 # FILTERING A SQUAREWAVE ================================================================

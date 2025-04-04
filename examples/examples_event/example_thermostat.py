@@ -19,8 +19,8 @@ from pathsim.events import ZeroCrossingUp, ZeroCrossingDown
 
 
 #system parameters
-a = 0.3
-T = 10
+a = 0.45
+T = 15
 H = 5
 Kp = 25
 Km = 23
@@ -97,6 +97,6 @@ if __name__ == "__main__":
 
     # #thermostat switching events
     for e in E1: sco.ax.axvline(e, ls="--", c="k")
-    for e in E2: sco.ax.axvline(e, ls="-.", c="k")
+    for e in E2: sco.ax.axvline(e, ls=":", c="k")
 
     plt.show()
