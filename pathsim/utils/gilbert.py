@@ -12,18 +12,6 @@
 import numpy as np
 
 
-# HELPER FUNCTIONS =====================================================================
-
-def is_numeric(array):
-    if isinstance(array, np.ndarray):
-        for a in array: 
-            if not is_numeric(a): 
-                return False
-        return True
-    else: 
-        return isinstance(array, (int, float, complex))
-
-
 # STATESPACE REALIZATION ===============================================================
 
 def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9): 

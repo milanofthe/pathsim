@@ -33,14 +33,19 @@ class AdaptiveBuffer:
         deque that collects the time data for buffering
     buffer_v : deque
         deque that collects the value data for buffering
+    ns : int
+        savety for buffer truncation
     """
 
     def __init__(self, delay):
 
         #the buffer uses a double ended queue
+        self.delay = delay
         self.buffer_t = deque()
         self.buffer_v = deque()
-        self.delay = delay
+        
+        #savety for buffer truncation
+        self.ns = 5
 
 
     def __len__(self):
@@ -62,9 +67,9 @@ class AdaptiveBuffer:
         self.buffer_t.append(t)
         self.buffer_v.append(value)
         
-        #remove second to last value from buffer -> enable interpolation
-        if len(self.buffer_t) > 1:
-            while t - self.buffer_t[1] > self.delay:
+        #remove values after savety from buffer -> enable interpolation
+        if len(self.buffer_t) > self.ns:
+            while t - self.buffer_t[self.ns] > self.delay:
                 self.buffer_t.popleft()
                 self.buffer_v.popleft()
 
@@ -83,13 +88,9 @@ class AdaptiveBuffer:
             interpolated value
         """
 
-        #default 0
-        if not self.buffer_t:
+        #empty or time too small -> return zero
+        if not self.buffer_t or t <= self.buffer_t[0]:
             return 0.0
-
-        #requested time too small -> return first value
-        if t <= self.buffer_t[0]:
-            return self.buffer_v[0]
         
         #requested time too large -> return last value
         if t >= self.buffer_t[-1]:

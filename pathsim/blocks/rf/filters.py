@@ -147,33 +147,43 @@ class ButterworthBandstopFilter(StateSpace):
 
 
 class AllpassFilter(StateSpace):
-
-    """Direct implementation of an Allpass filter using Pade approximants. 
-    The transfer function of the ideal allpass is
+    """Direct implementation of a first order allpass filter, or a cascade 
+    of n 1st order allpass filters
     
-        H(s) = exp(-sT) = exp(-sT/2) / exp(sT/2)
+    .. math:: 
 
-    where T is the time delay. This implementation uses Pade approximation 
-    of the exponential to create a n-th order LTI statespace model that is 
-    used for the numerical integration internally.
+        H(s) = \\frac{s - 2\\pi f_s}{s + 2\\pi f_s}
+
+    where f_s is the frequency, where the 1st order allpass has a 90 deg phase shift.
     
     Parameters
     ----------
-    T : float
-        time delay of the allpass in [s]
+    f_s : float
+        frequency for 90 deg phase shift of 1st order allpass
     n : int
-        order of the pade approximation
+        number of cascades
     """
 
-    def __init__(self, T, n=1):
+    def __init__(self, fs, n=1):
 
         #filter parameters
-        self.T = T
+        self.fs = fs
         self.n = n
 
-        #taylor approximations for numerator and denominator
-        num = [(-T/2)**i/factorial(i) for i in range(n+1)]
-        den = [ (T/2)**i/factorial(i) for i in range(n+1)]
+        #1st order allpass for numerator and denominator (normalized frequency)
+        num = [-1, 1]
+        den = [1, 1]
+
+        #higher order by convolution
+        for _ in range(1, self.n):
+            num = np.convolve(num, [-1, 1])
+            den = np.convolve(den, [1, 1])
+
+        #create statespace model
+        A, B, C, D = tf2ss(num, den)
+
+        #rescale to actual frequency and make statespace model
+        omega_s = 2*np.pi*fs
 
         #initialize parent block
-        super().__init__(*tf2ss(num, den))
+        super().__init__(omega_s*A, omega_s*B, C, D)
