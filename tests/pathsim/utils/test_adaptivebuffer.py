@@ -47,7 +47,7 @@ class TestAdaptiveBuffer(unittest.TestCase):
             buffer.add(i, i)
 
             #test the counter
-            self.assertLessEqual(len(buffer.buffer_t), min(i+1, d+2))
+            self.assertLessEqual(len(buffer.buffer_t), min(i+1, d+buffer.ns+1))
 
             
 
