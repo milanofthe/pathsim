@@ -1360,7 +1360,11 @@ class Simulation:
             if adaptive:
 
                 #advance the simulation by one (effective) timestep '_dt'
-                success, _, scale, evals, solver_its = self.step_adaptive(_dt)
+                success, error_norm, scale, evals, solver_its = self.step_adaptive(_dt)
+
+                #if no error estimate and rescale -> back to default timestep
+                if not error_norm and scale == 1:
+                    _dt = self.dt
 
                 #apply bounds to timestep after rescale
                 _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
