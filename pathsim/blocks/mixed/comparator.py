@@ -34,7 +34,9 @@ class Comparator(Block):
     threshold : float
         threshold value for the comparator
     tolerance : float
-        tolerance for zero crossing detection
+        tolerance for zero crossing detection    
+    span : list[float] or tuple[float], optional
+        output value range [min, max]
     
     Attributes
     ----------
@@ -42,11 +44,12 @@ class Comparator(Block):
         internal zero crossing event
     """
 
-    def __init__(self, threshold=0, tolerance=1e-4):
+    def __init__(self, threshold=0, tolerance=1e-4, span=[-1, 1]):
         super().__init__()
 
         self.threshold = threshold
         self.tolerance = tolerance
+        self.span = span
 
         def func_evt(t):
             return self.inputs[0] - self.threshold
@@ -61,5 +64,9 @@ class Comparator(Block):
 
 
     def update(self, t):
-        self.outputs[0] = np.sign(self.inputs[0] - self.threshold)
+        if self.inputs[0] >= self.threshold:
+            self.outputs[0] = max(self.span)
+        else:
+            self.outputs[0] = min(self.span)
+
         return 0.0

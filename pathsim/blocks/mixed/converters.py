@@ -182,7 +182,11 @@ class DAC(Block):
 
             #scale to DAC span and set output
             lower, upper = self.span
-            self.outputs[0] = lower + (upper - lower) * (val / 2**self.n_bits)
+            levels = 2**self.n_bits
+
+            scaled_val =  val / (levels - 1) if levels > 1 else 0.0
+            self.outputs[0] = lower + (upper - lower) * scaled_val
+
 
         #internal scheduled events
         self.events = [
