@@ -11,39 +11,42 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 
+from pathsim.blocks import Integrator, Adder, Scope, Source 
 from pathsim.blocks.mixed import SampleHold, DAC, Comparator
-from pathsim.blocks import Integrator, Adder, Scope, Source, Constant  
+
 from pathsim.solvers import RKBS32
 
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
 
-v_ref = 1.0          
-f_clk = 1000          
-T_clk = 1.0 / f_clk  
+v_ref = 1.0           #dac reference
+f_clk = 400           #sampling frequency
+T_clk = 1.0 / f_clk   #sampling period
 
+#blocks that define the system
 src = Source(lambda t: np.sin(2*np.pi*t))
-
 sub = Adder("+-")
 itg = Integrator() 
 sah = SampleHold(T=T_clk, tau=T_clk*0.01)
 qtz = Comparator(span=[0, 1])
 dac = DAC(n_bits=1, span=[-v_ref, v_ref], T=T_clk, tau=T_clk*0.02)
+sc1 = Scope(labels=["src", "qtz", "dac"]) 
+sc2 = Scope(labels=["itg", "sah"]) 
 
-sco = Scope(labels=["src", "itg", "qtz", "dac", "sah"]) 
+blocks = [src, sub, itg, sah, qtz, dac, sc1, sc2]
 
-blocks = [src, sub, itg, sah, qtz, dac, sco]
-
+#connections between the blocks
 connections = [
-    Connection(src, sub[0], sco[0]),  
-    Connection(dac, sub[1], sco[3]),     
+    Connection(src, sub[0], sc1[0]),  
+    Connection(dac, sub[1], sc1[2]),     
     Connection(sub, itg),          
-    Connection(itg, sah, sco[1]),      
-    Connection(sah, qtz, sco[4]),    
-    Connection(qtz, dac[0], sco[2]),
+    Connection(itg, sah, sc2[0]),      
+    Connection(sah, qtz, sc2[1]),    
+    Connection(qtz, dac[0], sc1[1]),
 ]
 
 
+#simulation with adaptive solver
 Sim = Simulation(
     blocks,
     connections,
@@ -56,7 +59,7 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(0.5)
-    sco.plot()
+    Sim.run(1)
+    Sim.plot()
 
     plt.show()

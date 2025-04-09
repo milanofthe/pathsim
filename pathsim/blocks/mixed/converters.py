@@ -89,10 +89,9 @@ class ADC(Block):
             scaled_val = (clipped_val - lower) / (upper - lower)
             int_val = np.floor(scaled_val * (2**self.n_bits))
             int_val = min(int_val, 2**self.n_bits - 1)
-            int_val = int_val.astype(int)
 
             #convert to bits
-            bits = format(int_val, "b").zfill(self.n_bits)
+            bits = format(int(int_val), "b").zfill(self.n_bits)
 
             #set bits to block outputs LSB -> MSB
             for i, b in enumerate(bits):

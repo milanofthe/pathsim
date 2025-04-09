@@ -27,8 +27,8 @@ omega = 2.0*np.pi
 
 #blocks that define the system
 src = Source(lambda t: np.sin(omega*t))
-adc = ADC(n_bits=n, T=1/fs, span=[-1.1, 1.1])
-dac = DAC(n_bits=n, T=1/fs, tau=0.1/fs, span=[-1.1, 1.1]) #dac has slight delay
+adc = ADC(n_bits=n, T=1/fs, span=[-1, 1])
+dac = DAC(n_bits=n, T=1/fs, tau=0.1/fs, span=[-1, 1]) #dac has slight delay
 lpf = ButterworthLowpassFilter(Fc=fs/10, n=2)
 
 sco = Scope(labels=["src", "dac", "lpf"])
