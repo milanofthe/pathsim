@@ -8,4 +8,5 @@ pathsim.blocks.mixed
    pathsim.blocks.mixed.comparator
    pathsim.blocks.mixed.converters
    pathsim.blocks.mixed.samplehold
-   pathsim.blocks.mixed.sources
+   pathsim.blocks.mixed.sources   
+   pathsim.blocks.mixed.fir

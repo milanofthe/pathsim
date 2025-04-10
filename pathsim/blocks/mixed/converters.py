@@ -110,6 +110,11 @@ class ADC(Block):
         self.outputs = {i: 0.0 for i in range(self.n_bits)}
 
 
+    def __len__(self):
+        """This block has no direct passthrough"""
+        return 0
+
+
 class DAC(Block):
     """Models an ideal Digital-to-Analog Converter (DAC).
 
@@ -186,7 +191,6 @@ class DAC(Block):
             scaled_val =  val / (levels - 1) if levels > 1 else 0.0
             self.outputs[0] = lower + (upper - lower) * scaled_val
 
-
         #internal scheduled events
         self.events = [
             Schedule(
@@ -198,3 +202,8 @@ class DAC(Block):
 
         #initialize inputs dict to expect n_bits entries
         self.inputs = {i: 0.0 for i in range(self.n_bits)}
+
+
+    def __len__(self):
+        """This block has no direct passthrough"""
+        return 0
