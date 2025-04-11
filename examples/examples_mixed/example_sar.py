@@ -67,12 +67,12 @@ class SAR(Block):
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
 
-n = 8                  #number of bits
+n = 6                  #number of bits
 f_clk = 20             #sampling frequency
 T_clk = 1.0 / f_clk    #sampling period
 
 #blocks that define the system
-src = Source(lambda t: np.sin(2*np.pi*t)) 
+src = Source(lambda t: np.sin(2*np.pi*t) * np.cos(3*np.pi*t)) 
 sah = SampleHold(T=T_clk) 
 sub = Adder("+-")
 cpt = Comparator(span=[0, 1])

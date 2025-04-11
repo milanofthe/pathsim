@@ -74,15 +74,15 @@ class FIR(Block):
 
         #buffer to store the last N+1 input samples (current + N past)
         n = len(self.coeffs)
-        self.buffer = deque([0.0]*n, maxlen=n)
+        self._buffer = deque([0.0]*n, maxlen=n)
 
         def _update_fir(t):
 
             #update internal buffer
-            self.buffer.appendleft(self.inputs[0])
+            self._buffer.appendleft(self.inputs[0])
 
             #compute the FIR output: y[n] = sum(b[k] * x[n-k])
-            current_output = np.dot(self.coeffs, self.buffer)
+            current_output = np.dot(self.coeffs, self._buffer)
 
             #update the block's output port
             self.outputs[0] = current_output
@@ -101,7 +101,7 @@ class FIR(Block):
         """Resets the filter state (buffer) and output."""
         super().reset()
         n = len(self.coeffs)
-        self.buffer = deque([0.0]*n, maxlen=n)
+        self._buffer = deque([0.0]*n, maxlen=n)
 
 
     def __len__(self):
