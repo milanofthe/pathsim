@@ -115,9 +115,6 @@ class Scope(Block):
     def plot(self, *args, **kwargs):
         """Directly create a plot of the recorded data for quick visualization and debugging.
 
-        The 'fig' and 'ax' objects are accessible as attributes of the 'Scope' instance 
-        from the outside for saving, or modification, etc.
-
         Parameters
         ----------
         args : tuple
@@ -141,26 +138,26 @@ class Scope(Block):
         time, data = self.read() 
 
         #initialize figure
-        self.fig, self.ax = plt.subplots(nrows=1, ncols=1, figsize=(8,4), tight_layout=True, dpi=120)
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8,4), tight_layout=True, dpi=120)
         
         #custom colors
-        self.ax.set_prop_cycle(color=COLORS_ALL)
+        ax.set_prop_cycle(color=COLORS_ALL)
         
         #plot the recorded data
         for p, d in enumerate(data):
             lb = self.labels[p] if p < len(self.labels) else f"port {p}"
-            self.ax.plot(time, d, *args, **kwargs, label=lb)
+            ax.plot(time, d, *args, **kwargs, label=lb)
 
         #legend labels from ports
-        self.ax.legend(fancybox=False)
+        ax.legend(fancybox=False)
 
         #other plot settings
-        self.ax.set_xlabel("time [s]")
-        self.ax.grid()
+        ax.set_xlabel("time [s]")
+        ax.grid()
 
         # Legend picking functionality
-        lines = self.ax.get_lines()  # Get the lines from the plot
-        leg = self.ax.get_legend()   # Get the legend
+        lines = ax.get_lines()  # Get the lines from the plot
+        leg = ax.get_legend()   # Get the legend
 
         # Map legend lines to original plot lines
         lined = dict()  
@@ -176,16 +173,74 @@ class Scope(Block):
             origline.set_visible(visible)
             legline.set_alpha(1.0 if visible else 0.2)
             # Redraw the figure
-            self.fig.canvas.draw()  
+            fig.canvas.draw()  
 
         #enable picking
-        self.fig.canvas.mpl_connect("pick_event", on_pick)
+        fig.canvas.mpl_connect("pick_event", on_pick)
 
         #show the plot without blocking following code
         plt.show(block=False)
 
         #return figure and axis for outside manipulation
-        return self.fig, self.ax
+        return fig, ax
+
+
+    def plot2D(self, *args, **kwargs):
+        """Directly create a 2D plot of the recorded data for quick visualization and debugging.
+
+        Note
+        ----
+        Only plots the data recorded from the first two ports.
+
+        Parameters
+        ----------
+        args : tuple
+            args for ax.plot
+        kwargs : dict
+            kwargs for ax.plot
+
+        Returns
+        -------
+        fig : matplotlib.figure
+            internal figure instance
+        ax : matplotlib.axis
+            internal axis instance
+        """ 
+
+        #just return 'None' if no recording available
+        if not self.recording:
+            return None
+
+        #get data
+        time, data = self.read() 
+
+        #not enough channels -> early exit
+        if len(data) < 2:
+            return None
+
+        #initialize figure
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4, 4), tight_layout=True, dpi=120)
+        
+        #custom colors
+        ax.set_prop_cycle(color=COLORS_ALL)
+
+        #unpack data
+        d1, d2, *_ = data
+
+        #plot the data
+        ax.plot(d1, d2, *args, **kwargs)
+
+        #axis labels
+        ax.set_xlabel(self.labels[0] if len(self.labels)>0 else "port 0")
+        ax.set_ylabel(self.labels[1] if len(self.labels)>1 else "port 1")
+        
+        ax.grid()
+
+        #show the plot without blocking following code
+        plt.show(block=False)
+
+        #return figure and axis for outside manipulation
+        return fig, ax
 
 
     def save(self, path="scope.csv"):
