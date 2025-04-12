@@ -119,11 +119,11 @@ if __name__ == "__main__":
     Sim.run(15)
 
     #plot the recordings from the scope
-    Sc.plot(lw=2)
+    fig, ax = Sc.plot(lw=2)
 
     #add detected events to scope plot
-    for t in E1: Sc.ax.axvline(t, ls="--", c="k")
-    for t in E2: Sc.ax.axvline(t, ls="-.", c="k")
-    for t in E3: Sc.ax.axvline(t, ls="-", c="k", lw=2)
+    for t in E1: ax.axvline(t, ls="--", c="k")
+    for t in E2: ax.axvline(t, ls="-.", c="k")
+    for t in E3: ax.axvline(t, ls="-", c="k", lw=2)
 
     plt.show()

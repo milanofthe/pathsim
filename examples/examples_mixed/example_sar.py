@@ -13,6 +13,7 @@ from pathsim import Simulation, Connection
 
 from pathsim.blocks import Adder, Scope, Source
 from pathsim.blocks.mixed import SampleHold, Comparator, DAC
+from pathsim.blocks.rf import ButterworthLowpassFilter
 
 
 from pathsim.solvers import RKBS32
@@ -67,33 +68,37 @@ class SAR(Block):
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
 
-n = 6                  #number of bits
-f_clk = 20             #sampling frequency
-T_clk = 1.0 / f_clk    #sampling period
+n = 8                 #number of bits
+f_clk = 50            #sampling frequency
+T_clk = 1.0 / f_clk   #sampling period
 
 #blocks that define the system
-src = Source(lambda t: np.sin(2*np.pi*t) * np.cos(3*np.pi*t)) 
+src = Source(lambda t: np.sin(2*np.pi*t) * np.cos(5*np.pi*t)) 
 sah = SampleHold(T=T_clk) 
 sub = Adder("+-")
 cpt = Comparator(span=[0, 1])
-dac = DAC(n_bits=n, T=T_clk/n, tau=T_clk*0.002) 
-sar = SAR(n_bits=n, T=T_clk, tau=T_clk*0.001)
-sco = Scope(labels=["src", "sah", "dac"]) 
+dac1 = DAC(n_bits=n, T=T_clk/n, tau=T_clk*2e-3) 
+dac2 = DAC(n_bits=n, T=T_clk, tau=T_clk) 
+lpf = ButterworthLowpassFilter(f_clk/5, n=3)
+sar = SAR(n_bits=n, T=T_clk, tau=T_clk*1e-3)
+sco = Scope(labels=["src", "sah", "dac1", "dac2", "lpf"]) 
 
-blocks = [src, cpt, dac, sar, sah, sub, sco]
+blocks = [src, cpt, dac1, dac2, lpf, sar, sah, sub, sco]
 
 #connections between the blocks
 connections = [
     Connection(src, sah, sco[0]),  
     Connection(sah, sub[0], sco[1]),     
-    Connection(dac, sub[1], sco[2]),     
+    Connection(dac1, sub[1], sco[2]),    
+    Connection(dac2, lpf, sco[3]),     
+    Connection(lpf, sco[4]),  
     Connection(sub, cpt),
     Connection(cpt, sar)
 ]
 
 for i in range(n):
     connections.append(
-        Connection(sar[i], dac[i])
+        Connection(sar[i], dac1[i], dac2[i])
         )
 
 
@@ -101,7 +106,7 @@ for i in range(n):
 Sim = Simulation(
     blocks,
     connections,
-    dt_max=T_clk*0.1,
+    # dt_max=T_clk*0.1,
     Solver=RKBS32
 )
 

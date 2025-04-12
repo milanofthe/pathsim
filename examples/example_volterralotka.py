@@ -10,15 +10,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
-from pathsim.blocks import Scope, ODE
-from pathsim.solvers import RKCK54, RKF78
-
+from pathsim.blocks import Scope, Integrator, Constant, Adder, Amplifier, Multiplier
+from pathsim.solvers import RKBS32
 
 
 # VOLTERRA-LOTKA SYSTEM =================================================================
-
-#simulation timestep
-dt = 0.1
 
 #parameters 
 alpha = 1.0  # growth rate of prey
@@ -26,48 +22,61 @@ beta = 0.1   # predator sucess rate
 delta = 0.5  # predator efficiency
 gamma = 1.2  # death rate of predators
 
-#function for ODE
-def _f(x, u, t):
-    x1, x2 = x
-    return np.array([x1*(alpha - beta*x2), x2*(delta*x1 - gamma)])
+
+i_pred = Integrator(10)
+i_prey = Integrator(5)
+
+c_alp = Constant(alpha)
+c_gma = Constant(gamma)
+
+a_bet = Amplifier(beta)
+a_del = Amplifier(delta)
+
+p_pred = Adder("-+")
+p_prey = Adder("+-")
+
+m_pred = Multiplier()
+m_prey = Multiplier()
+
+sco = Scope(labels=["predator population", "prey population"])
+
+blocks = [
+    i_pred, i_prey, c_alp, c_gma, 
+    a_bet, a_del, p_pred, p_prey, 
+    m_pred, m_prey, sco
+    ]
+
+connections = [
+    Connection(i_pred, m_pred[0], a_del, sco[0]),
+    Connection(i_prey, m_prey[0], a_bet, sco[1]),
+    Connection(a_del, p_prey[0]),
+    Connection(c_gma, p_prey[1]),
+    Connection(a_bet, p_pred[0]),
+    Connection(c_alp, p_pred[1]),
+    Connection(p_pred, m_pred[1]),
+    Connection(p_prey, m_prey[1]),
+    Connection(m_pred, i_pred),
+    Connection(m_prey, i_prey)
+    ]
 
 
-fig, ax = plt.subplots(tight_layout=True)
-ax.set_xlabel("predator population")
-ax.set_ylabel("prey population")
+Sim = Simulation(
+    blocks, 
+    connections, 
+    Solver=RKBS32,
+    tolerance_lte_rel=1e-4,
+    tolerance_lte_abs=1e-6
+    )
 
-#iterate different initial conditions for predators
-for r in np.linspace(3, 12, 10):
 
-    #initial condition
-    x0 = np.array([r, 10])
+# Run Example ===========================================================================    
 
-    #blocks that define the system
-    VL = ODE(_f, x0)
-    Sc = Scope(labels=["predators", "prey"])
+if __name__ == "__main__":
 
-    blocks = [VL, Sc]
-
-    #the connections between the blocks
-    connections = [
-        Connection(VL, Sc),
-        Connection(VL[1], Sc[1]),
-        ]
-
-    #initialize simulation with the blocks, connections, timestep and logging enabled
-    Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54, tolerance_lte_rel=1e-6)
-        
     #run the simulation
-    Sim.run(50)
+    Sim.run(20)
 
-    #read the data from the scope
-    time, data = Sc.read()
+    sco.plot()
+    sco.plot2D()
 
-    #plot the phase diagram
-    ax.plot(*data, label=f"{x0}")
-
-ax.legend()
-
-plt.show()
-
-    
+    plt.show()

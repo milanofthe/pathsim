@@ -95,10 +95,10 @@ if __name__ == "__main__":
     Sim.run(duration=15)
 
     #plot the results directly from the scope
-    Sco.plot(lw=2)
+    fig, ax = Sco.plot(lw=2)
 
     #add the events to scope plot
-    for t in E1: Sco.ax.axvline(t, c="k", ls="--")
+    for t in E1: ax.axvline(t, c="k", ls="--")
 
     #read the recordings from the scope
     time, [om, ph] = Sco.read()

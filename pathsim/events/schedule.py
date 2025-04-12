@@ -13,7 +13,7 @@ import numpy as np
 
 from ._event import Event
 
-from .. _constants import TOLERANCE, EVT_TOLERANCE
+from .. _constants import TOLERANCE
 
 
 # EVENT MANAGER CLASS ===================================================================
@@ -67,7 +67,7 @@ class Schedule(Event):
         t_end=None, 
         t_period=1, 
         func_act=None,      
-        tolerance=EVT_TOLERANCE
+        tolerance=TOLERANCE
         ):
         super().__init__(None, func_act, tolerance)
         

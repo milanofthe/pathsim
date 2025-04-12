@@ -96,13 +96,13 @@ if __name__ == "__main__":
     #run the simulation
     Sim.run(20)
 
-    Sc.plot(".-")
+    fig, ax = Sc.plot(".-")
 
     #add detected events to scope plot
-    for e in E1: Sc.ax.axvline(e, ls="--", c="k")
-    for e in E2: Sc.ax.axvline(e, ls=":", c="k")
-    for e in E3: Sc.ax.axvline(e, ls="--", c="k")
-    for e in E4: Sc.ax.axvline(e, ls=":", c="k")
+    for e in E1: ax.axvline(e, ls="--", c="k")
+    for e in E2: ax.axvline(e, ls=":", c="k")
+    for e in E3: ax.axvline(e, ls="--", c="k")
+    for e in E4: ax.axvline(e, ls=":", c="k")
 
     plt.show()
 

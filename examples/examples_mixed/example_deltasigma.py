@@ -25,7 +25,6 @@ v_ref = 1.0           #dac reference
 f_clk = 100           #sampling frequency
 T_clk = 1.0 / f_clk   #sampling period
 
-#coefficients for the digital lowpass filter (after DAC)
 fir_coeffs = firwin(20, f_clk/50, fs=f_clk)
 
 

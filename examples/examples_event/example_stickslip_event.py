@@ -183,13 +183,13 @@ if __name__ == "__main__":
     # visualization ---------------------------------------------------------------------
 
     #plot the results directly from the two scopes
-    Sc1.plot("-", lw=2)
+    fig, ax = Sc1.plot("-", lw=2)
 
     for t in E_slip_to_stick:
-        Sc1.ax.axvline( t , ls="--", c="k")
+        ax.axvline( t , ls="--", c="k")
 
     for t in E_stick_to_slip:
-        Sc1.ax.axvline( t , ls=":", c="k")
+        ax.axvline( t , ls=":", c="k")
 
     Sc2.plot("-", lw=2)
 

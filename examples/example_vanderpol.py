@@ -32,14 +32,14 @@ def jac(x, u, t):
 #blocks that define the system
 VDP = ODE(func, x0, jac) #jacobian improves convergence but is not needed
 # VDP = ODE(func, x0)
-Sco = Scope(labels=[r"$x_1(t)$"])
+Sco = Scope(labels=[r"$x_1(t)$", r"$x_2(t)$"])
 
 blocks = [VDP, Sco]
 
 #the connections between the blocks
 connections = [
     Connection(VDP, Sco),
-    # Connection(VDP[1], Sco[1])
+    Connection(VDP[1], Sco[1])
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
@@ -49,8 +49,8 @@ Sim = Simulation(
     dt=0.1, 
     log=True, 
     Solver=GEAR52A, 
-    tolerance_lte_abs=1e-5, 
-    tolerance_lte_rel=1e-3,
+    tolerance_lte_abs=1e-6, 
+    tolerance_lte_rel=1e-4,
     tolerance_fpi=1e-8
     )
 
@@ -63,5 +63,6 @@ if __name__ == "__main__":
 
     #plotting
     Sco.plot(".-")
+    Sco.plot2D()
 
     plt.show()

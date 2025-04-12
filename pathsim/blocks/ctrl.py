@@ -86,7 +86,7 @@ class PID(Block):
 
 
     def __len__(self):
-        return 1 if self._active else 0
+        return 1 if self._active and (self.Kp or self.Kd) else 0
 
 
     def set_solver(self, Solver, **solver_args):

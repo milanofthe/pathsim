@@ -67,5 +67,6 @@ if __name__ == "__main__":
 
     # Plot the results directly from the scope
     Sc.plot(lw=2)
+    Sc.plot2D(lw=2)
 
     plt.show()

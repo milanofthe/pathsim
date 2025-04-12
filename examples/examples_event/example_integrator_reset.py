@@ -58,8 +58,8 @@ if __name__ == "__main__":
     #run simulation for some number of seconds
     Sim.run(10)
 
-    Sc.plot(".-", lw=1.5)
+    fig, ax = Sc.plot(".-", lw=1.5)
 
-    for e in E1: Sc.ax.axvline(e, ls="--", c="k")
+    for e in E1: ax.axvline(e, ls="--", c="k")
 
     plt.show()

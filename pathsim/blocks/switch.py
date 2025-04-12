@@ -62,7 +62,7 @@ class Switch(Block):
 
     def __len__(self):
         """Algebraic passthrough only possible if state is defined"""
-        return 0 if self.state is None else 1
+        return 0 if (self.state is None or not self._active) else 1
 
 
     def select(self, state=0):

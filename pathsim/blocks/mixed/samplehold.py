@@ -50,3 +50,6 @@ class SampleHold(Block):
                 func_act=_sample
                 ),
             ]
+
+    def __len__(self):
+        return 0

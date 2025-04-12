@@ -91,10 +91,10 @@ if __name__ == "__main__":
     time, [x] = Sc.read()
 
     #plot the recordings from the scope
-    Sc.plot(".-", lw=2)
+    fig, ax = Sc.plot(".-", lw=2)
 
     #add detected events to scope plot
-    for t in E1: Sc.ax.axvline(t, ls="--", c="k")
+    for t in E1: ax.axvline(t, ls="--", c="k")
 
 
     # timesteps -----------------------------------------------------------------------------

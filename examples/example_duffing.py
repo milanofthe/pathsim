@@ -28,14 +28,11 @@ from pathsim.solvers import (
 
 # DUFFING OSCILLATOR ====================================================================
 
-#simulation timestep
-dt = 0.05
-
 #initial position and velocity
 x0, v0 = 0.0, 0.0
 
 #driving angular frequency and amplitude
-a, omega = 15.0, 2.0
+a, omega = 5.0, 2.0
 
 #parameters (mass, damping, linear stiffness, nonlienar stiffness)
 m, c, k, d = 1.0, 0.5, 1.0, 1.4
@@ -67,28 +64,23 @@ connections = [
     ]
 
 #create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    Solver=RKCK54,
+    tolerance_lte_rel=1e-6,
+    tolerance_lte_abs=1e-9
+    )
 
 
 # Run Example ===========================================================================
 
 if __name__ == "__main__":
 
-    for _ in range(5):
-
-        #linearize the whole system
-        Sim.linearize()
-
-        #run the linarized system
-        Sim.run(20)
-
-        #delinearize the whole system
-        Sim.delinearize()
-
-        #run the nonlinear system 
-        Sim.run(20)
+    Sim.run(20)
 
     #plot the results directly from the scope
     Sc.plot()
+    Sc.plot2D()
 
     plt.show()

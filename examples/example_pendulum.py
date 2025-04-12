@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
     #plot the results directly from the scope
     Sco.plot(".-")
-
+    Sco.plot2D()
 
 
     #lets look at the timesteps
