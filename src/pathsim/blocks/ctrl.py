@@ -75,13 +75,32 @@ class PID(Block):
         #maximum frequency for differentiator approximation
         self.f_max = f_max
 
+        def _g_pid(x, u, t):
+            x1, x2 = x
+            yp = self.Kp * u
+            yi = self.Ki * x2
+            yd = self.Kd * self.f_max * (u - x1)
+            return yp + yi + yd
+
+        def _jac_x_g_pid(x, u, t):
+            return np.array([-self.Kd * self.f_max, self.Ki])
+
+        def _jac_u_g_pid(x, u, t):
+            return self.Kd * self.f_max + self.Kp
+
+        def _f_pid(x, u, t):
+            x1, x2 = x
+            dx1, dx2 = self.f_max * (u - x1), u
+            return np.array([dx1, dx2])
+
+        #internal operators
         self.op_dyn = DynamicOperator(
-            func=lambda x, u, t: np.array([self.f_max * (u - x[0]), u]),
+            func=_f_pid,
             )
         self.op_alg = DynamicOperator(
-            func=lambda x, u, t: self.Kd * self.f_max * (u - x[0]) + self.Ki * x[1] + self.Kp * u,
-            jac_x=lambda x, u, t: np.array([-self.Kd * self.f_max, self.Ki]),
-            jac_u=lambda x, u, t: self.Kd * self.f_max + self.Kp,
+            func=_g_pid,
+            jac_x=_jac_x_g_pid,
+            jac_u=_jac_u_g_pid,
             )
 
 
@@ -165,3 +184,108 @@ class PID(Block):
         x, u = self.engine.get(), self.inputs[0]
         f = self.op_dyn(x, u, t)
         return self.engine.step(f, dt)
+
+
+
+class AntiWindupPID(PID):
+    """Proportional-Integral-Differntiation (PID) controller with tracking 
+    anti-windup mechanism (back-calculation).
+    
+    Anti-windup mechanisms are needed when the magnitude of the control signal 
+    from the PID controller is limited by some real world saturation. In these cases, 
+    the integrator will continue to acumulate the control error and "wind itself up". 
+    Once the setpoint is reached, this can result in significant overshoots. This 
+    implementation adds a conditional feedback term to the internal integrator that 
+    "unwinds" it when the PID output crosses some limits. This is pretty much a 
+    deadzone feedback element for the integrator.
+
+    Note
+    ----
+    Depending on 'f_max', the resulting system might become stiff or ill conditioned!
+    As a practical choice set f_max to 3x the highest expected signal frequency.
+    
+    Example
+    -------
+    The block is initialized like this:
+
+    .. code-block:: python
+        
+        #cutoff at 1kHz, windup limits at [-5, 5]
+        pid = AntiWindupPID(Kp=2, Ki=0.5, Kd=0.1, f_max=1e3, limits=[-5, 5])
+
+    Parameters
+    ----------
+    Kp : float
+        poroportional controller coefficient
+    Ki : float
+        integral controller coefficient
+    Kd : float
+        differentiator controller coefficient
+    f_max : float
+        highest expected signal frequency
+    Ks : float
+        feedback term for back calculation for anti-windup control of integrator
+    limits : array_like[float]
+        lower and upper limit for PID output that triggers anti-windup of integrator
+
+    Attributes
+    ----------
+    op_dyn : DynamicOperator
+        internal dynamic operator for ODE component
+    op_alg : DynamicOperator
+        internal algebraic operator
+
+    """
+
+    def __init__(self, Kp=0, Ki=0, Kd=0, f_max=100, Ks=10, limits=[-10, 10]):
+        super().__init__()
+
+        #pid controller coefficients
+        self.Kp = Kp
+        self.Ki = Ki
+        self.Kd = Kd
+
+        #maximum frequency for differentiator approximation
+        self.f_max = f_max
+
+        #anti-windup control
+        self.Ks = Ks
+        self.limits = limits
+
+
+        def _g_pid(x, u, t):
+            x1, x2 = x
+            yp = self.Kp * u
+            yi = self.Ki * x2
+            yd = self.Kd * self.f_max * (u - x1)
+            return yp + yi + yd
+
+        def _jac_x_g_pid(x, u, t):
+            return np.array([-self.Kd * self.f_max, self.Ki])
+
+        def _jac_u_g_pid(x, u, t):
+            return self.Kd * self.f_max + self.Kp
+
+        def _f_pid(x, u, t):
+            x1, x2 = x
+
+            #differentiator state
+            dx1 = self.f_max * (u - x1) 
+            
+            #integrator state with windup control
+            y = _g_pid(x, u, t) #pid output
+            w = self.Ks * (y - np.clip(y, *self.limits)) #anti-windup feedback
+            dx2 = u - w
+
+            return np.array([dx1, dx2])
+
+        #internal operators
+        self.op_dyn = DynamicOperator(
+            func=_f_pid,
+            )
+        self.op_alg = DynamicOperator(
+            func=_g_pid,
+            jac_x=_jac_x_g_pid,
+            jac_u=_jac_u_g_pid,
+            )
+
