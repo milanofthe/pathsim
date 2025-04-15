@@ -3,6 +3,16 @@
 This is a preliminary roadmap for PathSim's development. To be fair, its more a collection of ideas and potential directions then a real roadmap.
 
 
+## Blocks
+
+- PID with anti-windup mechanism (clamping, back calculation, reset)
+
+
+## Solvers
+
+- multistep methods (BDF, GEAR) need startup methods to build history
+
+
 ## Analysis
 
 - periodic steady state solver, probably shooting method with automatic frequency/period detection
