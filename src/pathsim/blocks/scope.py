@@ -17,6 +17,8 @@ import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
+from mpl_toolkits.mplot3d import Axes3D
+
 from ._block import Block
 from ..utils.utils import dict_to_array
 from ..utils.realtimeplotter import RealtimePlotter
@@ -135,7 +137,7 @@ class Scope(Block):
         #just return 'None' if no recording available
         if not self.recording:
             warnings.warn("no recording available for plotting in 'Scope.plot'")
-            return None
+            return None, None
 
         #get data
         time, data = self.read() 
@@ -211,7 +213,7 @@ class Scope(Block):
         #just return 'None' if no recording available
         if not self.recording:
             warnings.warn("no recording available for plotting in 'Scope.plot2D'")
-            return None
+            return None, None
 
         #get data
         time, data = self.read() 
@@ -219,13 +221,13 @@ class Scope(Block):
         #not enough channels -> early exit
         if len(data) < 2 or len(axes) != 2:
             warnings.warn("not enough channels for plotting in 'Scope.plot2D'")
-            return None
+            return None, None
 
         #axes selected not available -> early exit
         for a in axes:
             if a >= len(data):
                 warnings.warn(f"channel {a} not available for plotting in 'Scope.plot2D'")
-                return None
+                return None, None
 
         #initialize figure
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4, 4), tight_layout=True, dpi=120)
