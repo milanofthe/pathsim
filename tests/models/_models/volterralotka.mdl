@@ -1,44 +1,109 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 500,
-    "version": "0.6.0",
-    "timestamp": "2025-03-18T09:12:55.456446"
+    "duration": 100,
+    "version": "0.6.5.dev11+g5f9cc5c",
+    "timestamp": "2025-04-15T09:21:12.773797"
   },
   "structure": {
     "blocks": [
       {
-        "id": 1755594518608,
-        "type": "ODE",
+        "id": 2374346577232,
+        "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
         "metadata": {},
         "params": {
-          "func": {
-            "type": "dill",
-            "data": "gASVaQIAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwQCAQgBlEsDSwBLAEsFSwZLA0N+lQBVAHUCAABwNFsAAAAAAAAAAABSAgAAAAAAAAAAAAAAAAAAAAAAACIAVQNbBAAAAAAAAAAAWwYAAAAAAAAAAFUELQUAAC0KAAAtBQAAVQRbCAAAAAAAAAAAVQMtBQAAWwoAAAAAAAAAAC0KAAAtBQAALwI1AQAAAAAAACQAlE6FlCiMAm5wlIwFYXJyYXmUjAVhbHBoYZSMBGJldGGUjAVkZWx0YZSMBWdhbW1hlHSUKIwBeJSMAXWUjAF0lIwCeDGUjAJ4MpR0lIxXQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV92b2x0ZXJyYWxvdGthLnB5lIwCX2aUaBZLHkM4gADYDQ6BRoBC3AsNjziKOJBSnBWkFKBioReZH9EVKagyrHWwUql4vCXRLz/RK0DQFEHTC0LQBEKUQwCUKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gWTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgbKIwCbnCUaACMDl9pbXBvcnRfbW9kdWxllJOUjAVudW1weZSFlFKUjAVkZWx0YZRHP+AAAAAAAACMBWFscGhhlEc/8AAAAAAAAIwFZ2FtbWGURz/zMzMzMzMzjARiZXRhlEc/uZmZmZmZmnUwLg==",
-            "name": "_f"
-          },
-          "initial_value": {
-            "type": "object",
-            "__module__": "numpy",
-            "__class__": "ndarray",
-            "data": [
-              12.0,
-              10.0
-            ]
-          },
-          "jac": null
+          "initial_value": 10
         }
       },
       {
-        "id": 1755594518864,
+        "id": 2374349073424,
+        "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
+        "params": {
+          "initial_value": 5
+        }
+      },
+      {
+        "id": 2374348958960,
+        "type": "Constant",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
+        "params": {
+          "value": 1.0
+        }
+      },
+      {
+        "id": 2374349074064,
+        "type": "Constant",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
+        "params": {
+          "value": 1.2
+        }
+      },
+      {
+        "id": 2374348959296,
+        "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
+        "params": {
+          "gain": 0.1
+        }
+      },
+      {
+        "id": 2374349074384,
+        "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
+        "params": {
+          "gain": 0.5
+        }
+      },
+      {
+        "id": 2374348959968,
+        "type": "Adder",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": "-+"
+        }
+      },
+      {
+        "id": 2374349075344,
+        "type": "Adder",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": "+-"
+        }
+      },
+      {
+        "id": 2374348960304,
+        "type": "Multiplier",
+        "module": "pathsim.blocks.multiplier",
+        "metadata": {},
+        "params": {}
+      },
+      {
+        "id": 2374349075664,
+        "type": "Multiplier",
+        "module": "pathsim.blocks.multiplier",
+        "metadata": {},
+        "params": {}
+      },
+      {
+        "id": 2374348960640,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
         "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
           "labels": [
-            "predators",
-            "prey"
+            "predator population",
+            "prey population"
           ]
         }
       }
@@ -46,41 +111,160 @@
     "events": [],
     "connections": [
       {
-        "id": 1755594053552,
+        "id": 2374348960976,
         "source": {
-          "block": 1755594518608,
+          "block": 2374346577232,
           "port": 0
         },
         "targets": [
           {
-            "block": 1755594518864,
+            "block": 2374348960304,
+            "port": 0
+          },
+          {
+            "block": 2374349074384,
+            "port": 0
+          },
+          {
+            "block": 2374348960640,
             "port": 0
           }
         ]
       },
       {
-        "id": 1755599031344,
+        "id": 2374349075984,
         "source": {
-          "block": 1755594518608,
-          "port": 1
+          "block": 2374349073424,
+          "port": 0
         },
         "targets": [
           {
-            "block": 1755594518864,
+            "block": 2374349075664,
+            "port": 0
+          },
+          {
+            "block": 2374348959296,
+            "port": 0
+          },
+          {
+            "block": 2374348960640,
             "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2374349076304,
+        "source": {
+          "block": 2374349074384,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374349075344,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2374348553744,
+        "source": {
+          "block": 2374349074064,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374349075344,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2374349766736,
+        "source": {
+          "block": 2374348959296,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374348959968,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2374349401712,
+        "source": {
+          "block": 2374348958960,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374348959968,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2374348716192,
+        "source": {
+          "block": 2374348959968,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374348960304,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2374348717824,
+        "source": {
+          "block": 2374349075344,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374349075664,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2374349653840,
+        "source": {
+          "block": 2374348960304,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374346577232,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2374349654608,
+        "source": {
+          "block": 2374349075664,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2374349073424,
+            "port": 0
           }
         ]
       }
     ]
   },
   "params": {
-    "dt": 0.1,
+    "dt": 0.01,
     "dt_min": 1e-16,
     "dt_max": null,
-    "Solver": "RKCK54",
+    "Solver": "RKBS32",
     "tolerance_fpi": 1e-12,
     "iterations_min": 1,
-    "iterations_max": 200,
-    "tolerance_lte_rel": 1e-06
+    "iterations_max": 200
   }
 }
