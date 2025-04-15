@@ -134,6 +134,7 @@ class Scope(Block):
 
         #just return 'None' if no recording available
         if not self.recording:
+            warnings.warn("no recording available for plotting in 'Scope.plot'")
             return None
 
         #get data
