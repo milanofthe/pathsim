@@ -224,10 +224,10 @@ class Scope(Block):
             return None, None
 
         #axes selected not available -> early exit
-        for a in axes:
-            if a >= len(data):
-                warnings.warn(f"channel {a} not available for plotting in 'Scope.plot2D'")
-                return None, None
+        ax1_idx, ax2_idx = axes
+        if not (0 <= ax1_idx < data.shape[0] and 0 <= ax2_idx < data.shape[0]):
+             warnings.warn(f"Selected axes {axes} out of bounds for data shape {data.shape}")
+             return None, None 
 
         #initialize figure
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4, 4), tight_layout=True, dpi=120)
@@ -235,15 +235,18 @@ class Scope(Block):
         #custom colors
         ax.set_prop_cycle(color=COLORS_ALL)
 
-        #unpack data
-        d1, d2, *_ = data
+        #unpack data for selected axes
+        d1 = data[ax1_idx]
+        d2 = data[ax2_idx]
 
         #plot the data
         ax.plot(d1, d2, *args, **kwargs)
 
         #axis labels
-        ax.set_xlabel(self.labels[0] if len(self.labels)>0 else "port 0")
-        ax.set_ylabel(self.labels[1] if len(self.labels)>1 else "port 1")
+        l1 = self.labels[ax1_idx] if ax1_idx < len(self.labels) else f"port {ax1_idx}"
+        l2 = self.labels[ax2_idx] if ax2_idx < len(self.labels) else f"port {ax2_idx}"
+        ax.set_xlabel(l1)
+        ax.set_ylabel(l2)
         
         ax.grid()
 
@@ -251,6 +254,76 @@ class Scope(Block):
         plt.show(block=False)
 
         #return figure and axis for outside manipulation
+        return fig, ax
+
+
+    def plot3D(self, *args, axes=(0, 1, 2), **kwargs):
+        """Directly create a 3D plot of the recorded data for quick visualization.
+
+        Parameters
+        ----------
+        args : tuple
+            args for ax.plot
+        axes : tuple[int]
+            indices of the three data channels (ports) to plot (default: (0, 1, 2)).
+        kwargs : dict
+            kwargs for ax.plot
+
+        Returns
+        -------
+        fig : matplotlib.figure
+            internal figure instance.
+        ax : matplotlib.axes._axes.Axes3D
+            internal 3D axis instance.
+        """
+        
+        #check if recording is available
+        if not self.recording:
+            warnings.warn("no recording available for plotting in 'Scope.plot3D'")
+            return None, None 
+
+        #read the recorded data
+        time, data = self.read()
+
+        #check if enough channels are available
+        if data.shape[0] < 3 or len(axes) != 3:
+            warnings.warn(f"Need at least 3 channels for plot3D, got {data.shape[0]}. Or axes argument length is not 3.")
+            return None, None
+
+        #check if selected axes are valid
+        ax1_idx, ax2_idx, ax3_idx = axes
+        if not (0 <= ax1_idx < data.shape[0] and
+                0 <= ax2_idx < data.shape[0] and
+                0 <= ax3_idx < data.shape[0]):
+            warnings.warn(f"Selected axes {axes} out of bounds for data shape {data.shape}")
+            return None, None 
+
+        #initialize 3D figure
+        fig = plt.figure(figsize=(6, 6), tight_layout=True, dpi=120)
+        ax = fig.add_subplot(111, projection='3d')
+
+        #custom colors
+        ax.set_prop_cycle(color=COLORS_ALL)
+
+        #unpack data for selected axes
+        d1 = data[ax1_idx]
+        d2 = data[ax2_idx]
+        d3 = data[ax3_idx]
+
+        #plot the 3D data
+        ax.plot(d1, d2, d3, *args, **kwargs)
+
+        #set axis labels using provided labels or default port numbers
+        label1 = self.labels[ax1_idx] if ax1_idx < len(self.labels) else f"port {ax1_idx}"
+        label2 = self.labels[ax2_idx] if ax2_idx < len(self.labels) else f"port {ax2_idx}"
+        label3 = self.labels[ax3_idx] if ax3_idx < len(self.labels) else f"port {ax3_idx}"
+        ax.set_xlabel(label1)
+        ax.set_ylabel(label2)
+        ax.set_zlabel(label3)
+
+        #show the plot without blocking
+        plt.show(block=False)
+
         return fig, ax
 
 
