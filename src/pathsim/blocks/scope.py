@@ -12,6 +12,8 @@
 
 import csv
 
+import warnings
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -185,17 +187,15 @@ class Scope(Block):
         return fig, ax
 
 
-    def plot2D(self, *args, **kwargs):
+    def plot2D(self, *args, axes=(0, 1), **kwargs):
         """Directly create a 2D plot of the recorded data for quick visualization and debugging.
-
-        Note
-        ----
-        Only plots the data recorded from the first two ports.
 
         Parameters
         ----------
         args : tuple
             args for ax.plot
+        axes : tuple[int]
+            axes / ports to select for 2d plot
         kwargs : dict
             kwargs for ax.plot
 
@@ -209,14 +209,22 @@ class Scope(Block):
 
         #just return 'None' if no recording available
         if not self.recording:
+            warnings.warn("no recording available for plotting in 'Scope.plot2D'")
             return None
 
         #get data
         time, data = self.read() 
 
         #not enough channels -> early exit
-        if len(data) < 2:
+        if len(data) < 2 or len(axes) != 2:
+            warnings.warn("not enough channels for plotting in 'Scope.plot2D'")
             return None
+
+        #axes selected not available -> early exit
+        for a in axes:
+            if a >= len(data):
+                warnings.warn(f"channel {a} not available for plotting in 'Scope.plot2D'")
+                return None
 
         #initialize figure
         fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4, 4), tight_layout=True, dpi=120)
