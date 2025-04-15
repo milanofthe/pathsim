@@ -26,4 +26,4 @@ Homepage = "https://github.com/milanofthe/pathsim"
 documentation = "https://pathsim.readthedocs.io/en/latest/"
 
 [tool.setuptools_scm]
-write_to = "src/festim/_version.py"
+write_to = "src/pathsim/_version.py"
