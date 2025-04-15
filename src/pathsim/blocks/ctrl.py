@@ -198,6 +198,28 @@ class AntiWindupPID(PID):
     implementation adds a conditional feedback term to the internal integrator that 
     "unwinds" it when the PID output crosses some limits. This is pretty much a 
     deadzone feedback element for the integrator.
+            
+    Mathematically, this block implements the following set of ODEs 
+
+    .. math::
+    
+        \\begin{eqnarray}    
+        \\dot{x}_1 &= f_\\mathrm{max} (u - x_1) \\\\
+        \\dot{x}_2 &= u - w \\\\
+        \\end{eqnarray}
+    
+    with the anti-windup feedback (depending on the pid output)
+
+    .. math::
+    
+        w = K_s (y - \\min(\\max(y, y_\\mathrm{min}), y_\\mathrm{max}))
+
+    and the output itself
+
+    .. math::
+
+        y = K_p u + K_d x_1 + K_i x_2
+    
 
     Note
     ----
