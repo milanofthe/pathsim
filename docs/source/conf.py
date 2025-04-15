@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join('..', '..')))
 
 
-from pathsim._version import __version__ 
+from pathsim import __version__ 
 
 # -- Project information -----------------------------------------------------
 
