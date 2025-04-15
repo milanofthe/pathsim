@@ -79,3 +79,6 @@ ENV/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+
+*_version.py
