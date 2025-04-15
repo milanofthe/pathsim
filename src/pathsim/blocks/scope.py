@@ -2,7 +2,7 @@
 ##
 ##                              SCOPE BLOCK (blocks/scope.py)
 ##
-##             This module defines a block for recording time domain data
+##               This module defines blocks for recording time domain data
 ##
 ##                                  Milan Rother 2024
 ##
