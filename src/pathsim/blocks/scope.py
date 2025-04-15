@@ -299,7 +299,7 @@ class Scope(Block):
             return None, None 
 
         #initialize 3D figure
-        fig = plt.figure(figsize=(6, 6), tight_layout=True, dpi=120)
+        fig = plt.figure(figsize=(6, 6), dpi=120)
         ax = fig.add_subplot(111, projection='3d')
 
         #custom colors

@@ -92,6 +92,6 @@ if __name__ == "__main__":
     #run the simulation
     Sim.run(50)
     sco.plot()
-    sco.plot2D()
+    sco.plot3D()
 
     plt.show()
