@@ -63,9 +63,7 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    Solver=RKBS32,
-    tolerance_lte_rel=1e-4,
-    tolerance_lte_abs=1e-6
+    Solver=RKBS32
     )
 
 
