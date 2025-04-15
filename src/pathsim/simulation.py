@@ -18,7 +18,7 @@ import json
 import datetime
 import logging
 
-from ._version import __version__
+from pathsim import __version__
 
 from ._constants import (
     SIM_TIMESTEP,

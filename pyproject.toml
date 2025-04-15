@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools-scm[toml] >= 7.0.5"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pathsim"
+dynamic = ["version"]
+description = "A differentiable block based hybrid system simulation framework."
+readme = "README.md"
+authors = [{ name = "Milan Rother", email = "milan.rother@gmx.de" }]
+license = { text = "MIT" }
+keywords = ["simulation", "differentiable", "hybrid systems"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.6"
+dependencies = ["numpy>=1.15", "matplotlib>=3.1", "scipy>=1.2", "dill>=0.3.5"]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov", "codecov"]
+
+[project.urls]
+Homepage = "https://github.com/milanofthe/pathsim"
+documentation = "https://pathsim.readthedocs.io/en/latest/"
+
+[tool.setuptools_scm]
+write_to = "src/pathsim/_version.py"
