@@ -1,0 +1,303 @@
+{
+  "type": "Simulation",
+  "metadata": {
+    "duration": 100,
+    "version": "0.6.5.dev25+g74cf4f9.d20250415",
+    "timestamp": "2025-04-16T15:27:04.116209"
+  },
+  "structure": {
+    "blocks": [
+      {
+        "id": 2342995858768,
+        "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
+        "params": {
+          "initial_value": 1.0
+        }
+      },
+      {
+        "id": 2342998355280,
+        "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
+        "params": {
+          "initial_value": 1.0
+        }
+      },
+      {
+        "id": 2342998355920,
+        "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
+        "params": {
+          "initial_value": 1.0
+        }
+      },
+      {
+        "id": 2342998224112,
+        "type": "Adder",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": "--"
+        }
+      },
+      {
+        "id": 2342998224784,
+        "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
+        "params": {
+          "gain": 0.2
+        }
+      },
+      {
+        "id": 2342998356560,
+        "type": "Adder",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": "++"
+        }
+      },
+      {
+        "id": 2342998225120,
+        "type": "Constant",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
+        "params": {
+          "value": 0.2
+        }
+      },
+      {
+        "id": 2342998357200,
+        "type": "Constant",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
+        "params": {
+          "value": 5.7
+        }
+      },
+      {
+        "id": 2342998357520,
+        "type": "Adder",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": "+-"
+        }
+      },
+      {
+        "id": 2342998225456,
+        "type": "Multiplier",
+        "module": "pathsim.blocks.multiplier",
+        "metadata": {},
+        "params": {}
+      },
+      {
+        "id": 2342999048272,
+        "type": "Adder",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": "++"
+        }
+      },
+      {
+        "id": 2342998225792,
+        "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": [
+            "x",
+            "y",
+            "z"
+          ]
+        }
+      }
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 2342998226128,
+        "source": {
+          "block": 2342995858768,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998356560,
+            "port": 0
+          },
+          {
+            "block": 2342998357520,
+            "port": 0
+          },
+          {
+            "block": 2342998225792,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2342998357840,
+        "source": {
+          "block": 2342998355280,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998224112,
+            "port": 0
+          },
+          {
+            "block": 2342998224784,
+            "port": 0
+          },
+          {
+            "block": 2342998225792,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2342998358160,
+        "source": {
+          "block": 2342998355920,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998224112,
+            "port": 1
+          },
+          {
+            "block": 2342998225456,
+            "port": 0
+          },
+          {
+            "block": 2342998225792,
+            "port": 2
+          }
+        ]
+      },
+      {
+        "id": 2342999048576,
+        "source": {
+          "block": 2342998224112,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342995858768,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2342999048880,
+        "source": {
+          "block": 2342998224784,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998356560,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2342998699632,
+        "source": {
+          "block": 2342998356560,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998355280,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2342997997456,
+        "source": {
+          "block": 2342998225120,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342999048272,
+            "port": 0
+          }
+        ]
+      },
+      {
+        "id": 2342997999088,
+        "source": {
+          "block": 2342998357200,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998357520,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2342998935376,
+        "source": {
+          "block": 2342998357520,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998225456,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2342998936144,
+        "source": {
+          "block": 2342998225456,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342999048272,
+            "port": 1
+          }
+        ]
+      },
+      {
+        "id": 2342998950928,
+        "source": {
+          "block": 2342999048272,
+          "port": 0
+        },
+        "targets": [
+          {
+            "block": 2342998355920,
+            "port": 0
+          }
+        ]
+      }
+    ]
+  },
+  "params": {
+    "dt": 0.01,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "RKCK54",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200
+  }
+}
