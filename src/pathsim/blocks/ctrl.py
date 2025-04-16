@@ -260,20 +260,11 @@ class AntiWindupPID(PID):
     """
 
     def __init__(self, Kp=0, Ki=0, Kd=0, f_max=100, Ks=10, limits=[-10, 10]):
-        super().__init__()
-
-        #pid controller coefficients
-        self.Kp = Kp
-        self.Ki = Ki
-        self.Kd = Kd
-
-        #maximum frequency for differentiator approximation
-        self.f_max = f_max
+        super().__init__(Kp, Ki, Kd, f_max)
 
         #anti-windup control
         self.Ks = Ks
         self.limits = limits
-
 
         def _g_pid(x, u, t):
             x1, x2 = x
