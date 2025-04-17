@@ -15,11 +15,32 @@ from ._solver import ExplicitSolver, ImplicitSolver
 # SOLVERS ==============================================================================
 
 class EUF(ExplicitSolver):
-    """Class that performs explicit (forward) euler integration
-    it holds the state and implements the timestep update.
+    """Explicit Forward Euler (FE) integration method.
 
+    This is the simplest explicit numerical integration method. It is first-order
+    accurate (:math:`O(h)`) and generally not suitable for stiff problems due to its
+    limited stability region.
+
+    Method:
+
+    .. math::
+        
+        x_{n+1} = x_n + dt \\cdot f(x_n, t_n)
+
+    Characteristics:
+
+        * Order: 1
+        * Stages: 1
+        * Explicit
+        * Fixed timestep only
+        * Not A-stable
+        * Low accuracy and stability, but computationally very cheap.
+    
+    Note
+    ----
     Use this only if the function to integrate is super smooth 
     or multistep/multistage methods cant be used. 
+
     """
 
     def step(self, f, dt):
@@ -51,12 +72,30 @@ class EUF(ExplicitSolver):
 
 
 class EUB(ImplicitSolver):
-    """Class that performs implicit (backward) euler integration
-    it holds the state and implements the solution of the 
-    implicit update equation at each timestep.
+    """Implicit Backward Euler (BE) integration method.
 
-    Its an absolute classic and ok for moderately stiff problems 
-    that dont require super high accuracy.
+    This is the simplest implicit numerical integration method. It is first-order
+    accurate (:math:`O(h)`) and is A-stable and L-stable, making it suitable for very
+    stiff problems where stability is paramount, although its low order limits
+    accuracy for non-stiff problems or when high precision is required.
+
+    Method:
+    
+    .. math::
+
+        x_{n+1} = x_n + dt \\cdot f(x_{n+1}, t_{n+1})
+    
+    This implicit equation is solved iteratively using the internal optimizer.
+
+    Characteristics:
+
+        * Order: 1
+        * Stages: 1 (Implicit)
+        * Implicit
+        * Fixed timestep only
+        * A-stable, L-stable
+        * Very stable, suitable for stiff problems, but low accuracy.
+
     """
 
     def solve(self, f, J, dt):
