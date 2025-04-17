@@ -100,6 +100,7 @@ class Pulse(Block):
         def _set_phase_rising(t):
             self._phase = 'rising'
             self._phase_start_time = t
+            self.outputs[0] = 0.0    
 
         def _set_phase_high(t):
             self._phase = 'high'
