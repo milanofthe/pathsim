@@ -15,6 +15,7 @@ pathsim.solvers
    pathsim.solvers.rkck54
    pathsim.solvers.rkdp54
    pathsim.solvers.rkdp87
+   pathsim.solvers.rkf21
    pathsim.solvers.rkf45
    pathsim.solvers.rkf78
    pathsim.solvers.rkv65
