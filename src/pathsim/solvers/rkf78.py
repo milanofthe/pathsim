@@ -15,13 +15,19 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKF78(ExplicitRungeKutta):
-    """13-stage 7-th order embedded Runge-Kutta-Fehlberg method 
-    with 8-th order truncation error estimate that can be used to 
-    adaptively control the timestep. 
+    """Thirteen-stage, 8th order explicit Runge-Kutta method by Fehlberg.
 
-    This solver is a great choice if extremely high accuracy is required. 
-    It is also almost symplectic and therefore quite suitable for 
-    conservation systems such as celestial dynamics, etc.
+    Features an embedded 7th order method. The difference provides an 8th order error
+    estimate. The 7th order solution is typically propagated. Designed for high accuracy
+    requirements.
+
+    Characteristics:
+        * Order: 7 (Propagating solution)
+        * Embedded Order: 8 (Error estimation)
+        * Stages: 13
+        * Explicit
+        * Adaptive timestep
+        * Suitable for high-precision computations, nearly symplectic.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

@@ -15,11 +15,17 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKDP87(ExplicitRungeKutta):
-    """13-stage 8-th order embedded Runge-Kutta method from Dormand and Prince
-    with embedded 7-th order method for 8-th order truncation error estimate 
-    that can be used to adaptively control the timestep. 
+    """Thirteen-stage, 8th order explicit Runge-Kutta method by Dormand and Prince (DOP8(7)).
 
-    This solver is a great choice if extremely high accuracy is required.
+    Features an embedded 7th order method for adaptive step size control. Designed for
+    problems requiring very high accuracy. FSAL property (not available in this implementation).
+
+    Characteristics:
+        * Order: 8 (Propagating solution)
+        * Embedded Order: 7
+        * Stages: 13 (12 effective due to FSAL)
+        * Explicit
+        * Adaptive timestep
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

@@ -20,6 +20,15 @@ class RKV65(ExplicitRungeKutta):
 
     This is the 'most robust' 9, 6(5) pair of Jim Verner's Refuge for Runge-Kutta Pairs
     URL: https://www.sfu.ca/~jverner/
+
+    Characteristics:
+    * Order: 6 (Propagating solution)
+    * Embedded Order: 5
+    * Stages: 9
+    * Explicit
+    * Adaptive timestep
+    * Efficient high-order method for non-stiff problems.
+    
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
