@@ -15,9 +15,19 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK4(DiagonallyImplicitRungeKutta):
-    """6-stage, 4th order Diagonally Implicit Runge–Kutta (DIRK) method 
-    with explicit first stage that is specifically designed to handle 
-    differential algebraic equations of indices up to two or three.
+    """Six-stage, 4th order Singly Diagonally Implicit Runge-Kutta (ESDIRK) method.
+
+    Features an explicit first stage (making it ESDIRK). This specific tableau is often
+    designed for handling stiff problems and potentially Differential Algebraic Equations (DAEs)
+    of index up to two or three. Does not have an embedded method for error estimation in this
+    implementation (fixed step only).
+
+    Characteristics:
+       * Order: 4
+       * Stages: 6 (1 Explicit, 5 Implicit)
+       * Implicit (ESDIRK)
+       * Fixed timestep only
+       * A-stable
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
