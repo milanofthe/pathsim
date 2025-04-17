@@ -163,23 +163,14 @@ class Pulse(Block):
             always 0.0 for this source block
         """
 
-        #if before the initial delay, output is 0 and phase is low
-        if t < self.tau:
-            self._phase = 'low' 
-            self.outputs[0] = 0.0
-            return 0.0
-
-        #calculate time elapsed since the current phase began
-        time_in_phase = t - self._phase_start_time
-
         #calculate output based on phase
         if self._phase == 'rising':
-            _val = self.amplitude * (time_in_phase / self.t_rise)
+            _val = self.amplitude * (t - self._phase_start_time) / self.t_rise
             self.outputs[0] = np.clip(_val, 0.0, self.amplitude)
         elif self._phase == 'high':
             self.outputs[0] = self.amplitude
         elif self._phase == 'falling':
-            _val = self.amplitude * (1.0 - (time_in_phase / self.t_fall))
+            _val = self.amplitude * (1.0 - (t - self._phase_start_time) / self.t_fall)
             self.outputs[0] = np.clip(_val, 0.0, self.amplitude)
         elif self._phase == 'low':
             self.outputs[0] = 0.0
@@ -190,6 +181,17 @@ class Pulse(Block):
     def __len__(self):
         #no algebraic passthrough
         return 0
+
+
+
+
+
+
+
+
+
+
+
 
 
 class Clock(Block):
