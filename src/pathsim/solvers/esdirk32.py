@@ -15,9 +15,22 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK32(DiagonallyImplicitRungeKutta):
-    """Williams et.al constructed an ESDIRK method of order 3 with four stages.
-    This method is constructed such that it is applicable to index-2 
-    differential algebraic systems.
+    """Four-stage, 3rd order Embedded Singly Diagonally Implicit Runge-Kutta (ESDIRK) method.
+
+    Features an embedded 2nd order method for adaptive step size control. The first stage
+    is explicit (FSAL property not present in this specific implementation structure).
+    Designed to be applicable to index-2 Differential Algebraic Equations (DAEs).
+
+    FROM: 
+        Williams et al.
+
+    Characteristics:
+        * Order: 3
+        * Embedded Order: 2
+        * Stages: 4 (1 Explicit, 3 Implicit)
+        * Implicit (ESDIRK)
+        * Adaptive timestep
+        * A-stable 
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

@@ -15,18 +15,26 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK85(DiagonallyImplicitRungeKutta):
-    """16 stage 8-th order L-stable, stiffly accurate, stage order 2 ESDIRK method with 
-    embedded 5-th order method for stepsize control. This very high order integrator 
-    is suited for very stiff problems that require very high accuracy but is also 
-    relatively expensive due to the insane 15 implicit (1 explicit) stages.
+    """Sixteen-stage, 8th order, L-stable, stiffly accurate Embedded Singly Diagonally
+    Implicit Runge-Kutta (ESDIRK) method.
 
-    This method is a real beast and it remains to be seen how practical it is.
+    Features an embedded 5th order method for adaptive step size control. The first stage is
+    explicit. Designed for very stiff problems requiring very high accuracy, but computationally
+    expensive due to the large number of stages.
 
-    FROM : 
-        VERY HIGH-ORDER A-STABLE STIFFLY ACCURATE DIAGONALLY 
+    FROM:
+        VERY HIGH-ORDER A-STABLE STIFFLY ACCURATE DIAGONALLY
         IMPLICIT RUNGE-KUTTA METHODS WITH ERROR ESTIMATORS
         YOUSEF ALAMRI AND DAVID I. KETCHESON
-        ESDIRK(16,8)[2]SAL-[(16,5)]
+        Method: ESDIRK(16,8)[2]SAL-[(16,5)]
+
+    Characteristics:
+        * Order: 8
+        * Embedded Order: 5
+        * Stages: 16 (1 Explicit, 15 Implicit)
+        * Implicit (ESDIRK)
+        * Adaptive timestep
+        * L-stable, Stiffly Accurate
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

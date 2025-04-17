@@ -301,8 +301,17 @@ class GEAR(ImplicitSolver):
 # SOLVERS ==============================================================================
 
 class GEAR21(GEAR):
-    """Adaptive GEAR integrator with 2-nd order BDF for timestepping 
-    and 1-st order BDF (euler backward) for truncation error estimation.
+    """Adaptive-step GEAR integrator using 2nd order BDF for timestepping
+    and 1st order BDF (Backward Euler) for truncation error estimation.
+
+    Suitable for moderately stiff problems where variable timestepping is beneficial.
+
+    Characteristics:
+        * Stepping Order: 2 (max)
+        * Error Estimation Order: 1
+        * Implicit Variable-Step Multistep
+        * Adaptive timestep
+        * A-stable (based on BDF2)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -314,8 +323,17 @@ class GEAR21(GEAR):
 
 
 class GEAR32(GEAR):
-    """Adaptive GEAR integrator with 3-rd order BDF for timestepping 
-    and 2-nd order BDF for truncation error estimation.
+    """Adaptive-step GEAR integrator using 3rd order BDF for timestepping
+    and 2nd order BDF for truncation error estimation.
+
+    Suitable for stiff problems requiring higher accuracy than GEAR21.
+
+    Characteristics:
+        * Stepping Order: 3 (max)
+        * Error Estimation Order: 2
+        * Implicit Variable-Step Multistep
+        * Adaptive timestep
+        * A(alpha)-stable (based on BDF3)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -327,8 +345,17 @@ class GEAR32(GEAR):
 
 
 class GEAR43(GEAR):
-    """Adaptive GEAR integrator with 4-th order BDF for timestepping 
-    and 3-rd order BDF for truncation error estimation.
+    """Adaptive-step GEAR integrator using 4th order BDF for timestepping
+    and 3rd order BDF for truncation error estimation.
+
+    Suitable for stiff problems requiring good accuracy.
+
+    Characteristics:
+        * Stepping Order: 4 (max)
+        * Error Estimation Order: 3
+        * Implicit Variable-Step Multistep
+        * Adaptive timestep
+        * A(alpha)-stable (based on BDF4)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -340,8 +367,18 @@ class GEAR43(GEAR):
 
 
 class GEAR54(GEAR):
-    """Adaptive GEAR integrator with 5-th order BDF for timestepping 
-    and 4-th order BDF for truncation error estimation.
+    """Adaptive-step GEAR integrator using 5th order BDF for timestepping
+    and 4th order BDF for truncation error estimation.
+
+    Suitable for stiff problems requiring high accuracy, but stability region
+    is smaller than lower-order GEAR methods.
+
+    Characteristics:
+        * Stepping Order: 5 (max)
+        * Error Estimation Order: 4
+        * Implicit Variable-Step Multistep
+        * Adaptive timestep
+        * A(alpha)-stable (based on BDF5)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -353,27 +390,22 @@ class GEAR54(GEAR):
 
 
 class GEAR52A(GEAR):
-    """Adaptive order adaptive stepsize GEAR integrator.
+    """Adaptive-order, adaptive-stepsize GEAR integrator (Variable-Step Variable-Order BDF).
 
-    Adaptively selects the order (BDF coefficients) for timestepping between 
-    2 and 5 depending on which method yields the lower truncation error. 
-    This balances the stability of the lower order methods with the accuracy 
-    of higher order methods. 
+    This method dynamically adjusts the BDF order used for timestepping (between 2 and 5)
+    based on error estimates from lower and higher order predictors. It aims to optimize
+    step size by using higher orders for smooth regions and lower, more stable orders
+    for stiff or rapidly changing regions.
 
-    Previous solutions and the variable timestep BDF coefficients are used 
-    to estimate a lower and a higher order solution from the solution of the 
-    timestepping method. This gives two separate estimates for the local 
-    tuncation error.
+    Error estimation compares the current order solution with predictions from
+    order n-1 and n+1 formulas.
 
-    If the error is dominated by stability (lte of lower order method is lower), 
-    the order of the stepping method is decreased for the next timestep. 
-
-    If the error is dominated by the accuracy of the method (higher order error 
-    is lower), the order of the stepping method is increased for the next timestep.
-    
-    This means the integrator can take larger steps in regions where the solution 
-    is smooth using a higher order method and use more stable lower order methods 
-    in regions where the system exhibits stiffness or discontinuities.
+    Characteristics:
+        * Stepping Order: Variable (2 to 5)
+        * Error Estimation Orders: n-1 and n+1 (relative to current n)
+        * Implicit Variable-Step, Variable-Order Multistep
+        * Adaptive timestep and order
+        * Stability varies with the currently selected order (A-stable or A(alpha)-stable)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

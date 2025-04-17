@@ -15,12 +15,20 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKBS32(ExplicitRungeKutta):
-    """The Bogacki–Shampine method is a Runge–Kutta method of order three with four stages.
-    It has an embedded second-order method which can be used to implement adaptive 
-    step size. The Bogacki–Shampine method is implemented in the 'ode3' for fixed 
-    step solver and 'ode23' for a variable step solver function in MATLAB.
+    """Four-stage, 3rd order explicit Runge-Kutta method by Bogacki and Shampine.
 
-    This is the adaptive variant. It is a good choice of low accuracy is acceptable.
+    Features an embedded 2nd order method for adaptive step size control (FSAL property -
+    First Same As Last). The 3rd order result is used for propagation. Commonly used in
+    software packages (e.g., MATLAB's ode23). Good for problems requiring low to moderate
+    accuracy with efficiency.
+
+    Characteristics:
+        * Order: 3 (Propagating solution)
+        * Embedded Order: 2 (Error estimation)
+        * Stages: 4 (3 effective due to FSAL)
+        * Explicit
+        * Adaptive timestep
+        * Efficient low-to-moderate accuracy solver.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

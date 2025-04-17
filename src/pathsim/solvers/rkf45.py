@@ -15,11 +15,20 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKF45(ExplicitRungeKutta):
-    """6-stage 4-th order embedded Runge-Kutta-Fehlberg method 
-    with 5-th order truncation error estimate that can be used to 
-    adaptively control the timestep. 
+    """Six-stage, 4th order explicit Runge-Kutta method by Fehlberg.
 
-    Absolute classic but relatively slow.
+    Features an embedded 5th order method. The difference between the 5th and 4th order
+    results provides a 5th order error estimate. Typically, the 4th order solution is
+    propagated. A classic adaptive step size method, though often superseded in efficiency
+    by Dormand-Prince methods.
+
+    Characteristics:
+        * Order: 4 (Propagating solution)
+        * Embedded Order: 5 (Error estimation)
+        * Stages: 6
+        * Explicit
+        * Adaptive timestep
+        * Classic adaptive method, good for moderate accuracy.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

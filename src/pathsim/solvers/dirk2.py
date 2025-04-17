@@ -15,15 +15,23 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class DIRK2(DiagonallyImplicitRungeKutta):
-    """The 2-stage SSP-optimal Diagonally Implicit Runge–Kutta (DIRK) method 
-    of second order, namely the second order RK with the largest radius 
-    of absolute monotonicity. 
-    It is also symplectic and the optimal 2-stage second order implicit RK.
-    
-    FROM : 
-        L. Ferracina and M.N. Spijker. 
-        Strong stability of singlydiagonally-implicit Runge-Kutta methods. 
+    """Two-stage, 2nd order, Diagonally Implicit Runge-Kutta (DIRK) method.
+
+    This specific method is SSP-optimal (largest radius of absolute monotonicity
+    for a 2-stage, 2nd order DIRK), symplectic, and A-stable. It's a robust choice
+    for moderately stiff problems where second-order accuracy is sufficient.
+
+    FROM:
+        L. Ferracina and M.N. Spijker.
+        Strong stability of singly-diagonally-implicit Runge-Kutta methods.
         Applied Numerical Mathematics, 58:1675–1686, 2008.
+
+    Characteristics:
+        * Order: 2
+        * Stages: 2 (Implicit)
+        * Implicit (DIRK)
+        * Fixed timestep only
+        * A-stable, SSP-optimal, Symplectic
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

@@ -15,19 +15,18 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class SSPRK34(ExplicitRungeKutta):
-    """Strong Stability Preserving (SSP) 3-rd order 4 stage 
-    (3,4) Runge-Kutta method
-    
-    This integrator has one more stage then SSPRK33 but is also
-    3-rd order. So in terms or accuracy, they are the same but 
-    the 4-th stage gives quite a lot more stability. 
-    The stability region includes the point -4 on the real axis 
-    and is even more stable then the classical 'RK4' method in 
-    this aspect. But again it is 33% more expensive then SSPRK33 
-    due to the additional stage. 
+    """Four-stage, 3rd order, Strong Stability Preserving (SSP) explicit Runge-Kutta method.
 
-    If super high stability is required, this might be a good 
-    choice.
+    Provides a larger stability region compared to SSPRK33, particularly along the negative
+    real axis, at the cost of an additional stage. Useful when stability is more critical
+    than computational cost for a 3rd order explicit method.
+
+    Characteristics:
+        * Order: 3
+        * Stages: 4
+        * Explicit (SSP)
+        * Fixed timestep only
+        * Enhanced stability compared to SSPRK33.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

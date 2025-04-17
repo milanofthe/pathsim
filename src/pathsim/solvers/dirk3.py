@@ -15,9 +15,20 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class DIRK3(DiagonallyImplicitRungeKutta):
-    """Four-stage, 3rd order, L-stable Diagonally Implicit Runge–Kutta (DIRK) method.
+    """Four-stage, 3rd order, L-stable Diagonally Implicit Runge-Kutta (DIRK) method.
 
-    (from Wikipedia)
+    L-stability (A-stability and stiffly accurate, i.e., :math:`|R(\\infty)| = 0`) makes
+    this method suitable for stiff problems where damping of high-frequency components
+    is desired.
+
+    (Butcher tableau often attributed to Crouzeix, or Nørsett-Thomsen based on Wikipedia/Hairer).
+
+    Characteristics:
+        * Order: 3
+        * Stages: 4 (Implicit)
+        * Implicit (DIRK)
+        * Fixed timestep only
+        * L-stable (and thus A-stable)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

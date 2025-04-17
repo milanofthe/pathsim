@@ -15,11 +15,18 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class SSPRK22(ExplicitRungeKutta):
-    """Strong Stability Preserving (SSP) 2-nd order two stage (2,2) Runge-Kutta method,
-    also known as the 'Heun-Method'.
+    """Two-stage, 2nd order, Strong Stability Preserving (SSP) explicit Runge-Kutta method.
 
-    This integrator has a good trade off between speed, accuracy and stability.
-    Especially for non-stiff linear systems, this is probably a great choice.
+    Also known as the explicit midpoint method or Heun's method. SSP methods are designed
+    to preserve stability properties (like total variation diminishing - TVD) when solving
+    hyperbolic PDEs, but are also effective general-purpose low-order explicit methods.
+
+    Characteristics:
+        * Order: 2
+        * Stages: 2
+        * Explicit (SSP)
+        * Fixed timestep only
+        * Good balance of simplicity, cost, and stability (for an explicit method).
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

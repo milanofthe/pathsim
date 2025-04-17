@@ -141,8 +141,16 @@ class BDF(ImplicitSolver):
 # SOLVERS ==============================================================================
 
 class BDF2(BDF):
-    """2-nd order backward differentiation formula 
-    with order ramp up for the initial steps.
+    """Fixed-step 2nd order Backward Differentiation Formula (BDF).
+
+    Implicit linear multistep method. Uses the previous two solution points.
+    A-stable, suitable for stiff problems. Uses BDF1 for the first step.
+
+    Characteristics:
+        * Order: 2
+        * Implicit Multistep
+        * Fixed timestep only
+        * A-stable
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -153,8 +161,16 @@ class BDF2(BDF):
 
 
 class BDF3(BDF):
-    """3-rd order backward differentiation formula 
-    with order ramp up for the initial steps.
+    """Fixed-step 3rd order Backward Differentiation Formula (BDF).
+
+    Implicit linear multistep method. Uses the previous three solution points.
+    A(alpha)-stable, suitable for stiff problems. Uses lower orders for startup.
+
+    Characteristics:
+        * Order: 3
+        * Implicit Multistep
+        * Fixed timestep only
+        * A(alpha)-stable (:math:`\\alpha \\approx 86^\\circ`)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -165,8 +181,16 @@ class BDF3(BDF):
 
 
 class BDF4(BDF):
-    """4-th order backward differentiation formula 
-    with order ramp up for the initial steps.
+    """Fixed-step 4th order Backward Differentiation Formula (BDF).
+
+    Implicit linear multistep method. Uses the previous four solution points.
+    A(alpha)-stable, suitable for stiff problems. Uses lower orders for startup.
+
+    Characteristics:
+        * Order: 4
+        * Implicit Multistep
+        * Fixed timestep only
+        * A(alpha)-stable (:math:`\\alpha \\approx 73^\\circ`)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -177,8 +201,16 @@ class BDF4(BDF):
 
 
 class BDF5(BDF):
-    """5-th order backward differentiation formula 
-    with order ramp up for the initial steps.
+    """Fixed-step 5th order Backward Differentiation Formula (BDF).
+
+    Implicit linear multistep method. Uses the previous five solution points.
+    A(alpha)-stable, suitable for stiff problems. Uses lower orders for startup.
+
+    Characteristics:
+        * Order: 5
+        * Implicit Multistep
+        * Fixed timestep only
+        * A(alpha)-stable (:math:`\\alpha \\approx 51^\\circ`)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -189,8 +221,18 @@ class BDF5(BDF):
 
 
 class BDF6(BDF):
-    """6-th order backward differentiation formula 
-    with order ramp up for the initial steps.
+    """Fixed-step 6th order Backward Differentiation Formula (BDF).
+
+    Implicit linear multistep method. Uses the previous six solution points.
+    Not A-stable, stability region does not contain the entire left half-plane,
+    limiting its use for highly stiff problems compared to lower-order BDFs.
+    Uses lower orders for startup.
+
+    Characteristics:
+        * Order: 6
+        * Implicit Multistep
+        * Fixed timestep only
+        * Not A-stable (stability angle approx :math:`18^\\circ`)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
