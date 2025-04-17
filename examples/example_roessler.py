@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Integrator, Constant, Adder, Amplifier, Multiplier
-from pathsim.solvers import RKCK54 
+from pathsim.solvers import RKCK54, RKBS32 
 
 
 # RÖSSLER SYSTEM ========================================================================
@@ -81,14 +81,16 @@ connections = [
 Sim = Simulation(
     blocks,
     connections,
-    Solver=RKCK54 
+    Solver=RKBS32,
+    tolerance_lte_rel=1e-4,
+    tolerance_lte_abs=1e-6
     )
 
 # Run Example ===========================================================================
 
 if __name__ == "__main__":
 
-    Sim.run(200)
+    Sim.run(100)
     sco.plot()
     sco.plot3D()
 
