@@ -17,8 +17,17 @@ from ._solver import ImplicitSolver
 # SOLVERS ==============================================================================
 
 class SteadyState(ImplicitSolver):
-    """Solver that finds the time independent steady state solution (DC) 
-    by forcing the derivatives to zero, i.e. f(x,u,t) = 0.
+    """Pseudo-solver that finds the time-independent steady-state solution (DC operating point).
+
+    This works by modifying the fixed-point iteration target. Instead of solving
+    :math:`x_{n+1} = G(x_{n+1})` for an implicit step, it aims to solve the algebraic equation
+    :math:`f(x, u, t_{steady}) = 0` by finding the fixed point of :math:`x = x + f(x, u, t_{steady})`.
+    It uses the same internal optimizer (e.g., NewtonAnderson) as other implicit solvers.
+
+    Characteristics:
+        * Purpose: Find steady-state (:math:`dx/dt = 0`)
+        * Implicit (uses optimizer)
+        * Not a time-stepping method.
     """
         
     def solve(self, f, J, dt):
