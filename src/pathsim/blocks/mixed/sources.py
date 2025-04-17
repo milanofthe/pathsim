@@ -114,31 +114,38 @@ class Pulse(Block):
         def _set_phase_low(t):
             self._phase = 'low'
             self._phase_start_time = t
-            self.outputs[0] = 0.0
+            self.outputs[0] = 0.0    
 
+        #start rising
+        _E_rising = Schedule( 
+            t_start=max(0.0, t_start_rise), 
+            t_period=self.T, 
+            func_act=_set_phase_rising
+            )
+
+        #start high plateau (end rising)
+        _E_high = Schedule(
+            t_start=max(0.0, t_start_high), 
+            t_period=self.T, 
+            func_act=_set_phase_high
+            )
+
+        #start falling
+        _E_falling = Schedule( 
+            t_start=max(0.0, t_start_fall), 
+            t_period=self.T, 
+            func_act=_set_phase_falling
+            )
+
+        #start low (end falling)
+        _E_low = Schedule( 
+            t_start=max(0.0, t_start_low), 
+            t_period=self.T, 
+            func_act=_set_phase_low
+            )
+        
         #scheduled events for state transitions
-        self.events = [
-            Schedule( #start rising
-                t_start=max(0.0, t_start_rise), 
-                t_period=self.T, 
-                func_act=_set_phase_rising
-                ),
-            Schedule( #start high plateau (end rising)
-                t_start=max(0.0, t_start_high), 
-                t_period=self.T, 
-                func_act=_set_phase_high
-                ),
-            Schedule( #start falling
-                t_start=max(0.0, t_start_fall), 
-                t_period=self.T, 
-                func_act=_set_phase_falling
-                ),
-            Schedule( #start low (end falling)
-                t_start=max(0.0, t_start_low), 
-                t_period=self.T, 
-                func_act=_set_phase_low
-                )
-        ]
+        self.events = [_E_rising, _E_high, _E_falling, _E_low]
 
 
     def reset(self):
