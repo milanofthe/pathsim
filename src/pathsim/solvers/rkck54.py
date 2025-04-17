@@ -15,19 +15,20 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKCK54(ExplicitRungeKutta):
-    """6-stage 5-th order with embedded 4-th order Runge-Kutta method from Cash and Karp 
-    with 5-th order truncation error estimate for the 4-th order solution that can be 
-    used to adaptively control the timestep. 
+    """Six-stage, 5th order explicit Runge-Kutta method by Cash and Karp.
 
-    The 5-th order method is used for timestepping (local extrapolation) and the difference 
-    to the 5-th order solution is used as an estimate for the local truncation error of 
-    the 4-th order solution.
-    
-    This is the fixed order Cash-Karp scheme without early quitting.
+    Features an embedded 4th order method. The difference between the 5th and 4th order
+    results provides a 5th order error estimate, typically used to control the step size
+    while propagating the 5th order solution (local extrapolation). Known for good stability
+    properties compared to RKF45.
 
-    The method balances the accuracy of the 5-th and 4-th order solution and 
-    has enhanced stability properties compared to Fehlberg or Dormand-Prince 
-    methods. This makes it suitable for slightly stiff problems.
+    Characteristics:
+        * Order: 5 (Propagating solution)
+        * Embedded Order: 4
+        * Stages: 6
+        * Explicit
+        * Adaptive timestep
+        * Good stability, suitable for moderate accuracy requirements.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

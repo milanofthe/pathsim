@@ -15,19 +15,19 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKDP54(ExplicitRungeKutta):
-    """Dormand–Prince method with seven Runge-Kutta stages is 5-th order 
-    accurate with an embedded 4-th order method. 
+    """Seven-stage, 5th order explicit Runge-Kutta method by Dormand and Prince (DOPRI5(4)).
 
-    The 5-th order method is used for timestepping (local extrapolation) 
-    and the difference to the 5-th order solution is used as an estimate 
-    for the local truncation error of the 4-th order solaution.
-    
-    Wikipedia:
-        As of 2023, Dormand–Prince is the default method 
-        in the 'ode45' solver for MATLAB
+    Features an embedded 4th order method. Widely considered one of the most efficient
+    general-purpose adaptive step size solvers for non-stiff problems requiring moderate
+    to high accuracy. The 5th order result is used for propagation. Used as the basis for
+    MATLAB's ode45. FSAL property (not available in this implementation).
 
-    Great choice for all kinds of problems that require high accuracy 
-    and where the adaptive timestepping doesnt cause problems.
+    Characteristics:
+        * Order: 5 (Propagating solution)
+        * Embedded Order: 4
+        * Stages: 7 (6 effective due to FSAL, not here though)
+        * Explicit
+        * Adaptive timestep
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
