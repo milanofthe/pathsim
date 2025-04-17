@@ -15,7 +15,17 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RK4(ExplicitRungeKutta):
-    """'The' classical 4-th order 4-stage Runge-Kutta method.
+    """Classical four-stage, 4th order explicit Runge-Kutta method.
+
+    The most well-known Runge-Kutta method. It provides a good balance 
+    between accuracy and computational cost for non-stiff problems. Not SSP.
+
+    Characteristics:
+        * Order: 4
+        * Stages: 4
+        * Explicit
+        * Fixed timestep only
+        * Widely used, good general-purpose explicit solver.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

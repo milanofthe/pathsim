@@ -15,13 +15,19 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class SSPRK33(ExplicitRungeKutta):
-    """Strong Stability Preserving (SSP) 3-rd order 
-    three stage (3,3) Runge-Kutta method
-    
-    This integrator is more accurate and stable then SSPRK22 but 
-    also 50% more expensive due to 3 instead of 2 stages. 
-    Originally designed for hyperbolic PDEs, this is also a great 
-    choice if accuracy and stability and still good speed are important.
+    """Three-stage, 3rd order, Strong Stability Preserving (SSP) explicit 
+    Runge-Kutta method.
+
+    Offers higher accuracy than SSPRK22 while maintaining the SSP property. 
+    A popular choice for problems where TVD properties are important or when 
+    a simple, stable 3rd order explicit method is needed.
+
+    Characteristics:
+        * Order: 3
+        * Stages: 3
+        * Explicit (SSP)
+        * Fixed timestep only
+        * Good stability properties for an explicit 3rd order method.
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
