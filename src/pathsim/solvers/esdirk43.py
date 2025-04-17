@@ -17,8 +17,19 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK43(DiagonallyImplicitRungeKutta):
-    """6 stage 4-th order ESDIRK method with embedded 3-rd order method for stepsize control. 
-    The first stage is explicit, followed by 5 implicit stages.
+    """Six-stage, 4th order Embedded Singly Diagonally Implicit Runge-Kutta (ESDIRK) method.
+
+    Features an embedded 3rd order method for adaptive step size control. The first stage is
+    explicit. Suitable for stiff problems requiring moderate accuracy.
+
+    Characteristics:
+        * Order: 4
+        * Embedded Order: 3
+        * Stages: 6 (1 Explicit, 5 Implicit)
+        * Implicit (ESDIRK)
+        * Adaptive timestep
+        * L-stable
+        * Stiffy Accurate
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
