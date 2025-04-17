@@ -28,6 +28,7 @@ from .ssprk34 import *
 from .rk4 import *
 
 #adaptive explicit runge-kutta methods
+from .rkf21 import *
 from .rkbs32 import *
 from .rkf45 import *
 from .rkck54 import *
