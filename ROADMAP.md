@@ -3,11 +3,6 @@
 This is a preliminary roadmap for PathSim's development. To be fair, its more a collection of ideas and potential directions then a real roadmap.
 
 
-## Blocks
-
-- PID with anti-windup mechanism (clamping, back calculation, reset)
-
-
 ## Solvers
 
 - multistep methods (BDF, GEAR) need startup methods to build history
@@ -37,7 +32,7 @@ This is a preliminary roadmap for PathSim's development. To be fair, its more a 
 
 ## Testing
 
-- complete testing for all the blocks (currently testing is mostly second order) including linearization
+- complete testing for all the blocks (currently testing for blocks is mostly top down) including linearization
 - test automatic differentiation through `Value` with every block and with linearization
 
 
