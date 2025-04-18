@@ -138,20 +138,28 @@ class Connection:
         Returns
         -------
         bool
-
+            is other part of connecion?
         """
         if isinstance(other, Block): 
-
-            #check if other is part of targets
-            for trg, _ in self.targets:
-                if other == trg:
-                    return True
-
-            #check if other is source
-            src, _ = self.source
-            return other == src
-
+            return other in self.get_blocks()
         return False
+
+
+    def get_blocks(self):
+        """Returns all the unique internal source and target blocks 
+        of the connection instance
+
+        Returns
+        -------
+        list[Block]
+            internal unique blocks of the connection
+        """
+        src, _ = self.source
+        blocks = [src]
+        for trg, _ in self.targets:
+            if trg not in blocks:
+                blocks.append(trg)
+        return blocks
 
 
     def on(self):
