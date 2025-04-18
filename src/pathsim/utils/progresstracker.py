@@ -15,8 +15,7 @@ import sys
 import math
 import warnings
 
-
-from ... _constants import LOG_MIN_INTERVAL, LOG_UPDATE_EVERY
+from .._constants import LOG_MIN_INTERVAL, LOG_UPDATE_EVERY
 
 
 # HELPER CLASS =========================================================================
