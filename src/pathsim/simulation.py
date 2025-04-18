@@ -1313,6 +1313,112 @@ class Simulation:
             return self.step_fixed(dt)
 
 
+    # def run(self, duration=10, reset=False, adaptive=True):
+    #     """Perform multiple simulation timesteps for a given 'duration'.
+        
+    #     Tracks the total number of block evaluations (proxy for function 
+    #     calls, although larger, since one function call of the system equation 
+    #     consists of many block evaluations) and the total number of solver
+    #     iterations for implicit solvers.
+
+    #     Additionally the progress of the simulation is tracked by a custom
+    #     'ProgressTracker' class that is a dynamic generator and interfaces 
+    #     the logging system.
+
+    #     Parameters
+    #     ----------
+    #     duration : float
+    #         simulation time (in time units)
+    #     reset : bool
+    #         reset the simulation before running (default False)
+    #     adaptive : bool
+    #         use adaptive timesteps if solver is adaptive (default True)
+
+    #     Returns
+    #     -------
+    #     stats : dict
+    #         stats of simulation run tracked by the ´ProgressTracker´ 
+    #     """
+
+    #     #reset the simulation before running it
+    #     if reset:
+    #         self.reset()
+
+    #     #select simulation stepping method
+    #     adaptive = adaptive and self.engine.is_adaptive
+
+    #     #log message for transient analysis
+    #     self._logger_info(f"TRANSIENT -> duration={duration}")
+
+    #     #simulation start and end time
+    #     start_time, end_time = self.time, self.time + duration
+
+    #     #effective timestep for duration
+    #     _dt = self.dt
+
+    #     #initial system function evaluation 
+    #     initial_evals = self._update(self.time)
+
+    #     #catch and resolve initial events
+    #     for event, *_ in self._events(self.time):
+
+    #         #resolve events directly
+    #         event.resolve(self.time)
+
+    #         #evaluate system function again -> propagate event
+    #         initial_evals += self._update(self.time) 
+    
+    #     #sampling states and inputs at 'self.time == starting_time' 
+    #     self._sample(self.time)
+
+    #     #initialize progress tracker
+    #     tracker = ProgressTracker(
+    #         logger=self.logger, 
+    #         log_interval=10, 
+    #         function_evaluations=initial_evals
+    #         )
+
+
+    #     #iterate progress tracker generator until 'progress >= 1.0' is reached
+    #     for _ in tracker:
+
+    #         #rescale effective timestep if in danger of overshooting 'end_time'
+    #         if self.time + _dt > end_time:
+    #             _dt = end_time - self.time
+
+    #         #perform adaptive timestep including rescale
+    #         if adaptive:
+
+    #             #advance the simulation by one (effective) timestep '_dt'
+    #             success, error_norm, scale, evals, solver_its = self.step_adaptive(_dt)
+
+    #             #if no error estimate and rescale -> back to default timestep
+    #             if not error_norm and scale == 1:
+    #                 _dt = self.dt
+
+    #             #apply bounds to timestep after rescale
+    #             _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
+
+    #         #perform fixed timestep
+    #         else:
+
+    #             #advance the simulation by one (effective) timestep '_dt'
+    #             success, _, scale, evals, solver_its = self.step_fixed(_dt)
+
+    #         #calculate progress and update progress tracker
+    #         tracker.check(
+    #             progress=(self.time - start_time)/duration, 
+    #             success=success, 
+    #             function_evaluations=evals, 
+    #             solver_iterations=solver_its
+    #             )
+
+    #     return tracker.stats
+
+
+
+
+
     def run(self, duration=10, reset=False, adaptive=True):
         """Perform multiple simulation timesteps for a given 'duration'.
         
@@ -1347,9 +1453,6 @@ class Simulation:
         #select simulation stepping method
         adaptive = adaptive and self.engine.is_adaptive
 
-        #log message for transient analysis
-        self._logger_info(f"TRANSIENT -> duration={duration}")
-
         #simulation start and end time
         start_time, end_time = self.time, self.time + duration
 
@@ -1373,44 +1476,46 @@ class Simulation:
 
         #initialize progress tracker
         tracker = ProgressTracker(
-            logger=self.logger, 
-            log_interval=10, 
-            function_evaluations=initial_evals
+            total_duration=duration, 
+            description="TRANSIENT", 
+            logger=self.logger
             )
 
+        #enter tracker context
+        with tracker as trk:
 
-        #iterate progress tracker generator until 'progress >= 1.0' is reached
-        for _ in tracker:
+            #iterate progress tracker generator until 'progress >= 1.0' is reached
+            for _ in trk:
 
-            #rescale effective timestep if in danger of overshooting 'end_time'
-            if self.time + _dt > end_time:
-                _dt = end_time - self.time
+                #rescale effective timestep if in danger of overshooting 'end_time'
+                if self.time + _dt > end_time:
+                    _dt = end_time - self.time
 
-            #perform adaptive timestep including rescale
-            if adaptive:
+                #perform adaptive timestep including rescale
+                if adaptive:
 
-                #advance the simulation by one (effective) timestep '_dt'
-                success, error_norm, scale, evals, solver_its = self.step_adaptive(_dt)
+                    #advance the simulation by one (effective) timestep '_dt'
+                    success, error_norm, scale, evals, solver_its = self.step_adaptive(_dt)
 
-                #if no error estimate and rescale -> back to default timestep
-                if not error_norm and scale == 1:
-                    _dt = self.dt
+                    #if no error estimate and rescale -> back to default timestep
+                    if not error_norm and scale == 1:
+                        _dt = self.dt
 
-                #apply bounds to timestep after rescale
-                _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
+                    #apply bounds to timestep after rescale
+                    _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
 
-            #perform fixed timestep
-            else:
+                #perform fixed timestep
+                else:
 
-                #advance the simulation by one (effective) timestep '_dt'
-                success, _, scale, evals, solver_its = self.step_fixed(_dt)
+                    #advance the simulation by one (effective) timestep '_dt'
+                    success, _, scale, evals, solver_its = self.step_fixed(_dt)
 
-            #calculate progress and update progress tracker
-            tracker.check(
-                progress=(self.time - start_time)/duration, 
-                success=success, 
-                function_evaluations=evals, 
-                solver_iterations=solver_its
-                )
+                #compute simulation progress
+                progress = np.clip((self.time - start_time)/duration, 0.0, 1.0)
+
+                #update the tracker
+                tracker.update(progress, success=success)
+
 
         return tracker.stats
+
