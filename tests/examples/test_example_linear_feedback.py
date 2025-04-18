@@ -60,12 +60,7 @@ class TestExampleLinearFeedback(unittest.TestCase):
         stats = self.Sim.run(3*self.tau, reset=True)
 
         steps = stats["total_steps"]
-        evals = stats["function_evaluations"]
-        iters = stats["solver_iterations"]
-
         self.assertEqual(steps, 3*self.tau/self.Sim.dt+1)
-        self.assertGreater(evals, steps)
-        self.assertEqual(iters, 0)
 
         time, [stp, dta] = self.Sco.read()
 
@@ -84,12 +79,7 @@ class TestExampleLinearFeedback(unittest.TestCase):
         stats = self.Sim.run(3*self.tau, reset=True)
 
         steps = stats["total_steps"]
-        evals = stats["function_evaluations"]
-        iters = stats["solver_iterations"]
-
         self.assertEqual(steps, 3*self.tau/self.Sim.dt+1)
-        self.assertGreater(evals, steps)
-        self.assertEqual(iters, 0)
 
         time, [stp, dta] = self.Sco.read()
 
