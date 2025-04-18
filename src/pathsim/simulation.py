@@ -283,7 +283,7 @@ class Simulation:
             self.logger.addHandler(handler)
             self.logger.setLevel(logging.INFO)
 
-            self._logger_info("LOGGING enabled")
+            self._logger_info(f"LOGGING (log: {self.log})")
 
 
     def _logger_info(self, message):
@@ -613,12 +613,12 @@ class Simulation:
                 self.path_length = _path_length
 
         #logging message
-        self._logger_info(f"ALGEBRAIC PATH LENGTH -> {self.path_length}")
+        self._logger_info(f"ALGEBRAIC PATH DFS (path_length: {self.path_length})")
 
         #set 'iterations_min' for fixed-point loop if not provided globally
         if self.iterations_min is None:
             self.iterations_min = self.path_length
-            self._logger_info(f"'iterations_min' set to {self.path_length}")
+            self._logger_info(f"SET 'iterations_min' -> {self.path_length}")
 
 
     def _check_blocks_are_managed(self):
@@ -675,7 +675,7 @@ class Simulation:
 
         #logging message
         self._logger_info(
-            "SOLVER -> {}, adaptive={}, implicit={}".format(
+            "SOLVER -> {} (adaptive: {}, implicit: {})".format(
                 self.engine,
                 self.engine.is_adaptive, 
                 not self.engine.is_explicit
@@ -699,7 +699,7 @@ class Simulation:
         the block inputs and outputs.
         """
 
-        self._logger_info("RESET -> time=0.0")
+        self._logger_info("RESET (time: 0.0)")
 
         #reset simulation time
         self.time = 0.0
@@ -738,7 +738,7 @@ class Simulation:
             for block in self.blocks:
                 block.linearize(self.time)
 
-        self._logger_info(f"LINEARIZED -> runtime={T}")
+        self._logger_info(f"LINEARIZED (runtime: {T})")
 
 
     def delinearize(self):
@@ -837,7 +837,7 @@ class Simulation:
 
         #not converged
         self._logger_error(
-            "fixed-point loop in '_update' not converged, iters={}, err={}".format(
+            "fixed-point loop in '_update' not converged (iters: {}, err: {})".format(
                 iteration+1, max_error), 
             RuntimeError
             )
@@ -922,7 +922,7 @@ class Simulation:
         self._set_solver(SteadyState)    
 
         #log message begin of steady state solver
-        self._logger_info(f"STEADYSTATE -> start, reset={reset}")
+        self._logger_info(f"STEADYSTATE -> STARTING (reset: {reset})")
 
         #solve for steady state at current time
         with Timer(verbose=False) as T:
@@ -931,7 +931,7 @@ class Simulation:
         #catch non convergence
         if not success:
             self._logger_error(
-                "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
+                "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
                     success, evals, iters, T), 
                 RuntimeError
                 )
@@ -941,7 +941,7 @@ class Simulation:
 
         #log message 
         self._logger_info(
-            "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
+            "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
                 success, evals, iters, T)
             )
 
@@ -1347,9 +1347,6 @@ class Simulation:
         #select simulation stepping method
         adaptive = adaptive and self.engine.is_adaptive
 
-        #log message for transient analysis
-        self._logger_info(f"TRANSIENT -> duration={duration}")
-
         #simulation start and end time
         start_time, end_time = self.time, self.time + duration
 
@@ -1373,44 +1370,45 @@ class Simulation:
 
         #initialize progress tracker
         tracker = ProgressTracker(
-            logger=self.logger, 
-            log_interval=10, 
-            function_evaluations=initial_evals
+            total_duration=duration, 
+            description="TRANSIENT", 
+            logger=self.logger,
+            log=self.log
             )
 
+        #enter tracker context
+        with tracker as trk:
 
-        #iterate progress tracker generator until 'progress >= 1.0' is reached
-        for _ in tracker:
+            #iterate progress tracker generator until 'progress >= 1.0' is reached
+            for _ in trk:
 
-            #rescale effective timestep if in danger of overshooting 'end_time'
-            if self.time + _dt > end_time:
-                _dt = end_time - self.time
+                #rescale effective timestep if in danger of overshooting 'end_time'
+                if self.time + _dt > end_time:
+                    _dt = end_time - self.time
 
-            #perform adaptive timestep including rescale
-            if adaptive:
+                #perform adaptive timestep including rescale
+                if adaptive:
 
-                #advance the simulation by one (effective) timestep '_dt'
-                success, error_norm, scale, evals, solver_its = self.step_adaptive(_dt)
+                    #advance the simulation by one (effective) timestep '_dt'
+                    success, error_norm, scale, evals, solver_its = self.step_adaptive(_dt)
 
-                #if no error estimate and rescale -> back to default timestep
-                if not error_norm and scale == 1:
-                    _dt = self.dt
+                    #if no error estimate and rescale -> back to default timestep
+                    if not error_norm and scale == 1:
+                        _dt = self.dt
 
-                #apply bounds to timestep after rescale
-                _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
+                    #apply bounds to timestep after rescale
+                    _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
 
-            #perform fixed timestep
-            else:
+                #perform fixed timestep
+                else:
 
-                #advance the simulation by one (effective) timestep '_dt'
-                success, _, scale, evals, solver_its = self.step_fixed(_dt)
+                    #advance the simulation by one (effective) timestep '_dt'
+                    success, _, scale, evals, solver_its = self.step_fixed(_dt)
 
-            #calculate progress and update progress tracker
-            tracker.check(
-                progress=(self.time - start_time)/duration, 
-                success=success, 
-                function_evaluations=evals, 
-                solver_iterations=solver_its
-                )
+                #compute simulation progress
+                progress = np.clip((self.time - start_time)/duration, 0.0, 1.0)
+
+                #update the tracker
+                tracker.update(progress, success=success)
 
         return tracker.stats
