@@ -213,6 +213,9 @@ class Simulation:
             for event in events:
                 self.add_event(event)
 
+        #check if blocks from connections are in simulation
+        self._check_blocks_are_managed()
+
         #set numerical integration solver
         self._set_solver()
 
@@ -259,6 +262,9 @@ class Simulation:
 
         #initialize the logger
         self.logger = logging.Logger("PathSim_Simulation_Logger")
+
+        #capture warnings from the 'warnings' module
+        logging.captureWarnings(True)
 
         #check if logging is enabled
         if self.log:    
@@ -582,7 +588,7 @@ class Simulation:
         longest signal path through algebraic (instant time) blocks, 
         information can travel within a single timestep.
     
-        The depth first search leverates the '__len__' method of the blocks 
+        The depth first search leverages the '__len__' method of the blocks 
         for contribution of each block to the total signal path. 
 
         This enables 'Subsystem' blocks to recursively propagate their internal 
@@ -593,6 +599,9 @@ class Simulation:
         the main simulation loop.
         """
 
+        #reset path length (at least 1)
+        self.path_length = 1
+
         #iterate all possible starting blocks (nodes of directed graph)
         for block in self.blocks:
 
@@ -602,13 +611,34 @@ class Simulation:
             #update global algebraic path length
             if _path_length > self.path_length:
                 self.path_length = _path_length
-        
+
         #logging message
         self._logger_info(f"ALGEBRAIC PATH LENGTH -> {self.path_length}")
-        
+
         #set 'iterations_min' for fixed-point loop if not provided globally
         if self.iterations_min is None:
             self.iterations_min = self.path_length
+            self._logger_info(f"'iterations_min' set to {self.path_length}")
+
+
+    def _check_blocks_are_managed(self):
+        """Check whether the blocks that are part of the connections are 
+        in the simulation block list ('self.blocks') and therefore managed 
+        by the simulation.
+
+        If not, there will be a warning in the logging.            
+        """
+        #collect blocks from connections
+        conn_blocks = []
+        for conn in self.connections:
+            conn_blocks.extend(conn.get_blocks())
+
+        #iterate set of blocks from connections (unique)
+        for blk in set(conn_blocks):
+            if blk not in self.blocks:
+                self._logger_warning(
+                    f"{blk} in 'connections' but not in 'blocks'!"
+                    )
 
 
     # solver management -----------------------------------------------------------
