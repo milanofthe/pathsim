@@ -260,6 +260,9 @@ class Simulation:
         #initialize the logger
         self.logger = logging.Logger("PathSim_Simulation_Logger")
 
+        #capture warnings from the 'warnings' module
+        logging.captureWarnings(True)
+
         #check if logging is enabled
         if self.log:    
 
