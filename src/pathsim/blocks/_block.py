@@ -123,16 +123,16 @@ class Block(Serializable):
 
         Parameters
         ----------
-        key : int
-            key of the port
+        key : int, slice
+            key(s) of the port
 
         Returns
         -------
         pair : tuple[Block, int]
             tuple of the block itself and the key of the port
         """
-        if not isinstance(key, int):
-            raise ValueError(f"Port has to be of type 'int' but is '{type(key)}'!")
+        if not isinstance(key, (int, slice)):
+            raise ValueError(f"Port has to be of type 'int' or 'slice' but is '{type(key)}'!")
         return (self, key)
 
 
