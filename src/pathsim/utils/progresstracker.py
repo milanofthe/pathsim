@@ -16,6 +16,9 @@ import math
 import warnings
 
 
+from ... _constants import LOG_MIN_INTERVAL, LOG_UPDATE_EVERY
+
+
 # HELPER CLASS =========================================================================
 
 class ProgressTracker:
@@ -67,11 +70,11 @@ class ProgressTracker:
     min_log_interval : float, optional
         The minimum real time interval in seconds that must pass between
         consecutive log updates, regardless of progress change. Helps to
-        throttle output. Defaults to 1.0 seconds.
+        throttle output. Default from '_constants.py'.
     update_log_every : float, optional
         Log a message every time the progress increases by at least this
         fraction (e.g., 0.1 for 10%). Must be between 0 (exclusive) and
-        1 (inclusive). Defaults to 0.2 (20%).
+        1 (inclusive). Default from '_constants.py'.
 
     """
 
@@ -82,8 +85,8 @@ class ProgressTracker:
         logger=None,
         log=True,
         log_level=logging.INFO,
-        min_log_interval=1.0,
-        update_log_every=0.2
+        min_log_interval=LOG_MIN_INTERVAL,
+        update_log_every=LOG_UPDATE_EVERY
         ):
 
         #input validation
