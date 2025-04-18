@@ -26,7 +26,8 @@ from ._constants import (
     SIM_TIMESTEP_MAX,
     SIM_TOLERANCE_FPI,
     SIM_ITERATIONS_MIN,
-    SIM_ITERATIONS_MAX
+    SIM_ITERATIONS_MAX,
+    LOG_ENABLE
     )
 
 from .utils.utils import path_length_dfs
@@ -150,7 +151,7 @@ class Simulation:
         tolerance_fpi=SIM_TOLERANCE_FPI, 
         iterations_min=SIM_ITERATIONS_MIN, 
         iterations_max=SIM_ITERATIONS_MAX, 
-        log=True,
+        log=LOG_ENABLE,
         **solver_kwargs
         ):
 
