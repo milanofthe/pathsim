@@ -283,7 +283,7 @@ class Simulation:
             self.logger.addHandler(handler)
             self.logger.setLevel(logging.INFO)
 
-            self._logger_info("LOGGING enabled")
+            self._logger_info(f"LOGGING (log: {self.log})")
 
 
     def _logger_info(self, message):
@@ -613,12 +613,12 @@ class Simulation:
                 self.path_length = _path_length
 
         #logging message
-        self._logger_info(f"ALGEBRAIC PATH LENGTH -> {self.path_length}")
+        self._logger_info(f"ALGEBRAIC PATH DFS (path_length: {self.path_length})")
 
         #set 'iterations_min' for fixed-point loop if not provided globally
         if self.iterations_min is None:
             self.iterations_min = self.path_length
-            self._logger_info(f"'iterations_min' set to {self.path_length}")
+            self._logger_info(f"SET 'iterations_min' -> {self.path_length}")
 
 
     def _check_blocks_are_managed(self):
@@ -675,7 +675,7 @@ class Simulation:
 
         #logging message
         self._logger_info(
-            "SOLVER -> {}, adaptive={}, implicit={}".format(
+            "SOLVER -> {} (adaptive: {}, implicit: {})".format(
                 self.engine,
                 self.engine.is_adaptive, 
                 not self.engine.is_explicit
@@ -699,7 +699,7 @@ class Simulation:
         the block inputs and outputs.
         """
 
-        self._logger_info("RESET -> time=0.0")
+        self._logger_info("RESET (time: 0.0)")
 
         #reset simulation time
         self.time = 0.0
@@ -738,7 +738,7 @@ class Simulation:
             for block in self.blocks:
                 block.linearize(self.time)
 
-        self._logger_info(f"LINEARIZED -> runtime={T}")
+        self._logger_info(f"LINEARIZED (runtime: {T})")
 
 
     def delinearize(self):
@@ -837,7 +837,7 @@ class Simulation:
 
         #not converged
         self._logger_error(
-            "fixed-point loop in '_update' not converged, iters={}, err={}".format(
+            "fixed-point loop in '_update' not converged (iters: {}, err: {})".format(
                 iteration+1, max_error), 
             RuntimeError
             )
@@ -922,7 +922,7 @@ class Simulation:
         self._set_solver(SteadyState)    
 
         #log message begin of steady state solver
-        self._logger_info(f"STEADYSTATE -> start, reset={reset}")
+        self._logger_info(f"STEADYSTATE -> STARTING (reset: {reset})")
 
         #solve for steady state at current time
         with Timer(verbose=False) as T:
@@ -931,7 +931,7 @@ class Simulation:
         #catch non convergence
         if not success:
             self._logger_error(
-                "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
+                "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
                     success, evals, iters, T), 
                 RuntimeError
                 )
@@ -941,7 +941,7 @@ class Simulation:
 
         #log message 
         self._logger_info(
-            "STEADYSTATE -> success={}, evals={}, iters={}, runtime={}".format(
+            "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
                 success, evals, iters, T)
             )
 
@@ -1410,6 +1410,4 @@ class Simulation:
                 #update the tracker
                 tracker.update(progress, success=success)
 
-
         return tracker.stats
-
