@@ -628,12 +628,17 @@ class Simulation:
 
         If not, there will be a warning in the logging.            
         """
+        #collect blocks from connections
+        conn_blocks = []
         for conn in self.connections:
-            for blk in conn.get_blocks():
-                if blk not in self.blocks:
-                    self._logger_warning(
-                        f"{blk} in 'connections' but not in 'blocks'!"
-                        )
+            conn_blocks.extend(conn.get_blocks())
+
+        #iterate set of blocks from connections (unique)
+        for blk in set(conn_blocks):
+            if blk not in self.blocks:
+                self._logger_warning(
+                    f"{blk} in 'connections' but not in 'blocks'!"
+                    )
 
 
     # solver management -----------------------------------------------------------
