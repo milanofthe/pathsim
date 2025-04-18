@@ -3,8 +3,7 @@
 ##                        TESTS FOR (UPDATED)
 ##                     'utils/progresstracker.py'
 ##
-##                         Milan Rother 2023/24
-##                  (Test Adaptation by Gemini 2025)
+##                        Milan Rother 2023/24
 ##
 ########################################################################################
 
@@ -27,7 +26,7 @@ class TestProgressTracker(unittest.TestCase):
     # Helper to get a logger for testing (avoids duplicate handlers)
     def _get_test_logger(self, name):
         logger = logging.getLogger(name)
-        
+
         # Prevent messages propagating to root logger during tests if not desired
         logger.propagate = False
 
