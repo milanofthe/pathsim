@@ -127,6 +127,33 @@ class Connection:
         return self._active
 
 
+    def __contains__(self, other):
+        """Check if block is part of connection
+
+        Paramters
+        ---------
+        other : Block
+            block to check if its part of the connection
+
+        Returns
+        -------
+        bool
+
+        """
+        if isinstance(other, Block): 
+
+            #check if other is part of targets
+            for trg, _ in self.targets:
+                if other == trg:
+                    return True
+
+            #check if other is source
+            src, _ = self.source
+            return other == src
+
+        return False
+
+
     def on(self):
         self._active = True
 
