@@ -213,6 +213,9 @@ class Simulation:
             for event in events:
                 self.add_event(event)
 
+        #check if blocks from connections are in simulation
+        self._check_blocks_are_managed()
+
         #set numerical integration solver
         self._set_solver()
 
