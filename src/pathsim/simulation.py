@@ -585,7 +585,7 @@ class Simulation:
         longest signal path through algebraic (instant time) blocks, 
         information can travel within a single timestep.
     
-        The depth first search leverates the '__len__' method of the blocks 
+        The depth first search leverages the '__len__' method of the blocks 
         for contribution of each block to the total signal path. 
 
         This enables 'Subsystem' blocks to recursively propagate their internal 
@@ -596,6 +596,9 @@ class Simulation:
         the main simulation loop.
         """
 
+        #reset path length (at least 1)
+        self.path_length = 1
+
         #iterate all possible starting blocks (nodes of directed graph)
         for block in self.blocks:
 
@@ -605,13 +608,14 @@ class Simulation:
             #update global algebraic path length
             if _path_length > self.path_length:
                 self.path_length = _path_length
-        
+
         #logging message
         self._logger_info(f"ALGEBRAIC PATH LENGTH -> {self.path_length}")
-        
+
         #set 'iterations_min' for fixed-point loop if not provided globally
         if self.iterations_min is None:
             self.iterations_min = self.path_length
+            self._logger_info(f"'iterations_min' set to {self.path_length}")
 
 
     # solver management -----------------------------------------------------------
