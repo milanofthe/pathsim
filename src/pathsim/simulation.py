@@ -1372,7 +1372,8 @@ class Simulation:
         tracker = ProgressTracker(
             total_duration=duration, 
             description="TRANSIENT", 
-            logger=self.logger
+            logger=self.logger,
+            log=self.log
             )
 
         #enter tracker context
