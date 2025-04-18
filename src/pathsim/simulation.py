@@ -618,6 +618,21 @@ class Simulation:
             self._logger_info(f"'iterations_min' set to {self.path_length}")
 
 
+    def _check_blocks_are_managed(self):
+        """Check whether the blocks that are part of the connections are 
+        in the simulation block list ('self.blocks') and therefore managed 
+        by the simulation.
+
+        If not, there will be a warning in the logging.            
+        """
+        for conn in self.connections:
+            for blk in conn.get_blocks():
+                if blk not in self.blocks:
+                    self._logger_warning(
+                        f"{blk} in 'connections' but not in 'blocks'!"
+                        )
+
+
     # solver management -----------------------------------------------------------
 
     def _set_solver(self, Solver=None, **solver_kwargs):
