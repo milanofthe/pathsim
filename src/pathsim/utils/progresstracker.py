@@ -59,6 +59,8 @@ class ProgressTracker:
         The logger instance to use for outputting progress messages. If None,
         a default logger named 'ProgressTracker_<description>' is created
         and configured to print INFO level messages to stdout.
+    log : bool
+        Flag to indicate if logging messages should be printed or not.
     log_level : int, optional
         The logging level (e.g., `logging.INFO`, `logging.DEBUG`) to use for
         progress messages. Defaults to `logging.INFO`.
@@ -78,6 +80,7 @@ class ProgressTracker:
         total_duration,
         description="",
         logger=None,
+        log=True,
         log_level=logging.INFO,
         min_log_interval=1.0,
         update_log_every=0.2
@@ -96,6 +99,7 @@ class ProgressTracker:
         self.log_level = log_level
         self.min_log_interval = min_log_interval
         self.update_log_every = update_log_every
+        self.log = log
 
         #setup logger
         self.logger = logger or logging.getLogger(f"ProgressTracker_{self.description[:10]}")
@@ -256,10 +260,11 @@ class ProgressTracker:
         self.stats["total_steps"] = 0 # Ensure stats also start fresh if restart occurs
         self.stats["successful_steps"] = 0
 
-        self.logger.log(
-            self.log_level,
-            f"STARTING -> {self.description} (Duration: {self.total_duration:.2f}s)"
-            )
+        if self.log:
+            self.logger.log(
+                self.log_level,
+                f"STARTING -> {self.description} (Duration: {self.total_duration:.2f}s)"
+                )
 
         #log initial 0% state
         self._log_progress()
@@ -323,7 +328,7 @@ class ProgressTracker:
                 self._log_progress(is_final=True) 
 
                 #log summary statistics
-                if self.logger:
+                if self.logger and self.log:
                     final_stats_str = (
                         f"total steps: {self.stats['total_steps']}, "
                         f"successful: {self.stats['successful_steps']}, "
@@ -374,6 +379,9 @@ class ProgressTracker:
 
         #don't log if no logger
         if not self.logger: return
+
+        #don't log if logging not wanted
+        if not self.log: return                
 
         current_time = time.perf_counter()
 
