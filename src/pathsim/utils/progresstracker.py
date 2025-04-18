@@ -1,6 +1,6 @@
 ########################################################################################
 ##
-##                  PROGRESS TRACKER CLASS DEFINITION (Rate Updated)
+##                      PROGRESS TRACKER CLASS DEFINITION  
 ##                          (utils/progresstracker.py)
 ##
 #                               Milan Rother 2025
