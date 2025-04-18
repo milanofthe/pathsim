@@ -106,7 +106,14 @@ for i, b in enumerate(bodies):
     ])
 
 # Create simulation
-Sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=0.1, 
+    Solver=RKF78, 
+    tolerance_lte_rel=1e-6, 
+    tolerance_lte_abs=1e-8
+    )
 
 
 # Run Example ===========================================================================
@@ -114,7 +121,7 @@ Sim = Simulation(blocks, connections, dt=0.1, Solver=RKCK54)
 if __name__ == "__main__":
 
     # Run simulation for some number of days
-    Sim.run(365)
+    Sim.run(365*5)
 
 
     # PLOT THE RESULTS ==================================================================
