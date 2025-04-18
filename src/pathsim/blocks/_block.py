@@ -137,7 +137,7 @@ class Block(Serializable):
 
 
     def __call__(self):
-        """The '__call__' is a nalias for the 'get_all' method."""
+        """The '__call__' is an alias for the 'get_all' method."""
         return self.get_all()
 
 
