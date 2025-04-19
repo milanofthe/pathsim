@@ -22,7 +22,7 @@ class PortReference:
         self.ports = [0] if ports is None else ports # <- default port is set here
 
 
-    def set(self, *values):
+    def set(self, values):
         for p, v in zip(self.ports, values):
             self.block.set(p, v)
 
