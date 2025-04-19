@@ -17,6 +17,7 @@ import numpy as np
 
 from ..utils.utils import dict_to_array, array_to_dict, max_error_dicts
 from ..utils.serialization import Serializable
+from ..utils.portreference import PortReference
 
 
 # BASE BLOCK CLASS ======================================================================
@@ -124,16 +125,32 @@ class Block(Serializable):
         Parameters
         ----------
         key : int, slice
-            key(s) of the port
+            port indices
 
         Returns
         -------
-        pair : tuple[Block, int]
-            tuple of the block itself and the key of the port
+        PortReference
+            container object that hold block reference and list of ports
         """
-        if not isinstance(key, (int, slice)):
-            raise ValueError(f"Port has to be of type 'int' or 'slice' but is '{type(key)}'!")
-        return (self, key)
+
+        if isinstance(key, slice):
+            #slice to list of port keys
+            start, stop, step = key.start, key.stop, key.step
+
+            #slice validation
+            if stop is None: raise ValueError("Port slice cannot be open ended!")
+            if stop == 0: raise ValueError("Port slice cannot end with 0!")
+
+            #build port list
+            ports = list(range(start or 0, stop, step))
+            return PortReference(self, ports)
+
+        elif isinstance(key, int):
+            #standard integer key
+            return PortReference(self, [key])
+
+        else:
+            raise ValueError(f"Port has to be 'int' or 'slice' but is '{type(key)}'!")
 
 
     def __call__(self):

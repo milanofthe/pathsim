@@ -14,6 +14,8 @@
 
 import json
 
+from .utils.portreference import PortReference
+
 
 # CLASSES ===============================================================================
 
