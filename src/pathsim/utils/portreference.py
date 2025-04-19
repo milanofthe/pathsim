@@ -29,3 +29,10 @@ class PortReference:
 
     def get(self):
         return [self.block.get(p) for p in self.ports]
+
+
+    def to_dict(self):
+        return {
+            "block": id(self.block),
+            "ports": self.ports
+        }

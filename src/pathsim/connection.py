@@ -109,10 +109,10 @@ class Connection:
     def __init__(self, source, *targets):
         
         #assign source block and port
-        self.source = source if isinstance(source, (list, tuple)) else (source, 0)
+        self.source = source if isinstance(source, PortReference) else PortReference(source)
 
         #assign target blocks and ports
-        self.targets = [trg if isinstance(trg, (list, tuple)) else (trg, 0) for trg in targets]
+        self.targets = [trg if isinstance(trg, PortReference) else PortReference(trg) for trg in targets]
 
         #flag to set connection active
         self._active = True
@@ -156,11 +156,10 @@ class Connection:
         list[Block]
             internal unique blocks of the connection
         """
-        src, _ = self.source
-        blocks = [src]
-        for trg, _ in self.targets:
-            if trg not in blocks:
-                blocks.append(trg)
+        blocks = [self.source.block]
+        for trg in self.targets:
+            if trg.block not in blocks:
+                blocks.append(trg.block)
         return blocks
 
 
@@ -192,11 +191,17 @@ class Connection:
         if self == other:
             return False
 
-        #iterate all targets
+        #iterate all target permutations
         for trg in self.targets:
-            #check if there is target and port overlap
-            if trg in other.targets:
-                return True
+            for otrg in other.targets:
+
+                #check if same target block
+                if trg.block is otrg.block:
+
+                    #check if there is port overlap
+                    for prt in trg.ports:
+                        if prt in otrg.ports: 
+                            return True
 
         return False 
 
@@ -205,14 +210,8 @@ class Connection:
         """Convert connection to dictionary representation for serialization"""
         return {
             "id": id(self),
-            "source": {
-                "block": id(self.source[0]),
-                "port": self.source[1]
-            },
-            "targets": [
-                {"block": id(trg[0]), "port": trg[1]} 
-                for trg in self.targets
-            ]
+            "source": self.source.to_dict(),
+            "targets": [trg.to_dict() for trg in self.targets]
         }
 
 
@@ -220,9 +219,9 @@ class Connection:
         """Transfers data from the source block output port 
         to the target block input port.
         """
-        val = self.source[0].get(self.source[1])
-        for trg, prt in self.targets:
-            trg.set(prt, val)
+        vals = self.source.get()
+        for trg in self.targets:
+            trg.set(vals)
 
 
 class Duplex(Connection):
