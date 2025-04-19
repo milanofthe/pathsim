@@ -9,21 +9,34 @@
 
 # IMPORTS ===============================================================================
 
-# no dependencies
+from itertools import cycle
 
 
 # CLASS =================================================================================
 
 class PortReference:
+    """This is a container class that holds a reference 
+    to a block and a list of ports.
+
+    Note
+    ----
+    The default port, when no ports are defined in the arguments is `0`.
+
+    Parameters
+    ----------
+    block : Block
+        internal block reference
+    ports : list[int]
+        list of port indices
+    """
 
     def __init__(self, block=None, ports=None):
-
         self.block = block
-        self.ports = [0] if ports is None else ports # <- default port is set here
+        self.ports = [0] if ports is None else ports 
 
 
     def set(self, values):
-        for p, v in zip(self.ports, values):
+        for p, v in zip(self.ports, cycle(values)):
             self.block.set(p, v)
 
 

@@ -51,12 +51,12 @@ class Connection:
 
 
     which is a connection from block 'B1' to 'B2'. If we want to explicitly declare 
-    the input and output ports we can do that by giving tuples (lists also work) as 
-    the arguments
+    the input and output ports we can do that by utilizing the '__getitem__' method
+    of the blocks
 
     .. code-block:: python
  
-        C = Connection((B1, 0), (B2, 0))
+        C = Connection(B1[0], B2[0])
 
 
     which is exactly the default port setup. Connecting output port (1) of 'B1' to 
@@ -64,14 +64,14 @@ class Connection:
 
     .. code-block:: python
 
-        C = Connection((B1, 1), (B2, 0))
+        C = Connection(B1[1], B2[0])
         
 
     or just
     
     .. code-block:: python
 
-        C = Connection((B1, 1), B2).
+        C = Connection(B1[1], B2).
 
 
     The 'Connection' class also supports multiple targets for a single source. 
@@ -80,7 +80,7 @@ class Connection:
     
     .. code-block:: python
 
-        C = Connection(B1, (B2, 0), (B2, 1), B3)
+        C = Connection(B1, B2[0], B2[1], B3)
 
 
     The port definitions follow the same structure as for single target connections.
@@ -88,21 +88,19 @@ class Connection:
     'self'-connections also work without a problem. This is useful for modeling direct 
     feedback of a block to itself.
     
-    The port specification can be simplified (quality of life) by using the __getitem__ 
-    method that is implemented in the base 'Block' class. It returns the tuple of block
-    and port pair that is used for the port specification in the 'Connection' 
-    initialization. For example the following initializations are equivalent:
+    Port definitions support slicing. This enables direct MIMO connections. For example 
+    connecting ports 0, 1, 2 of 'B1' to ports 1, 2, 3 of 'B2' works like this:
 
-    .. code-block::
+    .. code-block:: python
 
-        Connection(B1[1], B2[3]) <=> Connection((B1, 1), (B2, 3))
+        C = Connection(B1[0:2], B2[1:3])
 
 
     Parameters
     ----------
-    source : tuple[Block, int], Block
+    source : PortReference, Block
         source block and optional source output port
-    targets : tuple[tuple[Block, int]], tuple[Block]
+    targets : tuple[PortReference], tuple[Block]
         target blocks and optional target input ports
     """
 
