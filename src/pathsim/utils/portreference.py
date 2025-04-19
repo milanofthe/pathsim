@@ -15,8 +15,8 @@ from itertools import cycle
 # CLASS =================================================================================
 
 class PortReference:
-    """This is a container class that holds a reference 
-    to a block and a list of ports.
+    """This is a container class that holds a reference to a block 
+    and a list of ports.
 
     Note
     ----
@@ -36,15 +36,36 @@ class PortReference:
 
 
     def set(self, values):
+        """Sets the input ports of the reference block with values.
+
+        Note
+        ----
+        If more values then ports, `zip` automatically stops iteration 
+        after all ports. If more ports then values, `itertools.cycle` is 
+        used to fill all the ports repeatedly.
+
+        Parameters
+        ----------
+        values : list[obj], list[float]
+            values to set at block input ports
+        """
         for p, v in zip(self.ports, cycle(values)):
             self.block.set(p, v)
 
 
     def get(self):
+        """Returns the values of the output ports of the reference block.
+        
+        Returns
+        -------
+        out : list[obj], list[float]
+            values from block output ports
+        """
         return [self.block.get(p) for p in self.ports]
 
 
     def to_dict(self):
+        """Serialization into dict"""
         return {
             "block": id(self.block),
             "ports": self.ports
