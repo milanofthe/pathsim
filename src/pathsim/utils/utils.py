@@ -244,14 +244,13 @@ def path_length_dfs(connections, starting_block, visited=None):
     for conn in connections:
         
         #find connections from starting block
-        src, _ = conn.source 
-        if src == starting_block:
+        if conn.source.block == starting_block:
 
             #iterate connection target blocks
-            for trg, _ in conn.targets:
+            for trg in conn.targets:
 
                 #recursively compute the new longest path
-                length = path_length_dfs(connections, trg, visited.copy())
+                length = path_length_dfs(connections, trg.block, visited.copy())
                 if length > max_length: max_length = length
 
     #add the contribution of the starting node to longest path
