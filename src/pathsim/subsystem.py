@@ -17,6 +17,7 @@ import numpy as np
 from .connection import Connection
 from .blocks._block import Block
 from .utils.utils import path_length_dfs, dict_to_array
+from .utils.portreference import PortReference
 
 
 # IO CLASS ==============================================================================
@@ -325,17 +326,22 @@ class Subsystem(Block):
 
             #source data
             source_block = id_to_block[conn_data["source"]["block"]]
-            source_port = conn_data["source"]["port"]
+            source_ports = conn_data["source"]["ports"]
+            source = PortReference(source_block, source_ports)
             
             #target data
             targets = []
             for trg in conn_data["targets"]:
                 target_block = id_to_block[trg["block"]]
-                target_port = trg["port"]
-                targets.append((target_block, target_port))
+                target_ports = trg["ports"]
+                targets.append(
+                    PortReference(target_block, target_ports)
+                    )
             
             #create the connection
-            connections.append(Connection((source_block, source_port), *targets))
+            connections.append(
+                Connection(source, *targets)
+                )
         
         #finally construct the subsystem
         return cls(blocks, connections)

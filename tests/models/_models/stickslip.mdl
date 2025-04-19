@@ -1,29 +1,34 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 50.0,
-    "timestamp": "2025-03-15T16:37:23.899049"
+    "duration": 100.0,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T16:00:11.973967"
   },
   "structure": {
     "blocks": [
       {
-        "id": 1335754832064,
+        "id": 1611188835664,
         "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASV9wEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwICAZRLAUsASwBLAUsFSwNDcpUAWwAAAAAAAAAAAFsCAAAAAAAAAABSBAAAAAAAAAAAAAAAAAAAAAAAACIAUwFbAgAAAAAAAAAAUgYAAAAAAAAAAAAAAAAAAAAAAAAtBQAAVQAtBQAAWwgAAAAAAAAAAC0LAAA1AQAAAAAAAC0FAAAkAJROSwKGlCiMAXaUjAJucJSMA3NpbpSMAnBplIwBVJR0lIwBdJSFlIxTQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9zdGlja3NsaXAucHmUjAZ2X2JlbHSUaBFLHkMmgADcCwyMco92inaQYZwCnwWZBZFnmGGRaaQBkWvTDyLRCyLQBCKUQwCUKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gRTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgWKGgIR0AIAAAAAAAAaAxHQEkAAAAAAACMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlHUwLg==",
+            "data": "gAWV9wEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwICAZRLAUsASwBLAUsFSwNDcpUAWwAAAAAAAAAAAFsCAAAAAAAAAABSBAAAAAAAAAAAAAAAAAAAAAAAACIAUwFbAgAAAAAAAAAAUgYAAAAAAAAAAAAAAAAAAAAAAAAtBQAAVQAtBQAAWwgAAAAAAAAAAC0LAAA1AQAAAAAAAC0FAAAkAJROSwKGlCiMAXaUjAJucJSMA3NpbpSMAnBplIwBVJR0lIwBdJSFlIxTQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9zdGlja3NsaXAucHmUjAZ2X2JlbHSUaBFLHkMmgADcCwyMco92inaQYZwCnwWZBZFnmGGRaaQBkWvTDyLRCyLQBCKUQwCUKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gRTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgWKGgMR0BJAAAAAAAAaAhHQAgAAAAAAACMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlHUwLg==",
             "name": "v_belt"
           }
         }
       },
       {
-        "id": 1335754832400,
+        "id": 1611191283600,
         "type": "ODE",
+        "module": "pathsim.blocks.ode",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVCgMAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwYCARYBXAGUSwNLAEsASwVLB0sDQ+6VAFUAUwEFAAAAVQFTAgUAAAAtCgAAbgNbAAAAAAAAAAAAWwIAAAAAAAAAAC0FAABbBAAAAAAAAAAALQUAAFsGAAAAAAAAAABSCAAAAAAAAAAAAAAAAAAAAAAAACIAUwNVAy0FAAA1AQAAAAAAAC0FAABuBFsGAAAAAAAAAABSCgAAAAAAAAAAAAAAAAAAAAAAACIAVQBTAQUAAABbDAAAAAAAAAAAVQBTAgUAAAAtBQAAWw4AAAAAAAAAAFUAUwEFAAAALQUAAC0AAABVBC0AAAAqAFsCAAAAAAAAAAAtCwAALwI1AQAAAAAAACQAlChOSwFLAE3oA3SUKIwCbXWUjAFtlIwBZ5SMAm5wlIwEdGFuaJSMBWFycmF5lIwBa5SMAWSUdJQojAF4lIwBdZSMAXSUjAV2X3JlbJSMA0ZfY5R0lIxTQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9zdGlja3NsaXAucHmUjAJfZpRoGEsiQ2uAANgMDYhhiUSQMZBRkTSJS4BF3AoMjFGJJIxxiSaUEpcXkheYFJhlmRrTESTRCiSAQ9wLDY84ijiQUZBxkVScUZhxoBGZdJlWpGGoAaghqQShZplfqHPRHTLQGzO0QdEbNdAUNtMLN9AEN5RDAJQpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaBhOTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiaB0oaA5HQFGAAAAAAACMAm11lEc/+AAAAAAAAIwCbnCUaACMDl9pbXBvcnRfbW9kdWxllJOUjAVudW1weZSFlFKUaApHQCOeuFHrhR9oD0dAJAAAAAAAAGgJR0A0AAAAAAAAdTAu",
+            "data": "gAWVCgMAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwYCARYBXAGUSwNLAEsASwVLB0sDQ+6VAFUAUwEFAAAAVQFTAgUAAAAtCgAAbgNbAAAAAAAAAAAAWwIAAAAAAAAAAC0FAABbBAAAAAAAAAAALQUAAFsGAAAAAAAAAABSCAAAAAAAAAAAAAAAAAAAAAAAACIAUwNVAy0FAAA1AQAAAAAAAC0FAABuBFsGAAAAAAAAAABSCgAAAAAAAAAAAAAAAAAAAAAAACIAVQBTAQUAAABbDAAAAAAAAAAAVQBTAgUAAAAtBQAAWw4AAAAAAAAAAFUAUwEFAAAALQUAAC0AAABVBC0AAAAqAFsCAAAAAAAAAAAtCwAALwI1AQAAAAAAACQAlChOSwFLAE3oA3SUKIwCbXWUjAFtlIwBZ5SMAm5wlIwEdGFuaJSMBWFycmF5lIwBa5SMAWSUdJQojAF4lIwBdZSMAXSUjAV2X3JlbJSMA0ZfY5R0lIxTQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9zdGlja3NsaXAucHmUjAJfZpRoGEsiQ2uAANgMDYhhiUSQMZBRkTSJS4BF3AoMjFGJJIxxiSaUEpcXkheYFJhlmRrTESTRCiSAQ9wLDY84ijiQUZBxkVScUZhxoBGZdJlWpGGoAaghqQShZplfqHPRHTLQGzO0QdEbNdAUNtMLN9AEN5RDAJQpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaBhOTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiaB0oaA5HQFGAAAAAAACMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlGgPR0AkAAAAAAAAjAJtdZRHP/gAAAAAAABoCkdAI564UeuFH2gJR0A0AAAAAAAAdTAu",
             "name": "_f"
           },
           "initial_value": {
@@ -39,8 +44,10 @@
         }
       },
       {
-        "id": 1335754832736,
+        "id": 1611191284272,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
@@ -55,45 +62,59 @@
     "events": [],
     "connections": [
       {
-        "id": 1335754833072,
+        "id": 1611191284608,
         "source": {
-          "block": 1335754832064,
-          "port": 0
+          "block": 1611188835664,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 1335754832400,
-            "port": 0
+            "block": 1611191283600,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 1335754832736,
-            "port": 0
+            "block": 1611191284272,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 1335755026704,
+        "id": 1611191366544,
         "source": {
-          "block": 1335754832400,
-          "port": 0
+          "block": 1611191283600,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 1335754832736,
-            "port": 1
+            "block": 1611191284272,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 1335755027344,
+        "id": 1611191366864,
         "source": {
-          "block": 1335754832400,
-          "port": 1
+          "block": 1611191283600,
+          "ports": [
+            1
+          ]
         },
         "targets": [
           {
-            "block": 1335754832736,
-            "port": 2
+            "block": 1611191284272,
+            "ports": [
+              2
+            ]
           }
         ]
       }

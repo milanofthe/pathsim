@@ -1,0 +1,242 @@
+{
+  "type": "Simulation",
+  "metadata": {
+    "duration": 200,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:57:47.157315"
+  },
+  "structure": {
+    "blocks": [
+      {
+        "id": 2060459873616,
+        "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
+        "params": {
+          "func": {
+            "type": "dill",
+            "data": "gAWVSAEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwYCAQ4BDgGUSwFLAEsASwFLAksDQyCVAFUAUwE6lAAAYQEAAGcCVQBTAzqUAABhAQAAZwNnBJQoTktkSwVLCksAdJQpjAF0lIWUjFhDOlxVc2Vyc1xtaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlX3BpZF9hbnRpd2luZHVwLnB5lIwDZl9zlGgLSx5DF4AA2AcIiBODdZBR2AkKiDKLFJBi2BESlEMAlCkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoC05OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGIu",
+            "name": "f_s"
+          }
+        }
+      },
+      {
+        "id": 2060462305168,
+        "type": "Adder",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": "+-"
+        }
+      },
+      {
+        "id": 2060462305840,
+        "type": "AntiWindupPID",
+        "module": "pathsim.blocks.ctrl",
+        "metadata": {},
+        "params": {
+          "Kp": 1.5,
+          "Ki": 0.5,
+          "Kd": 0.2,
+          "f_max": 10,
+          "Ks": 10,
+          "limits": [
+            -20,
+            20
+          ]
+        }
+      },
+      {
+        "id": 2060462306176,
+        "type": "Function",
+        "module": "pathsim.blocks.function",
+        "metadata": {},
+        "params": {
+          "func": {
+            "type": "dill",
+            "data": "gAWVhwEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQzKVAFsAAAAAAAAAAABSAgAAAAAAAAAAAAAAAAAAAAAAACIAVQBTAVMCNQMAAAAAAAAkAJROSvb///9LCoeUjAJucJSMBGNsaXCUhpSMAXiUhZSMWEM6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfcGlkX2FudGl3aW5kdXAucHmUjAg8bGFtYmRhPpRoDksoQxGAAJwSnxeaF6ARoEOoEtQZLJRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEowCbnCUaACMDl9pbXBvcnRfbW9kdWxllJOUjAVudW1weZSFlFKUczAu",
+            "name": "<lambda>"
+          }
+        }
+      },
+      {
+        "id": 2060462306512,
+        "type": "TransferFunction",
+        "module": "pathsim.blocks.lti",
+        "metadata": {},
+        "params": {
+          "Poles": [
+            -0.1
+          ],
+          "Residues": [
+            0.1
+          ],
+          "Const": 0.0
+        }
+      },
+      {
+        "id": 2060462306848,
+        "type": "Delay",
+        "module": "pathsim.blocks.delay",
+        "metadata": {},
+        "params": {
+          "tau": 2
+        }
+      },
+      {
+        "id": 2060462307520,
+        "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
+        "params": {
+          "sampling_rate": null,
+          "t_wait": 0.0,
+          "labels": [
+            "s(t)",
+            "x(t)",
+            "$\\epsilon(t)$",
+            "pid(t)"
+          ]
+        }
+      }
+    ],
+    "events": [],
+    "connections": [
+      {
+        "id": 2060462308192,
+        "source": {
+          "block": 2060459873616,
+          "ports": [
+            0
+          ]
+        },
+        "targets": [
+          {
+            "block": 2060462305168,
+            "ports": [
+              0
+            ]
+          },
+          {
+            "block": 2060462307520,
+            "ports": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2060462404816,
+        "source": {
+          "block": 2060462306848,
+          "ports": [
+            0
+          ]
+        },
+        "targets": [
+          {
+            "block": 2060462305168,
+            "ports": [
+              1
+            ]
+          },
+          {
+            "block": 2060462307520,
+            "ports": [
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2060462405136,
+        "source": {
+          "block": 2060462305168,
+          "ports": [
+            0
+          ]
+        },
+        "targets": [
+          {
+            "block": 2060462305840,
+            "ports": [
+              0
+            ]
+          },
+          {
+            "block": 2060462307520,
+            "ports": [
+              2
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2060463079504,
+        "source": {
+          "block": 2060462305840,
+          "ports": [
+            0
+          ]
+        },
+        "targets": [
+          {
+            "block": 2060462306176,
+            "ports": [
+              0
+            ]
+          },
+          {
+            "block": 2060462307520,
+            "ports": [
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2060463079808,
+        "source": {
+          "block": 2060462306176,
+          "ports": [
+            0
+          ]
+        },
+        "targets": [
+          {
+            "block": 2060462306512,
+            "ports": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2060462731728,
+        "source": {
+          "block": 2060462306512,
+          "ports": [
+            0
+          ]
+        },
+        "targets": [
+          {
+            "block": 2060462306848,
+            "ports": [
+              0
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "params": {
+    "dt": 0.01,
+    "dt_min": 1e-16,
+    "dt_max": null,
+    "Solver": "RKCK54",
+    "tolerance_fpi": 1e-12,
+    "iterations_min": 1,
+    "iterations_max": 200
+  }
+}

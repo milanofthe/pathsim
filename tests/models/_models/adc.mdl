@@ -2,26 +2,26 @@
   "type": "Simulation",
   "metadata": {
     "duration": 2,
-    "version": "0.6.5.dev11+g5f9cc5c",
-    "timestamp": "2025-04-15T09:19:23.646419"
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T16:03:32.204870"
   },
   "structure": {
     "blocks": [
       {
-        "id": 2250983495328,
+        "id": 2800412154176,
         "type": "Source",
         "module": "pathsim.blocks.sources",
         "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gAWVpgEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQzyVAFsAAAAAAAAAAABSAgAAAAAAAAAAAAAAAAAAAAAAACIAWwQAAAAAAAAAAFUALQUAADUBAAAAAAAAJACUToWUjAJucJSMA3NpbpSMBW9tZWdhlIeUjAF0lIWUjFxDOlxVc2Vyc1xtaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlc19taXhlZFxleGFtcGxlX2FkYy5weZSMCDxsYW1iZGE+lGgPSx1DEIAAlHKXdpJ2nGWgQZlnlH+UaAUpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaA9OTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiaBMojAJucJRoAIwOX2ltcG9ydF9tb2R1bGWUk5SMBW51bXB5lIWUUpSMBW9tZWdhlEdAGSH7VEQtGHUwLg==",
+            "data": "gAWVpgEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQzyVAFsAAAAAAAAAAABSAgAAAAAAAAAAAAAAAAAAAAAAACIAWwQAAAAAAAAAAFUALQUAADUBAAAAAAAAJACUToWUjAJucJSMA3NpbpSMBW9tZWdhlIeUjAF0lIWUjFxDOlxVc2Vyc1xtaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlc19taXhlZFxleGFtcGxlX2FkYy5weZSMCDxsYW1iZGE+lGgPSx1DEIAAlHKXdpJ2nGWgQZlnlH+UaAUpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaA9OTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiaBMojAVvbWVnYZRHQBkh+1RELRiMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlHUwLg==",
             "name": "<lambda>"
           }
         }
       },
       {
-        "id": 2250983496336,
+        "id": 2800412155184,
         "type": "DAC",
         "module": "pathsim.blocks.mixed.converters",
         "metadata": {},
@@ -36,7 +36,7 @@
         }
       },
       {
-        "id": 2250983495664,
+        "id": 2800412154512,
         "type": "ADC",
         "module": "pathsim.blocks.mixed.converters",
         "metadata": {},
@@ -51,7 +51,7 @@
         }
       },
       {
-        "id": 2250983496672,
+        "id": 2800412155520,
         "type": "ButterworthLowpassFilter",
         "module": "pathsim.blocks.rf.filters",
         "metadata": {},
@@ -61,7 +61,7 @@
         }
       },
       {
-        "id": 2250983497344,
+        "id": 2800412156192,
         "type": "Scope",
         "module": "pathsim.blocks.scope",
         "metadata": {},
@@ -78,7 +78,7 @@
     ],
     "events": [
       {
-        "id": 2250983095376,
+        "id": 2800411786960,
         "type": "Schedule",
         "module": "pathsim.events.schedule",
         "metadata": {},
@@ -95,7 +95,7 @@
         }
       },
       {
-        "id": 2250983496000,
+        "id": 2800412154848,
         "type": "Schedule",
         "module": "pathsim.events.schedule",
         "metadata": {},
@@ -105,7 +105,7 @@
           "t_period": 0.02,
           "func_act": {
             "type": "dill",
-            "data": "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",
+            "data": "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",
             "name": "_sample"
           },
           "tolerance": 1e-16
@@ -114,153 +114,201 @@
     ],
     "connections": [
       {
-        "id": 2250983497680,
+        "id": 2800412156864,
         "source": {
-          "block": 2250983495328,
-          "port": 0
+          "block": 2800412154176,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2250983495664,
-            "port": 0
+            "block": 2800412154512,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2250983497344,
-            "port": 0
+            "block": 2800412156192,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2250983833680,
+        "id": 2800412591440,
         "source": {
-          "block": 2250983496336,
-          "port": 0
+          "block": 2800412155184,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2250983496672,
-            "port": 0
+            "block": 2800412155520,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2250983497344,
-            "port": 1
+            "block": 2800412156192,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2250983834000,
+        "id": 2800412591760,
         "source": {
-          "block": 2250983496672,
-          "port": 0
+          "block": 2800412155520,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2250983497344,
-            "port": 2
+            "block": 2800412156192,
+            "ports": [
+              2
+            ]
           }
         ]
       },
       {
-        "id": 2250983458368,
+        "id": 2800412199376,
         "source": {
-          "block": 2250983495664,
-          "port": 0
+          "block": 2800412154512,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 0
+            "block": 2800412155184,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2250983459280,
+        "id": 2800412199680,
         "source": {
-          "block": 2250983495664,
-          "port": 1
+          "block": 2800412154512,
+          "ports": [
+            1
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 1
+            "block": 2800412155184,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2250983155344,
+        "id": 2800411831632,
         "source": {
-          "block": 2250983495664,
-          "port": 2
+          "block": 2800412154512,
+          "ports": [
+            2
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 2
+            "block": 2800412155184,
+            "ports": [
+              2
+            ]
           }
         ]
       },
       {
-        "id": 2250983784800,
+        "id": 2800412510688,
         "source": {
-          "block": 2250983495664,
-          "port": 3
+          "block": 2800412154512,
+          "ports": [
+            3
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 3
+            "block": 2800412155184,
+            "ports": [
+              3
+            ]
           }
         ]
       },
       {
-        "id": 2250983786432,
+        "id": 2800412510960,
         "source": {
-          "block": 2250983495664,
-          "port": 4
+          "block": 2800412154512,
+          "ports": [
+            4
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 4
+            "block": 2800412155184,
+            "ports": [
+              4
+            ]
           }
         ]
       },
       {
-        "id": 2252709468496,
+        "id": 2801717350480,
         "source": {
-          "block": 2250983495664,
-          "port": 5
+          "block": 2800412154512,
+          "ports": [
+            5
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 5
+            "block": 2800412155184,
+            "ports": [
+              5
+            ]
           }
         ]
       },
       {
-        "id": 2252288167760,
+        "id": 2800412168272,
         "source": {
-          "block": 2250983495664,
-          "port": 6
+          "block": 2800412154512,
+          "ports": [
+            6
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 6
+            "block": 2800412155184,
+            "ports": [
+              6
+            ]
           }
         ]
       },
       {
-        "id": 2250983173456,
+        "id": 2800411849216,
         "source": {
-          "block": 2250983495664,
-          "port": 7
+          "block": 2800412154512,
+          "ports": [
+            7
+          ]
         },
         "targets": [
           {
-            "block": 2250983496336,
-            "port": 7
+            "block": 2800412155184,
+            "ports": [
+              7
+            ]
           }
         ]
       }

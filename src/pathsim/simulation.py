@@ -32,6 +32,7 @@ from ._constants import (
 
 from .utils.utils import path_length_dfs
 from .utils.analysis import Timer
+from .utils.portreference import PortReference
 from .utils.progresstracker import ProgressTracker
 
 from .solvers import SSPRK22, SteadyState
@@ -446,18 +447,21 @@ class Simulation:
             
             #get source block and port
             source_block = id_to_block[conn_data["source"]["block"]]
-            source_port = conn_data["source"]["port"]
+            source_ports = conn_data["source"]["ports"]
+            source = PortReference(source_block, source_ports)
             
             #get targets
             targets = []
             for trg in conn_data["targets"]:
                 target_block = id_to_block[trg["block"]]
-                target_port = trg["port"]
-                targets.append((target_block, target_port))
+                target_ports = trg["ports"]
+                targets.append(
+                    PortReference(target_block, target_ports)
+                    )
             
             #create connection
             connections.append(
-                Connection((source_block, source_port), *targets)
+                Connection(source, *targets)
                 )
         
         #deserialize events

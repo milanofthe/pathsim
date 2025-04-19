@@ -1,14 +1,14 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 400,
-    "version": "0.6.2",
-    "timestamp": "2025-03-26T19:49:56.733469"
+    "duration": 200,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:54:45.045923"
   },
   "structure": {
     "blocks": [
       {
-        "id": 2475792495488,
+        "id": 2137299113296,
         "type": "Integrator",
         "module": "pathsim.blocks.integrator",
         "metadata": {},
@@ -17,7 +17,7 @@
         }
       },
       {
-        "id": 2475792545936,
+        "id": 2137301659920,
         "type": "Integrator",
         "module": "pathsim.blocks.integrator",
         "metadata": {},
@@ -26,7 +26,7 @@
         }
       },
       {
-        "id": 2475792495824,
+        "id": 2137301561232,
         "type": "Function",
         "module": "pathsim.blocks.function",
         "metadata": {},
@@ -39,7 +39,7 @@
         }
       },
       {
-        "id": 2475792496496,
+        "id": 2137301561904,
         "type": "Constant",
         "module": "pathsim.blocks.sources",
         "metadata": {},
@@ -48,7 +48,7 @@
         }
       },
       {
-        "id": 2475792546576,
+        "id": 2137301659280,
         "type": "Constant",
         "module": "pathsim.blocks.sources",
         "metadata": {},
@@ -57,7 +57,7 @@
         }
       },
       {
-        "id": 2475792496832,
+        "id": 2137301562240,
         "type": "Amplifier",
         "module": "pathsim.blocks.amplifier",
         "metadata": {},
@@ -66,7 +66,7 @@
         }
       },
       {
-        "id": 2475792547216,
+        "id": 2137301660560,
         "type": "Amplifier",
         "module": "pathsim.blocks.amplifier",
         "metadata": {},
@@ -75,7 +75,7 @@
         }
       },
       {
-        "id": 2475792497168,
+        "id": 2137301562576,
         "type": "Adder",
         "module": "pathsim.blocks.adder",
         "metadata": {},
@@ -84,7 +84,7 @@
         }
       },
       {
-        "id": 2475793432656,
+        "id": 2137301661200,
         "type": "Adder",
         "module": "pathsim.blocks.adder",
         "metadata": {},
@@ -93,7 +93,7 @@
         }
       },
       {
-        "id": 2475792497504,
+        "id": 2137301562912,
         "type": "Scope",
         "module": "pathsim.blocks.scope",
         "metadata": {},
@@ -110,153 +110,199 @@
     "events": [],
     "connections": [
       {
-        "id": 2475792497840,
+        "id": 2137301563248,
         "source": {
-          "block": 2475792497168,
-          "port": 0
+          "block": 2137301562576,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475792495488,
-            "port": 0
+            "block": 2137299113296,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2475793432976,
+        "id": 2137301661840,
         "source": {
-          "block": 2475792547216,
-          "port": 0
+          "block": 2137301660560,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475792545936,
-            "port": 0
+            "block": 2137301659920,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2475793433296,
+        "id": 2137301662480,
         "source": {
-          "block": 2475793432656,
-          "port": 0
+          "block": 2137301661200,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475792547216,
-            "port": 0
+            "block": 2137301660560,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2475793449040,
+        "id": 2137302335568,
         "source": {
-          "block": 2475792495488,
-          "port": 0
+          "block": 2137299113296,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475792497168,
-            "port": 0
+            "block": 2137301562576,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2475793432656,
-            "port": 0
+            "block": 2137301661200,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2475792495824,
-            "port": 0
+            "block": 2137301561232,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2475792497504,
-            "port": 0
+            "block": 2137301562912,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2475793449344,
+        "id": 2137302335872,
         "source": {
-          "block": 2475792545936,
-          "port": 0
+          "block": 2137301659920,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475792497168,
-            "port": 2
+            "block": 2137301562576,
+            "ports": [
+              2
+            ]
           },
           {
-            "block": 2475792496832,
-            "port": 0
+            "block": 2137301562240,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2475792497504,
-            "port": 1
+            "block": 2137301562912,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2475793401904,
+        "id": 2137301987504,
         "source": {
-          "block": 2475792495824,
-          "port": 0
+          "block": 2137301561232,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475792497168,
-            "port": 1
+            "block": 2137301562576,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2475792654928,
+        "id": 2137301335536,
         "source": {
-          "block": 2475792546576,
-          "port": 0
+          "block": 2137301659280,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475792497168,
-            "port": 3
+            "block": 2137301562576,
+            "ports": [
+              3
+            ]
           }
         ]
       },
       {
-        "id": 2475792655744,
+        "id": 2137301335808,
         "source": {
-          "block": 2475792496496,
-          "port": 0
+          "block": 2137301561904,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475793432656,
-            "port": 1
+            "block": 2137301661200,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2475766994768,
+        "id": 2137302175056,
         "source": {
-          "block": 2475792496832,
-          "port": 0
+          "block": 2137301562240,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2475793432656,
-            "port": 2
+            "block": 2137301661200,
+            "ports": [
+              2
+            ]
           }
         ]
       }
     ]
   },
   "params": {
-    "dt": 0.1,
+    "dt": 0.01,
     "dt_min": 1e-16,
     "dt_max": null,
     "Solver": "RKCK54",
     "tolerance_fpi": 1e-12,
     "iterations_min": 1,
     "iterations_max": 200,
-    "tolerance_lte_abs": 1e-06,
-    "tolerance_lte_rel": 0.0001
+    "tolerance_lte_abs": 1e-08,
+    "tolerance_lte_rel": 1e-06
   }
 }

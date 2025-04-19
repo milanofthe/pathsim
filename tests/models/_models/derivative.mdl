@@ -2,60 +2,73 @@
   "type": "Simulation",
   "metadata": {
     "duration": 20.0,
-    "timestamp": "2025-03-15T16:40:31.850566"
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:54:03.323849"
   },
   "structure": {
     "blocks": [
       {
-        "id": 2319916087152,
+        "id": 2212955854160,
         "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVngEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQzyVAFsAAAAAAAAAAABSAgAAAAAAAAAAAAAAAAAAAAAAACIAWwQAAAAAAAAAAFUALQUAADUBAAAAAAAAJACUToWUjAJucJSMA3NpbpSMBW9tZWdhlIeUjAF0lIWUjFRDOlxVc2Vyc1xtaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlX2Rlcml2YXRpdmUucHmUjAg8bGFtYmRhPpRoD0slQxCAAJRyl3aSdpxloEGZZ5R/lGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gPTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgTKIwCbnCUaACMDl9pbXBvcnRfbW9kdWxllJOUjAVudW1weZSFlFKUjAVvbWVnYZRHQBkh+1RELRh1MC4=",
+            "data": "gAWVngEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQzyVAFsAAAAAAAAAAABSAgAAAAAAAAAAAAAAAAAAAAAAACIAWwQAAAAAAAAAAFUALQUAADUBAAAAAAAAJACUToWUjAJucJSMA3NpbpSMBW9tZWdhlIeUjAF0lIWUjFRDOlxVc2Vyc1xtaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlX2Rlcml2YXRpdmUucHmUjAg8bGFtYmRhPpRoD0slQxCAAJRyl3aSdpxloEGZZ5R/lGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gPTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgTKIwCbnCUaACMDl9pbXBvcnRfbW9kdWxllJOUjAVudW1weZSFlFKUjAVvbWVnYZRHQBkh+1RELRh1MC4=",
             "name": "<lambda>"
           }
         }
       },
       {
-        "id": 2319916282128,
+        "id": 2212958384720,
         "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVwAEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQ1CVAFMBWwAAAAAAAAAAAC0LAABbAgAAAAAAAAAAUgQAAAAAAAAAAAAAAAAAAAAAAAAiAFsAAAAAAAAAAABVAC0FAAA1AQAAAAAAAC0FAAAkAJROSv////+GlIwFb21lZ2GUjAJucJSMA2Nvc5SHlIwBdJSFlIxUQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9kZXJpdmF0aXZlLnB5lIwIPGxhbWJkYT6UaA9LJkMZgACQcpwlkXikAqcGogakdahRoXejD9IXL5RoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoD05OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEyiMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlIwFb21lZ2GUR0AZIftURC0YdTAu",
+            "data": "gAWVwAEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQ1CVAFMBWwAAAAAAAAAAAC0LAABbAgAAAAAAAAAAUgQAAAAAAAAAAAAAAAAAAAAAAAAiAFsAAAAAAAAAAABVAC0FAAA1AQAAAAAAAC0FAAAkAJROSv////+GlIwFb21lZ2GUjAJucJSMA2Nvc5SHlIwBdJSFlIxUQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9kZXJpdmF0aXZlLnB5lIwIPGxhbWJkYT6UaA9LJkMZgACQcpwlkXikAqcGogakdahRoXejD9IXL5RoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoD05OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEyiMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlIwFb21lZ2GUR0AZIftURC0YdTAu",
             "name": "<lambda>"
           }
         }
       },
       {
-        "id": 2319916282768,
+        "id": 2212958384080,
         "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVsQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQ0qVAFsAAAAAAAAAAABbAgAAAAAAAAAAUgQAAAAAAAAAAAAAAAAAAAAAAAAiAFsAAAAAAAAAAABVAC0FAAA1AQAAAAAAAC0FAAAkAJROhZSMBW9tZWdhlIwCbnCUjANjb3OUh5SMAXSUhZSMVEM6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfZGVyaXZhdGl2ZS5weZSMCDxsYW1iZGE+lGgPSydDFYAAlHWcUp9WmlakRaghoUebX9IXLJRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoD05OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEyiMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlIwFb21lZ2GUR0AZIftURC0YdTAu",
+            "data": "gAWVsQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBUsDQ0qVAFsAAAAAAAAAAABbAgAAAAAAAAAAUgQAAAAAAAAAAAAAAAAAAAAAAAAiAFsAAAAAAAAAAABVAC0FAAA1AQAAAAAAAC0FAAAkAJROhZSMBW9tZWdhlIwCbnCUjANjb3OUh5SMAXSUhZSMVEM6XFVzZXJzXG1pbGFuXE9uZURyaXZlXFVOSV9Qcm9tb3Rpb25cUGF0aFNpbVxwYXRoc2ltXGV4YW1wbGVzXGV4YW1wbGVfZGVyaXZhdGl2ZS5weZSMCDxsYW1iZGE+lGgPSydDFYAAlHWcUp9WmlakRaghoUebX9IXLJRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoD05OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEyiMAm5wlGgAjA5faW1wb3J0X21vZHVsZZSTlIwFbnVtcHmUhZRSlIwFb21lZ2GUR0AZIftURC0YdTAu",
             "name": "<lambda>"
           }
         }
       },
       {
-        "id": 2319916087488,
+        "id": 2212958285712,
         "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
         "params": {
           "initial_value": -0.15915494309189535
         }
       },
       {
-        "id": 2319916087824,
+        "id": 2212958286048,
         "type": "Differentiator",
+        "module": "pathsim.blocks.differentiator",
+        "metadata": {},
         "params": {
           "f_max": 100
         }
       },
       {
-        "id": 2319916088160,
+        "id": 2212958286720,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
@@ -72,75 +85,99 @@
     "events": [],
     "connections": [
       {
-        "id": 2319916088496,
+        "id": 2212958287392,
         "source": {
-          "block": 2319916087152,
-          "port": 0
+          "block": 2212955854160,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2319916087488,
-            "port": 0
+            "block": 2212958285712,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2319916087824,
-            "port": 0
+            "block": 2212958286048,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2319916088160,
-            "port": 0
+            "block": 2212958286720,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2319916283088,
+        "id": 2212958386000,
         "source": {
-          "block": 2319916087488,
-          "port": 0
+          "block": 2212958285712,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2319916088160,
-            "port": 1
+            "block": 2212958286720,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2319916283408,
+        "id": 2212958386320,
         "source": {
-          "block": 2319916087824,
-          "port": 0
+          "block": 2212958286048,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2319916088160,
-            "port": 2
+            "block": 2212958286720,
+            "ports": [
+              2
+            ]
           }
         ]
       },
       {
-        "id": 2319917007232,
+        "id": 2212957846752,
         "source": {
-          "block": 2319916282128,
-          "port": 0
+          "block": 2212958384720,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2319916088160,
-            "port": 3
+            "block": 2212958286720,
+            "ports": [
+              3
+            ]
           }
         ]
       },
       {
-        "id": 2319917008144,
+        "id": 2212957847056,
         "source": {
-          "block": 2319916282768,
-          "port": 0
+          "block": 2212958384080,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2319916088160,
-            "port": 4
+            "block": 2212958286720,
+            "ports": [
+              4
+            ]
           }
         ]
       }
