@@ -56,14 +56,57 @@ class TestPortReference(unittest.TestCase):
 
     def test_set(self):
 
-        pass
+        B = Block()
+
+        #default
+        PR = PortReference(B)
+        PR.set([23])
+        self.assertEqual(B.inputs[0], 23)
+        PR.set([0.02])
+        self.assertEqual(B.inputs[0], 0.02)
+    
+        #specific
+        PR = PortReference(B, [0, 2, 3])
+        PR.set([33, -0.3, 1e4])
+        self.assertEqual(B.inputs[0], 33)
+        self.assertEqual(B.inputs[2], -0.3)
+        self.assertEqual(B.inputs[3], 1e4)
+
+        PR.set([1, 3])
+        self.assertEqual(B.inputs[0], 1)
+        self.assertEqual(B.inputs[2], 3)
+        self.assertEqual(B.inputs[3], 1)
+
+        PR.set([1])
+        self.assertEqual(B.inputs[0], 1)
+        self.assertEqual(B.inputs[2], 1)
+        self.assertEqual(B.inputs[3], 1)
+
+        PR.set([1, 2, 3, 4, 5])
+        self.assertEqual(B.inputs[0], 1)
+        self.assertEqual(B.inputs[2], 2)
+        self.assertEqual(B.inputs[3], 3)
 
 
     def test_get(self):
 
-        pass
+        B = Block()
 
+        #default
+        PR = PortReference(B)
+        self.assertEqual(PR.get(), [0.0])
 
+        #specific
+        B.outputs = {0:0.0, 1:3.2, 2:-0.04}
+
+        PR = PortReference(B, [0, 1, 2])
+        self.assertEqual(PR.get(), [0.0, 3.2, -0.04])
+
+        PR = PortReference(B, [1])
+        self.assertEqual(PR.get(), [3.2])
+
+        PR = PortReference(B, [0, 2])
+        self.assertEqual(PR.get(), [0.0, -0.04])
 
 
 

@@ -12,6 +12,7 @@
 import unittest
 import numpy as np
 
+from pathsim.utils.portreference import PortReference
 from pathsim.connection import Connection, Duplex
 from pathsim.blocks._block import Block
 
