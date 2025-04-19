@@ -1,14 +1,14 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 80.0,
-    "version": "0.6.2",
-    "timestamp": "2025-03-25T08:36:27.323920"
+    "duration": 200.0,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T16:02:14.629421"
   },
   "structure": {
     "blocks": [
       {
-        "id": 3280151140000,
+        "id": 2135262629904,
         "type": "SquareWaveSource",
         "module": "pathsim.blocks.rf.sources",
         "metadata": {},
@@ -19,7 +19,7 @@
         }
       },
       {
-        "id": 3280151140336,
+        "id": 2135262630240,
         "type": "PinkNoise",
         "module": "pathsim.blocks.rf.noise",
         "metadata": {},
@@ -30,7 +30,7 @@
         }
       },
       {
-        "id": 3280151140672,
+        "id": 2135262630576,
         "type": "WhiteNoise",
         "module": "pathsim.blocks.rf.noise",
         "metadata": {},
@@ -40,7 +40,7 @@
         }
       },
       {
-        "id": 3280151141680,
+        "id": 2135262631584,
         "type": "Adder",
         "module": "pathsim.blocks.adder",
         "metadata": {},
@@ -49,7 +49,7 @@
         }
       },
       {
-        "id": 3280151141008,
+        "id": 2135262630912,
         "type": "ButterworthBandpassFilter",
         "module": "pathsim.blocks.rf.filters",
         "metadata": {},
@@ -67,7 +67,7 @@
         }
       },
       {
-        "id": 3280151142352,
+        "id": 2135262632256,
         "type": "Scope",
         "module": "pathsim.blocks.scope",
         "metadata": {},
@@ -84,7 +84,7 @@
         }
       },
       {
-        "id": 3280151142688,
+        "id": 2135262632592,
         "type": "Spectrum",
         "module": "pathsim.blocks.spectrum",
         "metadata": {},
@@ -611,103 +611,141 @@
     "events": [],
     "connections": [
       {
-        "id": 3280151143024,
+        "id": 2135262632928,
         "source": {
-          "block": 3280151140000,
-          "port": 0
+          "block": 2135262629904,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3280151141680,
-            "port": 0
+            "block": 2135262631584,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 3280151142352,
-            "port": 0
+            "block": 2135262632256,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 3280151142688,
-            "port": 0
+            "block": 2135262632592,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 3280151382928,
+        "id": 2135263019408,
         "source": {
-          "block": 3280151140336,
-          "port": 0
+          "block": 2135262630240,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3280151141680,
-            "port": 1
+            "block": 2135262631584,
+            "ports": [
+              1
+            ]
           },
           {
-            "block": 3280151142352,
-            "port": 3
+            "block": 2135262632256,
+            "ports": [
+              3
+            ]
           },
           {
-            "block": 3280151142688,
-            "port": 3
+            "block": 2135262632592,
+            "ports": [
+              3
+            ]
           }
         ]
       },
       {
-        "id": 3280151383248,
+        "id": 2135263019728,
         "source": {
-          "block": 3280151140672,
-          "port": 0
+          "block": 2135262630576,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3280151141680,
-            "port": 2
+            "block": 2135262631584,
+            "ports": [
+              2
+            ]
           },
           {
-            "block": 3280151142352,
-            "port": 4
+            "block": 2135262632256,
+            "ports": [
+              4
+            ]
           },
           {
-            "block": 3280151142688,
-            "port": 4
+            "block": 2135262632592,
+            "ports": [
+              4
+            ]
           }
         ]
       },
       {
-        "id": 3280151184960,
+        "id": 2135262692016,
         "source": {
-          "block": 3280151141680,
-          "port": 0
+          "block": 2135262631584,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3280151141008,
-            "port": 0
+            "block": 2135262630912,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 3280151142352,
-            "port": 2
+            "block": 2135262632256,
+            "ports": [
+              2
+            ]
           },
           {
-            "block": 3280151142688,
-            "port": 2
+            "block": 2135262632592,
+            "ports": [
+              2
+            ]
           }
         ]
       },
       {
-        "id": 3280151184048,
+        "id": 2135262692624,
         "source": {
-          "block": 3280151141008,
-          "port": 0
+          "block": 2135262630912,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3280151142352,
-            "port": 1
+            "block": 2135262632256,
+            "ports": [
+              1
+            ]
           },
           {
-            "block": 3280151142688,
-            "port": 1
+            "block": 2135262632592,
+            "ports": [
+              1
+            ]
           }
         ]
       }

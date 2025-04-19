@@ -1,46 +1,57 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 25,
-    "timestamp": "2025-03-15T16:38:51.045395"
+    "duration": 20,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:56:27.272085"
   },
   "structure": {
     "blocks": [
       {
-        "id": 2069344827584,
+        "id": 2710461453648,
         "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
         "params": {
           "initial_value": 0
         }
       },
       {
-        "id": 2069345087440,
+        "id": 2710463983888,
         "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
         "params": {
           "initial_value": 2.827433388230814
         }
       },
       {
-        "id": 2069344827920,
+        "id": 2710463901584,
         "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
         "params": {
           "gain": -9.81
         }
       },
       {
-        "id": 2069344828256,
+        "id": 2710463902256,
         "type": "Function",
+        "module": "pathsim.blocks.function",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVKQAAAAAAAACMHW51bXB5Ll9jb3JlLl9tdWx0aWFycmF5X3VtYXRolIwDc2lulJOULg==",
+            "data": "gAWVKQAAAAAAAACMHW51bXB5Ll9jb3JlLl9tdWx0aWFycmF5X3VtYXRolIwDc2lulJOULg==",
             "name": "sin"
           }
         }
       },
       {
-        "id": 2069344828592,
+        "id": 2710463902592,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
@@ -54,62 +65,82 @@
     "events": [],
     "connections": [
       {
-        "id": 2069344828928,
+        "id": 2710463903264,
         "source": {
-          "block": 2069344827584,
-          "port": 0
+          "block": 2710461453648,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2069345087440,
-            "port": 0
+            "block": 2710463983888,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2069344828592,
-            "port": 0
+            "block": 2710463902592,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2069345088080,
+        "id": 2710463984848,
         "source": {
-          "block": 2069345087440,
-          "port": 0
+          "block": 2710463983888,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2069344828256,
-            "port": 0
+            "block": 2710463902256,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2069344828592,
-            "port": 1
+            "block": 2710463902592,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2069345088400,
+        "id": 2710463985168,
         "source": {
-          "block": 2069344828256,
-          "port": 0
+          "block": 2710463902256,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2069344827920,
-            "port": 0
+            "block": 2710463901584,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2069345747328,
+        "id": 2710463446240,
         "source": {
-          "block": 2069344827920,
-          "port": 0
+          "block": 2710463901584,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2069344827584,
-            "port": 0
+            "block": 2710461453648,
+            "ports": [
+              0
+            ]
           }
         ]
       }
@@ -123,6 +154,7 @@
     "tolerance_fpi": 1e-12,
     "iterations_min": 1,
     "iterations_max": 200,
-    "tolerance_lte_rel": 1e-06
+    "tolerance_lte_rel": 1e-06,
+    "tolerance_lte_abs": 1e-08
   }
 }

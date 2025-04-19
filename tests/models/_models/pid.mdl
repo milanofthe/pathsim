@@ -2,97 +2,87 @@
   "type": "Simulation",
   "metadata": {
     "duration": 100,
-    "timestamp": "2025-03-15T16:38:27.437978"
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:55:09.183823"
   },
   "structure": {
     "blocks": [
       {
-        "id": 3135909214064,
+        "id": 1988194833744,
         "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVkAEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBksDQ0KVAFsBAAAAAAAAAABVAFMBOoQAADUBAAAAAAAAUwJbAQAAAAAAAAAAVQBTAzqEAAA1AQAAAAAAAC0FAAAtCgAAJACUKE5LCkc/4AAAAAAAAEsydJSMA2ludJSFlIwBdJSFlIxNQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9waWQucHmUjAg8bGFtYmRhPpRoDUsbQx2AAJxDoAGgIqEEm0mgY6wjqGGwAqlkqymhbdIcM5RoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDU5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEYwDaW50lGgAjApfbG9hZF90eXBllJOUaAiFlFKUczAu",
-            "name": "<lambda>"
+            "data": "gAWVRgEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwYCAQ4BDgGUSwFLAEsASwFLAksDQyCVAFUAUwE6lAAAYQEAAGcCVQBTAzqUAABhAQAAZwRnBZQoTks8Rz/gAAAAAAAASxRLAUsAdJQpjAF0lIWUjE1DOlxVc2Vyc1xtaWxhblxPbmVEcml2ZVxVTklfUHJvbW90aW9uXFBhdGhTaW1ccGF0aHNpbVxleGFtcGxlc1xleGFtcGxlX3BpZC5weZSMA2Zfc5RoC0sbQxeAANgHCIgSg3SQQ9gJCogyixSQYdgREpRDAJQpKXSUUpR9lIwIX19uYW1lX1+UjAhfX21haW5fX5RzaAtOTnSUUpR9lH2UjA9fX2Fubm90YXRpb25zX1+UfZRzhpRiLg==",
+            "name": "f_s"
           }
         }
       },
       {
-        "id": 3135909214400,
+        "id": 1988197281680,
         "type": "Adder",
-        "params": {}
-      },
-      {
-        "id": 3135909214736,
-        "type": "Amplifier",
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
         "params": {
-          "gain": 1.5
+          "operations": "+-"
         }
       },
       {
-        "id": 3135909490640,
-        "type": "Amplifier",
+        "id": 1988197282352,
+        "type": "PID",
+        "module": "pathsim.blocks.ctrl",
+        "metadata": {},
         "params": {
-          "gain": 0.75
-        }
-      },
-      {
-        "id": 3135909491280,
-        "type": "Amplifier",
-        "params": {
-          "gain": 0.05
-        }
-      },
-      {
-        "id": 3135909215072,
-        "type": "Integrator",
-        "params": {
-          "initial_value": 0.0
-        }
-      },
-      {
-        "id": 3135909215408,
-        "type": "Differentiator",
-        "params": {
+          "Kp": {
+            "type": "dill",
+            "data": "gAWVGwEAAAAAAACME3BhdGhzaW0ub3B0aW0udmFsdWWUjAVWYWx1ZZSTlCmBlE59lCiMA3ZhbJSMFm51bXB5Ll9jb3JlLm11bHRpYXJyYXmUjAZzY2FsYXKUk5SMBW51bXB5lIwFZHR5cGWUk5SMAmY4lImIh5RSlChLA4wBPJROTk5K/////0r/////SwB0lGJDCAAAAAAAAPg/lIaUUpSMBGdyYWSUjAtjb2xsZWN0aW9uc5SMC2RlZmF1bHRkaWN0lJOUjApkaWxsLl9kaWxslIwKX2xvYWRfdHlwZZSTlIwFZmxvYXSUhZRSlIWUUpSKBgBKL+jOAUc/8AAAAAAAAHOMA3NpZ5RHAAAAAAAAAACMA19pZJSKBgBKL+jOAXWGlGIu",
+            "name": "unknown"
+          },
+          "Ki": {
+            "type": "dill",
+            "data": "gAWVGwEAAAAAAACME3BhdGhzaW0ub3B0aW0udmFsdWWUjAVWYWx1ZZSTlCmBlE59lCiMA3ZhbJSMFm51bXB5Ll9jb3JlLm11bHRpYXJyYXmUjAZzY2FsYXKUk5SMBW51bXB5lIwFZHR5cGWUk5SMAmY4lImIh5RSlChLA4wBPJROTk5K/////0r/////SwB0lGJDCAAAAAAAAOA/lIaUUpSMBGdyYWSUjAtjb2xsZWN0aW9uc5SMC2RlZmF1bHRkaWN0lJOUjApkaWxsLl9kaWxslIwKX2xvYWRfdHlwZZSTlIwFZmxvYXSUhZRSlIWUUpSKBgBs2rbOAUc/8AAAAAAAAHOMA3NpZ5RHAAAAAAAAAACMA19pZJSKBgBs2rbOAXWGlGIu",
+            "name": "unknown"
+          },
+          "Kd": {
+            "type": "dill",
+            "data": "gAWVGwEAAAAAAACME3BhdGhzaW0ub3B0aW0udmFsdWWUjAVWYWx1ZZSTlCmBlE59lCiMA3ZhbJSMFm51bXB5Ll9jb3JlLm11bHRpYXJyYXmUjAZzY2FsYXKUk5SMBW51bXB5lIwFZHR5cGWUk5SMAmY4lImIh5RSlChLA4wBPJROTk5K/////0r/////SwB0lGJDCJqZmZmZmbk/lIaUUpSMBGdyYWSUjAtjb2xsZWN0aW9uc5SMC2RlZmF1bHRkaWN0lJOUjApkaWxsLl9kaWxslIwKX2xvYWRfdHlwZZSTlIwFZmxvYXSUhZRSlIWUUpSKBoBr2rbOAUc/8AAAAAAAAHOMA3NpZ5RHAAAAAAAAAACMA19pZJSKBoBr2rbOAXWGlGIu",
+            "name": "unknown"
+          },
           "f_max": 10
         }
       },
       {
-        "id": 3135909491600,
-        "type": "Adder",
-        "params": {}
-      },
-      {
-        "id": 3135909491920,
+        "id": 1988197283024,
         "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
         "params": {
           "initial_value": 0.0
         }
       },
       {
-        "id": 3135910134144,
+        "id": 1988197283360,
         "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
         "params": {
-          "gain": 0.2
+          "gain": 0.4
         }
       },
       {
-        "id": 3135910135056,
-        "type": "Amplifier",
-        "params": {
-          "gain": -1
-        }
-      },
-      {
-        "id": 3135909215744,
+        "id": 1988197283696,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
           "labels": [
-            "setpoint",
-            "output",
-            "control signal"
+            "s(t)",
+            "x(t)",
+            "$\\epsilon(t)$"
           ]
         }
       }
@@ -100,172 +90,112 @@
     "events": [],
     "connections": [
       {
-        "id": 3135910215760,
+        "id": 1988197284368,
         "source": {
-          "block": 3135909214064,
-          "port": 0
+          "block": 1988194833744,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3135909214400,
-            "port": 0
+            "block": 1988197281680,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 3135909215744,
-            "port": 0
+            "block": 1988197283696,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 3135909492240,
+        "id": 1988197364944,
         "source": {
-          "block": 3135910135056,
-          "port": 0
+          "block": 1988197283360,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3135909214400,
-            "port": 1
-          }
-        ]
-      },
-      {
-        "id": 3135909492560,
-        "source": {
-          "block": 3135909214400,
-          "port": 0
-        },
-        "targets": [
-          {
-            "block": 3135909214736,
-            "port": 0
+            "block": 1988197281680,
+            "ports": [
+              1
+            ]
           },
           {
-            "block": 3135909490640,
-            "port": 0
+            "block": 1988197283696,
+            "ports": [
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": 1988197365264,
+        "source": {
+          "block": 1988197281680,
+          "ports": [
+            0
+          ]
+        },
+        "targets": [
+          {
+            "block": 1988197282352,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 3135909491280,
-            "port": 0
+            "block": 1988197283696,
+            "ports": [
+              2
+            ]
           }
         ]
       },
       {
-        "id": 3135910135360,
+        "id": 1988196810256,
         "source": {
-          "block": 3135909490640,
-          "port": 0
+          "block": 1988197282352,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3135909215072,
-            "port": 0
+            "block": 1988197283024,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 3135910135664,
+        "id": 1988198039632,
         "source": {
-          "block": 3135909491280,
-          "port": 0
+          "block": 1988197283024,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 3135909215408,
-            "port": 0
-          }
-        ]
-      },
-      {
-        "id": 3135910200240,
-        "source": {
-          "block": 3135909214736,
-          "port": 0
-        },
-        "targets": [
-          {
-            "block": 3135909491600,
-            "port": 0
-          }
-        ]
-      },
-      {
-        "id": 3135909586576,
-        "source": {
-          "block": 3135909215072,
-          "port": 0
-        },
-        "targets": [
-          {
-            "block": 3135909491600,
-            "port": 1
-          }
-        ]
-      },
-      {
-        "id": 3135909586848,
-        "source": {
-          "block": 3135909215408,
-          "port": 0
-        },
-        "targets": [
-          {
-            "block": 3135909491600,
-            "port": 2
-          }
-        ]
-      },
-      {
-        "id": 3137472095568,
-        "source": {
-          "block": 3135909491600,
-          "port": 0
-        },
-        "targets": [
-          {
-            "block": 3135909491920,
-            "port": 0
-          },
-          {
-            "block": 3135909215744,
-            "port": 2
-          }
-        ]
-      },
-      {
-        "id": 3135909701200,
-        "source": {
-          "block": 3135909491920,
-          "port": 0
-        },
-        "targets": [
-          {
-            "block": 3135910134144,
-            "port": 0
-          }
-        ]
-      },
-      {
-        "id": 3135909608768,
-        "source": {
-          "block": 3135910134144,
-          "port": 0
-        },
-        "targets": [
-          {
-            "block": 3135910135056,
-            "port": 0
-          },
-          {
-            "block": 3135909215744,
-            "port": 1
+            "block": 1988197283360,
+            "ports": [
+              0
+            ]
           }
         ]
       }
     ]
   },
   "params": {
-    "dt": 0.1,
+    "dt": 0.01,
     "dt_min": 1e-16,
     "dt_max": null,
     "Solver": "RKCK54",
