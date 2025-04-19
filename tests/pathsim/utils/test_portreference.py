@@ -39,8 +39,29 @@ class TestPortReference(unittest.TestCase):
         PR = PortReference(B, [0, 1, 2, 3])
         self.assertEqual(PR.ports, [0, 1, 2, 3])
 
-        PR = PortReference(B, [2, 3, 1, 3])
-        self.assertEqual(PR.ports, [2, 3, 1, 3])
+        PR = PortReference(B, [2, 3, 1])
+        self.assertEqual(PR.ports, [2, 3, 1])
+
+        #input validation
+        with self.assertRaises(ValueError): PR = PortReference(B, [2, 2, 3])    #duplicates
+        with self.assertRaises(ValueError): PR = PortReference(B, [2, 3, 2, 1]) #duplicates
+        with self.assertRaises(ValueError): PR = PortReference(B, [-1, 2, 3])   #negative integer
+        with self.assertRaises(ValueError): PR = PortReference(B, ["e", 2, 3])  #list but no int
+        with self.assertRaises(ValueError): PR = PortReference(B, [1, 2.1])     #no int
+        with self.assertRaises(ValueError): PR = PortReference(B, (3, 2))       #no list but iterable
+        with self.assertRaises(ValueError): PR = PortReference(B, 1)            #no list but int
+        with self.assertRaises(ValueError): PR = PortReference(B, "d")          #no list
+
+
+
+    def test_set(self):
+
+        pass
+
+
+    def test_get(self):
+
+        pass
 
 
 
