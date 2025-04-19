@@ -13,6 +13,7 @@ import unittest
 import numpy as np
 
 from pathsim.blocks._block import Block
+from pathsim.utils.portreference import PortReference
 
 
 # TESTS ================================================================================
@@ -77,10 +78,22 @@ class TestBlock(unittest.TestCase):
 
         B = Block()
 
-        #test default getitem method (for connection creation)
-        self.assertEqual(B[0], (B, 0))
-        self.assertEqual(B[1], (B, 1))
-        self.assertEqual(B[2], (B, 2))
+        #test default getitem method
+        pr = B[0]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.block, B)
+        self.assertEqual(pr.ports, [0])
+
+        pr = B[2]
+        self.assertEqual(pr.ports, [2])
+
+        pr = B[30]
+        self.assertEqual(pr.ports, [30])
+
+        #test slicing in getitem
+        pr = B[0:1:1]
+        self.assertTrue(isinstance(pr, PortReference))
+
 
         #test input validation
         with self.assertRaises(ValueError): B[0.2]

@@ -134,15 +134,18 @@ class Block(Serializable):
         """
 
         if isinstance(key, slice):
-            #slice to list of port keys
-            start, stop, step = key.start, key.stop, key.step
-
             #slice validation
-            if stop is None: raise ValueError("Port slice cannot be open ended!")
-            if stop == 0: raise ValueError("Port slice cannot end with 0!")
+            if key.stop is None: raise ValueError("Port slice cannot be open ended!")
+            if key.stop == 0: raise ValueError("Port slice cannot end with 0!")
 
             #build port list
-            ports = list(range(start or 0, stop, step))
+            ports = list(
+                range(
+                0 if key.start is None else key.start, 
+                key.stop, 
+                1 if key.step is None else key.step
+                )
+            )
             return PortReference(self, ports)
 
         elif isinstance(key, int):
