@@ -30,7 +30,7 @@ class PortReference:
         list of port indices
     """
 
-    def __init__(self, block=None, ports=None):
+    def __init__(self, block=None, ports=[0]):
 
         #type validation for ports
         if not isinstance(ports, list):            
@@ -45,7 +45,7 @@ class PortReference:
             raise ValueError("'ports' must be unique!")
 
         self.block = block
-        self.ports = [0] if ports is None else ports 
+        self.ports = ports 
 
 
     def set(self, values):
