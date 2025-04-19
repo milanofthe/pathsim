@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                                    CONNECTION CLASS 
+##                                   CONNECTION CLASS 
 ##                                    (connection.py)
 ##
 ##              This module implements the 'Connection' class that transfers
@@ -27,9 +27,9 @@ class Connection:
     The default ports for connection are (0) -> (0), since these are the default inputs 
     that are used in the SISO blocks.
 
-    Example
-    -------
-    Lets assume we have two generic blocks 
+    Examples
+    --------
+    Lets assume we have some generic blocks 
 
     .. code-block:: python
     
@@ -94,6 +94,20 @@ class Connection:
     .. code-block:: python
 
         C = Connection(B1[0:2], B2[1:3])
+
+
+    Slicing can also be used for one-to-many connections where this:
+    
+    .. code-block:: python
+
+        C = Connection(B1, B2[0], B2[1])
+
+
+    would be equivalent to this:
+    
+    .. code-block:: python
+
+        C = Connection(B1, B2[0:2])
 
 
     Parameters
@@ -230,10 +244,10 @@ class Duplex(Connection):
 
     def __init__(self, source, target):
         
-        self.source = source if isinstance(source, (list, tuple)) else (source, 0)
-        self.target = target if isinstance(target, (list, tuple)) else (target, 0)
+        self.source = source if isinstance(source, PortReference) else PortReference(source)
+        self.target = target if isinstance(target, PortReference) else PortReference(target)
         
-        #for path length estimation
+        #this is required for path length estimation
         self.targets = [self.target, self.source]
 
         #flag to set connection active
@@ -244,14 +258,8 @@ class Duplex(Connection):
         """Convert duplex to dictionary representation for serialization"""
         return {
             "id": id(self),
-            "source": {
-                "block": id(self.source[0]),
-                "port": self.source[1]
-            },
-            "target": {
-                "block": id(self.target[0]),
-                "port": self.target[1]
-            }
+            "source": self.source.to_dict(),
+            "target": self.target.to_dict()
         }
 
 
@@ -260,10 +268,6 @@ class Duplex(Connection):
         and ports bidirectionally.
         """
 
-        #unpack the two targets
-        (trg1, prt1) = self.target
-        (trg2, prt2) = self.source
-
         #bidirectional data transfer
-        trg1.set(prt1, trg2.get(prt2))
-        trg2.set(prt2, trg1.get(prt1))
+        self.target.set(self.source.get())
+        self.source.set(self.target.get())
