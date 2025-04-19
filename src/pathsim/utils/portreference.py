@@ -11,8 +11,6 @@
 
 from itertools import cycle
 
-from .blocks._block import Block
-
 
 # CLASS =================================================================================
 
@@ -34,19 +32,17 @@ class PortReference:
 
     def __init__(self, block=None, ports=None):
 
-        #input type validation
-        if not isinstance(block, Block):
-            raise ValueError(f"'block' must be type 'Block' or subclass but is '{type(block)}'!")
+        #type validation for ports
         if not isinstance(ports, list):            
             raise ValueError(f"'ports' must be 'list[int]' but is '{type(ports)}'!")
+
+        #ports are positive integers
+        if not all(isinstance(p, int) and p >= 0 for p in ports):
+            raise ValueError("'ports' must be positive integers!")   
 
         #unique ports
         if len(ports) != len(set(ports)):
             raise ValueError("'ports' must be unique!")
-
-        #ports are positive integers
-        if not all(isinstance(p, int) and p >= 0 for p in ports):
-            raise ValueError("'ports' must be positive integers!")
 
         self.block = block
         self.ports = [0] if ports is None else ports 
