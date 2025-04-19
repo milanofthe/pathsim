@@ -90,15 +90,54 @@ class TestBlock(unittest.TestCase):
         pr = B[30]
         self.assertEqual(pr.ports, [30])
 
-        #test slicing in getitem
-        pr = B[0:1:1]
-        self.assertTrue(isinstance(pr, PortReference))
-
-
         #test input validation
         with self.assertRaises(ValueError): B[0.2]
         with self.assertRaises(ValueError): B[1j]
         with self.assertRaises(ValueError): B["a"]
+
+
+    def test_getitem_slice(self):
+
+        B = Block()
+
+        #test slicing in getitem
+        pr = B[:1]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0])
+
+        pr = B[:2]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0, 1])
+
+        pr = B[1:2]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [1])
+
+        pr = B[0:5]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0, 1, 2, 3, 4])
+
+        pr = B[3:7]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [3, 4, 5, 6])
+
+        pr = B[3:7:2]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [3, 5])
+
+        pr = B[:10:3]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0, 3, 6, 9])
+
+        pr = B[2:12:4]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [2, 6, 10])
+
+        #slice input validation
+        with self.assertRaises(ValueError): B[1:] #open ended
+        with self.assertRaises(ValueError): B[:0] #starting at zero
+
+
 
 
     def test_reset(self):
