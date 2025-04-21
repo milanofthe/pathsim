@@ -78,10 +78,26 @@ class TestConnection(unittest.TestCase):
         self.assertEqual(C.source.ports, [0])
         self.assertTrue(isinstance(C.targets, list))
         self.assertEqual(len(C.targets), 2)
+        self.assertEqual(C.targets[0].ports, [0])
+        self.assertEqual(C.targets[1].ports, [0])
 
         #mixed
+        C = Connection(B1[1], B2[3], B3)
+        self.assertEqual(C.source.ports, [1])
+        self.assertEqual(C.targets[0].ports, [3])
+        self.assertEqual(C.targets[1].ports, [0])
+
+        C = Connection(B1, B2[2], B3[0])
+        self.assertEqual(C.source.ports, [0])
+        self.assertEqual(C.targets[0].ports, [2])
+        self.assertEqual(C.targets[1].ports, [0])
 
         #all
+        C = Connection(B1[1:7], B2[2], B3[3:9])
+        self.assertEqual(C.source.ports, [1, 2, 3, 4, 5, 6])
+        self.assertEqual(C.targets[0].ports, [2])
+        self.assertEqual(C.targets[1].ports, [3, 4, 5, 6, 7, 8])
+
 
 
     def test_overwrites(self):
