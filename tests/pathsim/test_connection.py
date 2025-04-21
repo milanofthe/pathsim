@@ -297,7 +297,8 @@ class TestDuplex(unittest.TestCase):
 
         B1, B2 = Block(), Block()
 
-        #test data transfer with default ports
+        #default
+
         D = Duplex(B1, B2) 
         B1.outputs[0] = 3
         B2.outputs[0] = 1
@@ -305,7 +306,24 @@ class TestDuplex(unittest.TestCase):
         self.assertEqual(B1.inputs[0], 1)
         self.assertEqual(B2.inputs[0], 3)
 
-        #test data transfer with special ports
+        #specific
+
+        D = Duplex(B1[3], B2[1]) 
+        B1.outputs[3] = 2
+        B2.outputs[1] = -0.1
+        D.update()
+        self.assertEqual(B1.inputs[3], -0.1)
+        self.assertEqual(B2.inputs[1], 2)
+
+        #slicing
+
+        D = Duplex(B1[1:4], B2[:3]) 
+        B1.outputs = {0:33, 1:99, 2:44, 3:77, 4:11}
+        B2.outputs = {0:0.33, 1:0.99, 2:0.44, 3:0.77, 4:0.11}
+        D.update()
+        self.assertEqual(B1.inputs[3], 0.44)
+        self.assertEqual(B2.inputs[1], 44)
+
 
 
 
