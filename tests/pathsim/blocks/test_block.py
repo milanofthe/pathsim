@@ -13,6 +13,7 @@ import unittest
 import numpy as np
 
 from pathsim.blocks._block import Block
+from pathsim.utils.portreference import PortReference
 
 
 # TESTS ================================================================================
@@ -77,15 +78,66 @@ class TestBlock(unittest.TestCase):
 
         B = Block()
 
-        #test default getitem method (for connection creation)
-        self.assertEqual(B[0], (B, 0))
-        self.assertEqual(B[1], (B, 1))
-        self.assertEqual(B[2], (B, 2))
+        #test default getitem method
+        pr = B[0]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.block, B)
+        self.assertEqual(pr.ports, [0])
+
+        pr = B[2]
+        self.assertEqual(pr.ports, [2])
+
+        pr = B[30]
+        self.assertEqual(pr.ports, [30])
 
         #test input validation
         with self.assertRaises(ValueError): B[0.2]
         with self.assertRaises(ValueError): B[1j]
         with self.assertRaises(ValueError): B["a"]
+
+
+    def test_getitem_slice(self):
+
+        B = Block()
+
+        #test slicing in getitem
+        pr = B[:1]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0])
+
+        pr = B[:2]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0, 1])
+
+        pr = B[1:2]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [1])
+
+        pr = B[0:5]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0, 1, 2, 3, 4])
+
+        pr = B[3:7]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [3, 4, 5, 6])
+
+        pr = B[3:7:2]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [3, 5])
+
+        pr = B[:10:3]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [0, 3, 6, 9])
+
+        pr = B[2:12:4]
+        self.assertTrue(isinstance(pr, PortReference))
+        self.assertEqual(pr.ports, [2, 6, 10])
+
+        #slice input validation
+        with self.assertRaises(ValueError): B[1:] #open ended
+        with self.assertRaises(ValueError): B[:0] #starting at zero
+
+
 
 
     def test_reset(self):

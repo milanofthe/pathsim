@@ -1,54 +1,71 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 25,
-    "timestamp": "2025-03-15T16:39:14.022009"
+    "duration": 100,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:55:46.221067"
   },
   "structure": {
     "blocks": [
       {
-        "id": 2822757627760,
+        "id": 1842693363360,
         "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
         "params": {
           "initial_value": 5
         }
       },
       {
-        "id": 2822757806352,
+        "id": 1842695909648,
         "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
         "params": {
           "initial_value": 2
         }
       },
       {
-        "id": 2822757628096,
+        "id": 1842695794912,
         "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
         "params": {
           "gain": 0.2
         }
       },
       {
-        "id": 2822757806992,
+        "id": 1842695909008,
         "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
         "params": {
           "gain": 1.5
         }
       },
       {
-        "id": 2822757807312,
+        "id": 1842695910288,
         "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
         "params": {
           "gain": -1.25
         }
       },
       {
-        "id": 2822757628432,
+        "id": 1842695795584,
         "type": "Adder",
-        "params": {}
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": null
+        }
       },
       {
-        "id": 2822757628768,
+        "id": 1842695795920,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
@@ -62,92 +79,122 @@
     "events": [],
     "connections": [
       {
-        "id": 2822757629104,
+        "id": 1842695796256,
         "source": {
-          "block": 2822757627760,
-          "port": 0
+          "block": 1842693363360,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2822757806352,
-            "port": 0
+            "block": 1842695909648,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2822757628096,
-            "port": 0
+            "block": 1842695794912,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2822757628768,
-            "port": 0
+            "block": 1842695795920,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2822757807632,
+        "id": 1842695911568,
         "source": {
-          "block": 2822757806352,
-          "port": 0
+          "block": 1842695909648,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2822757806992,
-            "port": 0
+            "block": 1842695909008,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2822757628768,
-            "port": 1
+            "block": 1842695795920,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2822757807952,
+        "id": 1842695911888,
         "source": {
-          "block": 2822757628096,
-          "port": 0
+          "block": 1842695794912,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2822757628432,
-            "port": 0
+            "block": 1842695795584,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2822758547840,
+        "id": 1842695355920,
         "source": {
-          "block": 2822757806992,
-          "port": 0
+          "block": 1842695909008,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2822757628432,
-            "port": 1
+            "block": 1842695795584,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2822758548752,
+        "id": 1842696585296,
         "source": {
-          "block": 2822757628432,
-          "port": 0
+          "block": 1842695795584,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2822757807312,
-            "port": 0
+            "block": 1842695910288,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2822758597552,
+        "id": 1842696237232,
         "source": {
-          "block": 2822757807312,
-          "port": 0
+          "block": 1842695910288,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2822757627760,
-            "port": 0
+            "block": 1842693363360,
+            "ports": [
+              0
+            ]
           }
         ]
       }

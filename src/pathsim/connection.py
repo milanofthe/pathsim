@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##                                    CONNECTION CLASS 
+##                                   CONNECTION CLASS 
 ##                                    (connection.py)
 ##
 ##              This module implements the 'Connection' class that transfers
@@ -14,6 +14,8 @@
 
 import json
 
+from .utils.portreference import PortReference
+
 
 # CLASSES ===============================================================================
 
@@ -25,9 +27,9 @@ class Connection:
     The default ports for connection are (0) -> (0), since these are the default inputs 
     that are used in the SISO blocks.
 
-    Example
-    -------
-    Lets assume we have two generic blocks 
+    Examples
+    --------
+    Lets assume we have some generic blocks 
 
     .. code-block:: python
     
@@ -49,12 +51,12 @@ class Connection:
 
 
     which is a connection from block 'B1' to 'B2'. If we want to explicitly declare 
-    the input and output ports we can do that by giving tuples (lists also work) as 
-    the arguments
+    the input and output ports we can do that by utilizing the '__getitem__' method
+    of the blocks
 
     .. code-block:: python
  
-        C = Connection((B1, 0), (B2, 0))
+        C = Connection(B1[0], B2[0])
 
 
     which is exactly the default port setup. Connecting output port (1) of 'B1' to 
@@ -62,14 +64,14 @@ class Connection:
 
     .. code-block:: python
 
-        C = Connection((B1, 1), (B2, 0))
+        C = Connection(B1[1], B2[0])
         
 
     or just
     
     .. code-block:: python
 
-        C = Connection((B1, 1), B2).
+        C = Connection(B1[1], B2).
 
 
     The 'Connection' class also supports multiple targets for a single source. 
@@ -78,7 +80,7 @@ class Connection:
     
     .. code-block:: python
 
-        C = Connection(B1, (B2, 0), (B2, 1), B3)
+        C = Connection(B1, B2[0], B2[1], B3)
 
 
     The port definitions follow the same structure as for single target connections.
@@ -86,31 +88,43 @@ class Connection:
     'self'-connections also work without a problem. This is useful for modeling direct 
     feedback of a block to itself.
     
-    The port specification can be simplified (quality of life) by using the __getitem__ 
-    method that is implemented in the base 'Block' class. It returns the tuple of block
-    and port pair that is used for the port specification in the 'Connection' 
-    initialization. For example the following initializations are equivalent:
+    Port definitions support slicing. This enables direct MIMO connections. For example 
+    connecting ports 0, 1, 2 of 'B1' to ports 1, 2, 3 of 'B2' works like this:
 
-    .. code-block::
+    .. code-block:: python
 
-        Connection(B1[1], B2[3]) <=> Connection((B1, 1), (B2, 3))
+        C = Connection(B1[0:2], B2[1:3])
+
+
+    Slicing can also be used for one-to-many connections where this:
+    
+    .. code-block:: python
+
+        C = Connection(B1, B2[0], B2[1])
+
+
+    would be equivalent to this:
+    
+    .. code-block:: python
+
+        C = Connection(B1, B2[0:2])
 
 
     Parameters
     ----------
-    source : tuple[Block, int], Block
+    source : PortReference, Block
         source block and optional source output port
-    targets : tuple[tuple[Block, int]], tuple[Block]
+    targets : tuple[PortReference], tuple[Block]
         target blocks and optional target input ports
     """
 
     def __init__(self, source, *targets):
         
         #assign source block and port
-        self.source = source if isinstance(source, (list, tuple)) else (source, 0)
+        self.source = source if isinstance(source, PortReference) else PortReference(source)
 
         #assign target blocks and ports
-        self.targets = [trg if isinstance(trg, (list, tuple)) else (trg, 0) for trg in targets]
+        self.targets = [trg if isinstance(trg, PortReference) else PortReference(trg) for trg in targets]
 
         #flag to set connection active
         self._active = True
@@ -154,11 +168,10 @@ class Connection:
         list[Block]
             internal unique blocks of the connection
         """
-        src, _ = self.source
-        blocks = [src]
-        for trg, _ in self.targets:
-            if trg not in blocks:
-                blocks.append(trg)
+        blocks = [self.source.block]
+        for trg in self.targets:
+            if trg.block not in blocks:
+                blocks.append(trg.block)
         return blocks
 
 
@@ -190,11 +203,17 @@ class Connection:
         if self == other:
             return False
 
-        #iterate all targets
+        #iterate all target permutations
         for trg in self.targets:
-            #check if there is target and port overlap
-            if trg in other.targets:
-                return True
+            for otrg in other.targets:
+
+                #check if same target block
+                if trg.block is otrg.block:
+
+                    #check if there is port overlap
+                    for prt in trg.ports:
+                        if prt in otrg.ports: 
+                            return True
 
         return False 
 
@@ -203,14 +222,8 @@ class Connection:
         """Convert connection to dictionary representation for serialization"""
         return {
             "id": id(self),
-            "source": {
-                "block": id(self.source[0]),
-                "port": self.source[1]
-            },
-            "targets": [
-                {"block": id(trg[0]), "port": trg[1]} 
-                for trg in self.targets
-            ]
+            "source": self.source.to_dict(),
+            "targets": [trg.to_dict() for trg in self.targets]
         }
 
 
@@ -218,9 +231,9 @@ class Connection:
         """Transfers data from the source block output port 
         to the target block input port.
         """
-        val = self.source[0].get(self.source[1])
-        for trg, prt in self.targets:
-            trg.set(prt, val)
+        vals = self.source.get()
+        for trg in self.targets:
+            trg.set(vals)
 
 
 class Duplex(Connection):
@@ -231,10 +244,10 @@ class Duplex(Connection):
 
     def __init__(self, source, target):
         
-        self.source = source if isinstance(source, (list, tuple)) else (source, 0)
-        self.target = target if isinstance(target, (list, tuple)) else (target, 0)
+        self.source = source if isinstance(source, PortReference) else PortReference(source)
+        self.target = target if isinstance(target, PortReference) else PortReference(target)
         
-        #for path length estimation
+        #this is required for path length estimation
         self.targets = [self.target, self.source]
 
         #flag to set connection active
@@ -245,14 +258,8 @@ class Duplex(Connection):
         """Convert duplex to dictionary representation for serialization"""
         return {
             "id": id(self),
-            "source": {
-                "block": id(self.source[0]),
-                "port": self.source[1]
-            },
-            "target": {
-                "block": id(self.target[0]),
-                "port": self.target[1]
-            }
+            "source": self.source.to_dict(),
+            "target": self.target.to_dict()
         }
 
 
@@ -261,10 +268,6 @@ class Duplex(Connection):
         and ports bidirectionally.
         """
 
-        #unpack the two targets
-        (trg1, prt1) = self.target
-        (trg2, prt2) = self.source
-
         #bidirectional data transfer
-        trg1.set(prt1, trg2.get(prt2))
-        trg2.set(prt2, trg1.get(prt1))
+        self.target.set(self.source.get())
+        self.source.set(self.target.get())

@@ -2,41 +2,48 @@
   "type": "Simulation",
   "metadata": {
     "duration": 100,
-    "timestamp": "2025-03-15T16:37:03.326645"
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:53:34.513416"
   },
   "structure": {
     "blocks": [
       {
-        "id": 2658869000048,
+        "id": 2935313356112,
         "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVeAEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQyaVAFsBAAAAAAAAAABVAFsCAAAAAAAAAAA6rAAANQEAAAAAAAAkAJROhZSMA2ludJSMA3RhdZSGlIwBdJSFlIxaQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV90cmFuc2ZlcmZ1bmN0aW9uLnB5lIwIPGxhbWJkYT6UaA5LH0MMgACUY5ghnFOZJpRrlGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gOTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgSKIwDaW50lGgAjApfbG9hZF90eXBllJOUaAiFlFKUjAN0YXWUR0AUAAAAAAAAdTAu",
+            "data": "gAWVeAEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQyaVAFsBAAAAAAAAAABVAFsCAAAAAAAAAAA6rAAANQEAAAAAAAAkAJROhZSMA2ludJSMA3RhdZSGlIwBdJSFlIxaQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV90cmFuc2ZlcmZ1bmN0aW9uLnB5lIwIPGxhbWJkYT6UaA5LH0MMgACUY5ghnFOZJpRrlGgFKSl0lFKUfZSMCF9fbmFtZV9flIwIX19tYWluX1+Uc2gOTk50lFKUfZR9lIwPX19hbm5vdGF0aW9uc19flH2Uc4aUYmgSKIwDaW50lGgAjApfbG9hZF90eXBllJOUaAiFlFKUjAN0YXWUR0AUAAAAAAAAdTAu",
             "name": "<lambda>"
           }
         }
       },
       {
-        "id": 2658869000384,
+        "id": 2935315787664,
         "type": "TransferFunction",
+        "module": "pathsim.blocks.lti",
+        "metadata": {},
         "params": {
           "Poles": {
             "type": "dill",
-            "data": "gASVlgAAAAAAAABdlChHv9MzMzMzMzOMCmRpbGwuX2RpbGyUjApfbG9hZF90eXBllJOUjAdjb21wbGV4lIWUUpRHv6mZmZmZmZpHP9mZmZmZmZqGlFKUaAZHv6mZmZmZmZpHv9mZmZmZmZqGlFKUaAZHv7mZmZmZmZpHQAAAAAAAAACGlFKUaAZHv7mZmZmZmZpHwAAAAAAAAACGlFKUZS4=",
+            "data": "gAWVlgAAAAAAAABdlChHv9MzMzMzMzOMCmRpbGwuX2RpbGyUjApfbG9hZF90eXBllJOUjAdjb21wbGV4lIWUUpRHv6mZmZmZmZpHP9mZmZmZmZqGlFKUaAZHv6mZmZmZmZpHv9mZmZmZmZqGlFKUaAZHv7mZmZmZmZpHQAAAAAAAAACGlFKUaAZHv7mZmZmZmZpHwAAAAAAAAACGlFKUZS4=",
             "name": "unknown"
           },
           "Residues": {
             "type": "dill",
-            "data": "gASVeAAAAAAAAABdlChHv8mZmZmZmZqMCmRpbGwuX2RpbGyUjApfbG9hZF90eXBllJOUjAdjb21wbGV4lIWUUpRHgAAAAAAAAABHv8mZmZmZmZqGlFKUaAZHAAAAAAAAAABHP8mZmZmZmZqGlFKURz/TMzMzMzMzRz/TMzMzMzMzZS4=",
+            "data": "gAWVeAAAAAAAAABdlChHv8mZmZmZmZqMCmRpbGwuX2RpbGyUjApfbG9hZF90eXBllJOUjAdjb21wbGV4lIWUUpRHgAAAAAAAAABHv8mZmZmZmZqGlFKUaAZHAAAAAAAAAABHP8mZmZmZmZqGlFKURz/TMzMzMzMzRz/TMzMzMzMzZS4=",
             "name": "unknown"
           },
           "Const": 0.0
         }
       },
       {
-        "id": 2658869000720,
+        "id": 2935315788336,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
@@ -50,32 +57,42 @@
     "events": [],
     "connections": [
       {
-        "id": 2658869001056,
+        "id": 2935315788672,
         "source": {
-          "block": 2658869000048,
-          "port": 0
+          "block": 2935313356112,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2658869000384,
-            "port": 0
+            "block": 2935315787664,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2658869000720,
-            "port": 0
+            "block": 2935315788336,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2658869260240,
+        "id": 2935315903376,
         "source": {
-          "block": 2658869000384,
-          "port": 0
+          "block": 2935315787664,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2658869000720,
-            "port": 1
+            "block": 2935315788336,
+            "ports": [
+              1
+            ]
           }
         ]
       }

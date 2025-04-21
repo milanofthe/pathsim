@@ -1,44 +1,57 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 12,
-    "timestamp": "2025-03-15T16:39:49.407455"
+    "duration": 15,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:59:53.656256"
   },
   "structure": {
     "blocks": [
       {
-        "id": 2970125154160,
+        "id": 2114934052176,
         "type": "Source",
+        "module": "pathsim.blocks.sources",
+        "metadata": {},
         "params": {
           "func": {
             "type": "dill",
-            "data": "gASVaQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQyaVAFsBAAAAAAAAAABVAFsCAAAAAAAAAAA6hAAANQEAAAAAAAAkAJROhZSMA2ludJSMA3RhdZSGlIwBdJSFlIxSQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9mZWVkYmFjay5weZSMCDxsYW1iZGE+lGgOSx9DDIAAnAOYQZxjmUWcCpRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEiiMA3RhdZRLA4wDaW50lGgAjApfbG9hZF90eXBllJOUaAiFlFKUdTAu",
+            "data": "gAWVaQEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwFLAEsASwFLBEsDQyaVAFsBAAAAAAAAAABVAFsCAAAAAAAAAAA6hAAANQEAAAAAAAAkAJROhZSMA2ludJSMA3RhdZSGlIwBdJSFlIxSQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9mZWVkYmFjay5weZSMCDxsYW1iZGE+lGgOSx9DDIAAnAOYQZxjmUWcCpRoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEiiMA3RhdZRLA4wDaW50lGgAjApfbG9hZF90eXBllJOUaAiFlFKUdTAu",
             "name": "<lambda>"
           }
         }
       },
       {
-        "id": 2970125154496,
+        "id": 2114936483728,
         "type": "Integrator",
+        "module": "pathsim.blocks.integrator",
+        "metadata": {},
         "params": {
           "initial_value": 2
         }
       },
       {
-        "id": 2970125154832,
+        "id": 2114936484064,
         "type": "Amplifier",
+        "module": "pathsim.blocks.amplifier",
+        "metadata": {},
         "params": {
           "gain": -1
         }
       },
       {
-        "id": 2970125155168,
+        "id": 2114936484736,
         "type": "Adder",
-        "params": {}
+        "module": "pathsim.blocks.adder",
+        "metadata": {},
+        "params": {
+          "operations": null
+        }
       },
       {
-        "id": 2970125155504,
+        "id": 2114936485072,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
@@ -52,69 +65,89 @@
     "events": [],
     "connections": [
       {
-        "id": 2970125155840,
+        "id": 2114936485744,
         "source": {
-          "block": 2970125154160,
-          "port": 0
+          "block": 2114934052176,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2970125155168,
-            "port": 0
+            "block": 2114936484736,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2970125155504,
-            "port": 0
+            "block": 2114936485072,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2970125414352,
+        "id": 2114936583056,
         "source": {
-          "block": 2970125154832,
-          "port": 0
+          "block": 2114936484064,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2970125155168,
-            "port": 1
+            "block": 2114936484736,
+            "ports": [
+              1
+            ]
           }
         ]
       },
       {
-        "id": 2970125414992,
+        "id": 2114936583376,
         "source": {
-          "block": 2970125155168,
-          "port": 0
+          "block": 2114936484736,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2970125154496,
-            "port": 0
+            "block": 2114936483728,
+            "ports": [
+              0
+            ]
           }
         ]
       },
       {
-        "id": 2970126074240,
+        "id": 2114936028384,
         "source": {
-          "block": 2970125154496,
-          "port": 0
+          "block": 2114936483728,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 2970125154832,
-            "port": 0
+            "block": 2114936484064,
+            "ports": [
+              0
+            ]
           },
           {
-            "block": 2970125155504,
-            "port": 1
+            "block": 2114936485072,
+            "ports": [
+              1
+            ]
           }
         ]
       }
     ]
   },
   "params": {
-    "dt": 0.01,
+    "dt": 0.025,
     "dt_min": 1e-16,
     "dt_max": null,
     "Solver": "SSPRK22",

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Integrator, Constant, Adder, Amplifier, Multiplier
-from pathsim.solvers import RKCK54, RKBS32, GEAR52A
+from pathsim.solvers import RKCK54, RKBS32, GEAR52A, RKF21, ESDIRK43
 
 
 # LORENZ SYSTEM =========================================================================
@@ -81,10 +81,10 @@ connections = [
 Sim = Simulation(
     blocks,
     connections,
-    Solver=GEAR52A,
-    tolerance_lte_rel=1e-3,
-    tolerance_lte_abs=1e-5,
-    tolerance_fpi=1e-8
+    Solver=RKBS32,
+    tolerance_lte_rel=1e-4,
+    tolerance_lte_abs=1e-6,
+    tolerance_fpi=1e-6
     )
 
 
@@ -93,7 +93,7 @@ Sim = Simulation(
 if __name__ == "__main__":
 
     #run the simulation
-    Sim.run(100)
+    Sim.run(50)
     sco.plot()
     sco.plot3D(lw=1)
 

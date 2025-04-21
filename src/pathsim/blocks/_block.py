@@ -17,6 +17,7 @@ import numpy as np
 
 from ..utils.utils import dict_to_array, array_to_dict, max_error_dicts
 from ..utils.serialization import Serializable
+from ..utils.portreference import PortReference
 
 
 # BASE BLOCK CLASS ======================================================================
@@ -123,21 +124,40 @@ class Block(Serializable):
 
         Parameters
         ----------
-        key : int
-            key of the port
+        key : int, slice
+            port indices
 
         Returns
         -------
-        pair : tuple[Block, int]
-            tuple of the block itself and the key of the port
+        PortReference
+            container object that hold block reference and list of ports
         """
-        if not isinstance(key, int):
-            raise ValueError(f"Port has to be of type 'int' but is '{type(key)}'!")
-        return (self, key)
+
+        if isinstance(key, slice):
+            #slice validation
+            if key.stop is None: raise ValueError("Port slice cannot be open ended!")
+            if key.stop == 0: raise ValueError("Port slice cannot end with 0!")
+
+            #build port list
+            ports = list(
+                range(
+                0 if key.start is None else key.start, 
+                key.stop, 
+                1 if key.step is None else key.step
+                )
+            )
+            return PortReference(self, ports)
+
+        elif isinstance(key, int):
+            #standard integer key
+            return PortReference(self, [key])
+
+        else:
+            raise ValueError(f"Port has to be 'int' or 'slice' but is '{type(key)}'!")
 
 
     def __call__(self):
-        """The '__call__' is a nalias for the 'get_all' method."""
+        """The '__call__' is an alias for the 'get_all' method."""
         return self.get_all()
 
 

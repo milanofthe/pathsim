@@ -66,6 +66,8 @@ Sim = Simulation(
     tolerance_fpi=1e-9
     )
 
+Sim.save("subsystem.mdl", duration=3*mu)
+
 
 # Run Example ===========================================================================
 

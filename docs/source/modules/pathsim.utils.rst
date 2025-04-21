@@ -7,6 +7,7 @@ pathsim.utils
    pathsim.utils.adaptivebuffer
    pathsim.utils.analysis
    pathsim.utils.gilbert
+   pathsim.utils.portreference
    pathsim.utils.progresstracker
    pathsim.utils.realtimeplotter
    pathsim.utils.serialization

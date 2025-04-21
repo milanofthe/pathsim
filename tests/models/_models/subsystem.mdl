@@ -1,96 +1,125 @@
 {
   "type": "Simulation",
   "metadata": {
-    "duration": 2000,
-    "timestamp": "2025-03-15T16:34:09.774967"
+    "duration": 3000,
+    "version": "0.6.6.dev42+gd8cb83a",
+    "timestamp": "2025-04-19T15:53:00.961452"
   },
   "structure": {
     "blocks": [
       {
-        "id": 1721475743232,
+        "id": 2046518736752,
         "type": "Subsystem",
+        "module": "pathsim.subsystem",
+        "metadata": {},
         "params": {
           "blocks": [
             {
-              "id": 1721475742224,
+              "id": 2046518735072,
               "type": "Integrator",
+              "module": "pathsim.blocks.integrator",
+              "metadata": {},
               "params": {
                 "initial_value": 2
               }
             },
             {
-              "id": 1721476001744,
+              "id": 2046518833424,
               "type": "Integrator",
+              "module": "pathsim.blocks.integrator",
+              "metadata": {},
               "params": {
                 "initial_value": 0
               }
             },
             {
-              "id": 1721475742560,
+              "id": 2046518735408,
               "type": "Function",
+              "module": "pathsim.blocks.function",
+              "metadata": {},
               "params": {
                 "func": {
                   "type": "dill",
-                  "data": "gASVYwEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwJLAEsASwJLBEsDQyyVAFsAAAAAAAAAAABTAVUAUwItCAAALQoAAC0FAABVAS0FAABVAC0KAAAkAJROSwFLAoeUjAJtdZSFlIwCeDGUjAJ4MpSGlIxTQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9zdWJzeXN0ZW0ucHmUjAg8bGFtYmRhPpRoDkskQxqAAJxSoBGgUqgRoVWhGZleqELRHS6wEtIdM5RoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEowCbXWUTegDczAu",
+                  "data": "gAWVYwEAAAAAAACMCmRpbGwuX2RpbGyUjBBfY3JlYXRlX2Z1bmN0aW9ulJOUKGgAjAxfY3JlYXRlX2NvZGWUk5QoQwCUSwJLAEsASwJLBEsDQyyVAFsAAAAAAAAAAABTAVUAUwItCAAALQoAAC0FAABVAS0FAABVAC0KAAAkAJROSwFLAoeUjAJtdZSFlIwCeDGUjAJ4MpSGlIxTQzpcVXNlcnNcbWlsYW5cT25lRHJpdmVcVU5JX1Byb21vdGlvblxQYXRoU2ltXHBhdGhzaW1cZXhhbXBsZXNcZXhhbXBsZV9zdWJzeXN0ZW0ucHmUjAg8bGFtYmRhPpRoDkskQxqAAJxSoBGgUqgRoVWhGZleqELRHS6wEtIdM5RoBSkpdJRSlH2UjAhfX25hbWVfX5SMCF9fbWFpbl9flHNoDk5OdJRSlH2UfZSMD19fYW5ub3RhdGlvbnNfX5R9lHOGlGJoEowCbXWUTegDczAu",
                   "name": "<lambda>"
                 }
               }
             },
             {
-              "id": 1721475741888,
+              "id": 2046518734736,
               "type": "Interface",
+              "module": "pathsim.subsystem",
+              "metadata": {},
               "params": {}
             }
           ],
           "connections": [
             {
-              "id": 1721475742896,
+              "id": 2046518736416,
               "source": {
-                "block": 1721476001744,
-                "port": 0
+                "block": 2046518833424,
+                "ports": [
+                  0
+                ]
               },
               "targets": [
                 {
-                  "block": 1721475742224,
-                  "port": 0
+                  "block": 2046518735072,
+                  "ports": [
+                    0
+                  ]
                 },
                 {
-                  "block": 1721475742560,
-                  "port": 1
+                  "block": 2046518735408,
+                  "ports": [
+                    1
+                  ]
                 },
                 {
-                  "block": 1721475741888,
-                  "port": 1
+                  "block": 2046518734736,
+                  "ports": [
+                    1
+                  ]
                 }
               ]
             },
             {
-              "id": 1721476002384,
+              "id": 2046518834064,
               "source": {
-                "block": 1721475742224,
-                "port": 0
+                "block": 2046518735072,
+                "ports": [
+                  0
+                ]
               },
               "targets": [
                 {
-                  "block": 1721475742560,
-                  "port": 0
+                  "block": 2046518735408,
+                  "ports": [
+                    0
+                  ]
                 },
                 {
-                  "block": 1721475741888,
-                  "port": 0
+                  "block": 2046518734736,
+                  "ports": [
+                    0
+                  ]
                 }
               ]
             },
             {
-              "id": 1721476002704,
+              "id": 2046518834384,
               "source": {
-                "block": 1721475742560,
-                "port": 0
+                "block": 2046518735408,
+                "ports": [
+                  0
+                ]
               },
               "targets": [
                 {
-                  "block": 1721476001744,
-                  "port": 0
+                  "block": 2046518833424,
+                  "ports": [
+                    0
+                  ]
                 }
               ]
             }
@@ -98,8 +127,10 @@
         }
       },
       {
-        "id": 1721475741552,
+        "id": 2046516303184,
         "type": "Scope",
+        "module": "pathsim.blocks.scope",
+        "metadata": {},
         "params": {
           "sampling_rate": null,
           "t_wait": 0.0,
@@ -110,28 +141,19 @@
     "events": [],
     "connections": [
       {
-        "id": 1721476661632,
+        "id": 2046518279392,
         "source": {
-          "block": 1721475743232,
-          "port": 0
+          "block": 2046518736752,
+          "ports": [
+            0
+          ]
         },
         "targets": [
           {
-            "block": 1721475741552,
-            "port": 0
-          }
-        ]
-      },
-      {
-        "id": 1721476662544,
-        "source": {
-          "block": 1721475743232,
-          "port": 1
-        },
-        "targets": [
-          {
-            "block": 1721475741552,
-            "port": 1
+            "block": 2046516303184,
+            "ports": [
+              0
+            ]
           }
         ]
       }
@@ -146,6 +168,6 @@
     "iterations_min": 1,
     "iterations_max": 200,
     "tolerance_lte_abs": 1e-05,
-    "tolerance_lte_rel": 0.001
+    "tolerance_lte_rel": 0.01
   }
 }

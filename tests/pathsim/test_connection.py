@@ -12,6 +12,7 @@
 import unittest
 import numpy as np
 
+from pathsim.utils.portreference import PortReference
 from pathsim.connection import Connection, Duplex
 from pathsim.blocks._block import Block
 
@@ -36,29 +37,35 @@ class TestConnection(unittest.TestCase):
 
         #default
         C = Connection(B1, B2)
-
-        #test if ports assigned correctly
-        self.assertEqual(C.source, (B1, 0))
-        self.assertEqual(C.targets, [(B2, 0)])
+        self.assertTrue(isinstance(C.source, PortReference))
+        self.assertEqual(C.source.ports, [0])
+        self.assertTrue(isinstance(C.targets, list))
 
         #mixed
-        C1 = Connection(B1, (B2, 2))    
-        C2 = Connection((B1, 3), B2)
-        
-        #test if ports assigned correctly
-        self.assertEqual(C1.source, (B1, 0))
-        self.assertEqual(C1.targets, [(B2, 2)])
+        C = Connection(B1[0], B2)
+        self.assertEqual(C.source.ports, [0])
+        self.assertEqual(C.targets[0].ports, [0])
 
-        #test if ports assigned correctly
-        self.assertEqual(C2.source, (B1, 3))
-        self.assertEqual(C2.targets, [(B2, 0)])
+        C = Connection(B1[2], B2)
+        self.assertEqual(C.source.ports, [2])
+
+        C = Connection(B1[0:3], B2)
+        self.assertEqual(C.source.ports, [0, 1, 2])
+
+        C = Connection(B1[1:6:2], B2)
+        self.assertEqual(C.source.ports, [1, 3, 5])
+
+        C = Connection(B1, B2[1:6:2])
+        self.assertEqual(C.targets[0].ports, [1, 3, 5])
 
         #all
-        C = Connection((B1, 4), (B2, 1))
+        C = Connection(B1[2], B2[9])
+        self.assertEqual(C.source.ports, [2])
+        self.assertEqual(C.targets[0].ports, [9])
 
-        #test if ports assigned correctly
-        self.assertEqual(C.source, (B1, 4))
-        self.assertEqual(C.targets, [(B2, 1)])
+        C = Connection(B1[:8:3], B2[1:6:2])
+        self.assertEqual(C.source.ports, [0, 3, 6])
+        self.assertEqual(C.targets[0].ports, [1, 3, 5])
 
 
     def test_init_multi(self):
@@ -67,34 +74,42 @@ class TestConnection(unittest.TestCase):
 
         #default
         C = Connection(B1, B2, B3)
-
-        #test if ports assigned correctly
-        self.assertEqual(C.source, (B1, 0))
-        self.assertEqual(C.targets, [(B2, 0), (B3, 0)])
+        self.assertTrue(isinstance(C.source, PortReference))
+        self.assertEqual(C.source.ports, [0])
+        self.assertTrue(isinstance(C.targets, list))
+        self.assertEqual(len(C.targets), 2)
+        self.assertEqual(C.targets[0].ports, [0])
+        self.assertEqual(C.targets[1].ports, [0])
 
         #mixed
-        C1 = Connection(B1, (B2, 2), B3)    
-        C2 = Connection((B1, 3), B2, (B3, 1))
-        
-        #test if ports assigned correctly
-        self.assertEqual(C1.source, (B1, 0))
-        self.assertEqual(C1.targets, [(B2, 2), (B3, 0)])
+        C = Connection(B1[1], B2[3], B3)
+        self.assertEqual(C.source.ports, [1])
+        self.assertEqual(C.targets[0].ports, [3])
+        self.assertEqual(C.targets[1].ports, [0])
 
-        #test if ports assigned correctly
-        self.assertEqual(C2.source, (B1, 3))
-        self.assertEqual(C2.targets, [(B2, 0), (B3, 1)])
+        C = Connection(B1, B2[2], B3[0])
+        self.assertEqual(C.source.ports, [0])
+        self.assertEqual(C.targets[0].ports, [2])
+        self.assertEqual(C.targets[1].ports, [0])
 
         #all
-        C = Connection((B1, 4), (B2, 1), (B3, 2))
+        C = Connection(B1[1:7], B2[2], B3[3:9])
+        self.assertEqual(C.source.ports, [1, 2, 3, 4, 5, 6])
+        self.assertEqual(C.targets[0].ports, [2])
+        self.assertEqual(C.targets[1].ports, [3, 4, 5, 6, 7, 8])
 
-        #test if ports assigned correctly
-        self.assertEqual(C.source, (B1, 4))
-        self.assertEqual(C.targets, [(B2, 1), (B3, 2)])
 
 
     def test_overwrites(self):
 
         B1, B2, B3 = Block(), Block(), Block()
+
+        #self overwrite
+
+        C1 = Connection(B1, B2) 
+        self.assertFalse(C1.overwrites(C1))
+
+        #default ports
 
         C1 = Connection(B1, B2) 
         C2 = Connection(B1, B3)  
@@ -111,23 +126,46 @@ class TestConnection(unittest.TestCase):
         self.assertTrue(C1.overwrites(C2))
         self.assertTrue(C2.overwrites(C1))
 
-        C1 = Connection(B1, (B2, 1)) 
-        C2 = Connection(B1, (B2, 2))  
+        #specific ports
+
+        C1 = Connection(B1, B2, B3[1]) 
+        C2 = Connection(B1, B3)  
 
         self.assertFalse(C1.overwrites(C2))
         self.assertFalse(C2.overwrites(C1))
 
-        C1 = Connection((B1, 1), B3) 
-        C2 = Connection((B1, 2), B3)  
+        C1 = Connection(B1, B2, B3) 
+        C2 = Connection(B1[2], B3)  
 
         self.assertTrue(C1.overwrites(C2))
         self.assertTrue(C2.overwrites(C1))
 
-        C1 = Connection((B1, 1), B3) 
-        C2 = Connection((B1, 2), (B3, 0))  
+        C1 = Connection(B1, B2, B3[5]) 
+        C2 = Connection(B1[2], B3)  
+
+        self.assertFalse(C1.overwrites(C2))
+        self.assertFalse(C2.overwrites(C1))    
+            
+        #sliced ports
+
+        C1 = Connection(B1[1:3], B2, B3[2]) 
+        C2 = Connection(B1, B3[2]) 
 
         self.assertTrue(C1.overwrites(C2))
         self.assertTrue(C2.overwrites(C1))
+
+        C1 = Connection(B2[1], B1, B3[2]) 
+        C2 = Connection(B1, B3[1:3]) 
+
+        self.assertTrue(C1.overwrites(C2))
+        self.assertTrue(C2.overwrites(C1))
+
+        C1 = Connection(B2[1], B1, B3[0]) 
+        C2 = Connection(B1, B3[1:3]) 
+
+        self.assertFalse(C1.overwrites(C2))
+        self.assertFalse(C2.overwrites(C1))
+
 
 
     def test_update_single(self):
@@ -140,22 +178,14 @@ class TestConnection(unittest.TestCase):
         C.update()
         self.assertEqual(B2.inputs[0], 3)
 
-        #test data transfer with specific ports
-        C = Connection((B1, 2), (B2, 2)) 
-        B1.outputs[2] = 3
+        C = Connection(B1, B2[3]) 
         C.update()
-        self.assertEqual(B2.inputs[2], 3)
+        self.assertEqual(B2.inputs[3], 3)
 
-        #test data transfer with mixed ports
-        C = Connection(B1, (B2, 2)) 
-        B1.outputs[0] = 3
+        C = Connection(B1[1], B2[3]) 
+        B1.outputs[1] = 2.5
         C.update()
-        self.assertEqual(B2.inputs[2], 3)
-
-        C = Connection((B1, 2), B2) 
-        B1.outputs[2] = 3
-        C.update()
-        self.assertEqual(B2.inputs[0], 3)
+        self.assertEqual(B2.inputs[3], 2.5)
 
 
     def test_update_multi(self):
@@ -170,11 +200,20 @@ class TestConnection(unittest.TestCase):
         self.assertEqual(B3.inputs[0], 3)
 
         #test data transfer with specific ports
-        C = Connection((B1, 2), (B2, 2), (B3, 1)) 
-        B1.outputs[2] = 3
+        C = Connection(B1, B2[3], B3[2]) 
+        B1.outputs[0] = 55
         C.update()
-        self.assertEqual(B2.inputs[2], 3)
-        self.assertEqual(B3.inputs[1], 3)
+        self.assertEqual(B2.inputs[3], 55)
+        self.assertEqual(B3.inputs[2], 55)
+
+        #test with sliced ports
+        C = Connection(B1[1:5], B2[2:4], B3[2]) 
+        B1.outputs = {0:33, 1:22, 2:3.2, 3:-90, 4:32, 5:0.01}
+        C.update()
+        self.assertEqual(B2.inputs[2], 22)
+        self.assertEqual(B2.inputs[3], 3.2)
+        self.assertEqual(B3.inputs[2], 22)
+
 
 
     def test_on_off_bool(self):
@@ -214,41 +253,52 @@ class TestDuplex(unittest.TestCase):
         B1, B2 = Block(), Block()
 
         #default
+
         D = Duplex(B1, B2)
+        self.assertTrue(isinstance(D.source, PortReference))
+        self.assertTrue(isinstance(D.target, PortReference))
+        self.assertTrue(isinstance(D.targets, list))
+        self.assertEqual(len(D.targets), 2)
+        self.assertEqual(D.source.ports, [0])
+        self.assertEqual(D.target.ports, [0])
 
-        #test if ports assigned correctly
-        self.assertEqual(D.source, (B1, 0))
-        self.assertEqual(D.target, (B2, 0))
+        #specific
 
-        #mixed
-        D1 = Duplex(B1, (B2, 2))
-        D2 = Duplex((B1, 3), B2)
+        D = Duplex(B1[3], B2)
+        self.assertEqual(D.source.ports, [3])
+        self.assertEqual(D.target.ports, [0])
+
+        D = Duplex(B1, B2[2])
+        self.assertEqual(D.source.ports, [0])
+        self.assertEqual(D.target.ports, [2])
+
+        D = Duplex(B1[5], B2[1])
+        self.assertEqual(D.source.ports, [5])
+        self.assertEqual(D.target.ports, [1])
+
+        #slicing
         
-        #test if ports assigned correctly
-        self.assertEqual(D1.source, (B1, 0))
-        self.assertEqual(D1.target, (B2, 2))
-
-        #test if ports assigned correctly
-        self.assertEqual(D2.source, (B1, 3))
-        self.assertEqual(D2.target, (B2, 0))
-
-        #all
-        D = Duplex((B1, 4), (B2, 1))
-
-        #test if ports assigned correctly
-        self.assertEqual(D.source, (B1, 4))
-        self.assertEqual(D.target, (B2, 1))
+        D = Duplex(B1[1:4], B2[1:4])
+        self.assertEqual(D.source.ports, [1, 2, 3])
+        self.assertEqual(D.target.ports, [1, 2, 3])
+        
+        D = Duplex(B1[:3], B2[1:4])
+        self.assertEqual(D.source.ports, [0, 1, 2])
+        self.assertEqual(D.target.ports, [1, 2, 3])
 
         #test too many
-        with self.assertRaises(TypeError):
-            D = Duplex((B1, 4), (B2, 1), (B2, 3))
+
+        B3 = Block()
+        with self.assertRaises(TypeError): 
+            D = Duplex(B1[3], B2, B3)
 
 
     def test_update(self):
 
         B1, B2 = Block(), Block()
 
-        #test data transfer with default ports
+        #default
+
         D = Duplex(B1, B2) 
         B1.outputs[0] = 3
         B2.outputs[0] = 1
@@ -256,13 +306,24 @@ class TestDuplex(unittest.TestCase):
         self.assertEqual(B1.inputs[0], 1)
         self.assertEqual(B2.inputs[0], 3)
 
-        #test data transfer with special ports
-        D = Duplex((B1, 3), (B2, 2)) 
-        B1.outputs[3] = 5.5
-        B2.outputs[2] = 12
+        #specific
+
+        D = Duplex(B1[3], B2[1]) 
+        B1.outputs[3] = 2
+        B2.outputs[1] = -0.1
         D.update()
-        self.assertEqual(B1.inputs[3], 12)
-        self.assertEqual(B2.inputs[2], 5.5)
+        self.assertEqual(B1.inputs[3], -0.1)
+        self.assertEqual(B2.inputs[1], 2)
+
+        #slicing
+
+        D = Duplex(B1[1:4], B2[:3]) 
+        B1.outputs = {0:33, 1:99, 2:44, 3:77, 4:11}
+        B2.outputs = {0:0.33, 1:0.99, 2:0.44, 3:0.77, 4:0.11}
+        D.update()
+        self.assertEqual(B1.inputs[3], 0.44)
+        self.assertEqual(B2.inputs[1], 44)
+
 
 
 
