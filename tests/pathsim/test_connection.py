@@ -104,6 +104,13 @@ class TestConnection(unittest.TestCase):
 
         B1, B2, B3 = Block(), Block(), Block()
 
+        #self overwrite
+
+        C1 = Connection(B1, B2) 
+        self.assertFalse(C1.overwrites(C1))
+
+        #default ports
+
         C1 = Connection(B1, B2) 
         C2 = Connection(B1, B3)  
         C3 = Connection(B2, B3) 
@@ -119,6 +126,46 @@ class TestConnection(unittest.TestCase):
         self.assertTrue(C1.overwrites(C2))
         self.assertTrue(C2.overwrites(C1))
 
+        #specific ports
+
+        C1 = Connection(B1, B2, B3[1]) 
+        C2 = Connection(B1, B3)  
+
+        self.assertFalse(C1.overwrites(C2))
+        self.assertFalse(C2.overwrites(C1))
+
+        C1 = Connection(B1, B2, B3) 
+        C2 = Connection(B1[2], B3)  
+
+        self.assertTrue(C1.overwrites(C2))
+        self.assertTrue(C2.overwrites(C1))
+
+        C1 = Connection(B1, B2, B3[5]) 
+        C2 = Connection(B1[2], B3)  
+
+        self.assertFalse(C1.overwrites(C2))
+        self.assertFalse(C2.overwrites(C1))    
+            
+        #sliced ports
+
+        C1 = Connection(B1[1:3], B2, B3[2]) 
+        C2 = Connection(B1, B3[2]) 
+
+        self.assertTrue(C1.overwrites(C2))
+        self.assertTrue(C2.overwrites(C1))
+
+        C1 = Connection(B2[1], B1, B3[2]) 
+        C2 = Connection(B1, B3[1:3]) 
+
+        self.assertTrue(C1.overwrites(C2))
+        self.assertTrue(C2.overwrites(C1))
+
+        C1 = Connection(B2[1], B1, B3[0]) 
+        C2 = Connection(B1, B3[1:3]) 
+
+        self.assertFalse(C1.overwrites(C2))
+        self.assertFalse(C2.overwrites(C1))
+
 
 
     def test_update_single(self):
@@ -132,8 +179,15 @@ class TestConnection(unittest.TestCase):
         self.assertEqual(B2.inputs[0], 3)
 
         #test data transfer with specific ports
+        C = Connection(B1, B2[3]) 
+        C.update()
+        self.assertEqual(B2.inputs[3], 3)
 
         #test data transfer with mixed ports
+        C = Connection(B1[1], B2[3]) 
+        B1.outputs[1] = 2.5
+        C.update()
+        self.assertEqual(B2.inputs[3], 2.5)
 
 
     def test_update_multi(self):
