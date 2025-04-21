@@ -253,13 +253,44 @@ class TestDuplex(unittest.TestCase):
         B1, B2 = Block(), Block()
 
         #default
-        D = Duplex(B1, B2)
 
-        #mixed
+        D = Duplex(B1, B2)
+        self.assertTrue(isinstance(D.source, PortReference))
+        self.assertTrue(isinstance(D.target, PortReference))
+        self.assertTrue(isinstance(D.targets, list))
+        self.assertEqual(len(D.targets), 2)
+        self.assertEqual(D.source.ports, [0])
+        self.assertEqual(D.target.ports, [0])
+
+        #specific
+
+        D = Duplex(B1[3], B2)
+        self.assertEqual(D.source.ports, [3])
+        self.assertEqual(D.target.ports, [0])
+
+        D = Duplex(B1, B2[2])
+        self.assertEqual(D.source.ports, [0])
+        self.assertEqual(D.target.ports, [2])
+
+        D = Duplex(B1[5], B2[1])
+        self.assertEqual(D.source.ports, [5])
+        self.assertEqual(D.target.ports, [1])
+
+        #slicing
         
-        #all
+        D = Duplex(B1[1:4], B2[1:4])
+        self.assertEqual(D.source.ports, [1, 2, 3])
+        self.assertEqual(D.target.ports, [1, 2, 3])
+        
+        D = Duplex(B1[:3], B2[1:4])
+        self.assertEqual(D.source.ports, [0, 1, 2])
+        self.assertEqual(D.target.ports, [1, 2, 3])
 
         #test too many
+
+        B3 = Block()
+        with self.assertRaises(TypeError): 
+            D = Duplex(B1[3], B2, B3)
 
 
     def test_update(self):
