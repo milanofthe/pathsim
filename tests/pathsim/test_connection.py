@@ -178,12 +178,10 @@ class TestConnection(unittest.TestCase):
         C.update()
         self.assertEqual(B2.inputs[0], 3)
 
-        #test data transfer with specific ports
         C = Connection(B1, B2[3]) 
         C.update()
         self.assertEqual(B2.inputs[3], 3)
 
-        #test data transfer with mixed ports
         C = Connection(B1[1], B2[3]) 
         B1.outputs[1] = 2.5
         C.update()
@@ -202,6 +200,19 @@ class TestConnection(unittest.TestCase):
         self.assertEqual(B3.inputs[0], 3)
 
         #test data transfer with specific ports
+        C = Connection(B1, B2[3], B3[2]) 
+        B1.outputs[0] = 55
+        C.update()
+        self.assertEqual(B2.inputs[3], 55)
+        self.assertEqual(B3.inputs[2], 55)
+
+        #test with sliced ports
+        C = Connection(B1[1:5], B2[2:4], B3[2]) 
+        B1.outputs = {0:33, 1:22, 2:3.2, 3:-90, 4:32, 5:0.01}
+        C.update()
+        self.assertEqual(B2.inputs[2], 22)
+        self.assertEqual(B2.inputs[3], 3.2)
+        self.assertEqual(B3.inputs[2], 22)
 
 
 
