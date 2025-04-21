@@ -37,15 +37,35 @@ class TestConnection(unittest.TestCase):
 
         #default
         C = Connection(B1, B2)
-
         self.assertTrue(isinstance(C.source, PortReference))
+        self.assertEqual(C.source.ports, [0])
         self.assertTrue(isinstance(C.targets, list))
 
         #mixed
+        C = Connection(B1[0], B2)
+        self.assertEqual(C.source.ports, [0])
+        self.assertEqual(C.targets[0].ports, [0])
 
+        C = Connection(B1[2], B2)
+        self.assertEqual(C.source.ports, [2])
+
+        C = Connection(B1[0:3], B2)
+        self.assertEqual(C.source.ports, [0, 1, 2])
+
+        C = Connection(B1[1:6:2], B2)
+        self.assertEqual(C.source.ports, [1, 3, 5])
+
+        C = Connection(B1, B2[1:6:2])
+        self.assertEqual(C.targets[0].ports, [1, 3, 5])
 
         #all
+        C = Connection(B1[2], B2[9])
+        self.assertEqual(C.source.ports, [2])
+        self.assertEqual(C.targets[0].ports, [9])
 
+        C = Connection(B1[:8:3], B2[1:6:2])
+        self.assertEqual(C.source.ports, [0, 3, 6])
+        self.assertEqual(C.targets[0].ports, [1, 3, 5])
 
 
     def test_init_multi(self):
@@ -54,6 +74,10 @@ class TestConnection(unittest.TestCase):
 
         #default
         C = Connection(B1, B2, B3)
+        self.assertTrue(isinstance(C.source, PortReference))
+        self.assertEqual(C.source.ports, [0])
+        self.assertTrue(isinstance(C.targets, list))
+        self.assertEqual(len(C.targets), 2)
 
         #mixed
 
