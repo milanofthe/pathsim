@@ -42,9 +42,6 @@ connections = [
 #initialize simulation
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
-
-Sim.save("transferfunction.mdl", duration=100)
-
 # Run Example ===========================================================================
 
 if __name__ == "__main__":
