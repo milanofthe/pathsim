@@ -35,6 +35,21 @@ class Function(Block):
     and for multi output, the aoutputs have to be provided as a 
     tuple or list. 
 
+    In the context of the global system, this block implements algebraic 
+    components of the global system ODE/DAE.
+
+    .. math::
+
+        \\vec{y} = \\mathrm{func}(\\vec{u})
+    
+    Note
+    ----
+    Evaluated as part of the evaluation of the global system ODE/DAE. 
+    In the simulation loop this happens multiple times for each timestep.
+    Therefore `func` must be purely algebraic and not introduce states, 
+    delay, etc. For interfacing with external stateful APIs, use the 
+    API block.
+
     Note
     -----
     If the outputs are provided as a single numpy array, they are 
@@ -75,7 +90,7 @@ class Function(Block):
     Parameters
     ---------- 
     func : callable
-        MIMO function that defines block IO behaviour
+        MIMO function that defines algebraic block IO behaviour
 
     Attributes
     ----------
@@ -97,7 +112,8 @@ class Function(Block):
 
 
     def update(self, t):
-        """Evaluate function block
+        """Evaluate function block as part of algebraic component 
+        of global system DAE.
 
         Parameters
         ----------
