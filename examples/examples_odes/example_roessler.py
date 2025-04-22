@@ -28,7 +28,6 @@ itg_y = Integrator(y0) # dy/dt = x + a*y
 itg_z = Integrator(z0) # dz/dt = b + z*(x - c)
 
 #components for dx/dt
-# Adder("--") computes -input0 - input1
 add_neg_yz = Adder("--") # Computes -y - z
 
 #components for dy/dt

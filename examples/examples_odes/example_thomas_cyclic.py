@@ -16,7 +16,7 @@ from pathsim.solvers import SSPRK33, RKCK54
 
 # MODEL =================================================================================
 
-b = 0.2
+b = 0.22
 xyz_0 = np.array([1, 1, -3])
 
 def f_tcs(_x, u, t):
@@ -50,7 +50,7 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(1000)
+    Sim.run(500)
 
     sco.plot3D()
 
