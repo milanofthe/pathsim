@@ -52,6 +52,6 @@ if __name__ == "__main__":
 
     Sim.run(1000)
 
-    sco.plot3D(lw=1)
+    sco.plot3D()
 
     plt.show()

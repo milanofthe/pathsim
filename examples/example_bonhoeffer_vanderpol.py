@@ -1,6 +1,6 @@
 #########################################################################################
 ##
-##     Example of Chemical reaction (chlorine dioxide–iodine–malonic acid reaction)
+##      Pathsim Example of Nerve impulse action potential (Bonhoeffer-Van der Pol)
 ##
 #########################################################################################
 
@@ -10,30 +10,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
-from pathsim.blocks import ODE, Scope
+from pathsim.blocks import ODE, Source, Scope
 from pathsim.solvers import RKCK54
 
 
 # MODEL =================================================================================
 
-a, b = 10, 1
+a, b, c, F, omega = 0.7, 0.8, 0.1, 0.6, 1
 
-xy_0 = np.zeros(2)
+xy_0 = np.array([0.0, 0.0])
 
-def f_che(_x, u, t):
+def f_bhf(_x, u, t):
     x, y = _x
-    dxdt = a - x - 4 * x * y / (1 + x**2)
-    dydt = b * x * (1 - y / (1 + x**2))
+    dxdt = x - x**3 / 3 - y + u[0]
+    dydt = c * (x + a - b * y)
     return np.array([dxdt, dydt])
 
-che = ODE(func=f_che, initial_value=xy_0)
+def s_bhf(t):
+    return F * np.cos(omega * t)
+
+src = Source(s_bhf)
+bhf = ODE(func=f_bhf, initial_value=xy_0)
 sco = Scope(labels=["x", "y"])
 
-blocks = [che, sco]
+blocks = [src, bhf, sco]
 
 #connections between the blocks
 connections = [
-    Connection(che[:2], sco[:2])
+    Connection(bhf[:2], sco[:2]),
+    Connection(src, bhf)
     ]
 
 #create a simulation instance from the blocks and connections
@@ -50,7 +55,7 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(50)
+    Sim.run(100)
 
     sco.plot()
 

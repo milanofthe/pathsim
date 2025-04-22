@@ -59,6 +59,6 @@ if __name__ == "__main__":
 
     sco.plot()
 
-    sco.plot2D(lw=1)
+    sco.plot2D()
 
     plt.show()
