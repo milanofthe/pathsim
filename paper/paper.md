@@ -51,60 +51,11 @@ PathSim employs a decentralized, object-oriented design centered around three pr
 
 The decentralized design promotes modularity, as blocks are fully self-contained. It simplifies adding new block types without altering the core simulation loop and provides flexibility in configuring individual block behaviors. Additionaly this opens up integration with other simulation environments (co-simulation), or hardware in the loop (HiL) setups through encapsulation within blocks.
 
-# Example Usage
+# PathSim Modeling Flow
 
-The following example of a nonlinear pendulum demonstrate PathSims core system modeling and simulation flow.
+![Example dynamical system modeling flow using PathSim](assets/pathsim_flow.svg)
 
-![Mechanical model and block diagram of nonlinear pendulum.](assets/pendulum_block_diagram.svg)
-
-```python
-import numpy as np
-
-from pathsim import Simulation, Connection
-from pathsim.blocks import Integrator, Amplifier, Function, Adder, Scope
-from pathsim.solvers import RKCK54
-
-#initial angle and angular velocity
-phi0, omega0 = 0.9*np.pi, 0
-
-#parameters (gravity, length)
-g, l = 9.81, 1
-
-#blocks that define the system
-in1 = Integrator(omega0) 
-in2 = Integrator(phi0) 
-amp = Amplifier(-g/l) 
-fnc = Function(np.sin) 
-sco = Scope(labels=[r"$\omega$", r"$\varphi$"])
-
-#simulation instance from the blocks and connections
-sim = Simulation(
-    blocks=[in1, in2, amp, fnc, sco], 
-    connections=[
-        Connection(in1, in2, sco[0]), 
-        Connection(in2, fnc, sco[1]),
-        Connection(fnc, amp), 
-        Connection(amp, in1)
-        ], 
-    Solver=RKCK54,
-    tolerance_lte_rel=1e-6,
-    tolerance_lte_abs=1e-8
-    )
-
-#run the simulation for 15 seconds
-sim.run(duration=15)
-
-#read the results directly from the scope for postprocessing
-time, [omega, phi] = sco.read()
-
-#plot the results for quick visualization
-sco.plot(".-")
-sco.plot2D()
-```
-
-![Time series results from `Scope.plot()` ](assets/pendulum_result_timeseries.svg) ![2D phase portrait from `Scope.plot2D()`](assets/pendulum_result_phasespace.svg)
-
-This code shows block instantiation, connection definition, simulation setup (including solver selection), execution, and result visualization. Full examples demonstrating event handling, stiff systems, and sensitivity analysis are available in the software repository [@PathSimRepo] and documentation [@PathSimDocs].
+<!-- This code shows block instantiation, connection definition, simulation setup (including solver selection), execution, and result visualization. Full examples demonstrating event handling, stiff systems, and sensitivity analysis are available in the software repository [@PathSimRepo] and documentation [@PathSimDocs]. -->
 
 
 # References
