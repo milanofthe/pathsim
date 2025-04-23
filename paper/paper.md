@@ -28,7 +28,7 @@ PathSim is a flexible, block-based, time-domain dynamical system simulation fram
 
 # Statement of Need
 
-Simulating dynamical systems is vital across many disciplines. PathSim meets the need for a Python-native framework combining a programmatic block-diagram approach with advanced features. Traditional simulation tools often rely on centralized solvers or compiled code, which can limit flexibility and extensibility within the Python ecosystem. PathSim's decentralized architecture offers distinct advantages: enhanced modularity (blocks are self-contained units), easier extensibility (new blocks integrate naturally without core modification), and greater flexibility in model composition and analysis, Cosimulation and Hardware in the Loop (HiL) testing. PathSim specifically addresses:
+Modeling and simulating dynamical systems is vital across many disciplines. PathSim meets the need for a Python-native framework combining a programmatic block-diagram approach with advanced features. Traditional simulation tools often rely on centralized solvers or compiled code, which can limit flexibility and extensibility within the Python ecosystem. PathSim's decentralized architecture offers distinct advantages: enhanced modularity (blocks are self-contained units), easier extensibility (new blocks integrate naturally without core modification), and greater flexibility in model composition and analysis, Cosimulation and Hardware in the Loop (HiL) testing. PathSim specifically addresses:
 
 * **Accessible Hybrid System Simulation:** Integrates event detection (zero-crossing, scheduled) directly into the block-diagram paradigm, simplifying the modeling of systems with both *continuous and discrete dynamics*.
 * **Gradient-Enabled Simulation:** Provides built-in *automatic differentiation* for sensitivity analysis and integration with gradient-based optimization or machine learning frameworks.
@@ -53,10 +53,11 @@ The decentralized design promotes modularity, as blocks are fully self-contained
 
 # PathSim Modeling Flow
 
-![Example dynamical system modeling flow using PathSim](assets/pathsim_flow.png)
+The figure below shows the modeling and simulation flow with PathSim. Once the dynamical system is translated to the block-diagram paradigm, it can be built from PathSim blocks and connections. The code to the right shows block instantiation, connection definition, simulation setup (including solver and tolerance selection), execution, and result visualization.
 
-<!-- This code shows block instantiation, connection definition, simulation setup (including solver selection), execution, and result visualization. Full examples demonstrating event handling, stiff systems, and sensitivity analysis are available in the software repository [@PathSimRepo] and documentation [@PathSimDocs]. -->
-
+![Exemplary dynamical system modeling and simulation flow using PathSim](assets/pathsim_flow.png)
+ 
+Full examples demonstrating event handling, stiff systems, and sensitivity analysis are available in the software repository [@PathSimRepo] and documentation [@PathSimDocs].
 
 # References
 
