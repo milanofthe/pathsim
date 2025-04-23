@@ -47,16 +47,127 @@ PathSim employs a decentralized, object-oriented design centered around three pr
 
 This decentralized design promotes modularity, as blocks are largely self-contained. It simplifies adding new block types without altering the core simulation loop and provides flexibility in configuring individual block behaviors.
 
-# Example Usage: Harmonic Oscillator
+# Example Usage
 
-The following example demonstrates simulating a damped harmonic oscillator ($\ddot{x} + \frac{c}{m} \dot{x} + \frac{k}{m} x = 0$) using PathSim's block-based approach.
+The following examples demonstrate PathSims core functionalities and features.
+
+
+## Continuous Nonlinear Dynamics - Pendulum
 
 ```python
+import numpy as np
 
+from pathsim import Simulation, Connection
+from pathsim.blocks import Integrator, Amplifier, Function, Adder, Scope
+from pathsim.solvers import RKBS32
 
+#initial angle and angular velocity
+phi0, omega0 = 0.9*np.pi, 0
+
+#parameters (gravity, length)
+g, l = 9.81, 1
+
+#blocks that define the system
+in1 = Integrator(omega0) 
+in2 = Integrator(phi0) 
+amp = Amplifier(-g/l) 
+fnc = Function(np.sin) 
+sco = Scope(labels=[r"$\omega$", r"$\varphi$"])
+
+#connections between the blocks
+connections = [
+    Connection(in1, in2, sco[0]), 
+    Connection(in2, fnc, sco[1]),
+    Connection(fnc, amp), 
+    Connection(amp, in1)
+    ]
+
+#simulation instance from the blocks and connections
+sim = Simulation(
+    blocks, 
+    connections, 
+    dt=0.1,  
+    Solver=RKBS32, 
+    tolerance_lte_rel=1e-6, 
+    tolerance_lte_abs=1e-8
+    )
+
+#run the simulation for 15 seconds
+sim.run(duration=15)
+
+#read the results directly from the scope
+time, [omega, phi] = sco.read()
+
+#plot the results for quick visualization
+sco.plot(".-")
+sco.plot2D()
 ```
 
-This example illustrates how the system's differential equation is translated into interconnected blocks, forming feedback loops. The Simulation object manages the execution and data recording via the Scope.
+
+## Stiff Systems and Subsystems - Van der Pol
+
+```python
+from pathsim import Simulation, Connection, Interface, Subsystem
+from pathsim.blocks import Integrator, Scope, Function
+from pathsim.solvers import ESDIRK43
+
+#initial conditions
+x1_0, x2_0 = 2, 0
+
+#van der Pol parameter
+mu = 1000
+
+#blocks that define the system
+sco = Scope()
+
+#subsystem with two separate integrators to emulate ODE block
+ifx = Interface()
+in1 = Integrator(x1_0)
+in2 = Integrator(x2_0)
+fnc = Function(lambda x1, x2: mu*(1 - x1**2)*x2 - x1)
+
+sub_blocks = [ifx, in1, in2, fnc]
+sub_connections = [
+    Connection(in2, in1, fnc[1], ifx[1]), 
+    Connection(in1, fnc, ifx), 
+    Connection(fnx, in2)
+    ]
+
+#the subsystem acts just like a normal block
+vdp = Subsystem(sub_blocks, sub_connections)
+
+#blocks of the main system
+blocks = [vdp, sco]
+
+#the connections between the blocks in the main system
+connections = [
+    Connection(vdp, sco)
+    ]
+
+#initialize simulation with the blocks and connections
+sim = Simulation(
+    blocks, 
+    connections, 
+    Solver=ESDIRK43, 
+    tolerance_lte_abs=1e-6, 
+    tolerance_lte_rel=1e-3,
+    tolerance_fpi=1e-9
+    )
+
+#run the simulation
+sim.run(3*mu)
+
+#quickly visualize the results
+sco.plot(".-")
+```
+
+
+## Event Handling - Bouncing Ball
+
+
+## Sensitivity Analysis - PID Controler
+
+
 
 
 # References
