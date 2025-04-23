@@ -16,7 +16,7 @@ authors:
     orcid: 0009-0006-5964-6115 
     affiliation: 1 
 affiliations:
- - name: University of Technology Braunschweig
+ - name: Technische Universität Braunschweig
    index: 1
 date: 23 april 2025
 bibliography: paper.bib 
@@ -49,18 +49,20 @@ PathSim employs a decentralized, object-oriented design centered around three pr
 2.  **Connections (`Connection`):** Define the explicit data flow pathways between block output ports and input ports, mirroring the connections in a block diagram.
 3.  **Simulation (`Simulation`):** Coordinates the overall simulation process. It maintains the list of blocks and connections. During each time step, it manages a fixed-point iteration loop. In this loop, `Connection.update()` propagates output values to inputs, and `Block.update()` computes algebraic outputs based on current inputs and states. This iterative process resolves algebraic loops and ensures consistency across interconnected blocks. The `Simulation` object then triggers the `step` (for explicit solvers) or `solve` (for implicit solvers) methods of the blocks' engines to advance their internal states. It also manages the event handling system.
 
-This decentralized design promotes modularity, as blocks are fully self-contained. It simplifies adding new block types without altering the core simulation loop and provides flexibility in configuring individual block behaviors. Additionaly this opens up integration with other simulation environments, or hardware in the loop (HiL) setups through encapsulation within blocks.
+The decentralized design promotes modularity, as blocks are fully self-contained. It simplifies adding new block types without altering the core simulation loop and provides flexibility in configuring individual block behaviors. Additionaly this opens up integration with other simulation environments (co-simulation), or hardware in the loop (HiL) setups through encapsulation within blocks.
 
 # Example Usage
 
 The following example of a nonlinear pendulum demonstrate PathSims core system modeling and simulation flow.
+
+![Mechanical model and block diagram of nonlinear pendulum.](assets/pendulum_block_diagram.svg)
 
 ```python
 import numpy as np
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Amplifier, Function, Adder, Scope
-from pathsim.solvers import RKBS32
+from pathsim.solvers import RKCK54
 
 #initial angle and angular velocity
 phi0, omega0 = 0.9*np.pi, 0
@@ -84,7 +86,9 @@ sim = Simulation(
         Connection(fnc, amp), 
         Connection(amp, in1)
         ], 
-    Solver=RKBS32
+    Solver=RKCK54,
+    tolerance_lte_rel=1e-6,
+    tolerance_lte_abs=1e-8
     )
 
 #run the simulation for 15 seconds
@@ -97,6 +101,8 @@ time, [omega, phi] = sco.read()
 sco.plot(".-")
 sco.plot2D()
 ```
+
+![Time series results from `Scope.plot()` ](assets/pendulum_result_timeseries.svg) ![2D phase portrait from `Scope.plot2D()`](assets/pendulum_result_phasespace.svg)
 
 This code shows block instantiation, connection definition, simulation setup (including solver selection), execution, and result visualization. Full examples demonstrating event handling, stiff systems, and sensitivity analysis are available in the software repository [@PathSimRepo] and documentation [@PathSimDocs].
 
