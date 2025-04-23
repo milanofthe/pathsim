@@ -53,7 +53,7 @@ The decentralized design promotes modularity, as blocks are fully self-contained
 
 # PathSim Modeling Flow
 
-![Example dynamical system modeling flow using PathSim](assets/pathsim_flow.svg)
+![Example dynamical system modeling flow using PathSim](assets/pathsim_flow.png)
 
 <!-- This code shows block instantiation, connection definition, simulation setup (including solver selection), execution, and result visualization. Full examples demonstrating event handling, stiff systems, and sensitivity analysis are available in the software repository [@PathSimRepo] and documentation [@PathSimDocs]. -->
 
