@@ -18,7 +18,6 @@ from ..utils.utils import (
     dict_to_array
     )
 
-
 from ..optim.operator import Operator
 
 
