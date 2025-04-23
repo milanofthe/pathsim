@@ -16,7 +16,7 @@ authors:
     orcid: 0009-0006-5964-6115 
     affiliation: 1 
 affiliations:
- - name: Technische Universität Braunschweig
+ - name: Technische Universität Braunschweig, Germany
    index: 1
 date: 23 april 2025
 bibliography: paper.bib 
@@ -28,7 +28,9 @@ PathSim is a flexible, block-based, time-domain dynamical system simulation fram
 
 # Statement of Need
 
-Modeling and simulating dynamical systems is vital across many disciplines. PathSim meets the need for a Python-native framework combining a programmatic block-diagram approach with advanced features. Traditional simulation tools often rely on centralized solvers or compiled code, which can limit flexibility and extensibility within the Python ecosystem. PathSim's decentralized architecture offers distinct advantages: enhanced modularity (blocks are self-contained units), easier extensibility (new blocks integrate naturally without core modification), and greater flexibility in model composition and analysis, Cosimulation and Hardware in the Loop (HiL) testing. PathSim specifically addresses:
+Modeling and simulating dynamical systems is vital across many disciplines such as control engineering, chemical process engineering, or general system engineering. Challenges are often the interplay of multiple *coupled* subsystems which have to be simulated and synchronized concurrently.
+
+PathSim meets the need for a Python-native framework combining a programmatic block-diagram approach with advanced features. Traditional simulation tools often rely on centralized solvers or compiled code, which can limit flexibility and extensibility within the Python ecosystem. PathSim's decentralized architecture offers distinct advantages: enhanced modularity (blocks are self-contained units), easier extensibility (new blocks integrate naturally without core modification), and greater flexibility in model composition and analysis, Cosimulation and Hardware in the Loop (HiL) testing. PathSim specifically addresses:
 
 * **Accessible Hybrid System Simulation:** Integrates event detection (zero-crossing, scheduled) directly into the block-diagram paradigm, simplifying the modeling of systems with both *continuous and discrete dynamics*.
 * **Gradient-Enabled Simulation:** Provides built-in *automatic differentiation* for sensitivity analysis and integration with gradient-based optimization or machine learning frameworks.
