@@ -1,5 +1,5 @@
 ---
-title: 'PathSim - A Decentralized System Simulation Framework'
+title: 'PathSim - A System Simulation Framework'
 tags:
   - Python
   - system simulation
