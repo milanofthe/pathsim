@@ -39,7 +39,9 @@ PathSim provides a powerful, flexible, and extensible open-source tool for simul
 
 # Comparison to Existing Tools
 
-Several Python tools exist for simulating dynamical systems. Standard ODE solvers like `scipy.integrate.solve_ivp` [@virtanen2020scipy] offer robust integration but lack a structured framework for modeling complex, interconnected systems or handling discrete events natively. Libraries like `SimuPy` [@Margolis2017; @SimuPyRepo] provide a block-based modeling approach similar to PathSim, leveraging SymPy for symbolic definition and SciPy solvers for integration. Other frameworks like `Collimator` [@pycollimator] offer graphical interfaces and JAX-based acceleration but introduce dependencies beyond the standard scientific Python stack. `bdsim` [@bdsimRepo] also provides block diagram simulation with a graphical editor, focusing often on robotics. PathSim differentiates itself by offering a purely script-based block-diagram interface with a *decentralized architecture*, *native integration* of both automatic differentiation and discrete event handling, and a *built-in library* of independently implemented and verified ODE solvers (beyond wrapping SciPy), all while maintaining *minimal core dependencies*.
+Several Python tools exist for simulating dynamical systems. Standard ODE solvers like `scipy.integrate.solve_ivp` [@virtanen2020scipy] offer robust integration but lack a structured framework for modeling complex, interconnected systems or handling discrete events natively. The *Python Control Systems Library* [@pythoncontrol] is a popular package for modeling and optimizing dynamical systems from the control engineering perspective primarily. Libraries like `SimuPy` [@Margolis2017; @SimuPyRepo] provide a block-based modeling approach similar to PathSim, leveraging SymPy for symbolic definition and SciPy solvers for integration. Other frameworks like `Collimator` [@pycollimator] offer graphical interfaces and JAX-based acceleration but require compilation and introduce dependencies beyond the standard scientific Python stack. `bdsim` [@bdsimRepo] also provides block diagram simulation, focusing on robotics. 
+
+PathSim differentiates itself by offering a purely script-based block-diagram interface with a *decentralized architecture*, native integration of both *automatic differentiation* and *discrete event handling*, and a *built-in library* of independently implemented and verified ODE solvers (beyond wrapping SciPy), all while maintaining *minimal core dependencies*.
 
 # Architecture and Design
 
@@ -57,7 +59,6 @@ The figure below shows the modeling and simulation flow with PathSim. Once the d
 
 ![Exemplary dynamical system modeling and simulation flow using PathSim](assets/pathsim_flow.png)
  
-Full examples demonstrating event handling, stiff systems, and sensitivity analysis are available in the software repository [@PathSimRepo] and documentation [@PathSimDocs].
 
 # References
 
