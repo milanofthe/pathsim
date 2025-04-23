@@ -12,23 +12,23 @@ tags:
   - scientific computing
   - numerical integration
 authors:
-  - name: Your Name Here # TODO: Add your name
-    orcid: 0000-0000-0000-0000 # TODO: Add your ORCID
-    affiliation: 1 # TODO: Add affiliation index
+  - name: Milan Rother
+    orcid: 0009-0006-5964-6115 
+    affiliation: 1 
 affiliations:
- - name: "Your Affiliation Here (e.g., University, Institute, Company, or 'Independent Researcher')" # TODO: Define your affiliation
+ - name: University of Technology Braunschweig
    index: 1
-date: DD Month Iodide # TODO: Add submission date
-bibliography: paper.bib # TODO: Create a paper.bib file for references
+date: 23 april 2025
+bibliography: paper.bib 
 ---
 
 # Summary
 
-PathSim is a flexible, block-based, time-domain dynamical system simulation framework implemented in Python. It enables the modeling and simulation of complex interconnected systems using an object-oriented and **decentralized architecture**. This architectural choice distinguishes PathSim by distributing state and computation across individual `Block` components, promoting modularity, extensibility, and flexibility. Core components include user-defined or built-in `Block` objects encapsulating specific behaviors, `Connection` objects defining explicit data flow, and a `Simulation` object managing time evolution and coordination via fixed-point iteration. Dynamic blocks possess their own numerical solver instances (`engine`) for state integration. PathSim incorporates advanced features like automatic differentiation for sensitivity analysis, discrete event handling for hybrid systems, automatic linearization, hierarchical subsystems, and a comprehensive suite of ODE solvers suitable for stiff problems. It requires only core scientific Python libraries (`numpy`, `scipy`, `matplotlib`).
+PathSim is a flexible, block-based, time-domain dynamical system simulation framework implemented in Python. It enables the modeling and simulation of complex interconnected systems using an object-oriented and decentralized architecture. This architectural choice distinguishes PathSim by distributing state and computation across individual `Block` components, promoting modularity, extensibility, and flexibility. Core components include user-defined or built-in `Block` objects encapsulating specific behaviors, `Connection` objects defining explicit data flow, and a `Simulation` object managing time evolution and coordination. Dynamic blocks possess their own numerical solver instances (`engine`) for state integration. PathSim incorporates advanced features like automatic differentiation for sensitivity analysis or gradient based optimization, discrete event handling for hybrid systems, automatic linearization, hierarchical subsystems, and a comprehensive suite of ODE solvers suitable for stiff problems. It requires only core scientific Python libraries (`numpy`, `scipy`, `matplotlib`).
 
 # Statement of Need
 
-Simulating dynamical systems is vital across disciplines. PathSim meets the need for a Python-native framework combining a programmatic block-diagram approach with advanced features. Traditional simulation tools often rely on centralized solvers or compiled code, which can limit flexibility and extensibility within the Python ecosystem. PathSim's **decentralized architecture** offers distinct advantages: enhanced **modularity** (blocks are self-contained units), easier **extensibility** (new blocks integrate naturally without core modification), and greater **flexibility** in model composition and analysis. PathSim specifically addresses:
+Simulating dynamical systems is vital across many disciplines. PathSim meets the need for a Python-native framework combining a programmatic block-diagram approach with advanced features. Traditional simulation tools often rely on centralized solvers or compiled code, which can limit flexibility and extensibility within the Python ecosystem. PathSim's decentralized architecture offers distinct advantages: enhanced modularity (blocks are self-contained units), easier extensibility (new blocks integrate naturally without core modification), and greater flexibility in model composition and analysis. PathSim specifically addresses:
 
 * **Accessible Hybrid System Simulation:** Integrates event detection (zero-crossing, scheduled) directly into the block-diagram paradigm, simplifying the modeling of systems with both continuous and discrete dynamics.
 * **Gradient-Enabled Simulation:** Provides built-in automatic differentiation, facilitating sensitivity analysis and integration with gradient-based optimization or machine learning frameworks.
