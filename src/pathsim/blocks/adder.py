@@ -36,7 +36,6 @@ class Adder(Block):
     
     Example
     -------
-
     This is the default initialization that just adds up all the inputs:
 
     .. code-block:: python
@@ -49,6 +48,23 @@ class Adder(Block):
     .. code-block:: python
     
         A = Adder('+-')
+
+    Inputs Outputs
+    --------------
+
+    This is how the block input and output ports are defined and map to 
+    the function of the block:
+
+    ======  ==========  ======  =========
+         Inputs             Outputs
+    ------------------  -----------------
+     Port    Meaning     Port    Meaning
+    ======  ==========  ======  =========
+      0     adder in 1    0     adder out
+      1     adder in 2
+      2     adder in 3
+     ...    adder in X
+    ======  ==========  ======  =========
 
     Parameters
     ----------
