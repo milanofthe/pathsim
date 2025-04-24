@@ -133,8 +133,7 @@ class Function(Block):
         """
                 
         #apply operator to get output
-        y = self.op_alg(dict_to_array(self.inputs))
+        y = self.op_alg(self.inputs.to_array())
 
-        #set outputs to new values
-        _outputs, self.outputs = self.outputs, array_to_dict(y)
-        return max_error_dicts(_outputs, self.outputs)
+        #set outputs to new values and return deviation
+        return self.outputs.update_from_array_max_err(y)
