@@ -28,6 +28,14 @@ class Multiplier(Block):
         
         y(t) = \\prod_i u_i(t)
 
+    
+    Note
+    ----
+    This block is purely algebraic and its operation (`op_alg`) will be called 
+    multiple times per timestep, each time when `Simulation._update(t)` is 
+    called in the global simulation loop.
+
+
     Attributes
     ----------
     op_alg : Operator

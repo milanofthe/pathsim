@@ -59,6 +59,7 @@ class Block(Serializable):
     -----
     This block is not intended to be used directly and serves as a base 
     class definition for other blocks to be inherited.
+    
 
     Attributes
     ----------

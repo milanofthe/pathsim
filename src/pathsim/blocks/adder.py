@@ -33,6 +33,7 @@ class Adder(Block):
     .. math::
         
         y(t) = \\sum_i \\mathrm{op}_i \\cdot u_i(t)
+
     
     Example
     -------
@@ -49,23 +50,14 @@ class Adder(Block):
     
         A = Adder('+-')
 
-    Inputs Outputs
-    --------------
+    
+    Note
+    ----
+    This block is purely algebraic and its operation (`op_alg`) will be called 
+    multiple times per timestep, each time when `Simulation._update(t)` is 
+    called in the global simulation loop.
 
-    This is how the block input and output ports are defined and map to 
-    the function of the block:
-
-    ======  ==========  ======  =========
-         Inputs             Outputs
-    ------------------  -----------------
-     Port    Meaning     Port    Meaning
-    ======  ==========  ======  =========
-      0     adder in 1    0     adder out
-      1     adder in 2
-      2     adder in 3
-     ...    adder in X
-    ======  ==========  ======  =========
-
+    
     Parameters
     ----------
     operations : str, optional
@@ -73,6 +65,7 @@ class Adder(Block):
         summation, i.e. '+-' will compute the difference, 
         'None' will just perform regular sum
     
+
     Attributes
     ----------
     _ops : dict

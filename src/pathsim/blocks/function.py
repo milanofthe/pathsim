@@ -42,18 +42,22 @@ class Function(Block):
 
         \\vec{y} = \\mathrm{func}(\\vec{u})
     
+
     Note
     ----
-    Evaluated as part of the evaluation of the global system ODE/DAE. 
-    In the simulation loop this happens multiple times for each timestep.
+    This block is purely algebraic and its operation (`op_alg`) will be called 
+    multiple times per timestep, each time when `Simulation._update(t)` is 
+    called in the global simulation loop.
     Therefore `func` must be purely algebraic and not introduce states, 
     delay, etc. For interfacing with external stateful APIs, use the 
     API block.
+
 
     Note
     -----
     If the outputs are provided as a single numpy array, they are 
     considered a single output. For MIMO, output has to be tuple.
+
     
     Example
     -------
@@ -69,8 +73,8 @@ class Function(Block):
         fn = Function(f)
         
 
-    then the input channels of the block are assigned 
-    to the function arguments following this scheme:
+    then, when the block is uldated, the input channels of the block are 
+    assigned to the function arguments following this scheme:
 
     .. code-block::
 
@@ -87,10 +91,12 @@ class Function(Block):
         a*b  -> outputs[1]
         b/c  -> outputs[2]
 
+
     Parameters
     ---------- 
     func : callable
         MIMO function that defines algebraic block IO behaviour
+
 
     Attributes
     ----------

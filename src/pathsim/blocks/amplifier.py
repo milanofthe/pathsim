@@ -23,6 +23,14 @@ class Amplifier(Block):
     .. math::
         
         y(t) = \\mathrm{gain} \\cdot u(t)
+
+    
+    Note
+    ----
+    This block is purely algebraic and its operation (`op_alg`) will be called 
+    multiple times per timestep, each time when `Simulation._update(t)` is 
+    called in the global simulation loop.
+
         
     Example
     -------
@@ -33,10 +41,12 @@ class Amplifier(Block):
         #amplification by factor 5
         A = Amplifier(gain=5)
 
+
     Parameters
     ----------
     gain : float
         amplifier gain
+
         
     Attributes
     ----------

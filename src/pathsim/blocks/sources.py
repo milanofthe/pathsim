@@ -55,6 +55,14 @@ class Source(Block):
     
         y(t) = \\mathrm{func}(t)
 
+
+    Note
+    ----
+    This block is purely algebraic and its internal function (`func`) will 
+    be called multiple times per timestep, each time when `Simulation._update(t)` 
+    is called in the global simulation loop.
+
+
     Example
     -------
     For example a ramp:
@@ -81,6 +89,7 @@ class Source(Block):
 
         src = Source(f)
 
+
     Parameters
     ---------- 
     func : callable
@@ -102,8 +111,8 @@ class Source(Block):
 
         Note
         ----
-        No direct passthrough, so the 'update' method 
-        is optimized
+        No direct passthrough, so the `update` method 
+        is optimized and has no convergence check
 
         Parameters
         ----------
