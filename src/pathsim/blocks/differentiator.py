@@ -30,9 +30,15 @@ class Differentiator(Block):
 
     Note
     -----
-    Depending on 'f_max', the resulting system might become stiff or ill conditioned!
-    As a practical choice set f_max to 3x the highest expected signal frequency.
-    
+    Depending on `f_max`, the resulting system might become stiff or ill conditioned!
+    As a practical choice set `f_max` to 3x the highest expected signal frequency.
+
+    Note
+    ----
+    Since this is an approximation of real differentiation, the approximation will not hold 
+    if there are high frequency components present in the signal. For example if you have 
+    discontinuities such as steps or squere waves.
+
     Example
     -------
     The block is initialized like this:

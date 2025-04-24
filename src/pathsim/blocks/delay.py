@@ -1,6 +1,7 @@
 #########################################################################################
 ##
-##                        TIME DOMAIN DELAY BLOCK (blocks/delay.py)
+##                             TIME DOMAIN DELAY BLOCK 
+##                                (blocks/delay.py)
 ##
 ##                                Milan Rother 2024
 ##
@@ -30,6 +31,12 @@ class Delay(Block):
         0            & , t < \\tau
         \\end{cases}
 
+    Note
+    ----
+    The internal adaptive buffer uses interpolation for the evaluation. This is 
+    required to be compatible with variable step solvers. It has a drawback however. 
+    The order of the ode solver used will degrade when this block is used, due to 
+    the interpolation.
 
     Example
     -------
@@ -39,19 +46,16 @@ class Delay(Block):
         
         #5 time units delay
         D = Delay(tau=5)
-
     
     Parameters
     ----------
     tau : float
         delay time constant
 
-
     Attributes
     ----------
     _buffer : AdaptiveBuffer
         internal interpolatable adaptive rolling buffer
-
     """
 
     def __init__(self, tau=1e-3):
