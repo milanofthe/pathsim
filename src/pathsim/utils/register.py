@@ -36,12 +36,16 @@ class Register:
             self._values[k] = 0.0
 
 
+    def _get_num(self, key):
+        val = self._values[key]
+        return val.item() if hasattr(val, "item") else val
+
+
     def to_array(self):
         return np.array([
-            self._values[k].item() if hasattr(self._values[k], "item") else val 
-            for k in sorted(self._values.keys())
+            self._get_num(k) for k in sorted(self._values.keys())
             ])
-
+ 
 
     def update_from_array(self, arr):
         for k, a in enumerate(np.atleast_1d(arr)):
