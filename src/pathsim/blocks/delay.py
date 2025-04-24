@@ -75,9 +75,7 @@ class Delay(Block):
 
 
     def reset(self):
-        #reset inputs and outputs
-        self.inputs  = {0:0.0}  
-        self.outputs = {0:0.0}
+        super().reset()
 
         #clear the buffer
         self._buffer.clear()
@@ -98,8 +96,8 @@ class Delay(Block):
         """
 
         #retrieve value from buffer
-        _out, self.outputs[0] = self.outputs[0], self._buffer.get(t)
-        return abs(_out - self.outputs[0])
+        y = self._buffer.get(t)
+        return self.outputs.update_from_array_max_err(y)
 
 
     def sample(self, t):
