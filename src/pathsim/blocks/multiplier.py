@@ -66,6 +66,5 @@ class Multiplier(Block):
         error : float
             absolute error to previous iteration for convergence control
         """
-        u = dict_to_array(self.inputs)
-        _out, self.outputs[0] = self.outputs[0], self.op_alg(u)
-        return abs(_out - self.outputs[0])
+        u = self.inputs.to_array()
+        return self.outputs.update_from_array_max_err(self.op_alg(u))
