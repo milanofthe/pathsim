@@ -81,13 +81,13 @@ class Integrator(Block):
             parameters for solver initialization
         """
 
-        #change solver if already initialized
-        if self.engine is not None:
+        if self.engine is None:
+            #initialize the integration engine
+            self.engine = Solver(self.initial_value, **solver_args)
+
+        else:
+            #change solver if already initialized
             self.engine = Solver.cast(self.engine, **solver_args)
-            return #quit early
-            
-        #initialize the integration engine
-        self.engine = Solver(self.initial_value, **solver_args)
 
 
     def update(self, t):
