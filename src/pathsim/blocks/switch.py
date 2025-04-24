@@ -94,5 +94,4 @@ class Switch(Block):
         t : float
             evaluation time
         """
-        _out, self.outputs[0] = self.outputs[0], self.inputs.get(self.state, 0.0)
-        return abs(_out - self.outputs[0])
+        return self.outputs.update_from_array_max_err(self.inputs[self.state])
