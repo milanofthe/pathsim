@@ -157,7 +157,7 @@ class ODE(Block):
         error : float
             deviation to previous iteration for convergence control
         """
-        self.outputs = array_to_dict(self.engine.get())
+        self.outputs.update_from_array(self.engine.get())
         return 0
 
 
@@ -176,7 +176,7 @@ class ODE(Block):
         error : float
             solver residual norm
         """
-        x, u = self.engine.get(), dict_to_array(self.inputs)
+        x, u = self.engine.get(), self.inputs.to_array()
         f, J = self.op_dyn(x, u, t), self.op_dyn.jac_x(x, u, t)
         return self.engine.solve(f, J, dt)
 
@@ -200,6 +200,6 @@ class ODE(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        x, u = self.engine.get(), dict_to_array(self.inputs)
+        x, u = self.engine.get(), self.inputs.to_array()
         f = self.op_dyn(x, u, t)
         return self.engine.step(f, dt)
