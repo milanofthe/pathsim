@@ -42,12 +42,9 @@ class Register:
 
 
     def to_array(self):
-        return np.array(
-            map(
-                self._get_num, 
-                sorted(self._values.keys())
-                )
-            )
+        return np.array([
+            self._get_num(k) for k in sorted(self._values.keys())
+            ])
  
 
     def update_from_array(self, arr):

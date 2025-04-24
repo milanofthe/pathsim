@@ -112,7 +112,7 @@ class Scope(Block):
         if t >= self.t_wait: 
             if (self.sampling_rate is None or 
                 t * self.sampling_rate > len(self.recording)):
-                self.recording[t] = self.inputs.from_array()
+                self.recording[t] = self.inputs.to_array()
 
 
     def plot(self, *args, **kwargs):
