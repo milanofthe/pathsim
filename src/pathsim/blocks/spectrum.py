@@ -149,14 +149,11 @@ class Spectrum(Block):
 
         
     def reset(self):
-        #reset inputs
-        self.inputs = {k:0.0 for k in sorted(self.inputs.keys())}  
+        super().reset()
 
         #local integration time
         self.time = 0.0
 
-        #reset numeric integration engine -> resets the spectrum
-        if self.engine: self.engine.reset()
 
 
     def read(self):
@@ -239,7 +236,7 @@ class Spectrum(Block):
             self.time = _t
             
             #advance solution of implicit update equation (no jacobian)
-            f = self._kernel(self.engine.get(), dict_to_array(self.inputs), _t)
+            f = self._kernel(self.engine.get(), self.inputs.to_array(), _t)
             return self.engine.solve(f, None, dt)
 
         #no error 
@@ -274,7 +271,7 @@ class Spectrum(Block):
             self.time = _t
             
             #compute update step with integration engine
-            f = self._kernel(self.engine.get(), dict_to_array(self.inputs), _t)
+            f = self._kernel(self.engine.get(), self.inputs.to_array(), _t)
             return self.engine.step(f, dt)
 
         #no error estimate
@@ -490,7 +487,7 @@ class RealtimeSpectrum(Spectrum):
                 self.plotter.update_all(self.freq, abs(data))
 
             #compute update step with integration engine
-            f = self._kernel(self.engine.get(), dict_to_array(self.inputs), _t)
+            f = self._kernel(self.engine.get(), self.inputs.to_array(), _t)
             return self.engine.step(f, dt)
             
         #no error estimate
