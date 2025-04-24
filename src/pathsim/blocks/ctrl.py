@@ -28,13 +28,18 @@ class PID(Block):
         H_\\mathrm{diff}(s) = K_p + K_i \\frac{1}{s} + K_d \\frac{s}{1 + s / f_\\mathrm{max}} 
 
     where the differentiation is approximated by a high pass filter that holds 
-    for signals up to a frequency of approximately f_max.
+    for signals up to a frequency of approximately `f_max`.
+
 
     Note
     ----
-    Depending on 'f_max', the resulting system might become stiff or ill conditioned!
-    As a practical choice set f_max to 3x the highest expected signal frequency.
-    
+    Depending on `f_max`, the resulting system might become stiff or ill conditioned!
+    As a practical choice set `f_max` to 3x the highest expected signal frequency.
+    Since this block uses an approximation of real differentiation, the approximation will 
+    not hold if there are high frequency components present in the signal. For example if 
+    you have discontinuities such as steps or squere waves.
+
+
     Example
     -------
     The block is initialized like this:
@@ -43,6 +48,7 @@ class PID(Block):
         
         #cutoff at 1kHz
         pid = PID(Kp=2, Ki=0.5, Kd=0.1, f_max=1e3)
+
 
     Parameters
     ----------
@@ -54,6 +60,7 @@ class PID(Block):
         differentiator controller coefficient
     f_max : float
         highest expected signal frequency
+
 
     Attributes
     ----------
@@ -186,7 +193,6 @@ class PID(Block):
         return self.engine.step(f, dt)
 
 
-
 class AntiWindupPID(PID):
     """Proportional-Integral-Differntiation (PID) controller with tracking 
     anti-windup mechanism (back-calculation).
@@ -223,8 +229,12 @@ class AntiWindupPID(PID):
 
     Note
     ----
-    Depending on 'f_max', the resulting system might become stiff or ill conditioned!
-    As a practical choice set f_max to 3x the highest expected signal frequency.
+    Depending on `f_max`, the resulting system might become stiff or ill conditioned!
+    As a practical choice set `f_max` to 3x the highest expected signal frequency.
+    Since this block uses an approximation of real differentiation, the approximation will 
+    not hold if there are high frequency components present in the signal. For example if 
+    you have discontinuities such as steps or squere waves.
+
     
     Example
     -------
@@ -234,6 +244,7 @@ class AntiWindupPID(PID):
         
         #cutoff at 1kHz, windup limits at [-5, 5]
         pid = AntiWindupPID(Kp=2, Ki=0.5, Kd=0.1, f_max=1e3, limits=[-5, 5])
+
 
     Parameters
     ----------
@@ -249,6 +260,7 @@ class AntiWindupPID(PID):
         feedback term for back calculation for anti-windup control of integrator
     limits : array_like[float]
         lower and upper limit for PID output that triggers anti-windup of integrator
+
 
     Attributes
     ----------

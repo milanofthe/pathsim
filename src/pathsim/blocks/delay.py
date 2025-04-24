@@ -12,6 +12,7 @@
 import numpy as np
 
 from ._block import Block
+
 from ..utils.adaptivebuffer import AdaptiveBuffer
 
 
