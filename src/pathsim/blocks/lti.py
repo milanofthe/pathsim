@@ -31,7 +31,8 @@ from ..optim.operator import DynamicOperator
 
 class StateSpace(Block):
     """
-    This block integrates a LTI MIMO state space model with the structure
+    This block defines a linear time invariant (LTI) multi input multi output (MIMO) 
+    state space model with the structure
 
     .. math::
 
@@ -106,8 +107,11 @@ class StateSpace(Block):
         self.inputs  = {i:0.0 for i in range(n_in)}
         self.outputs = {i:0.0 for i in range(n_out)}
 
-        #initial condition
-        self.initial_value = np.zeros(n) if initial_value is None else initial_value
+        #initial condition and shape validation
+        if initial_value is None:
+            self.initial_value = np.zeros(n)
+        else: 
+            self.initial_value = np.atleast_1d(initial_value)
 
         #operators
         self.op_dyn = DynamicOperator(
@@ -192,7 +196,7 @@ class StateSpace(Block):
 
 
 class TransferFunction(StateSpace):
-    """This block integrates a LTI (MIMO for pole residue) transfer function.
+    """This block defines a LTI (MIMO for pole residue) transfer function.
 
     The transfer function is defined in pole-residue form
 
@@ -200,14 +204,15 @@ class TransferFunction(StateSpace):
         
         \\mathbf{H}(s) = \\mathbf{C} + \\sum_n^N \\frac{\\mathbf{R}_n}{s - p_n}
 
-    where 'Poles' are the scalar poles of the transfer function and
-    'Residues' are the possibly matrix valued (in MIMO case) residues of
-    the transfer function. 'Const' has same shape as 'Residues'.
+    where 'Poles' are the scalar (possibly complex conjugate) poles of the 
+    transfer function and 'Residues' are the possibly matrix valued (in MIMO case) 
+    and complex conjugate residues of the transfer function. 'Const' has same 
+    shape as 'Residues'.
 
     Upon initialization, the state space realization of the transfer 
     function is computed using a minimal gilbert realization.
 
-    The resulting statespace model of the form
+    The resulting state space model of the form
 
     .. math::
         
@@ -216,9 +221,9 @@ class TransferFunction(StateSpace):
                    y &= \\mathbf{C} x + \\mathbf{D} u 
         \\end{eqnarray}
 
-    is handled the same as the 'StateSpace' block, where A, B, C and D 
-    are the state space matrices, x is the internal state, u the input and 
-    y the output vector.
+    is handled the same as the 'StateSpace' block, where `A`, `B`, `C` and `D` 
+    are the state space matrices, `x` is the internal state, `u` the input and 
+    `y` the output vector.
         
     Parameters
     ----------

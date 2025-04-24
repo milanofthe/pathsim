@@ -22,13 +22,13 @@ from ..optim.operator import Operator
 # MISO BLOCKS ===========================================================================
 
 class Multiplier(Block):
-    """multiplies all input signals (MISO)
+    """Multiplies all signals from all input ports (MISO).
       
     .. math::
         
         y(t) = \\prod_i u_i(t)
 
-    
+            
     Note
     ----
     This block is purely algebraic and its operation (`op_alg`) will be called 
