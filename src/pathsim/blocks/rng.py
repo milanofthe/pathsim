@@ -17,10 +17,10 @@ from ._block import Block
 
 class RNG(Block):
     """
-    Generates a random output value beteween -1 and 1 
+    Generates a random output value between -1 and 1 
     from a uniform distribution.
 
-    If no 'sampling_rate' (None) is specified, every 
+    If no `sampling_rate` (None) is specified, every 
     simulation timestep gets a random value.
 
     Parameters

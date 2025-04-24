@@ -84,8 +84,9 @@ class Spectrum(Block):
     with few evaluation frequencies, where just FFT'ing the time series data 
     wouldnt be efficient OR if only the evaluation at weirdly spaced frequencies 
     is required. Otherwise its more efficient to just do an FFT on the time 
-    series recording.
+    series recording after the simulation has finished.
     
+
     Parameters
     ----------
     freq : array[float] 

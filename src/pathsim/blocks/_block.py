@@ -59,6 +59,7 @@ class Block(Serializable):
     -----
     This block is not intended to be used directly and serves as a base 
     class definition for other blocks to be inherited.
+    
 
     Attributes
     ----------
@@ -393,15 +394,16 @@ class Block(Serializable):
     # methods for block output and state updates ----------------------------------------
 
     def update(self, t):
-        """The 'update' method is called iteratively for all blocks BEFORE the timestep 
-        to resolve algebraic loops (fixed-point iteraion). 
+        """The 'update' method is called iteratively for all blocks to evaluate the 
+        algbebraic components of the global system ode and resolve algebraic loops 
+        (fixed-point iteraion). 
 
         It is meant for instant time blocks (blocks that dont have a delay due to the 
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
         directly based on the 'inputs' and possibly internal states. 
 
-        It computes and returns the relative difference between the new output and 
-        the previous output (before the step) to track convergence of the fixed-point 
+        It computes and returns the absolute difference between the new output and 
+        the previous output (before the call) to track convergence of the fixed-point 
         iteration.
 
         Note
@@ -425,11 +427,12 @@ class Block(Serializable):
         if self.op_alg is None:
             return 0.0
 
-        #block input and internal state
-        u, _, x = self.get_all()
+        #block inputs 
+        u = dict_to_array(self.inputs)
 
         #no internal state -> standard 'Operator'
         if self.engine: 
+            x = self.engine.get()
             y = self.op_alg(x, u, t)
         else: 
             y = self.op_alg(u)            

@@ -26,18 +26,20 @@ class ADC(Block):
     is triggered by a scheduled event.
 
     Functionality:
+
     1. Samples the analog input `inputs[0]` at intervals of `T`, starting after delay `tau`.
     2. Clips the input voltage to the defined `span` [min_voltage, max_voltage].
     3. Scales the clipped voltage to the range [0, 1].
-    4. Quantizes the scaled value to an integer code between 0 and 2^n_bits - 1
-       using flooring (quantizes towards negative infinity).
+    4. Quantizes the scaled value to an integer code between 0 and 2^n_bits - 1 using flooring.
     5. Converts the integer code to an n_bits binary representation.
     6. Outputs the binary code on ports 0 (LSB) to n_bits-1 (MSB).
 
     Ideal characteristics:
+
     - Instantaneous sampling at scheduled times.
     - Perfect, noise-free quantization.
     - No aperture jitter or other dynamic errors.
+
 
     Parameters
     ----------
@@ -51,21 +53,7 @@ class ADC(Block):
     tau : float, optional
         Initial delay before the first sample is taken. Default is 0.
 
-    Input Ports
-    -----------
-    inputs[0] : float
-        Analog input value.
-
-    Output Ports
-    ------------
-    outputs[0] : int
-        Least Significant Bit (LSB) of the digital code (0 or 1).
-    outputs[1] : int
-        Next bit.
-    ...
-    outputs[n_bits-1] : int
-        Most Significant Bit (MSB) of the digital code (0 or 1).
-
+    
     Attributes
     ----------
     events : list[Schedule]
@@ -124,19 +112,20 @@ class DAC(Block):
     is triggered by a scheduled event.
 
     Functionality:
-    1. Reads the digital code from input ports 0 (LSB) to n_bits-1 (MSB)
-       at intervals of `T`, starting after delay `tau`.
+
+    1. Reads the digital code from input ports 0 (LSB) to n_bits-1 (MSB) at intervals of `T`, starting after delay `tau`.
     2. Interprets the inputs as an unsigned binary integer code.
-    3. Converts the integer code to a fractional value between 0 and
-       (2^n_bits - 1) / 2^n_bits.
+    3. Converts the integer code to a fractional value between 0 and (2^n_bits - 1) / 2^n_bits.
     4. Scales this fractional value to the specified analog output `span`.
     5. Outputs the resulting analog value on `outputs[0]`.
     6. Holds the output value constant until the next scheduled update.
 
     Ideal characteristics:
+
     - Instantaneous update at scheduled times.
     - Perfect, noise-free reconstruction.
     - No glitches or settling time.
+
 
     Parameters
     ----------
@@ -151,20 +140,6 @@ class DAC(Block):
     tau : float, optional
         Initial delay before the first output update. Default is 0.
 
-    Input Ports
-    -----------
-    inputs[0] : int
-        Least Significant Bit (LSB) of the digital code (0 or 1).
-    inputs[1] : int
-        Next bit.
-    ...
-    inputs[n_bits-1] : int
-        Most Significant Bit (MSB) of the digital code (0 or 1).
-
-    Output Ports
-    ------------
-    outputs[0] : float
-        Analog output voltage.
 
     Attributes
     ----------

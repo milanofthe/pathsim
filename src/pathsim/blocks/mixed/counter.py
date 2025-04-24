@@ -87,10 +87,7 @@ class CounterUp(Counter):
     """
 
     def __init__(self, start=0, threshold=0.0):
-        super().__init__()
-
-        self.start = start
-        self.threshold = threshold
+        super().__init__(start, threshold)
 
         #internal event
         self.E = ZeroCrossingUp(
@@ -126,10 +123,7 @@ class CounterDown(Counter):
     """
 
     def __init__(self, start=0, threshold=0.0):
-        super().__init__()
-
-        self.start = start
-        self.threshold = threshold
+        super().__init__(start, threshold)
 
         #internal event
         self.E = ZeroCrossingDown(

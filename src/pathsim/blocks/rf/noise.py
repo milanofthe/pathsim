@@ -23,7 +23,7 @@ class WhiteNoise(Block):
     with 'sampling_rate' and holds noise values constant for time bins.
 
     If no 'sampling_rate' (None) is specified, every simulation timestep 
-    gets a new noise values. This is the default setting.
+    gets a new noise value. This is the default setting.
     
     Parameters
     ----------
@@ -259,14 +259,10 @@ class SinusoidalPhaseNoiseSource(Block):
 
 
     def set_solver(self, Solver, **solver_kwargs):
-        
-        #change solver if already initialized
-        if self.engine is not None:
-            self.engine = Solver.cast(self.engine, **solver_kwargs)
-            return #quit early
-
         #initialize the numerical integration engine 
-        self.engine = Solver(0.0, **solver_kwargs)
+        if self.engine is None: self.engine = Solver(0.0, **solver_kwargs)
+        #change solver if already initialized
+        else: self.engine = Solver.cast(self.engine, **solver_kwargs)
 
 
     def reset(self):

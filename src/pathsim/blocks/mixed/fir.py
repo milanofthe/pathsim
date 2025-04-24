@@ -22,14 +22,17 @@ class FIR(Block):
     """Models a discrete-time Finite Impulse Response (FIR) filter.
 
     This block applies an FIR filter to an input signal sampled periodically.
-    The output at each sample time is a weighted sum of the current and a
-    finite number of past input samples. The operation is triggered by a
-    scheduled event.
+    The output at each sample time is a weighted sum of the current and a finite number 
+    of past input samples. The operation is triggered by a scheduled event.
 
     Functionality:
-    y[n] = b[0]*x[n] + b[1]*x[n-1] + ... + b[N]*x[n-N]
-    where `b` are the filter coefficients and `N` is the filter order
-    (number of coefficients - 1).
+    
+    .. math::
+
+        y[n] = b[0] x[n] + b[1] x[n-1] + \\dots + b[N] x[n-N]
+    
+    where `b` are the filter coefficients and `N` is the filter order (number of 
+    coefficients - 1).
 
     1. Samples the input `inputs[0]` at intervals of `T`, starting after delay `tau`.
     2. Stores the current and past `len(coefficients) - 1` input samples in an internal buffer.

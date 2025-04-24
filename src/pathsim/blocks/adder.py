@@ -14,6 +14,7 @@ import numpy as np
 from ._block import Block
 
 from ..utils.utils import dict_to_array
+
 from ..optim.operator import Operator
 
 
@@ -33,10 +34,10 @@ class Adder(Block):
     .. math::
         
         y(t) = \\sum_i \\mathrm{op}_i \\cdot u_i(t)
+
     
     Example
     -------
-
     This is the default initialization that just adds up all the inputs:
 
     .. code-block:: python
@@ -50,6 +51,14 @@ class Adder(Block):
     
         A = Adder('+-')
 
+    
+    Note
+    ----
+    This block is purely algebraic and its operation (`op_alg`) will be called 
+    multiple times per timestep, each time when `Simulation._update(t)` is 
+    called in the global simulation loop.
+
+    
     Parameters
     ----------
     operations : str, optional
@@ -57,6 +66,7 @@ class Adder(Block):
         summation, i.e. '+-' will compute the difference, 
         'None' will just perform regular sum
     
+
     Attributes
     ----------
     _ops : dict
