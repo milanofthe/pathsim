@@ -35,6 +35,9 @@ class Register:
         internal dict that stores the values of the register
     """
 
+    __slots__ = ["_values"]
+
+
     def __init__(self, size=1):
         self._values = defaultdict(
             float, 
