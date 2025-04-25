@@ -31,6 +31,13 @@ class Register:
             yield self._values[k]
 
 
+    def resize(self, size):
+        self._values = defaultdict(
+            float, 
+            {k:0.0 for k in range(size)}
+            )
+
+
     def reset(self):
         for k in sorted(self._values.keys()):
             self._values[k] = 0.0
@@ -48,17 +55,29 @@ class Register:
  
 
     def update_from_array(self, arr):
-        for k, a in enumerate(np.atleast_1d(arr)):
-            self._values[k] = a
-
+        if np.isscalar(arr):
+            self._values[0] = arr
+        else:
+            for k, a in enumerate(arr):
+                self._values[k] = a
+                
 
     def update_from_array_max_err(self, arr):
-        max_err = 0.0
-        for k, a in enumerate(np.atleast_1d(arr)):
-            err = abs(self._values[k] - a)
-            if err > max_err: max_err = err
-            self._values[k] = a
-        return max_err
+        if np.isscalar(arr):
+            err = abs(self._values[0] - arr)
+            self._values[0] = arr
+            return err
+        else:
+            max_err = 0.0
+            for k, a in enumerate(arr):
+                err = abs(self._values[k] - a)
+                if err > max_err: 
+                    max_err = err
+                self._values[k] = a
+            return max_err
+
+
+        
 
 
     def __setitem__(self, key, val):
