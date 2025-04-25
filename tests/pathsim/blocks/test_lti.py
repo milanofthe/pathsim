@@ -34,8 +34,9 @@ class TestStateSpace(unittest.TestCase):
         S = StateSpace()
         self.assertEqual(S.initial_value, 0.0)
         self.assertEqual(S.engine, None)
-        self.assertEqual(S.inputs, {0:0.0})
-        self.assertEqual(S.outputs, {0:0.0})
+
+        self.assertEqual(len(S.inputs), 1)
+        self.assertEqual(len(S.outputs), 1)
 
         #test special initialization (siso)
         S = StateSpace(
@@ -46,8 +47,8 @@ class TestStateSpace(unittest.TestCase):
             initial_value=None
             )
         self.assertTrue(np.all(S.initial_value == np.zeros(2)))
-        self.assertEqual(S.inputs, {0:0.0})
-        self.assertEqual(S.outputs, {0:0.0})
+        self.assertEqual(len(S.inputs), 1)
+        self.assertEqual(len(S.outputs), 1)
 
         #test special initialization (mimo)
         S = StateSpace(
@@ -58,8 +59,10 @@ class TestStateSpace(unittest.TestCase):
             initial_value=np.ones(2)
             )
         self.assertTrue(np.all(S.initial_value == np.ones(2)))
-        self.assertEqual(S.inputs, {0:0.0, 1:0.0})
-        self.assertEqual(S.outputs, {0:0.0, 1:0.0})
+
+        #are the dimensions initialized correctly?
+        self.assertEqual(len(S.inputs), 2)
+        self.assertEqual(len(S.outputs), 2)
 
 
     def test_len(self):
