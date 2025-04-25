@@ -30,7 +30,8 @@ class TestInterface(unittest.TestCase):
         I = Interface()
 
         #test that outputs are zero
-        self.assertEqual(I.outputs, {0: 0.0})
+        self.assertEqual(I.outputs[0], 0.0)
+        self.assertEqual(len(I.outputs), 1)
 
         #test if output is correctly set
         I.set_output(0, 0.2)
@@ -49,7 +50,9 @@ class TestInterface(unittest.TestCase):
         I = Interface()
 
         #test that inputs are zero
-        self.assertEqual(I.inputs, {0: 0.0})
+
+        self.assertEqual(I.inputs[0], 0.0)
+        self.assertEqual(len(I.inputs), 1)
 
         #test default retrieval        
         self.assertEqual(I.get_input(2), 0.0)
@@ -141,13 +144,16 @@ class TestSubsystem(unittest.TestCase):
         C1 = Connection(I1, B1, I1)
         S = Subsystem(blocks=[I1, B1], connections=[C1])
 
-        self.assertEqual(S.interface.outputs, {0:0.0})
-
+        self.assertEqual(S.interface.outputs[0], 0.0)
+        self.assertEqual(len(S.interface.outputs), 1)
+        
         S.set(0, 1.1)
         S.set(1, 2.2)
         S.set(2, 3.3)
 
-        self.assertEqual(S.interface.outputs, {0:1.1, 1:2.2, 2:3.3})
+        self.assertEqual(S.interface.outputs[0], 1.1)
+        self.assertEqual(S.interface.outputs[1], 2.2)
+        self.assertEqual(S.interface.outputs[2], 3.3)
 
 
     def test_get(self): 
@@ -157,7 +163,9 @@ class TestSubsystem(unittest.TestCase):
         C1 = Connection(I1, B1, I1)
         S = Subsystem(blocks=[I1, B1], connections=[C1])
 
-        S.interface.inputs = {0:1.1, 1:2.2, 2:3.3}
+        S.interface.inputs[0] = 1.1
+        S.interface.inputs[1] = 2.2
+        S.interface.inputs[2] = 3.3
 
         self.assertEqual(S.get(0), 1.1)
         self.assertEqual(S.get(1), 2.2)
