@@ -53,9 +53,7 @@ class WhiteNoise(Block):
 
 
     def reset(self):
-        #reset inputs and outputs
-        self.inputs  = {0:0.0}  
-        self.outputs = {0:0.0}
+        super().reset()
 
         #reset noise samples
         self.n_samples = 0
@@ -143,11 +141,9 @@ class PinkNoise(Block):
 
 
     def reset(self):
-        # Reset inputs and outputs
-        self.inputs  = {0: 0.0}  
-        self.outputs = {0: 0.0}
+        super().reset()
 
-        # Reset counters and octave values
+        #reset counters and octave values
         self.n_samples = 0
         self.noise = 0.0
         self.octave_values = np.random.normal(0, 1, self.num_octaves)
@@ -225,6 +221,19 @@ class SinusoidalPhaseNoiseSource(Block):
         weight for white phase noise contribution
     sampling_rate : float
         number of samples per unit time for the internal RNG 
+    
+    Attributes
+    ----------
+    omega : float
+        angular frequency of the sinusoid, derived from `frequency`
+    noise_1 : float
+        internal noise value sampled from normal distribution
+    noise_2 : float
+        internal noise value sampled from normal distribution
+    n_samples : int
+        bin counter for sampling
+    t_max : float
+        most recent sampling time, to ensure timing for sampling bins
     """
 
     def __init__(
@@ -266,16 +275,11 @@ class SinusoidalPhaseNoiseSource(Block):
 
 
     def reset(self):
-        #reset inputs and outputs
-        self.inputs  = {0:0.0}  
-        self.outputs = {0:0.0}
+        super().reset()
 
-        #reset 
+        #reset block specific attributes
         self.n_samples = 0
         self.t_max = 0
-
-        #reset engine
-        self.engine.reset()
 
 
     def update(self, t):
