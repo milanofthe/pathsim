@@ -72,7 +72,7 @@ class ADC(Block):
 
             #clip and scale to ADC span
             lower, upper = self.span
-            analog_in = self.inputs.get(0, lower)
+            analog_in = self.inputs[0]
 
             clipped_val = np.clip(analog_in, lower, upper)
             scaled_val = (clipped_val - lower) / (upper - lower)
@@ -158,7 +158,7 @@ class DAC(Block):
         def _sample(t):
             
             #convert bits to integer LSB -> MSB
-            val = sum(self.inputs.get(i, 0) * (2**i) for i in range(self.n_bits))
+            val = sum(self.inputs[i] * (2**i) for i in range(self.n_bits))
 
             #scale to DAC span and set output
             lower, upper = self.span
