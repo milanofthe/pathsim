@@ -17,6 +17,7 @@ import numpy as np
 from .connection import Connection
 from .blocks._block import Block
 from .utils.utils import path_length_dfs, dict_to_array
+from .utils.register import Register
 from .utils.portreference import PortReference
 
 
@@ -41,7 +42,7 @@ class Interface(Block):
         self.outputs[port] = value
     
     def get_input(self, port): 
-        return self.inputs.get(port, 0.0)
+        return self.inputs[port]
 
 
 # MAIN SUBSYSTEM CLASS ==================================================================
@@ -171,8 +172,8 @@ class Subsystem(Block):
         Either for monitoring, postprocessing or event detection. 
         In any case this enables easy access to the current block state.
         """
-        _inputs  = dict_to_array(self.interface.outputs)
-        _outputs = dict_to_array(self.interface.inputs)
+        _inputs  = self.interface.outputs.to_array()
+        _outputs = self.interface.inputs.to_array()
         _states  = []
         for block in self.blocks:
             _i, _o, _s = block()
@@ -239,6 +240,8 @@ class Subsystem(Block):
 
     def reset(self):
         """Reset the subsystem and all internal blocks"""
+
+        super().reset()
 
         #reset interface
         self.interface.reset()
