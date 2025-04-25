@@ -13,8 +13,6 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.utils import dict_to_array
-
 from ..optim.operator import Operator
 
 

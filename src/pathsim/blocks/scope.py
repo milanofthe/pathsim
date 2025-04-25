@@ -20,7 +20,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from ._block import Block
-from ..utils.utils import dict_to_array
 from ..utils.realtimeplotter import RealtimePlotter
 
 from .._constants import COLORS_ALL

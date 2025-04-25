@@ -15,8 +15,10 @@
 import numpy as np
 
 from .connection import Connection
+
 from .blocks._block import Block
-from .utils.utils import path_length_dfs, dict_to_array
+
+from .utils.utils import path_length_dfs
 from .utils.register import Register
 from .utils.portreference import PortReference
 

@@ -12,13 +12,6 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.utils import (
-    max_error_dicts, 
-    array_to_dict,
-    dict_to_array
-    )
-
-
 from ..optim.operator import Operator
 
 

@@ -15,7 +15,6 @@
 
 import numpy as np
 
-from ..utils.utils import dict_to_array, array_to_dict, max_error_dicts
 from ..utils.register import Register
 from ..utils.serialization import Serializable
 from ..utils.portreference import PortReference

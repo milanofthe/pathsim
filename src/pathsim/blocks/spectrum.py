@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from ._block import Block
-from ..utils.utils import dict_to_array
+
 from ..utils.realtimeplotter import RealtimePlotter
 
 from .._constants import COLORS_ALL

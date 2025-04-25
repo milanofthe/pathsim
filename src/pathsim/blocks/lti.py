@@ -14,17 +14,8 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.utils import (
-    max_error_dicts,
-    dict_to_array, 
-    array_to_dict
-    )
-
 from ..utils.register import Register
-
-from ..utils.gilbert import (
-    gilbert_realization
-    )
+from ..utils.gilbert import gilbert_realization
 
 from ..optim.operator import DynamicOperator
 

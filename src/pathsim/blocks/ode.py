@@ -13,11 +13,6 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.utils import (
-    dict_to_array, 
-    array_to_dict
-    )
-
 from ..optim.operator import DynamicOperator
 
 

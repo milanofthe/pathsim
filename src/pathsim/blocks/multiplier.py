@@ -15,7 +15,6 @@ import numpy as np
 from math import prod
 
 from ._block import Block
-from ..utils.utils import dict_to_array
 from ..optim.operator import Operator
 
 
