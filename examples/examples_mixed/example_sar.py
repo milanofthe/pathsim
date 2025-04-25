@@ -39,7 +39,7 @@ class SAR(Block):
         self.outputs = {i: 0 for i in range(self.n_bits)}
 
         def _step(t):
-            comparator_result = self.inputs.get(0, 0)
+            comparator_result = self.inputs[0]
 
             previous_weight = (self.trial_weight << 1) if self.trial_weight > 0 else 1
 

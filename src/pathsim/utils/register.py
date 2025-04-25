@@ -31,28 +31,16 @@ class Register:
             yield self._values[k]
 
 
-    def resize(self, size):
-        self._values = defaultdict(
-            float, 
-            {k:0.0 for k in range(size)}
-            )
-
-
     def reset(self):
         for k in sorted(self._values.keys()):
             self._values[k] = 0.0
 
 
-    def _get_num(self, key):
-        val = self._values[key]
-        return val.item() if hasattr(val, "item") else val
-
-
     def to_array(self):
         return np.array([
-            self._get_num(k) for k in sorted(self._values.keys())
-            ])
- 
+            self._values[k] for k in sorted(self._values.keys())
+            ]).flatten()
+
 
     def update_from_array(self, arr):
         if np.isscalar(arr):
@@ -60,24 +48,21 @@ class Register:
         else:
             for k, a in enumerate(arr):
                 self._values[k] = a
-                
+
 
     def update_from_array_max_err(self, arr):
         if np.isscalar(arr):
-            err = abs(self._values[0] - arr)
+            _err = abs(self._values[0] - arr)
             self._values[0] = arr
-            return err
+            return _err
         else:
-            max_err = 0.0
+            _max_err = 0.0
             for k, a in enumerate(arr):
-                err = abs(self._values[k] - a)
-                if err > max_err: 
-                    max_err = err
+                _err = abs(self._values[k] - a)
+                if _err > _max_err: 
+                    _max_err = _err
                 self._values[k] = a
-            return max_err
-
-
-        
+            return _max_err
 
 
     def __setitem__(self, key, val):
