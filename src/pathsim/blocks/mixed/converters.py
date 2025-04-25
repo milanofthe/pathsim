@@ -13,6 +13,7 @@ import numpy as np
 
 from .._block import Block
 from ...events.schedule import Schedule
+from ...utils.register import Register
 
 
 # MIXED SIGNAL BLOCKS ===================================================================
@@ -94,8 +95,8 @@ class ADC(Block):
                 ),
             ]
 
-        #initialize outputs dict to have n_bits entries
-        self.outputs = {i: 0.0 for i in range(self.n_bits)}
+        #initialize outputs to have 'n_bits' ports
+        self.outputs = Register(self.n_bits)
 
 
     def __len__(self):
@@ -175,8 +176,8 @@ class DAC(Block):
                 ),
             ]
 
-        #initialize inputs dict to expect n_bits entries
-        self.inputs = {i: 0.0 for i in range(self.n_bits)}
+        # initialize inputs to expect 'n_bits' entries
+        self.inputs = Register(self.n_bits)
 
 
     def __len__(self):

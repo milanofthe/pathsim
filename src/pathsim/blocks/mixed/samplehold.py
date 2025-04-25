@@ -40,7 +40,9 @@ class SampleHold(Block):
         self.tau = tau
 
         def _sample(t):
-            self.outputs = self.inputs.copy()
+            self.outputs.update_from_array(
+                self.inputs.to_array()
+                )
 
         #internal scheduled events
         self.events = [
