@@ -26,13 +26,15 @@ class Register:
     
     Parameters
     ----------
-    size : `int`, optional
+    size : int, optional
         initial size of the register 
 
     Attributes
     ----------
-    _values : `collections.defaultdict`
+    _values : dict[int, float]
         internal dict that stores the values of the register
+    _sorted_keys : list[int]
+        internal sorted list of port keys for fast ordered iterations of `_values`
     """
 
     __slots__ = ["_values", "_sorted_keys"]
@@ -72,7 +74,7 @@ class Register:
 
         Returns
         -------
-        arr : `numpy.ndarray`
+        arr : numpy.ndarray
             converted register as array
         """
         return np.array([self._values[k] for k in self._sorted_keys])
@@ -90,7 +92,7 @@ class Register:
 
         Parameters
         ----------
-        arr : `numpy.ndarray`, `float`
+        arr : numpy.ndarray, float
             array or scalar that is used to update internal register values
         """
         if np.isscalar(arr):
@@ -117,12 +119,12 @@ class Register:
 
         Parameters
         ----------
-        arr : `numpy.ndarray`, `float`
+        arr : numpy.ndarray, float
             array or scalar that is used to update internal register values
         
         Returns
         -------
-        err : `float`
+        err : float
             maximum absolute deviation from previous register values
         """
         if np.isscalar(arr):
@@ -144,6 +146,13 @@ class Register:
     def __setitem__(self, key, val):
         """Set the value of `_values`, wraps its setter method. 
         For direct access to the register values.
+
+        Parameters
+        ----------
+        key : int
+            port key, where to set value
+        val : float, obj
+            value to set at port
         """
         if key not in self._values:
             insort(self._sorted_keys, key) 
@@ -153,5 +162,15 @@ class Register:
     def __getitem__(self, key):
         """Get the value of `_values`, wraps its getter method.
         For direct access to the register values.
+        
+        Parameters
+        ----------
+        key : int
+            port key, where to get value from
+
+        Returns
+        -------
+        out : float, obj
+            value from port at `key` position
         """
         return self._values.get(key, 0.0)
