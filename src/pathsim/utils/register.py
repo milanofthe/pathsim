@@ -26,13 +26,15 @@ class Register:
     
     Parameters
     ----------
-    size : `int`, optional
+    size : int, optional
         initial size of the register 
 
     Attributes
     ----------
-    _values : `collections.defaultdict`
+    _values : dict[int, float]
         internal dict that stores the values of the register
+    _sorted_keys : list[int]
+        internal sorted list of port keys for fast ordered iterations of `_values`
     """
 
     __slots__ = ["_values", "_sorted_keys"]
@@ -72,7 +74,7 @@ class Register:
 
         Returns
         -------
-        arr : `numpy.ndarray`
+        arr : numpy.ndarray
             converted register as array
         """
         return np.array([self._values[k] for k in self._sorted_keys])
@@ -90,7 +92,7 @@ class Register:
 
         Parameters
         ----------
-        arr : `numpy.ndarray`, `float`
+        arr : numpy.ndarray, float
             array or scalar that is used to update internal register values
         """
         if np.isscalar(arr):
@@ -117,12 +119,12 @@ class Register:
 
         Parameters
         ----------
-        arr : `numpy.ndarray`, `float`
+        arr : numpy.ndarray, float
             array or scalar that is used to update internal register values
         
         Returns
         -------
-        err : `float`
+        err : float
             maximum absolute deviation from previous register values
         """
         if np.isscalar(arr):
