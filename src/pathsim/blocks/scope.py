@@ -20,7 +20,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from ._block import Block
-from ..utils.utils import dict_to_array
 from ..utils.realtimeplotter import RealtimePlotter
 
 from .._constants import COLORS_ALL
@@ -73,8 +72,7 @@ class Scope(Block):
 
 
     def reset(self):
-        #reset inputs
-        self.inputs = {k:0.0 for k in sorted(self.inputs.keys())}  
+        super().reset()
 
         #reset recording data and time
         self.recording = {}
@@ -113,7 +111,7 @@ class Scope(Block):
         if t >= self.t_wait: 
             if (self.sampling_rate is None or 
                 t * self.sampling_rate > len(self.recording)):
-                self.recording[t] = dict_to_array(self.inputs)
+                self.recording[t] = self.inputs.to_array()
 
 
     def plot(self, *args, **kwargs):
@@ -437,7 +435,7 @@ class RealtimeScope(Scope):
             evaluation time for sampling
         """
         if (self.sampling_rate is None or t * self.sampling_rate > len(self.recording)):
-            values = dict_to_array(self.inputs)
+            values = self.inputs.to_array()
             self.plotter.update(t, values)
             if t >= self.t_wait: 
                 self.recording[t] = values

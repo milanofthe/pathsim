@@ -49,9 +49,7 @@ class RNG(Block):
 
 
     def reset(self):
-        #reset inputs and outputs
-        self.inputs  = {0:0.0}  
-        self.outputs = {0:0.0}
+        super().reset()
 
         #reset noise samples
         self.n_samples = 0

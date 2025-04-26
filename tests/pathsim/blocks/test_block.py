@@ -13,6 +13,7 @@ import unittest
 import numpy as np
 
 from pathsim.blocks._block import Block
+from pathsim.utils.register import Register
 from pathsim.utils.portreference import PortReference
 
 
@@ -28,16 +29,22 @@ class TestBlock(unittest.TestCase):
         B = Block()
 
         #test default inputs and outputs
-        self.assertEqual(B.inputs, {0: 0.0})
-        self.assertEqual(B.outputs, {0: 0.0})
+        self.assertTrue(isinstance(B.inputs, Register))
+        self.assertTrue(isinstance(B.outputs, Register))
 
-        #test default engine
+        self.assertEqual(len(B.inputs), 1)
+        self.assertEqual(len(B.outputs), 1)
+
+        self.assertEqual(B.inputs[0], 0.0)
+        self.assertEqual(B.outputs[0], 0.0)
+
+        #test default engine not defined
         self.assertEqual(B.engine, None)
 
-        #is active
+        #is active by default
         self.assertTrue(B._active)
 
-        #operators
+        #operators not defined by default
         self.assertEqual(B.op_alg, None)
         self.assertEqual(B.op_dyn, None)
 
@@ -144,14 +151,28 @@ class TestBlock(unittest.TestCase):
 
         B = Block()
 
-        B.inputs = {0:0, 2:2, 1:1}
-        B.outputs = {1:1, 0:0, 2:2}
+        B.inputs.update_from_array([1, 2, 3])
+        B.outputs.update_from_array([-1, 5])
+
+
+        #test if inputs and outputs are set correctly
+        self.assertEqual(B.inputs[0], 1)
+        self.assertEqual(B.inputs[1], 2)
+        self.assertEqual(B.inputs[2], 3)
+
+        self.assertEqual(B.outputs[0], -1)
+        self.assertEqual(B.outputs[1], 5)
+
 
         B.reset()
 
         #test if inputs and outputs are reset correctly
-        self.assertEqual(B.inputs, {0:0.0, 1:0.0, 2:0.0})
-        self.assertEqual(B.outputs, {0:0.0, 1:0.0, 2:0.0})
+        self.assertEqual(B.inputs[0], 0.0)
+        self.assertEqual(B.inputs[1], 0.0)
+        self.assertEqual(B.inputs[2], 0.0)
+
+        self.assertEqual(B.outputs[0], 0.0)
+        self.assertEqual(B.outputs[1], 0.0)
 
 
     def test_set(self):
@@ -172,11 +193,11 @@ class TestBlock(unittest.TestCase):
 
         B = Block()
 
-        B.outputs = {0:0, 2:2, 1:1}
+        B.outputs.update_from_array([0, 2, 1])
 
         self.assertEqual(B.get(0), 0)
-        self.assertEqual(B.get(1), 1)
-        self.assertEqual(B.get(2), 2)
+        self.assertEqual(B.get(1), 2)
+        self.assertEqual(B.get(2), 1)
 
         #undefined output -> defaults to 0.0
         self.assertEqual(B.get(100), 0.0)

@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from ..utils.utils import dict_to_array, array_to_dict, max_error_dicts
+from ..utils.register import Register
 from ..utils.serialization import Serializable
 from ..utils.portreference import PortReference
 
@@ -63,9 +63,9 @@ class Block(Serializable):
 
     Attributes
     ----------
-    inputs : dict{int: float}
+    inputs : Register
         input value register of block
-    outputs : dict{int: float}
+    outputs : Register
         output value register of block
     engine : None, Solver
         numerical integrator instance
@@ -81,9 +81,9 @@ class Block(Serializable):
 
     def __init__(self):
 
-        #dicts to hold input and output values
-        self.inputs  = {0:0.0}  
-        self.outputs = {0:0.0} 
+        #registers to hold input and output values
+        self.inputs  = Register()
+        self.outputs = Register()
 
         #initialize integration engine as 'None' by default
         self.engine = None
@@ -210,9 +210,9 @@ class Block(Serializable):
         """Reset the blocks inputs and outputs and also its internal solver, 
         if the block has a solver instance.
         """
-        #reset inputs and outputs while maintaining ports
-        self.inputs  = {k:0.0 for k in sorted(self.inputs.keys())}  
-        self.outputs = {k:0.0 for k in sorted(self.outputs.keys())}
+        #reset inputs and outputs
+        self.inputs.reset()
+        self.outputs.reset()
 
         #reset engine if block has solver
         if self.engine: self.engine.reset()
@@ -354,8 +354,8 @@ class Block(Serializable):
         states : array
             internal states of the block
         """
-        _inputs  = dict_to_array(self.inputs)
-        _outputs = dict_to_array(self.outputs)
+        _inputs  = self.inputs.to_array()
+        _outputs = self.outputs.to_array()
         _states  = self.engine.get() if self.engine else []
         return _inputs, _outputs, _states
 
@@ -388,7 +388,7 @@ class Block(Serializable):
         value : int, float, complex
             value of the output register port
         """
-        return self.outputs.get(port, 0.0)
+        return self.outputs[port]
 
 
     # methods for block output and state updates ----------------------------------------
@@ -428,7 +428,7 @@ class Block(Serializable):
             return 0.0
 
         #block inputs 
-        u = dict_to_array(self.inputs)
+        u = self.inputs.to_array()
 
         #no internal state -> standard 'Operator'
         if self.engine: 
@@ -439,12 +439,11 @@ class Block(Serializable):
 
         #no passthrough -> early exit
         if len(self) == 0:
-            self.outputs = array_to_dict(y)
+            self.outputs.update_from_array(y)
             return 0.0
 
         #set outputs to new values and check convergence
-        _outputs, self.outputs = self.outputs, array_to_dict(y)
-        return max_error_dicts(_outputs, self.outputs)
+        return self.outputs.update_from_array_max_err(y)
 
 
     def solve(self, t, dt):

@@ -38,6 +38,7 @@ from .utils.progresstracker import ProgressTracker
 from .solvers import SSPRK22, SteadyState
 
 from .blocks._block import Block
+
 from .events._event import Event
 
 from .connection import Connection

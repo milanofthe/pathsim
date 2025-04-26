@@ -13,11 +13,6 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.utils import (
-    dict_to_array, 
-    array_to_dict
-    )
-
 from ..optim.operator import DynamicOperator
 
 
@@ -108,7 +103,7 @@ class Integrator(Block):
         error : float
             deviation to previous iteration for convergence control
         """
-        self.outputs = array_to_dict(self.engine.get())
+        self.outputs.update_from_array(self.engine.get())
         return 0.0
 
 
@@ -127,7 +122,7 @@ class Integrator(Block):
         error : float
             solver residual norm
         """
-        f = dict_to_array(self.inputs)
+        f = self.inputs.to_array()
         return self.engine.solve(f, None, dt)
 
 
@@ -150,5 +145,5 @@ class Integrator(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        f = dict_to_array(self.inputs)
+        f = self.inputs.to_array()
         return self.engine.step(f, dt)

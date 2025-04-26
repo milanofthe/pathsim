@@ -14,15 +14,8 @@ import numpy as np
 
 from ._block import Block
 
-from ..utils.utils import (
-    max_error_dicts,
-    dict_to_array, 
-    array_to_dict
-    )
-
-from ..utils.gilbert import (
-    gilbert_realization
-    )
+from ..utils.register import Register
+from ..utils.gilbert import gilbert_realization
 
 from ..optim.operator import DynamicOperator
 
@@ -104,8 +97,8 @@ class StateSpace(Block):
         else: n_out, _ = self.C.shape
 
         #set io channels
-        self.inputs  = {i:0.0 for i in range(n_in)}
-        self.outputs = {i:0.0 for i in range(n_out)}
+        self.inputs = Register(n_in)
+        self.outputs = Register(n_out)
 
         #initial condition and shape validation
         if initial_value is None:
@@ -166,7 +159,7 @@ class StateSpace(Block):
         error : float
             solver residual norm
         """
-        x, u = self.engine.get(), dict_to_array(self.inputs)
+        x, u = self.engine.get(), self.inputs.to_array()
         f, J = self.op_dyn(x, u, t), self.op_dyn.jac_x(x, u, t)
         return self.engine.solve(f, J, dt)
 
@@ -190,7 +183,7 @@ class StateSpace(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
-        x, u = self.engine.get(), dict_to_array(self.inputs)
+        x, u = self.engine.get(), self.inputs.to_array()
         f = self.op_dyn(x, u, t)
         return self.engine.step(f, dt)
 

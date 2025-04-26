@@ -64,8 +64,6 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=RKCK54)
 
 
-Sim.save("derivative.mdl", duration=20/f)
-
 # Run Example ===========================================================================
 
 if __name__ == "__main__":
