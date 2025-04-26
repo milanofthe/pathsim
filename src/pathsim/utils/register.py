@@ -11,7 +11,7 @@
 
 import numpy as np
 
-from collections import defaultdict
+from bisect import insort
 
 
 # CLASSES ===============================================================================
@@ -35,22 +35,21 @@ class Register:
         internal dict that stores the values of the register
     """
 
-    __slots__ = ["_values"]
+    __slots__ = ["_values", "_sorted_keys"]
 
 
     def __init__(self, size=1):
-        self._values = defaultdict(
-            float, 
-            {k:0.0 for k in range(size)}
-            )
+        self._values = {k:0.0 for k in range(size)}
+        self._sorted_keys = list(range(size))
 
 
     def __len__(self):
+        """Returns the number of register entries / ports."""
         return len(self._values)
 
 
     def __iter__(self):
-        for k in sorted(self._values.keys()):
+        for k in self._sorted_keys:
             yield self._values[k]
 
 
@@ -76,9 +75,7 @@ class Register:
         arr : `numpy.ndarray`
             converted register as array
         """
-        return np.array([
-            self._values[k] for k in sorted(self._values.keys())
-            ]).flatten()
+        return np.array([self._values[k] for k in self._sorted_keys])
 
 
     def update_from_array(self, arr):
@@ -98,9 +95,12 @@ class Register:
         """
         if np.isscalar(arr):
             self._values[0] = arr
-        else:
-            for k, a in enumerate(arr):
-                self._values[k] = a
+            return
+            
+        for k, a in enumerate(arr):
+            if k not in self._values:
+                insort(self._sorted_keys, k)
+            self._values[k] = a
 
 
     def update_from_array_max_err(self, arr):
@@ -129,20 +129,24 @@ class Register:
             _err = abs(self._values[0] - arr)
             self._values[0] = arr
             return _err
-        else:
-            _max_err = 0.0
-            for k, a in enumerate(arr):
-                _err = abs(self._values[k] - a)
-                if _err > _max_err: 
-                    _max_err = _err
-                self._values[k] = a
-            return _max_err
+        
+        _max_err = 0.0
+        for k, a in enumerate(arr):
+            if k in self._values:
+                _max_err = max(_max_err, abs(self._values[k] - a))
+            else:
+                insort(self._sorted_keys, k)  
+            self._values[k] = a
+
+        return _max_err
 
 
     def __setitem__(self, key, val):
         """Set the value of `_values`, wraps its setter method. 
         For direct access to the register values.
         """
+        if key not in self._values:
+            insort(self._sorted_keys, key) 
         self._values[key] = val
 
 
@@ -150,4 +154,4 @@ class Register:
         """Get the value of `_values`, wraps its getter method.
         For direct access to the register values.
         """
-        return self._values[key]
+        return self._values.get(key, 0.0)

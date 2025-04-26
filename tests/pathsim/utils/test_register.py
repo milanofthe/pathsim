@@ -12,8 +12,6 @@
 import unittest
 import numpy as np
 
-from collections import defaultdict
-
 from pathsim.utils.register import Register
 
 
@@ -27,13 +25,13 @@ class TestRegister(unittest.TestCase):
     def test_init(self):
         #default
         R = Register()
-        self.assertTrue(isinstance(R._values, defaultdict))
+        self.assertTrue(isinstance(R._values, dict))
         self.assertEqual(len(R._values), 1)
         self.assertEqual(R[0], 0.0)
 
         #specific
         R = Register(size=20)
-        self.assertTrue(isinstance(R._values, defaultdict))
+        self.assertTrue(isinstance(R._values, dict))
         self.assertEqual(len(R._values), 20)
         self.assertEqual(R[0], 0.0)
         self.assertEqual(R[19], 0.0)
@@ -41,8 +39,8 @@ class TestRegister(unittest.TestCase):
         #accessing a key beyond initial size uses defaultdict factory
         self.assertEqual(R[20], 0.0)
         
-        #but the lengt increases 
-        self.assertEqual(len(R), 21)
+        #but the lengt doesnt increases 
+        self.assertEqual(len(R), 20)
 
 
     def test_len(self):
@@ -231,8 +229,8 @@ class TestRegister(unittest.TestCase):
         #get non-existing key (should return default float 0.0)
         self.assertEqual(R[5], 0.0)
         
-        #check length has changed just by getting default
-        self.assertEqual(len(R), 3)
+        #check length has not changed just by getting default
+        self.assertEqual(len(R), 2)
 
 
 # RUN TESTS LOCALLY ====================================================================
