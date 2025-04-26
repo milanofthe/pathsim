@@ -146,6 +146,13 @@ class Register:
     def __setitem__(self, key, val):
         """Set the value of `_values`, wraps its setter method. 
         For direct access to the register values.
+
+        Parameters
+        ----------
+        key : int
+            port key, where to set value
+        val : float, obj
+            value to set at port
         """
         if key not in self._values:
             insort(self._sorted_keys, key) 
@@ -155,5 +162,15 @@ class Register:
     def __getitem__(self, key):
         """Get the value of `_values`, wraps its getter method.
         For direct access to the register values.
+        
+        Parameters
+        ----------
+        key : int
+            port key, where to get value from
+
+        Returns
+        -------
+        out : float, obj
+            value from port at `key` position
         """
         return self._values.get(key, 0.0)
