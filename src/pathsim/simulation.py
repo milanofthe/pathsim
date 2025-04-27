@@ -789,7 +789,25 @@ class Simulation:
         self._logger_info("DELINEARIZED")
 
 
-    # event system ----------------------------------------------------------------
+    # event system helpers --------------------------------------------------------
+
+    def _buffer_events(self, t):
+        """Buffer states for event monitoring before the timestep 
+        is taken. 
+
+        This is required to set reference for event monitoring and 
+        backtracking for root finding.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time for buffering
+        """
+
+        #buffer states for event detection (with timestamp)
+        for event in self._active_events:
+            event.buffer(t)
+
 
     def _detected_events(self, t):
         """Check for possible (active) events and return them chronologically, 
@@ -1016,9 +1034,8 @@ class Simulation:
             block.sample(t)
 
 
-    def _buffer(self, t, dt):
-        """Buffer internal states of blocks and buffer states for event 
-        monitoring before the timestep is taken. 
+    def _buffer_blocks(self, dt):
+        """Buffer internal states of blocks before the timestep is taken. 
 
         This is required for runge-kutta integrators but also for the 
         zero crossing detection of the event handling system.
@@ -1028,8 +1045,6 @@ class Simulation:
 
         Parameters
         ----------
-        t : float 
-            evaluation time for buffering
         dt : float
             timestep
         """
@@ -1037,10 +1052,6 @@ class Simulation:
         #buffer internal states of stateful blocks
         for block in self._active_blocks:
             block.buffer(dt)
-
-        #buffer states for event detection (with timestamp)
-        for event in self._active_events:
-            event.buffer(t)
 
 
     def _step(self, t, dt):
@@ -1138,8 +1149,11 @@ class Simulation:
         #assemble active system components
         self._update_active_components()
 
-        #buffer internal states for solvers and event system
-        self._buffer(self.time, dt)
+        #buffer states for event system
+        self._buffer_events(self.time)
+
+        #buffer internal states for solvers
+        self._buffer_blocks(dt)
 
         #total function evaluations 
         total_evals = 0
@@ -1214,8 +1228,11 @@ class Simulation:
         #assemble active system components
         self._update_active_components()
 
-        #buffer internal states for solvers and event system
-        self._buffer(self.time, dt)
+        #buffer states for event system
+        self._buffer_events(self.time)
+
+        #buffer internal states for solvers
+        self._buffer_blocks(dt)
 
         #total function evaluations and implicit solver iterations
         total_evals, total_solver_its = 0, 0
@@ -1305,8 +1322,11 @@ class Simulation:
         #assemble active system components
         self._update_active_components()
 
-        #buffer internal states for solvers and event system
-        self._buffer(self.time, dt)
+        #buffer states for event system
+        self._buffer_events(self.time)
+
+        #buffer internal states for solvers
+        self._buffer_blocks(dt)
 
         #total function evaluations and implicit solver iterations
         total_evals = 0
@@ -1409,8 +1429,11 @@ class Simulation:
         #assemble active system components
         self._update_active_components()
 
-        #buffer internal states for solvers and event system
-        self._buffer(self.time, dt)
+        #buffer states for event system
+        self._buffer_events(self.time)
+
+        #buffer internal states for solvers
+        self._buffer_blocks(dt)
 
         #total function evaluations and implicit solver iterations
         total_evals, total_solver_its = 0, 0
