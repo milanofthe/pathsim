@@ -333,8 +333,8 @@ class Simulation:
         kwargs : dict
             kwargs for the plot method
         """
-        for block in self.blocks:
-            if block: block.plot(*args, **kwargs)
+        for block in self._active_blocks:
+            block.plot(*args, **kwargs)
 
 
     # serialization/deserialization -----------------------------------------------
@@ -623,7 +623,7 @@ class Simulation:
         This enables 'Subsystem' blocks to recursively propagate their internal 
         length upward the hierarchies.
 
-        The result 'max_path_length' can be used as a an estimate for the 
+        The result 'path_length' can be used as a an estimate for the 
         minimum number of fixed-point iterations in the '_update' method in 
         the main simulation loop.
         """
@@ -632,10 +632,10 @@ class Simulation:
         self.path_length = 1
 
         #iterate all possible starting blocks (nodes of directed graph)
-        for block in self.blocks:
+        for block in self._active_blocks:
 
             #recursively compute the longest path via depth first search
-            _path_length = path_length_dfs(self.connections, block)
+            _path_length = path_length_dfs(self._active_connections, block)
 
             #update global algebraic path length
             if _path_length > self.path_length:
@@ -735,7 +735,7 @@ class Simulation:
         Resets linearization automatically, since resetting the blocks 
         resets their internal operators.
 
-        Afterwards the system function os evaluated with '_update' to update
+        Afterwards the system function is evaluated with '_update' to update
         the block inputs and outputs.
         """
 
@@ -950,7 +950,7 @@ class Simulation:
                 return True, total_evals, iteration + 1
 
         #not converged in 'self.iterations_max' steps
-        return False, total_evals, iteration + 1
+        return False, total_evals, self.iterations_max
 
 
     def steadystate(self, reset=False): 
@@ -1049,6 +1049,9 @@ class Simulation:
             timestep
         """
 
+        #buffer the dummy engine
+        self.engine.buffer(dt)
+
         #buffer internal states of stateful blocks
         for block in self._active_blocks:
             block.buffer(dt)
@@ -1092,10 +1095,10 @@ class Simulation:
         #step blocks and get error estimates if available
         for block in self._active_blocks:
 
-            ss, err_norm, scl = block.step(t, dt)
+            suc, err_norm, scl = block.step(t, dt)
             
             #check solver stepping success
-            if not ss: 
+            if not suc: 
                 success = False
 
             #update error tracking
@@ -1103,7 +1106,7 @@ class Simulation:
                 max_error_norm = err_norm
             
             #update timestep rescale if relevant
-            if scl not in [0.0, 1.0]: 
+            if scl != 1.0 and scl > 0.0: 
                 relevant_scales.append(scl)
 
         #no relevant timestep rescale -> quit early
