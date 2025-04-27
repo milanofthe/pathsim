@@ -791,6 +791,11 @@ class Simulation:
         return sorted(detected_events, key=lambda e: e[-1])
 
 
+    def _estimated_event_ratio(self, time):
+
+        pass
+
+
     # solving system equations ----------------------------------------------------
 
     def _update(self, t):
@@ -960,7 +965,7 @@ class Simulation:
         self._set_solver(_solver)
 
 
-    # timestepping ----------------------------------------------------------------
+    # timestepping helpers --------------------------------------------------------
 
     def _revert(self):
         """Revert simulation state to previous timestep for adaptive solvers 
@@ -1076,15 +1081,84 @@ class Simulation:
         return success, max_error_norm, min(relevant_scales)
 
 
-    def step_fixed(self, dt=None):
-        """Advances the simulation by one timestep 'dt' for fixed step solvers.
+    # timestepping ----------------------------------------------------------------
 
-        Selects between implicit and explicit solvers. Implicit solvers have 
-        an additional loop for solving the implicit update equation in each 
-        timestep.
+    def timestep_fixed_explicit(self, dt=None):
+        """Advances the simulation by one timestep 'dt' for explicit 
+        fixed step solvers.
 
-        If discrete events are detected, they are resolved immediately within 
-        the timestep.
+        If discrete events are detected, they are resolved immediately 
+        within the timestep.
+
+        Parameters
+        ----------
+        dt : float
+            timestep
+
+        Returns
+        -------
+        success : bool
+            indicator if the timestep was successful
+        max_error : float
+            maximum local truncation error from integration
+        scale : float
+            rescale factor for timestep
+        total_evals : int
+            total number of system evaluations
+        total_solver_its : int
+            total number of implicit solver iterations
+        """
+
+        #default global timestep as local timestep
+        if dt is None: 
+            dt = self.dt
+
+        #buffer internal states for solvers and event system
+        self._buffer(self.time, dt)
+
+        #total function evaluations 
+        total_evals = 0
+
+        #iterate explicit solver stages with evaluation time (generator)
+        for time_stage in self.engine.stages(self.time, dt):
+
+            #evaluate system equation by fixed-point iteration
+            total_evals += self._update(time_stage) 
+
+            #timestep for dynamical blocks (with internal states)
+            _1, error_norm, _3 = self._step(time_stage, dt)
+
+        #system time after timestep
+        time_dt = self.time + dt
+
+        #evaluate system equation before sampling and event check (+dt)
+        total_evals += self._update(time_dt) 
+
+        #handle events chronologically after timestep (+dt)
+        for event, _, ratio in self._detected_events(time_dt):
+
+            #fixed timestep -> resolve event directly
+            event.resolve(self.time + ratio * dt)  
+
+            #after resolve, evaluate system equation again -> propagate event
+            total_evals += self._update(time_dt)      
+
+        #sample data after successful timestep (+dt)
+        self._sample(time_dt)
+ 
+        #increment global time and continue simulation
+        self.time = time_dt 
+
+        #max local truncation error, timestep rescale, successful step
+        return True, error_norm, 1.0, total_evals, 0
+
+
+    def timestep_fixed_implicit(self, dt=None): 
+        """Advances the simulation by one timestep 'dt' for implicit 
+        fixed step solvers.
+
+        If discrete events are detected, they are resolved immediately 
+        within the timestep.
 
         Parameters
         ----------
@@ -1119,32 +1193,23 @@ class Simulation:
         total_evals, total_solver_its = 0, 0
 
         #iterate explicit solver stages with evaluation time (generator)
-        for time in self.engine.stages(self.time, dt):
+        for time_stage in self.engine.stages(self.time, dt):
 
-            #explicit solver stepping loop
-            if self.engine.is_explicit:
+            #solve implicit update equation and get iteration count
+            success, evals, solver_its = self._solve(time_stage, dt)
 
-                #evaluate system equation by fixed-point iteration
-                total_evals += self._update(time) 
+            #warning if implicit solver didnt converge in timestep
+            if not success:
+                self._logger_warning(
+                    f"implicit solver not converged in {solver_its} iterations!"
+                    )
 
-            #implicit solver stepping loop
-            else:
-
-                #solve implicit update equation and get iteration count
-                success, evals, solver_its = self._solve(time, dt)
-
-                #warning if implicit solver didnt converge in timestep
-                if not success:
-                    self._logger_warning(
-                        f"implicit solver not converged in {solver_its} iterations!"
-                        )
-
-                #count solver iterations and function evaluations
-                total_solver_its += solver_its
-                total_evals += evals
+            #count solver iterations and function evaluations
+            total_solver_its += solver_its
+            total_evals += evals
 
             #timestep for dynamical blocks (with internal states)
-            _1, error_norm, _3 = self._step(time, dt)
+            _1, error_norm, _3 = self._step(time_stage, dt)
 
         #system time after timestep
         time_dt = self.time + dt
@@ -1171,19 +1236,115 @@ class Simulation:
         return success, error_norm, 1.0, total_evals, total_solver_its
 
 
-    def step_adaptive(self, dt=None):
-        """Advances the simulation by one timestep 'dt' for adaptive solvers.
+    def timestep_adaptive_explicit(self, dt=None): 
+        """Advances the simulation by one timestep 'dt' for explicit 
+        adaptive solvers.
 
-        Selects between implicit and explicit solvers. Implicit solvers have an 
-        additional loop for solving the implicit update equation in each timestep.
+        If the local truncation error of the solver exceeds the tolerances 
+        set in the 'solver_kwargs', the simulation state is reverted to the 
+        state that was buffered (`_buffer(time, dt)`) at the beginning of 
+        the timestep.
+
+        If discrete events are detected, the chronologically first event is 
+        handled only. The event location (in time) is approached adaptively 
+        by reverting the step and adjusting the stepsize (this is equivalent 
+        to the secant method for finding zeros of the event function) until 
+        the tolerance of the event is satisfied (close==True).
+
+        Parameters
+        ----------
+        dt : float
+            timestep
+
+        Returns
+        -------
+        success : bool
+            indicator if the timestep was successful
+        max_error : float
+            maximum local truncation error from integration
+        scale : float
+            rescale factor for timestep
+        total_evals : int
+            total number of system evaluations
+        total_solver_its : int
+            total number of implicit solver iterations
+        """
+
+        #default global timestep as local timestep
+        if dt is None: 
+            dt = self.dt
+
+        #buffer internal states for solvers and event system
+        self._buffer(self.time, dt)
+
+        #total function evaluations and implicit solver iterations
+        total_evals = 0
+
+        #iterate explicit solver stages with evaluation time (generator)
+        for time_stage in self.engine.stages(self.time, dt):
+
+            #evaluate system equation by fixed-point iteration
+            total_evals += self._update(time_stage) 
+
+            #timestep for dynamical blocks (with internal states)
+            success, error_norm, scale = self._step(time_stage, dt)
+
+        #if step not successful -> revert to previous state
+        if not success:
+            self._revert()
+            
+            #after revert, evaluate system equation again -> reset for buffer
+            total_evals += self._update(self.time) 
+
+            return False, error_norm, scale, total_evals, 0
+
+        #system time after timestep
+        time_dt = self.time + dt
+
+        #evaluate system equation before sampling and event check (+dt)
+        total_evals += self._update(time_dt) 
+
+        #handle detected events chronologically after timestep (+dt)
+        for event, close, ratio in self._detected_events(time_dt):
+
+            #close enough to event (ratio approx 1) -> resolve it
+            if close:
+                event.resolve(time_dt)
+
+                #after resolve, evaluate system equation again -> propagate event
+                total_evals += self._update(time_dt) 
     
-        If the local truncation error of the solver exceeds the tolerances
-        set in the 'solver_kwargs', simulation state is reverted to the state 
-        before the 'step' method was called. 
+            #not close enough -> roll back timestep (secant step)
+            else:
+                self._revert()
 
-        If the solver is implicit and the solution of the implicit update 
-        equation in 'solve' doesnt converge, the timestep is also considered 
-        unsuccessful. Then it is reverted and the timestep is halfed.
+                #after revert, evaluate system equation again -> reset for buffer
+                total_evals += self._update(self.time) 
+
+                return False, error_norm, ratio, total_evals, 0
+        
+        #sample data after successful timestep (+dt)
+        self._sample(time_dt)
+
+        #increment global time and continue simulation
+        self.time = time_dt    
+
+        #max local truncation error, timestep rescale, successful step
+        return success, error_norm, scale, total_evals, 0
+
+
+    def timestep_adaptive_implicit(self, dt=None): 
+        """Advances the simulation by one timestep 'dt' for implicit 
+        adaptive solvers.
+
+        If the local truncation error of the solver exceeds the tolerances 
+        set in the 'solver_kwargs', the simulation state is reverted to the 
+        state that was buffered (`_buffer(time, dt)`) at the beginning of 
+        the timestep.
+
+        If the solution of the implicit update equation in 'solve' doesnt 
+        converge, the timestep is also considered unsuccessful. Then it is 
+        reverted and the timestep is halfed.
 
         If discrete events are detected, the chronologically first event is 
         handled only. The event location (in time) is approached adaptively 
@@ -1221,31 +1382,22 @@ class Simulation:
         total_evals, total_solver_its = 0, 0
 
         #iterate explicit solver stages with evaluation time (generator)
-        for time in self.engine.stages(self.time, dt):
+        for time_stage in self.engine.stages(self.time, dt):
 
-            #explicit solver stepping loop
-            if self.engine.is_explicit:
+            #solve implicit update equation and get iteration count
+            success, evals, solver_its = self._solve(time_stage, dt)
 
-                #evaluate system equation by fixed-point iteration
-                total_evals += self._update(time) 
+            #count solver iterations and function evaluations
+            total_solver_its += solver_its
+            total_evals += evals
 
-            #implicit solver stepping loop
-            else:
-
-                #solve implicit update equation and get iteration count
-                success, evals, solver_its = self._solve(time, dt)
-
-                #count solver iterations and function evaluations
-                total_solver_its += solver_its
-                total_evals += evals
-
-                #if solver did not converge -> quit early (adaptive only)
-                if not success:
-                    error_norm, scale = 0.0, 0.5
-                    break    
+            #if solver did not converge -> quit early (adaptive only)
+            if not success:
+                error_norm, scale = 0.0, 0.5
+                break    
 
             #timestep for dynamical blocks (with internal states)
-            success, error_norm, scale = self._step(time, dt)
+            success, error_norm, scale = self._step(time_stage, dt)
 
         #if step not successful and adaptive -> roll back timestep
         if not success:
@@ -1291,19 +1443,16 @@ class Simulation:
         return success, error_norm, scale, total_evals, total_solver_its
 
 
-    def step(self, dt=None, adaptive=False):
+    def timestep(self, dt=None):
         """Advances the simulation by one timestep 'dt'. 
         
-        Wraps the 'step_fixed' and 'step_adaptive' methods and 
-        selects between them. Can be called from the outside in 
-        case the simulation should be advanced one step at a time.
-        
+        Automatic stepping method selection based on 
+        selected `Solver`.
+
         Parameters
         ----------
         dt : float
             timestep
-        adaptive : bool
-            flag for adaptive timestepping
 
         Returns
         -------
@@ -1318,11 +1467,19 @@ class Simulation:
         total_solver_its : int
             total number of implicit solver iterations            
         """
-        if adaptive: 
-            return self.step_adaptive(dt)
-        else: 
-            return self.step_fixed(dt)
+        if self.engine.is_adaptive:
+            if self.engine.is_explicit:
+                return self.timestep_adaptive_explicit(dt)
+            else:                
+                return self.timestep_adaptive_implicit(dt)
+        else:
+            if self.engine.is_explicit:
+                return self.timestep_fixed_explicit(dt)
+            else:                
+                return self.timestep_fixed_implicit(dt)
 
+
+    # simulation execution --------------------------------------------------------
 
     def run(self, duration=10, reset=False, adaptive=True):
         """Perform multiple simulation timesteps for a given 'duration'.
@@ -1355,7 +1512,7 @@ class Simulation:
         if reset:
             self.reset()
 
-        #select simulation stepping method
+        #make an adaptive run?
         adaptive = adaptive and self.engine.is_adaptive
 
         #simulation start and end time
@@ -1368,7 +1525,7 @@ class Simulation:
         initial_evals = self._update(self.time)
 
         #catch and resolve initial events
-        for event, *_ in self._events(self.time):
+        for event, *_ in self._detected_events(self.time):
 
             #resolve events directly
             event.resolve(self.time)
@@ -1388,20 +1545,16 @@ class Simulation:
             )
 
         #enter tracker context
-        with tracker as trk:
+        with tracker:
 
             #iterate progress tracker generator until 'progress >= 1.0' is reached
-            for _ in trk:
+            for _ in tracker:
 
-                #rescale effective timestep if in danger of overshooting 'end_time'
-                if self.time + _dt > end_time:
-                    _dt = end_time - self.time
+                #advance the simulation by one (effective) timestep '_dt'
+                success, error_norm, scale, evals, solver_its = self.timestep(_dt)            
 
-                #perform adaptive timestep including rescale
-                if adaptive:
-
-                    #advance the simulation by one (effective) timestep '_dt'
-                    success, error_norm, scale, evals, solver_its = self.step_adaptive(_dt)
+                #perform adaptive rescale
+                if adaptive:            
 
                     #if no error estimate and rescale -> back to default timestep
                     if not error_norm and scale == 1:
@@ -1410,11 +1563,9 @@ class Simulation:
                     #apply bounds to timestep after rescale
                     _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
 
-                #perform fixed timestep
-                else:
-
-                    #advance the simulation by one (effective) timestep '_dt'
-                    success, _, scale, evals, solver_its = self.step_fixed(_dt)
+                    #rescale if in danger of overshooting 'end_time' at next step
+                    if self.time + _dt > end_time:
+                        _dt = end_time - self.time
 
                 #compute simulation progress
                 progress = np.clip((self.time - start_time)/duration, 0.0, 1.0)
