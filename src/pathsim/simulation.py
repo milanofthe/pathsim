@@ -757,7 +757,7 @@ class Simulation:
 
     # event system ----------------------------------------------------------------
 
-    def _events(self, t):
+    def _detected_events(self, t):
         """Check for possible (active) events and return them chronologically, 
         sorted by their timestep ratios (closest to the initial point in time).
     
@@ -765,6 +765,11 @@ class Simulation:
         ----------
         t : float
             evaluation time for event function
+
+        Returns
+        -------
+        detected : list[Event]
+            list of detected events within timestep
         """
 
         #iterate all event managers
@@ -1148,7 +1153,7 @@ class Simulation:
         total_evals += self._update(time_dt) 
 
         #handle events chronologically after timestep (+dt)
-        for event, _, ratio in self._events(time_dt):
+        for event, _, ratio in self._detected_events(time_dt):
 
             #fixed timestep -> resolve event directly
             event.resolve(self.time + ratio * dt)  
@@ -1258,7 +1263,7 @@ class Simulation:
         total_evals += self._update(time_dt) 
 
         #handle detected events chronologically after timestep (+dt)
-        for event, close, ratio in self._events(time_dt):
+        for event, close, ratio in self._detected_events(time_dt):
 
             #close enough to event (ratio approx 1) -> resolve it
             if close:
