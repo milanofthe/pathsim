@@ -8,7 +8,7 @@ This is a preliminary roadmap for PathSim's development. To be fair, its more a 
 ## Solvers
 
 - multistep methods (`BDF`, `GEAR`) need startup methods to build history, to maintain consistency order globally
-- make solver term $\\dot{x}$ accessible for solving index 1 DAEs, especially for stiffly accurate DIRK and ESDIRK methods, will be the basis for future `DAE` blocks
+- make solver term $\\dot{x}$ accessible for solving index 1 DAEs, especially for stiffly accurate `DIRK` and `ESDIRK` methods, will be the basis for future `DAE` blocks
 - add interpolant within timestep to solvers for dense output and to improve interpolation for the event mechanism 
 
 ## Events
