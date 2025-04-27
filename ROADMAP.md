@@ -7,7 +7,13 @@ This is a preliminary roadmap for PathSim's development. To be fair, its more a 
 
 ## Solvers
 
-- multistep methods (BDF, GEAR) need startup methods to build history, to maintain consistency order globally
+- multistep methods (`BDF`, `GEAR`) need startup methods to build history, to maintain consistency order globally
+- make solver term $\\dot{x}$ accessible for solving index 1 DAEs, especially for stiffly accurate `DIRK` and `ESDIRK` methods, will be the basis for future `DAE` blocks
+- add interpolant within timestep to solvers for dense output and to improve interpolation for the event mechanism 
+
+## Events
+
+- separate checks for event types in simulation loop, purely time dependent events (`Schedule`) can be estimated before the timestep is taken and therefore be approached without backtracking, which would improve performance (maybe add some method `Event.estimate(t)`)
 
 ## Analysis
 
@@ -44,7 +50,7 @@ This is a preliminary roadmap for PathSim's development. To be fair, its more a 
 
 - support for FMI / FMU, import and export of PathSim models and blocks 
 - support for electrical circuits, SPICE netlists 
-- support for s-parameters (touchstone files) 
+- support for s-parameters (touchstone files) by vectorfitting and wrapping `StateSpace` block
 
 
 # Testing
