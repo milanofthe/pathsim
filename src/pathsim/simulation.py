@@ -676,9 +676,9 @@ class Simulation:
 
         This gets called at every timestep.
         """
-        self._active_blocks      = [blk for blk in self.blocks if blk]
+        self._active_blocks      = [blk for blk in self.blocks      if blk]
         self._active_connections = [con for con in self.connections if con]
-        self._active_events      = [evt for evt in self.events if evt]
+        self._active_events      = [evt for evt in self.events      if evt]
 
 
     # solver management -----------------------------------------------------------
@@ -725,7 +725,7 @@ class Simulation:
 
     # resetting -------------------------------------------------------------------
 
-    def reset(self):
+    def reset(self, time=0.0):
         """Reset the blocks to their initial state and the global time of 
         the simulation. 
 
@@ -737,12 +737,17 @@ class Simulation:
 
         Afterwards the system function is evaluated with '_update' to update
         the block inputs and outputs.
+
+        Parameters
+        ----------
+        time : float
+            simulation time for reset
         """
 
-        self._logger_info("RESET (time: 0.0)")
+        self._logger_info(f"RESET (time: {time})")
 
         #reset simulation time
-        self.time = 0.0
+        self.time = time
 
         #reset all blocks to initial state
         for block in self.blocks:
@@ -753,7 +758,7 @@ class Simulation:
             event.reset()
 
         #evaluate system function
-        self._update(0.0)
+        self._update(time)
 
 
     # linearization ---------------------------------------------------------------
@@ -891,12 +896,12 @@ class Simulation:
 
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
-                return iteration+1
+                return iteration + 1
 
         #not converged
         self._logger_error(
             "fixed-point loop in '_update' not converged (iters: {}, err: {})".format(
-                iteration+1, max_error), 
+                self.iterations_max, max_error), 
             RuntimeError
             )
 
@@ -1503,8 +1508,8 @@ class Simulation:
         return success, error_norm, scale, total_evals, total_solver_its
 
 
-    def timestep(self, dt=None):
-        """Advances the simulation by one timestep 'dt'. 
+    def timestep(self, dt=None, adaptive=True):
+        """Advances the transient simulation by one timestep 'dt'. 
         
         Automatic stepping method selection based on 
         selected `Solver`.
@@ -1512,7 +1517,9 @@ class Simulation:
         Parameters
         ----------
         dt : float
-            timestep
+            timestep size for transient simulation
+        adaptive : bool
+            explicitly select the addaptive timestepping branch
 
         Returns
         -------
@@ -1527,7 +1534,7 @@ class Simulation:
         total_solver_its : int
             total number of implicit solver iterations            
         """
-        if self.engine.is_adaptive:
+        if adaptive and self.engine.is_adaptive:
             if self.engine.is_explicit:
                 return self.timestep_adaptive_explicit(dt)
             else:                
@@ -1537,6 +1544,14 @@ class Simulation:
                 return self.timestep_fixed_explicit(dt)
             else:                
                 return self.timestep_fixed_implicit(dt)
+
+
+    def step(self, dt=None, adaptive=True):
+        """Wraps 'Simulation.timestep' for backward compatibility"""
+        self._logger_warning(
+            "'Simulation.step' method will be deprecated in next release, use 'Simulation.timestep' instead!"
+            )
+        return self.timestep(dt, adaptive)
 
 
     # simulation execution --------------------------------------------------------
@@ -1573,7 +1588,7 @@ class Simulation:
             self.reset()
 
         #make an adaptive run?
-        adaptive = adaptive and self.engine.is_adaptive
+        _adaptive = adaptive and self.engine.is_adaptive
 
         #simulation start and end time
         start_time, end_time = self.time, self.time + duration
@@ -1611,7 +1626,10 @@ class Simulation:
             for _ in tracker:
 
                 #advance the simulation by one (effective) timestep '_dt'
-                success, error_norm, scale, evals, solver_its = self.timestep(_dt)            
+                success, error_norm, scale, evals, solver_its = self.timestep(
+                    dt=_dt, 
+                    adaptive=_adaptive
+                    )
 
                 #perform adaptive rescale
                 if adaptive:            
