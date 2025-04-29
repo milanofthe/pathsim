@@ -28,6 +28,11 @@ class Constant(Block):
     def __init__(self, value=1):
         super().__init__()
         self.value = value
+
+
+    def __len__(self):
+        """No algebraic passthrough"""
+        return 0
         
 
     def update(self, t):
@@ -103,6 +108,11 @@ class Source(Block):
             raise ValueError(f"'{func}' is not callable")
 
         self.func = func
+
+
+    def __len__(self):
+        """No algebraic passthrough"""
+        return 0
 
 
     def update(self, t):

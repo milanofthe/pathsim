@@ -18,6 +18,8 @@ import json
 import datetime
 import logging
 
+from collections import defaultdict
+
 from pathsim import __version__
 
 from ._constants import (
@@ -121,8 +123,6 @@ class Simulation:
         solver class for numerical integration from pathsim.solvers
     tolerance_fpi : float
         absolute tolerance for convergence of fixed-point iterations
-    iterations_min : int
-        minimum number of fixed-point iterations for system function evaluation
     iterations_max : int
         maximum allowed number of fixed-point iterations for system function evaluation
     log : bool, string
@@ -134,12 +134,6 @@ class Simulation:
     ----------
     time : float
         global simulation time
-    _active_blocks : list[Block]
-        list of active blocks to be included in simulation loop
-    _active_connections : list[Connection]
-        list of active connections to be included in simulation loop
-    _active_events : list[Event]
-        list of active events to be included in simulation loop
     path_length : int
         estimated length of the longest algebraic path
     engine : Solver
@@ -158,7 +152,6 @@ class Simulation:
         dt_max=SIM_TIMESTEP_MAX, 
         Solver=SSPRK22, 
         tolerance_fpi=SIM_TOLERANCE_FPI, 
-        iterations_min=SIM_ITERATIONS_MIN, 
         iterations_max=SIM_ITERATIONS_MAX, 
         log=LOG_ENABLE,
         **solver_kwargs
@@ -168,11 +161,6 @@ class Simulation:
         self.blocks      = []
         self.connections = []
         self.events      = []
-
-        #active system components (determined dynamically)
-        self._active_blocks      = []
-        self._active_connections = []
-        self._active_events      = []
 
         #simulation timestep and bounds
         self.dt     = dt
@@ -192,7 +180,6 @@ class Simulation:
         self.solver_kwargs = solver_kwargs
 
         #iterations for fixed-point loop
-        self.iterations_min = iterations_min
         self.iterations_max = iterations_max
 
         #enable logging flag
@@ -234,8 +221,8 @@ class Simulation:
         #set numerical integration solver
         self._set_solver()
 
-        #find length of longest algebraic path
-        self._algebraic_path_length()
+        #assemble the system for simulation
+        self._assemble()
 
 
     def __str__(self):
@@ -334,7 +321,7 @@ class Simulation:
         kwargs : dict
             kwargs for the plot method
         """
-        for block in self._active_blocks:
+        for block in self.blocks:
             block.plot(*args, **kwargs)
 
 
@@ -533,17 +520,9 @@ class Simulation:
         #add block to global blocklist
         self.blocks.append(block)
 
-        #add block to active list if active
-        if block:
-            self._active_blocks.append(block)
-
         #add events of block to global event list
         for event in block.get_events():
             self.add_event(event)
-
-        #recompute algebraic path length
-        if recompute_path:
-            self._algebraic_path_length()
 
 
     def add_connection(self, connection, recompute_path=True):
@@ -578,14 +557,6 @@ class Simulation:
         #add connection to global connection list
         self.connections.append(connection)
 
-        #add connection to active connection list if active
-        if connection:
-            self._active_connections.append(connection)
-
-        #recompute algebraic path length
-        if recompute_path:
-            self._algebraic_path_length()
-
 
     def add_event(self, event):
         """Checks and adds a new event to the simulation.
@@ -606,50 +577,78 @@ class Simulation:
         #add event to global event list
         self.events.append(event)
 
-        #add event to active event list if active
-        if event:
-            self._active_events.append(event)
+
+    # system assembly--------------------------------------------------------------
+
+
+    def _assemble(self):
+        self._assemble_components_alg_depth()
+        self._assemble_blocks_dyn()
+
+
+    def _assemble_components_alg_depth(self):
+        """Assemble lists of system components, ordered by their 
+        algebraic depth in the DAG.
+
+        Perform upstream depth first search on the DAG to assign 
+        each block their number of consecutive algebraic dependencies 
+        (algebraic depth). This is also used to assign the outgoing 
+        connections similarly.
+        """
+
+        #initial max algebraic depth (longest algebraic path)
+        max_depth = 0
+
+        #assembly of blocks by their algebraic depth
+        self._blocks_alg_depth = defaultdict(list)
+        self._blocks_alg_loop = []
+        
+        #assembly of connections by their algebraic depth
+        self._connections_alg_depth = defaultdict(list)
+        self._connections_alg_loop = []
+
+        #construct mapping for connections between blocks
+        con_map = upstream_connection_map(self.connections)
+
+        #construct mapping from blocks to outgoing connections
+        block_con_map = defaultdict(list)
+        for con in self.connections:
+            block_con_map[con.source.block].append(con)
+        
+        #iterate blocks to calculate their algebraic depths
+        for blk in self.blocks:
+            depth = upstream_path_length_dfs(con_map, blk) 
+
+            #None -> alg. loop upstream taints downstream components
+            if depth is None:
+                self._blocks_alg_loop.append(blk)
+
+                #find outgoing connections and assign them aswell
+                for con in block_con_map[blk]:
+                    self._connections_alg_loop.append(con)
+
+            else:
+                self._blocks_alg_depth[depth].append(blk)
+
+                #find outgoing connections and assign them aswell
+                for con in block_con_map[blk]:
+                    self._connections_alg_depth[depth].append(con)
+
+                #update max depth
+                if depth > max_depth:
+                    max_depth = depth
+
+        self._alg_depth = max_depth
+
+
+    def _assemble_blocks_dyn(self):
+        """Assemble a list of dynamic blocks, containing an 
+        internal integration engine
+        """
+        self._blocks_dyn = [blk for blk in self.blocks if blk.engine]
 
 
     # topological checks ----------------------------------------------------------
-
-    def _algebraic_path_length(self):
-        """Perform recursive depth first search to compute the length of the 
-        longest signal path through algebraic (instant time) blocks, 
-        information can travel within a single timestep.
-    
-        The depth first search leverages the '__len__' method of the blocks 
-        for contribution of each block to the total signal path. 
-
-        This enables 'Subsystem' blocks to recursively propagate their internal 
-        length upward the hierarchies.
-
-        The result 'path_length' can be used as a an estimate for the 
-        minimum number of fixed-point iterations in the '_update' method in 
-        the main simulation loop.
-        """
-
-        #reset path length (at least 1)
-        self.path_length = 1
-
-        #iterate all possible starting blocks (nodes of directed graph)
-        for block in self._active_blocks:
-
-            #recursively compute the longest path via depth first search
-            _path_length = path_length_dfs(self._active_connections, block)
-
-            #update global algebraic path length
-            if _path_length > self.path_length:
-                self.path_length = _path_length
-
-        #logging message
-        self._logger_info(f"ALGEBRAIC PATH DFS (path_length: {self.path_length})")
-
-        #set 'iterations_min' for fixed-point loop if not provided globally
-        if self.iterations_min is None:
-            self.iterations_min = self.path_length
-            self._logger_info(f"SET 'iterations_min' -> {self.path_length}")
-
 
     def _check_blocks_are_managed(self):
         """Check whether the blocks that are part of the connections are 
@@ -669,17 +668,6 @@ class Simulation:
                 self._logger_warning(
                     f"{blk} in 'connections' but not in 'blocks'!"
                     )
-
-
-    def _update_active_components(self):
-        """Assemble internal lists of active system components to 
-        be updated during the simulation loop.
-
-        This gets called at every timestep.
-        """
-        self._active_blocks      = [blk for blk in self.blocks      if blk]
-        self._active_connections = [con for con in self.connections if con]
-        self._active_events      = [evt for evt in self.events      if evt]
 
 
     # solver management -----------------------------------------------------------
@@ -811,8 +799,8 @@ class Simulation:
         """
 
         #buffer states for event detection (with timestamp)
-        for event in self._active_events:
-            event.buffer(t)
+        for event in self.events:
+            if event: event.buffer(t)
 
 
     def _detected_events(self, t):
@@ -832,7 +820,10 @@ class Simulation:
 
         #iterate all event managers
         detected_events = []
-        for event in self._active_events:
+        for event in self.events:
+
+            #skip inactive events
+            if not event: continue
             
             #check if an event is detected
             detected, close, ratio = event.detect(t)
@@ -870,36 +861,44 @@ class Simulation:
             evaluation time for system function
         """
 
-        #perform minimum number of fixed-point iterations without error checking
-        for _iteration in range(self.iterations_min):
-                        
-            #update connenctions (data transfer)
-            for connection in self._active_connections:
-                connection.update()
+        #iterations form algebraic depth
+        iterations_min = self._alg_depth + 1
 
-            #update all blocks
-            for block in self._active_blocks:
-                block.update(t)
+        #perform gauss-seidel iterations without error checking
+        for it in range(iterations_min):
 
-        #perform fixed-point iterations until convergence with error checking
-        for iteration in range(self.iterations_min, self.iterations_max):
-                        
-            #update connenctions (data transfer)
-            for connection in self._active_connections:
-                connection.update()
+            #update blocks at algebraic depth
+            for block in self._blocks_alg_depth[it]:
+                if block: block.update(t)
 
-            #update instant time blocks
+            #update connenctions at algebraic depth (data transfer)
+            for connection in self._connections_alg_depth[it]:
+                if connection: connection.update()
+
+        #no algebraic loop blocks -> early exit
+        if not self._blocks_alg_loop:
+            return self._alg_depth+1
+
+        #perform jacobi fixed-point iterations on algebraic loops
+        for it in range(iterations_min, self.iterations_max):        
+
+            #update algebraic loop blocks
             max_error = 0.0
-            for block in self._active_blocks:
+            for block in self._blocks_alg_loop:
+                if not block: continue
                 error = block.update(t)
                 if error > max_error:
                     max_error = error
 
+            #update algebraic loop connenctions (data transfer)
+            for connection in self._connections_alg_loop:
+                if connection: connection.update()
+
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
-                return iteration + 1
+                return it+1
 
-        #not converged
+        #not converged -> error
         self._logger_error(
             "fixed-point loop in '_update' not converged (iters: {}, err: {})".format(
                 self.iterations_max, max_error), 
@@ -939,21 +938,21 @@ class Simulation:
         total_evals = 0
 
         #perform fixed-point iterations to solve implicit update equation
-        for iteration in range(self.iterations_max):
+        for it in range(self.iterations_max):
 
             #evaluate system equation (this is a fixed point loop)
             total_evals += self._update(t)
 
             #advance solution of implicit solver
             max_error = 0.0
-            for block in self._active_blocks:
+            for block in self._blocks_dyn:
                 error = block.solve(t, dt)
                 if error > max_error:
                     max_error = error
 
             #check for convergence (only error)
             if max_error <= self.tolerance_fpi:
-                return True, total_evals, iteration + 1
+                return True, total_evals, it+1
 
         #not converged in 'self.iterations_max' steps
         return False, total_evals, self.iterations_max
@@ -1022,8 +1021,8 @@ class Simulation:
         when local truncation error is too large and timestep has to be 
         retaken with smaller timestep. 
         """
-        for block in self._active_blocks:
-            block.revert()
+        for block in self._blocks_dyn:
+            if block: block.revert()
 
 
     def _sample(self, t):
@@ -1036,8 +1035,8 @@ class Simulation:
         t : float
             time where to sample
         """
-        for block in self._active_blocks:
-            block.sample(t)
+        for block in self.blocks:
+            if block: block.sample(t)
 
 
     def _buffer_blocks(self, dt):
@@ -1059,8 +1058,8 @@ class Simulation:
         self.engine.buffer(dt)
 
         #buffer internal states of stateful blocks
-        for block in self._active_blocks:
-            block.buffer(dt)
+        for block in self._blocks_dyn:
+            if block: block.buffer(dt)
 
 
     def _step(self, t, dt):
@@ -1099,8 +1098,12 @@ class Simulation:
         success, max_error_norm, relevant_scales = True, 0.0, []
 
         #step blocks and get error estimates if available
-        for block in self._active_blocks:
+        for block in self._blocks_dyn:
 
+            #skip inactive blocks
+            if not block: continue
+
+            #step the block
             suc, err_norm, scl = block.step(t, dt)
             
             #check solver stepping success
@@ -1154,9 +1157,6 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
-
-        #assemble active system components
-        self._update_active_components()
 
         #buffer states for event system
         self._buffer_events(self.time)
@@ -1233,9 +1233,6 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
-
-        #assemble active system components
-        self._update_active_components()
 
         #buffer states for event system
         self._buffer_events(self.time)
@@ -1327,9 +1324,6 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
-
-        #assemble active system components
-        self._update_active_components()
 
         #buffer states for event system
         self._buffer_events(self.time)
@@ -1434,9 +1428,6 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
-
-        #assemble active system components
-        self._update_active_components()
 
         #buffer states for event system
         self._buffer_events(self.time)
@@ -1627,13 +1618,13 @@ class Simulation:
             for _ in tracker:
 
                 #advance the simulation by one (effective) timestep '_dt'
-                success, error_norm, scale, evals, solver_its = self.timestep(
+                success, error_norm, scale, *_ = self.timestep(
                     dt=_dt, 
                     adaptive=_adaptive
                     )
 
                 #perform adaptive rescale
-                if adaptive:            
+                if _adaptive:            
 
                     #if no error estimate and rescale -> back to default timestep
                     if not error_norm and scale == 1:

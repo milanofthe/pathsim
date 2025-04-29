@@ -48,6 +48,8 @@ connections = [
 Sim = Simulation(blocks, connections, dt=dt, log=True)
 
 
+Sim._assemble_components_alg_depth()
+
 # Run Example ===========================================================================
 
 if __name__ == "__main__":

@@ -135,6 +135,7 @@ def _dfs_generic(graph_map, node, propagate_inf, start, stack=frozenset()):
         best = 0
         nxt_stk = stk | {cur}
         for nbr in graph_map.get(cur, ()):
+            
             sub = dfs(nbr, nxt_stk)
 
             if sub is None:
