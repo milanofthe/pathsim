@@ -31,6 +31,8 @@ from ._constants import (
     )
 
 from .utils.utils import path_length_dfs
+from .utils.graph import upstream_connection_map, upstream_path_length_dfs
+
 from .utils.analysis import Timer
 from .utils.portreference import PortReference
 from .utils.progresstracker import ProgressTracker
