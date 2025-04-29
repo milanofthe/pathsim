@@ -69,4 +69,7 @@ class Comparator(Block):
         else:
             self.outputs[0] = min(self.span)
 
+    def update_err(t):
+        self.update(t)
         return 0.0
+    

@@ -93,17 +93,30 @@ class Differentiator(Block):
             parameters for solver initialization
         """
 
-        #change solver if already initialized
-        if self.engine is not None:
-            self.engine = Solver.cast(self.engine, **solver_args)
-            return #quit early
-
         #initialize the numerical integration engine with kernel
-        self.engine = Solver(0.0, **solver_args)
+        if self.engine is None: self.engine = Solver(0.0, **solver_args)
+        #change solver if already initialized
+        else: self.engine = Solver.cast(self.engine, **solver_args)
 
 
     def update(self, t):
-        """update system equation fixed point loop
+        """update system equation fixed point loop,
+        without convergence control
+    
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        """
+        x, u = self.engine.get(), self.inputs[0]
+        y = self.op_alg(x, u, t)
+        self.outputs.update_from_array(y)
+
+
+    def update_err(self, t):
+        """update system equation fixed point loop,
+        with convergence control
     
         Parameters
         ----------

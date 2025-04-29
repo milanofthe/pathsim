@@ -67,9 +67,18 @@ class Amplifier(Block):
     def update(self, t):
         """update system equation in fixed point loop
 
-        Note
-        ----
-        SISO block has optimized 'update' method
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        """
+        y = self.op_alg(self.inputs[0])
+        self.outputs.update_from_array(y)
+
+
+    def update_err(self, t):
+        """update system equation in fixed point loop
 
         Parameters
         ----------

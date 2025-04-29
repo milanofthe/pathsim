@@ -595,7 +595,6 @@ class Simulation:
         (algebraic depth). This is also used to assign the outgoing 
         connections similarly.
         """
-
         #initial max algebraic depth (longest algebraic path)
         max_depth = 0
 
@@ -886,9 +885,9 @@ class Simulation:
             max_error = 0.0
             for block in self._blocks_alg_loop:
                 if not block: continue
-                error = block.update(t)
-                if error > max_error:
-                    max_error = error
+                err = block.update_err(t)
+                if err > max_error:
+                    max_error = err
 
             #update algebraic loop connenctions (data transfer)
             for connection in self._connections_alg_loop:

@@ -146,14 +146,13 @@ class ODE(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            deviation to previous iteration for convergence control
         """
         self.outputs.update_from_array(self.engine.get())
-        return 0
+
+
+    def update_err(t):
+        self.update(t)
+        return 0.0
 
 
     def solve(self, t, dt):

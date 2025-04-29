@@ -49,7 +49,6 @@ class Constant(Block):
             absolute error to previous iteration for convergence control
         """
         self.outputs[0] = self.value
-        return 0.0
 
 
 class Source(Block):
@@ -135,5 +134,4 @@ class Source(Block):
             relative error to previous iteration for convergence control
         """
         self.outputs[0] = self.func(t)
-        return 0.0
         

@@ -128,11 +128,26 @@ class PID(Block):
         #initialize the numerical integration engine with kernel
         if not self.engine: self.engine = Solver(np.zeros(2), **solver_args)
         #change solver if already initialized    
-        else: self.engine = Solver.cast(self.engine, **solver_args)    
+        else: self.engine = Solver.cast(self.engine, **solver_args)
 
 
     def update(self, t):
-        """update system equation fixed point loop
+        """update system equation fixed point loop,
+        without convergence control
+    
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        """
+        x, u = self.engine.get(), self.inputs[0]
+        y = self.op_alg(x, u, t)
+        self.outputs.update_from_array(y)    
+
+
+    def update_err(self, t):
+        """update system equation fixed point loop,
+        with convergence control
     
         Parameters
         ----------

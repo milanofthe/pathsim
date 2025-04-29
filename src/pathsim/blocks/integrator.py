@@ -104,6 +104,10 @@ class Integrator(Block):
             deviation to previous iteration for convergence control
         """
         self.outputs.update_from_array(self.engine.get())
+
+
+    def update_err(self, t):
+        self.update(t)
         return 0.0
 
 

@@ -183,7 +183,10 @@ class Pulse(Block):
         elif self._phase == 'low':
             self.outputs[0] = 0.0
 
-        return 0.0 
+
+    def update_err(t):
+        self.update(t)
+        return 0 
 
 
     def __len__(self):

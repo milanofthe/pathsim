@@ -402,6 +402,45 @@ class Block(Serializable):
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
         directly based on the 'inputs' and possibly internal states. 
 
+        Note
+        ----
+        The implementation of the 'update' method in the base 'Block' class is intended 
+        as a fallback and is not performance optimized. Special blocks might reimplement 
+        this method differently for higher performance, for example SISO or MISO blocks.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        """
+
+        #no internal algebraic operator -> early exit
+        if self.op_alg is None:
+            return
+
+        #block inputs 
+        u = self.inputs.to_array()
+
+        #no internal state -> standard 'Operator'
+        if self.engine: 
+            x = self.engine.get()
+            y = self.op_alg(x, u, t)
+        else: 
+            y = self.op_alg(u)            
+
+        self.outputs.update_from_array(y)
+
+
+    def update_err(self, t):
+        """The 'update' method is called iteratively for all blocks to evaluate the 
+        algbebraic components of the global system ode and resolve algebraic loops 
+        (fixed-point iteraion). 
+
+        It is meant for instant time blocks (blocks that dont have a delay due to the 
+        timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
+        directly based on the 'inputs' and possibly internal states. 
+
         It computes and returns the absolute difference between the new output and 
         the previous output (before the call) to track convergence of the fixed-point 
         iteration.
@@ -436,11 +475,6 @@ class Block(Serializable):
             y = self.op_alg(x, u, t)
         else: 
             y = self.op_alg(u)            
-
-        #no passthrough -> early exit
-        if len(self) == 0:
-            self.outputs.update_from_array(y)
-            return 0.0
 
         #set outputs to new values and check convergence
         return self.outputs.update_from_array_max_err(y)

@@ -114,6 +114,27 @@ class Function(Block):
         """Evaluate function block as part of algebraic component 
         of global system DAE.
 
+        Without convergence control for speed.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        """
+
+        #apply operator to get output
+        y = self.op_alg(self.inputs.to_array())
+
+        #set outputs to new values
+        self.outputs.update_from_array(y)
+
+
+    def update_err(self, t):
+        """Evaluate function block as part of algebraic component 
+        of global system DAE. 
+
+        With convergence control for algebraic loop solver.
+
         Parameters
         ----------
         t : float

@@ -88,17 +88,17 @@ class Delay(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            deviation to previous iteration for convergence control
         """
 
         #retrieve value from buffer
         y = self._buffer.get(t)
-        return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)
 
+
+    def update_err(self, t):
+        self.update(t)
+        return 0.0
+        
 
     def sample(self, t):
         """Sample input values and time of sampling 

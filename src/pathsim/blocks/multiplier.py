@@ -53,7 +53,19 @@ class Multiplier(Block):
 
 
     def update(self, t):
-        """update system equation in fixed point loop
+        """update system equation
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        """
+        u = self.inputs.to_array()
+        self.outputs.update_from_array(self.op_alg(u))
+
+
+    def update_err(self, t):
+        """update system equation in with error control for algebraic loop solver
 
         Parameters
         ----------

@@ -52,6 +52,10 @@ class WhiteNoise(Block):
         self.noise = 0.0
 
 
+    def __len__(self):
+        return 0
+
+
     def reset(self):
         super().reset()
 
@@ -94,6 +98,10 @@ class WhiteNoise(Block):
             deviation to previous iteration for convergence control
         """
         self.outputs[0] = self.noise
+
+
+    def update_err(self, t):
+        self.update(t)
         return 0.0
 
 
@@ -138,6 +146,10 @@ class PinkNoise(Block):
 
         # Initialize the random values for each octave
         self.octave_values = np.random.normal(0, 1, self.num_octaves)
+
+
+    def __len__(self):
+        return 0
 
 
     def reset(self):
@@ -201,6 +213,10 @@ class PinkNoise(Block):
             deviation to previous iteration for convergence control
         """
         self.outputs[0] = self.noise
+        
+
+    def update_err(self, t):
+        self.update(t)
         return 0.0
 
 
@@ -267,6 +283,10 @@ class SinusoidalPhaseNoiseSource(Block):
         self.t_max = 0
 
 
+    def __len__(self):
+        return 0
+
+
     def set_solver(self, Solver, **solver_kwargs):
         #initialize the numerical integration engine 
         if self.engine is None: self.engine = Solver(0.0, **solver_kwargs)
@@ -289,6 +309,10 @@ class SinusoidalPhaseNoiseSource(Block):
 
         #set output
         self.outputs[0] = self.amplitude * np.sin(self.omega*t + self.phase + phase_error)
+        
+
+    def update_err(self, t):
+        self.update(t)
         return 0.0
 
 

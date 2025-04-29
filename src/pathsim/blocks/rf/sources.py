@@ -102,9 +102,17 @@ class SquareWaveSource(Block):
         self.phase = phase
 
 
+    def __len__(self):
+        return 0
+
+
     def update(self, t):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * square_wave(t + tau, self.frequency)
+
+
+    def update_err(t):
+        self.update(t)
         return 0.0
 
 
@@ -129,9 +137,17 @@ class TriangleWaveSource(Block):
         self.phase = phase
 
 
+    def __len__(self):
+        return 0
+
+
     def update(self, t):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * triangle_wave(t + tau, self.frequency)
+
+
+    def update_err(t):
+        self.update(t)
         return 0.0
 
 
@@ -156,9 +172,17 @@ class SinusoidalSource(Block):
         self.phase = phase
 
 
+    def __len__(self):
+        return 0
+
+
     def update(self, t):
         omega = 2*np.pi*self.frequency
         self.outputs[0] = self.amplitude * np.sin(omega*t + self.phase)
+
+
+    def update_err(t):
+        self.update(t)
         return 0.0
 
 
@@ -183,8 +207,16 @@ class GaussianPulseSource(Block):
         self.tau = tau
 
 
+    def __len__(self):
+        return 0
+
+
     def update(self, t):
         self.outputs[0] = self.amplitude * gaussian(t-self.tau, self.f_max)
+
+
+    def update_err(t):
+        self.update(t)
         return 0.0
 
 
@@ -206,8 +238,16 @@ class StepSource(Block):
         self.tau = tau
 
 
+    def __len__(self):
+        return 0
+
+
     def update(self, t):
         self.outputs[0] = self.amplitude * float(t > self.tau)
+
+
+    def update_err(t):
+        self.update(t)
         return 0.0
 
 
@@ -292,6 +332,10 @@ class ChirpSource(Block):
         self.t_max = 0
 
 
+    def __len__(self):
+        return 0
+
+
     def reset(self):
         #reset inputs and outputs
         self.inputs  = {0:0.0}  
@@ -329,6 +373,10 @@ class ChirpSource(Block):
         """update the block output, assebble phase and evaluate the sinusoid"""
         _phase = 2 * np.pi * (self.engine.get() + self.sig_white * self.noise_1) + self.phase
         self.outputs[0] = self.amplitude * np.sin(_phase)
+        
+
+    def update_err(t):
+        self.update(t)
         return 0.0
 
 
