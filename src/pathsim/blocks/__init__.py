@@ -13,4 +13,5 @@ from .ctrl import *
 from .lti import *
 from .ode import *
 from .rng import *
+from .wrapper import *
 
