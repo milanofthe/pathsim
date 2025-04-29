@@ -18,6 +18,14 @@ from pathsim.simulation import Simulation
 from pathsim.blocks._block import Block
 from pathsim.connection import Connection
 
+#modules from pathsim for test case
+from pathsim.blocks import (
+    Integrator,
+    Amplifier,  
+    Scope, 
+    Adder
+    )
+
 
 from pathsim._constants import (
     SIM_TIMESTEP,
@@ -50,7 +58,7 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_max, SIM_TIMESTEP_MAX)
         self.assertEqual(str(Sim.Solver()), "SSPRK22")
         self.assertEqual(Sim.tolerance_fpi, SIM_TOLERANCE_FPI)
-        self.assertEqual(Sim.iterations_min, SIM_ITERATIONS_MIN) 
+        self.assertEqual(Sim.iterations_min, 1) 
         self.assertEqual(Sim.iterations_max, SIM_ITERATIONS_MAX)
         self.assertFalse(Sim.log)
 
@@ -137,10 +145,117 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.connections, [C1, C2])
 
 
-    def test_set_solver(self): pass
-    def test_update(self): pass
-    def test_step(self): pass
-    def test_run(self): pass
+    def test_set_solver(self): 
+
+        from pathsim.solvers import SSPRK22, RKCK54
+        
+
+        B1, B2 = Block(), Block()
+        I1, I2 = Integrator(), Integrator()
+        C1 = Connection(B1, B2)
+
+        #check no solvers yet
+        self.assertEqual(I1.engine, None)
+        self.assertEqual(I2.engine, None)
+        self.assertEqual(B1.engine, None)
+        self.assertEqual(B2.engine, None)
+
+        Sim = Simulation(
+            blocks=[B1, B2, I1, I2], 
+            connections=[C1],
+            log=False
+            )
+
+        #check solvers initialized correctly
+        self.assertTrue(isinstance(I1.engine, SSPRK22))
+        self.assertTrue(isinstance(I2.engine, SSPRK22))
+        self.assertEqual(B1.engine, None)
+        self.assertEqual(B2.engine, None)
+
+        Sim._set_solver(RKCK54)
+
+        #check solvers are correctly updated
+        self.assertTrue(isinstance(I1.engine, RKCK54))
+        self.assertTrue(isinstance(I2.engine, RKCK54))
+        self.assertEqual(B1.engine, None)
+        self.assertEqual(B2.engine, None)
+
+
+    def test_update(self): 
+
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        C2 = Connection(B2, B3)
+        C3 = Connection(B3, B1)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C2, C3],
+            log=False
+            )   
+
+        self.assertEqual(Sim.iterations_min, 3)
+        evals = Sim._update(1)
+        self.assertEqual(evals, 4)
+
+
+    def test_step(self): 
+
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        C2 = Connection(B2, B3)
+        C3 = Connection(B3, B1)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C2, C3],
+            log=False
+            )   
+
+        self.assertEqual(Sim.time, 0.0)
+
+        #check stepping stats
+        suc, err, scl, evl, its = Sim.step(0.1)
+
+        self.assertTrue(suc)
+        self.assertEqual(err, 0.0)
+        self.assertEqual(scl, 1.0)
+        self.assertEqual(evl, 12)
+        self.assertEqual(its, 0)
+        self.assertEqual(Sim.time, 0.1)
+
+        Sim.reset()
+        self.assertEqual(Sim.time, 0.0)
+            
+        #test time progression
+        for i in range(1, 10):
+
+            stats = Sim.step(0.1)
+            self.assertAlmostEqual(Sim.time, 0.1*i, 10)
+
+
+    def test_run(self): 
+
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        C2 = Connection(B2, B3)
+        C3 = Connection(B3, B1)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C2, C3],
+            log=False
+            )   
+
+        self.assertEqual(Sim.time, 0.0)
+
+        stats = Sim.run(10)
+
+        #check stats
+        self.assertEqual(stats["total_steps"], 1001)
+            
+        #check internal time progression
+        self.assertAlmostEqual(Sim.time, 10, 10)
+
+
+
 
 
 class TestSimulationIVP(unittest.TestCase):
@@ -150,12 +265,6 @@ class TestSimulationIVP(unittest.TestCase):
     """
 
     def setUp(self):
-
-        #modules from pathsim for test case
-        from pathsim.blocks import (
-            Integrator, Scope, 
-            Amplifier, Adder
-            )
 
         #blocks that define the system
         self.Int = Integrator(1.0)
@@ -184,7 +293,7 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(len(self.Sim.blocks), 4)
         self.assertEqual(len(self.Sim.connections), 3)
         self.assertEqual(self.Sim.dt, 0.02)
-        self.assertEqual(self.Sim.iterations_min, 1)
+        self.assertEqual(self.Sim.iterations_min, 2)
         self.assertTrue(isinstance(self.Sim.engine, SSPRK22))
         self.assertTrue(self.Sim.engine.is_explicit)
         self.assertFalse(self.Sim.engine.is_adaptive)
@@ -206,7 +315,7 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(self.Int.get(0), self.Int.initial_value)
 
         #step using global timestep
-        success, err, scl, te, ts = self.Sim.step()
+        success, err, scl, te, ts = self.Sim.timestep()
         self.assertEqual(self.Sim.time, self.Sim.dt)
         self.assertEqual(err, 0.0) #fixed solver
         self.assertEqual(scl, 1.0) #fixed solver
@@ -226,7 +335,7 @@ class TestSimulationIVP(unittest.TestCase):
         #reset again
         self.Sim.reset()
 
-        #check if reset was sucecssful
+        #check if reset was successful
         self.assertEqual(self.Sim.time, 0.0)
         self.assertEqual(self.Int.get(0), self.Int.initial_value)
 
@@ -236,7 +345,7 @@ class TestSimulationIVP(unittest.TestCase):
         #reset first
         self.Sim.reset()
 
-        #check if reset was sucecssful
+        #check if reset was successful
         self.assertEqual(self.Sim.time, 0.0)
         self.assertEqual(self.Int.get(0), self.Int.initial_value)
 

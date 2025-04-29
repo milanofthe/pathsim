@@ -101,7 +101,6 @@ class Simulation:
         sim.run(4)
         sim.plot()
 
-
     Parameters
     ----------
     blocks : list[Block] 

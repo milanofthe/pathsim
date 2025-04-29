@@ -17,7 +17,7 @@ SIM_TIMESTEP = 0.01         # simulator timestep (initial)
 SIM_TIMESTEP_MIN = 1e-16    # minimum simulator timestep
 SIM_TIMESTEP_MAX =  None    # maximum simulator timestep
 SIM_TOLERANCE_FPI = 1e-12   # tolerance for fixed point loop convergence
-SIM_ITERATIONS_MIN = 1      # minimum number of fixed point loop iterations
+SIM_ITERATIONS_MIN = None   # minimum number of fixed point loop iterations -> determined automatically
 SIM_ITERATIONS_MAX = 200    # maximum number of fixed point loop iterations
 
 
