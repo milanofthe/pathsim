@@ -14,11 +14,19 @@
 
 import numpy as np
 
+from collections import defaultdict
+
 from .connection import Connection
 
 from .blocks._block import Block
 
-from .utils.utils import path_length_dfs
+from .utils.graph import (
+    downstream_connection_map,
+    upstream_connection_map, 
+    upstream_path_length_dfs, 
+    path_length_dfs
+    )
+
 from .utils.register import Register
 from .utils.portreference import PortReference
 
@@ -39,6 +47,9 @@ class Interface(Block):
     - Handles data transfer to and from the internal subsystem blocks 
       to and from the inputs and outputs of the subsystem.
     """
+
+    def __len__(self):
+        return 0
     
     def set_output(self, port, value): 
         self.outputs[port] = value
@@ -158,12 +169,17 @@ class Subsystem(Block):
 
         Basically the same as in the 'Simulation' class.
         """
-        max_path_length = 0
-        for block in [self.interface, *self.blocks]:
-            path_length = path_length_dfs(self.connections, block)
-            if path_length > max_path_length:
-                max_path_length = path_length
-        return max_path_length
+
+        #build downstream connection map
+        dst_con_map = downstream_connection_map(self.connections)
+
+        #compute algebraic path from interface back to itself (internal path length)
+        length = path_length_dfs(dst_con_map, self.interface, self.interface)
+
+        #hit internal algebraic loop (inf)
+        if length is None: return None
+
+        return int(length > 0)
 
 
     def __call__(self):
@@ -218,6 +234,94 @@ class Subsystem(Block):
                 if conn_1.overwrites(conn_2):
                     _msg = f"{conn_1} overwrites {conn_2}"
                     raise ValueError(_msg)
+
+
+    # subsystem assembly ----------------------------------------------------------
+
+    def assemble(self):
+        """Assemble internals of subsystem for simulation.
+
+        Assemble internal blocks (recursively assemble nested subsystems)
+        and the internal DAG and dynamic blocks for timestepping
+        """
+
+        #assemble blocks internally
+        for block in self.blocks:
+            block.assemble()
+
+        #assemble system for simulation
+        self._assemble_components_alg_depth()
+        self._assemble_blocks_dyn()
+
+
+    def _assemble_components_alg_depth(self):
+        """Assemble lists of internal system components, ordered by 
+        their algebraic depth in the DAG.
+
+        Perform upstream depth first search on the DAG to assign 
+        each block their number of consecutive algebraic dependencies 
+        (algebraic depth). This is also used to assign the outgoing 
+        connections similarly.
+        """
+
+        #initial max algebraic depth (longest algebraic path)
+        max_depth = 0
+
+        #assembly of blocks by their algebraic depth
+        self._blocks_alg_depth = defaultdict(list)
+        self._blocks_alg_loop = []
+        
+        #assembly of connections by their algebraic depth
+        self._connections_alg_depth = defaultdict(list)
+        self._connections_alg_loop = []
+
+        #assembly of initerface connections
+        self._connections_interface = []
+
+        #construct mapping for connections between blocks
+        ust_con_map = upstream_connection_map(self.connections)
+
+        #construct mapping from blocks to outgoing connections
+        block_con_map = defaultdict(list)
+        for con in self.connections:
+            block_con_map[con.source.block].append(con)
+        
+        #iterate blocks to calculate their algebraic depths
+        for blk in self.blocks:
+            depth = upstream_path_length_dfs(ust_con_map, blk) 
+
+            #None -> alg. loop upstream taints downstream components
+            if depth is None:
+                self._blocks_alg_loop.append(blk)
+
+                #find outgoing connections and assign them aswell
+                for con in block_con_map[blk]:
+                    self._connections_alg_loop.append(con)
+
+            else:
+                self._blocks_alg_depth[depth].append(blk)
+
+                #find outgoing connections and assign them aswell
+                for con in block_con_map[blk]:
+                    self._connections_alg_depth[depth].append(con)
+
+                #update max depth
+                if depth > max_depth:
+                    max_depth = depth
+
+        #find outgoing connections from interface
+        for con in block_con_map[self.interface]:
+            self._connections_interface.append(con)
+
+        self._alg_depth = max_depth
+
+
+    def _assemble_blocks_dyn(self):
+        """Assemble a list of dynamic blocks, containing an 
+        internal integration engine
+        """
+        self._blocks_dyn = [blk for blk in self.blocks if blk.engine]
+
 
 
     # visualization -------------------------------------------------------------------------
@@ -420,6 +524,34 @@ class Subsystem(Block):
         ----------
         t : float
             evaluation time 
+        """
+
+        #update interface outgoing connections
+        for connection in self._connections_interface:
+            if connection: connection.update()
+
+        #perform gauss-seidel iterations without error checking
+        for it in range(self._alg_depth + 1):
+
+            #update blocks at algebraic depth
+            for block in self._blocks_alg_depth[it]:
+                if block: block.update(t)
+
+            #update connenctions at algebraic depth (data transfer)
+            for connection in self._connections_alg_depth[it]:
+                if connection: connection.update()
+
+
+    def update_err(self, t):
+        """Update the instant time components of the internal blocks 
+        to evaluate the (distributed) system equation.
+
+        Collect convergence errors of internal blocks.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time 
 
         Returns
         ------- 
@@ -427,24 +559,31 @@ class Subsystem(Block):
             error tolerance of system equation convergence
         """
 
-        #update internal connections (data transfer)
-        for connection in self.connections:
-            connection.update()
+        #update interface outgoing connections
+        for connection in self._connections_interface:
+            if connection: connection.update()
 
-        #update internal blocks
+        #update algebraic loop blocks
         max_error = 0.0
-        for block in self.blocks:
-            error = block.update(t)
-            if error > max_error:
-                max_error = error
+        for block in self._blocks_alg_loop:
+            if not block: continue
+            err = block.update_err(t)
+            if err > max_error:
+                max_error = err
+
+        #update algebraic loop connenctions (data transfer)
+        for connection in self._connections_alg_loop:
+            if connection: connection.update()
 
         #return subsystem convergence error
         return max_error
 
 
+    # methods for blocks with integration engines -------------------------------------------
+
     def solve(self, t, dt):
-        """
-        Advance solution of implicit update equation for internal blocks.
+        """Advance solution of implicit update equation 
+        for internal blocks.
 
         Parameters
         ----------
@@ -459,10 +598,11 @@ class Subsystem(Block):
             maximum error of implicit update equaiton
         """
         max_error = 0.0
-        for block in self.blocks:
-            error = block.solve(t, dt)
-            if error > max_error:
-                max_error = error
+        for block in self._blocks_dyn:
+            if not block: continue
+            err = block.solve(t, dt)
+            if err > max_error:
+                max_error = err
         return max_error
 
 
@@ -496,11 +636,15 @@ class Subsystem(Block):
         success, max_error_norm, relevant_scales = True, 0.0, []
 
         #step blocks and get error estimates if available
-        for block in self.blocks:
-            ss, err_norm, scl = block.step(t, dt)
+        for block in self._blocks_dyn:
+
+            #skip inactive internal blocks
+            if not block: continue
+
+            suc, err_norm, scl = block.step(t, dt)
             
             #check solver stepping success
-            if not ss: 
+            if not suc: 
                 success = False
 
             #update error tracking
@@ -508,7 +652,7 @@ class Subsystem(Block):
                 max_error_norm = err_norm
             
             #update timestep rescale if relevant
-            if scl not in [0.0, 1.0]: 
+            if scl != 1.0 and scl > 0.0: 
                 relevant_scales.append(scl)
 
         #no relevant timestep rescale -> quit early
@@ -518,8 +662,6 @@ class Subsystem(Block):
         #compute real timestep rescale
         return success, max_error_norm, min(relevant_scales)
 
-
-    # methods for blocks with integration engines -------------------------------------------
 
     def set_solver(self, Solver, **solver_args):
         """Initialize all blocks with solver for numerical integration
@@ -536,6 +678,9 @@ class Subsystem(Block):
             args to initialize solver with 
         """
 
+        #set internal dummy engine
+        self.engine = Solver()
+
         #iterate all blocks and set integration engines
         for block in self.blocks:
             block.set_solver(Solver, **solver_args)
@@ -545,8 +690,8 @@ class Subsystem(Block):
         """revert the internal blocks to the state 
         of the previous timestep 
         """
-        for block in self.blocks:
-            block.revert()
+        for block in self._blocks_dyn:
+            if block: block.revert()
 
 
     def buffer(self, dt):
@@ -558,5 +703,5 @@ class Subsystem(Block):
         dt : float
             evaluation time for buffering    
         """
-        for block in self.blocks:
-            block.buffer(dt)
+        for block in self._blocks_dyn:
+            if block: block.buffer(dt)

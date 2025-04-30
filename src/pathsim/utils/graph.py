@@ -181,7 +181,7 @@ def upstream_path_length_dfs(connection_map, starting_block):
 def downstream_path_length_dfs(connection_map, starting_block):
     """
     Longest algebraic path length starting from `starting_block`, walking
-    **downstream** (source → targets).
+    **downstream** (source -> targets).
 
     * Traversal *immediately* stops on a non-algebraic block, a hidden-loop
       block, or a loop farther downstream; those branches contribute 0.
@@ -198,3 +198,73 @@ def downstream_path_length_dfs(connection_map, starting_block):
         propagate_inf=False,  # downstream -> infinite branches local
         start=starting_block
     )
+
+
+def path_length_dfs(connection_map, start_block, end_block):
+    """
+    Return the length of the *longest purely-algebraic* directed path from
+    `src_block` to `dst_block` following the `connection_map` orientation
+    (source -> targets).
+
+    Parameters
+    ----------
+    connection_map : dict[Block, set[Block]]
+        Adjacency map in downstream (source → targets) orientation.
+    start_block, end_block : Block
+        Start and end nodes of interest.  They may be identical; a zero-length
+        self-path is then possible.
+
+    Returns
+    -------
+    int | None
+        * 0      – No algebraic path exists (either no path at all, or every
+                   path is broken by at least one non-algebraic block
+                   ``len(b)==0``).
+        * >0     – Length of the longest purely-algebraic path (sum of
+                   ``len(b)`` for all blocks on that path).
+        * None   – At least one candidate path runs into
+                     • an **algebraic loop** (cycle containing a
+                       ``len(b)>0`` block), **or**
+                     • a **hidden-loop block** where ``len(b) is None``.
+                   Because such a loop makes the algebraic influence
+                   'infinite', we propagate the value `None`.
+    """
+    @cache
+    def dfs(node, stack=frozenset()):
+        n_len = len(node)
+        
+        #hidden loop block -> abort with None
+        if n_len is None:
+            return None
+
+        #reached destination -> base length (include end if algebraic)
+        if node is end_block:
+            return 0 if n_len == 0 else n_len
+
+        #cycle detection
+        if node in stack:
+            
+            #least one algebraic block? -> algebraic cycle  
+            cycle_alg = any(len(b) and len(b) > 0 for b in stack | {node})
+            return None if cycle_alg else 0
+
+        #block is non-algebraic -> breaks path
+        if n_len == 0:
+            return 0
+
+        #explore targets
+        best = 0
+        for nxt in connection_map.get(node, ()):
+
+            sub = dfs(nxt, stack | {node})
+
+            #loop upstream of end -> propagate
+            if sub is None:
+                return None          
+            
+            best = max(best, sub)
+        
+        #if all branches broken -> 0
+        return (best + n_len) if best else 0   
+
+    return dfs(start_block)

@@ -32,7 +32,6 @@ from ._constants import (
     LOG_ENABLE
     )
 
-from .utils.utils import path_length_dfs
 from .utils.graph import upstream_connection_map, upstream_path_length_dfs
 
 from .utils.analysis import Timer
@@ -577,10 +576,15 @@ class Simulation:
         self.events.append(event)
 
 
-    # system assembly--------------------------------------------------------------
-
+    # system assembly -------------------------------------------------------------
 
     def _assemble(self):
+
+        #assemble blocks internally
+        for block in self.blocks:
+            block.assemble()
+
+        #assemble system for simulation
         self._assemble_components_alg_depth()
         self._assemble_blocks_dyn()
 
@@ -607,7 +611,7 @@ class Simulation:
         self._connections_alg_loop = []
 
         #construct mapping for connections between blocks
-        con_map = upstream_connection_map(self.connections)
+        ust_con_map = upstream_connection_map(self.connections)
 
         #construct mapping from blocks to outgoing connections
         block_con_map = defaultdict(list)
@@ -616,7 +620,7 @@ class Simulation:
         
         #iterate blocks to calculate their algebraic depths
         for blk in self.blocks:
-            depth = upstream_path_length_dfs(con_map, blk) 
+            depth = upstream_path_length_dfs(ust_con_map, blk) 
 
             #None -> alg. loop upstream taints downstream components
             if depth is None:
@@ -988,9 +992,6 @@ class Simulation:
 
         #log message begin of steady state solver
         self._logger_info(f"STEADYSTATE -> STARTING (reset: {reset})")
-
-        #assemble active system components
-        self._update_active_components()
 
         #solve for steady state at current time
         with Timer(verbose=False) as T:

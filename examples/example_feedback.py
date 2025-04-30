@@ -18,13 +18,8 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import RKBS32
-
 
 # 1st ORDER SYSTEM ======================================================================
-
-#simulation timestep
-dt = 0.025
 
 #step delay
 tau = 3
@@ -50,8 +45,7 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=dt, 
-    Solver=RKBS32,
+    dt=0.01, 
     log=True
     )
 

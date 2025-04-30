@@ -222,6 +222,20 @@ class Block(Serializable):
         if self.op_dyn: self.op_dyn.reset()
 
 
+    def assemble(self):
+        """Assemble internals of the block. Can implement optional preprocessing 
+        of block internals before running the simulation. Compilation, ordering, 
+        whatever.
+
+        Note
+        ----
+        Most blocks dont implement this method, only really relevant if the 
+        block needs some preprocessing before the simulation is run, that is 
+        only dependent on the internals of the blocks, such as 'Subsystem'.
+        """
+        pass
+
+
     def linearize(self, t):
         """Linearize the algebraic and dynamic components of the block.
 
