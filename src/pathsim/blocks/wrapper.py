@@ -38,8 +38,8 @@ class Wrapper(Block):
 
     def __init__(self, T=1, tau=0):
         super().__init__()
-
-
+        self._T   = T
+        self._tau = tau
         self.op_alg = Operator(func=lambda x: self._run_wrapper(*x))
 
         def _sample(t):
@@ -61,8 +61,6 @@ class Wrapper(Block):
                 func_act=_sample
                 ),
             ]
-        self.T   = T
-        self.tau = tau
 
     def update(self, t):
         """Update system equation for fixed point loop.
