@@ -579,15 +579,21 @@ class Simulation:
 
     def _assemble_graph(self):
 
-        #assemble blocks internally
-        for block in self.blocks:
-            block.assemble()
+        #time the graph construction
+        with Timer(verbose=False) as T:
 
-        #assemble graph for simulation
-        self.graph = Graph(self.blocks, self.connections)
-        self._logger_info(f"GRAPH (depth: {len(self.graph)}, loops: {self.graph.has_loops})")
+            #assemble blocks internally
+            for block in self.blocks:
+                block.assemble()
 
+            #assemble graph for simulation
+            self.graph = Graph(self.blocks, self.connections)
 
+        self._logger_info(
+            "GRAPH (depth: {}, loops: {}, runtime:{})".format(
+                self.graph._alg_depth, self.graph.has_loops, T
+                )
+            )
 
 
     # topological checks ----------------------------------------------------------
@@ -824,23 +830,23 @@ class Simulation:
         if not self.graph.has_loops:
             return d+1
 
-        #get blocks and connections that are tainted by loop
-        blocks_loop, connections_loop = self.graph.loop()
-
         #perform jacobi fixed-point iterations on algebraic loops
-        for it in range(d+1, self.iterations_max):        
-
-            #update algebraic loop blocks
+        for it in range(d+1, self.iterations_max):       
+            
+            #iterate DAG depths of broken loops
             max_error = 0.0
-            for block in blocks_loop:
-                if not block: continue
-                err = block.update_err(t)
-                if err > max_error:
-                    max_error = err
+            for d, blocks_loop, connections_loop in self.graph.loop():
 
-            #update algebraic loop connenctions (data transfer)
-            for connection in connections_loop:
-                if connection: connection.update()
+                #update blocks at algebraic depth
+                for block in blocks_loop:
+                    if not block: continue
+                    err = block.update_err(t)
+                    if err > max_error:
+                        max_error = err
+
+                #update connenctions at algebraic depth (data transfer)
+                for connection in connections_loop:
+                    if connection: connection.update() 
 
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:

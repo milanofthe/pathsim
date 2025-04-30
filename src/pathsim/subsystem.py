@@ -497,20 +497,20 @@ class Subsystem(Block):
         if not self.graph.has_loops:
             return 0.0
 
-        #get blocks and connections that are tainted by loop
-        blocks_loop, connections_loop = self.graph.loop()
-
-        #update algebraic loop blocks afterwards
+        #iterate DAG depths of broken loops
         max_error = 0.0
-        for block in blocks_loop:
-            if not block: continue
-            err = block.update_err(t)
-            if err > max_error:
-                max_error = err
+        for d, blocks_loop, connections_loop in self.graph.loop():
 
-        #update algebraic loop connenctions (data transfer)
-        for connection in connections_loop:
-            if connection: connection.update()
+            #update blocks at algebraic depth
+            for block in blocks_loop:
+                if not block: continue
+                err = block.update_err(t)
+                if err > max_error:
+                    max_error = err
+
+            #update connenctions at algebraic depth (data transfer)
+            for connection in connections_loop:
+                if connection: connection.update() 
 
         #return subsystem convergence error
         return max_error

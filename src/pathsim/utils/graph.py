@@ -9,7 +9,7 @@
 
 # IMPORTS ==============================================================================
 
-from collections import defaultdict
+from collections import defaultdict, deque, namedtuple
 from functools import cache
 
 
@@ -70,7 +70,6 @@ def upstream_block_block_map(connections):
     -------
     connection_map : defaultdict[Block, set[Block]]
         directed upstream graph of connections (target -> source)
-
     """
     connection_map = defaultdict(set)
     for con in connections:
@@ -81,8 +80,7 @@ def upstream_block_block_map(connections):
 
 
 def _block_meta(block):
-    """
-    Return a triple: (alg_len, is_hidden_loop, is_algebraic)
+    """Return a triple: (alg_len, is_hidden_loop, is_algebraic)
 
     * `len(block) is None` -> (0,  True,  False)
     * `len(block) == 0`    -> (0,  False, False)
@@ -177,8 +175,7 @@ def _dfs_generic(graph_map, node, propagate_inf, start, stack=frozenset()):
 
 
 def upstream_path_length_dfs(connection_map, starting_block):
-    """
-    Longest algebraic path length ending at `starting_block`, walking
+    """Longest algebraic path length ending at `starting_block`, walking
     **upstream** (targets -> sources).
 
     * Stops – and finishes that branch – as soon as a *non-algebraic* block
@@ -199,9 +196,8 @@ def upstream_path_length_dfs(connection_map, starting_block):
 
 
 def downstream_path_length_dfs(connection_map, starting_block):
-    """
-    Longest algebraic path length starting from `starting_block`, walking
-    **downstream** (source -> targets).
+    """Longest algebraic path length starting from `starting_block`, 
+    walking **downstream** (source -> targets).
 
     * Traversal *immediately* stops on a non-algebraic block, a hidden-loop
       block, or a loop farther downstream; those branches contribute 0.
@@ -220,11 +216,10 @@ def downstream_path_length_dfs(connection_map, starting_block):
     )
 
 
-def path_length_dfs(connection_map, start_block, end_block):
-    """
-    Return the length of the *longest purely-algebraic* directed path from
-    `src_block` to `dst_block` following the `connection_map` orientation
-    (source -> targets).
+def distance_path_length_dfs(connection_map, start_block, end_block):
+    """Return the length of the *longest purely-algebraic* directed path 
+    from `src_block` to `dst_block` following the `connection_map` 
+    orientation (source -> targets).
 
     Parameters
     ----------
@@ -293,12 +288,17 @@ def path_length_dfs(connection_map, start_block, end_block):
 # GRAPH CLASS ==========================================================================
 
 class Graph:
-
     """Representation of a directed graph, defined by blocks (nodes) 
     and edges (connections).
 
     Manages graph analysis methods.
 
+    Parameter
+    ---------
+    blocks : list[blocks] | None
+        blocks / nodes of the graph
+    connections : list[Connection] | None
+        connections / edges of the graph
     """
 
     def __init__(self, blocks=None, connections=None):
@@ -311,10 +311,10 @@ class Graph:
 
         #initialize graph orderings
         self._blocks_dag = defaultdict(list)
-        self._blocks_loop = []
+        self._blocks_loop_dag = defaultdict(list)
         
         self._connections_dag = defaultdict(list)
-        self._connections_loop = []
+        self._connections_loop_dag = defaultdict(list)
 
         #construct mappings for connections between blocks
         self.upst_blk_blk_map = upstream_block_block_map(self.connections)
@@ -330,7 +330,80 @@ class Graph:
 
 
     def __len__(self):
-        return self._alg_depth
+        return len(self.blocks)
+
+    def _build_loop_depths(self, blocks_loop):
+        """Populate the defaultdicts that order **only the blocks/connections
+        which belong to algebraic loops** by an internal “depth”.
+
+        A purely internal, breadth-first layering is used:
+
+        1.  **Entry set**  (depth 0) = every block in the loop sub-graph
+            that either
+              * has an upstream predecessor outside the loop, **or**
+              * has no predecessors at all
+            If the SCC is completely self-contained (no entry), pick one
+            arbitrary seed so the loop still gets an ordering.
+
+        2.  Perform a BFS that walks *only edges whose target is also in the
+            loop.*  Every time we traverse an algebraic edge we enqueue the
+            target with depth = parent + 1.
+
+        The result is stored in:
+
+        .. code-block::
+
+            self._blocks_loop_dag[depth]       ->  list[Block]
+            self._connections_loop_dag[depth]  ->  list[Connection]
+
+        Depth values are purely relative but let the solver update loop
+        blocks in Gauss–Seidel order (shallow -> deep) if desired.
+        """
+
+        # safety: nothing to do
+        if not blocks_loop:  return
+
+        loop_set = set(blocks_loop)
+        depth_of  = {}
+
+        #collect entry nodes
+        for blk in loop_set:
+            preds = self.upst_blk_blk_map[blk]
+            if not preds or any(p not in loop_set for p in preds):
+                depth_of[blk] = 0
+                self._blocks_loop_dag[0].append(blk)
+
+        #self-contained SCC -> seed with first block
+        if not depth_of:
+            seed = blocks_loop[0]
+            depth_of[seed] = 0
+            self._blocks_loop_dag[0].append(seed)
+
+        #BFS level-by-level inside the loop
+        q = deque(self._blocks_loop_dag[0])
+
+        while q:
+            cur = q.popleft()
+            cur_d = depth_of[cur]
+
+            #add outgoing connections at this depth (for convenience)
+            self._connections_loop_dag[cur_d].extend(self.outg_blk_con_map[cur])
+
+            for nxt in self.dnst_blk_blk_map[cur]:
+                
+                #leaves the loop -> ignore
+                if nxt not in loop_set: continue
+
+                #already visited
+                if nxt in depth_of: continue
+                
+                depth_of[nxt] = cur_d+1
+                self._blocks_loop_dag[cur_d+1].append(nxt)
+                
+                q.append(nxt)
+
+        #finally calculate depth of loop DAG
+        self._loop_depth = max(self._blocks_loop_dag.keys())
 
 
     def _assemble(self):
@@ -343,11 +416,11 @@ class Graph:
         connections similarly.
         """
 
-        #initial max algebraic depth (longest algebraic path)
-        max_depth = 0
+        #collect tainted blocks 
+        blocks_loop = []
 
-        #loop detection flag
-        self.has_loops = False 
+        #flag for loop detection
+        self.has_loops = False
 
         #iterate blocks to calculate their algebraic depths
         for blk in self.blocks:
@@ -355,30 +428,41 @@ class Graph:
 
             #None -> alg. loop upstream taints downstream components
             if depth is None:
-                self._blocks_loop.append(blk)
-                self._connections_loop.extend(self.outg_blk_con_map[blk])
-
-                #loop detection flag
+                blocks_loop.append(blk)
                 self.has_loops = True
-
+                
             else:
                 self._blocks_dag[depth].append(blk)
                 self._connections_dag[depth].extend(self.outg_blk_con_map[blk])
 
-                #update max depth
-                if depth > max_depth:
-                    max_depth = depth
-
-        self._alg_depth = max_depth
+        #compute total algebraic depth of DAG
+        self._alg_depth = max(self._blocks_dag) if self._blocks_dag else 0
+        
+        #build the DAG for the broken loops
+        self._build_loop_depths(blocks_loop)
 
 
     def outgoing_connections(self, block):
+        """Returns the outgoing connections of a block, 
+        or, connections that have 'block' as its source
+        
+        Parameters
+        ----------
+        block : Block
+            block that we want to get the outgoing connections of
+
+        Returns
+        -------
+        list[Connections]
+            connections from the graph that have 'block' as their source
+        """
         return self.outg_blk_con_map[block]
 
 
     def distance(self, start_block, end_block):
-        """Compute the algebraic distance / path length between two 
-        blocks in the graph.
+        """Compute the algebraic distance / path length between two blocks 
+        in the downstream arangement ('start_block' -> 'end_block') in the 
+        graph.
         """
 
         #blocks are not part of same graph -> no algebraic path
@@ -387,12 +471,12 @@ class Graph:
             return 0
 
         #use depth first search
-        return path_length_dfs(self.dnst_blk_blk_map, start_block, end_block)
+        return distance_path_length_dfs(self.dnst_blk_blk_map, start_block, end_block)
 
 
     def dag(self):
-        """Generator that yields blocks and connections 
-        at each algebraich depth level.
+        """Generator that yields blocks and connections at each 
+        algebraic depth level.
     
         Yields
         ------
@@ -400,17 +484,21 @@ class Graph:
             blocks and connections at current algebraic depth, 
             together with the depth 'd'
         """
-        for d in range(self._alg_depth + 1):
+        for d in range(self._alg_depth+1):
             yield (d, self._blocks_dag[d], self._connections_dag[d])
 
 
     def loop(self):
-        """Returns the blocks and connections that are part 
-        of algebraic loops.
+        """Generator that yields blocks and connections that are part of 
+        algebraic loops. 
 
-        Returns
-        -------
-        tuple[list[Block], list[Connection]]
+        Formatted as a DAG, that represents a broken loop with entry points.
+
+        Yields
+        ------
+        tuple[int, list[Block], list[Connection]]
+            blocks and connections at current algebraic depth of 
+            broken loop, together with the depth 'd'
         """
-        return (self._blocks_loop, self._connections_loop)
-
+        for d in range(self._loop_depth+1):
+            yield (d, self._blocks_loop_dag[d], self._connections_loop_dag[d])
