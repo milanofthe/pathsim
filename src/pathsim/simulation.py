@@ -602,6 +602,9 @@ class Simulation:
         #initial max algebraic depth (longest algebraic path)
         max_depth = 0
 
+        #loop detection flag
+        loops = False
+
         #assembly of blocks by their algebraic depth
         self._blocks_alg_depth = defaultdict(list)
         self._blocks_alg_loop = []
@@ -630,6 +633,9 @@ class Simulation:
                 for con in block_con_map[blk]:
                     self._connections_alg_loop.append(con)
 
+                #loop detection flag
+                loops = True
+
             else:
                 self._blocks_alg_depth[depth].append(blk)
 
@@ -643,7 +649,7 @@ class Simulation:
 
         self._alg_depth = max_depth
 
-        self._logger_info(f"ASSEMBLE ALG (alg depth: {max_depth})")
+        self._logger_info(f"ASSEMBLE (alg. depth: {max_depth}, alg. loops: {loops})")
 
 
     def _assemble_blocks_dyn(self):
@@ -652,7 +658,7 @@ class Simulation:
         """
         self._blocks_dyn = [blk for blk in self.blocks if blk.engine]
 
-        self._logger_info(f"ASSEMBLE DYN (num dyn blocks: {len(self._blocks_dyn)})")
+        self._logger_info(f"ASSEMBLE (num. dyn. blocks: {len(self._blocks_dyn)})")
 
 
     # topological checks ----------------------------------------------------------
