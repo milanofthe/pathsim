@@ -559,11 +559,10 @@ class Subsystem(Block):
             error tolerance of system equation convergence
         """
 
-        #update interface outgoing connections
-        for connection in self._connections_interface:
-            if connection: connection.update()
+        #update DAG first
+        self.update(t)
 
-        #update algebraic loop blocks
+        #update algebraic loop blocks afterwards
         max_error = 0.0
         for block in self._blocks_alg_loop:
             if not block: continue
