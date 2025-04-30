@@ -32,8 +32,7 @@ from ._constants import (
     LOG_ENABLE
     )
 
-from .utils.graph import upstream_connection_map, upstream_path_length_dfs
-
+from .utils.graph import Graph
 from .utils.analysis import Timer
 from .utils.portreference import PortReference
 from .utils.progresstracker import ProgressTracker
@@ -172,6 +171,9 @@ class Simulation:
         #numerical integrator instance -> initialized later
         self.engine = None
 
+        #internal system graph -> initialized later
+        self.graph = None
+
         #error tolerance for fixed point loop and implicit solver
         self.tolerance_fpi = tolerance_fpi
 
@@ -186,9 +188,6 @@ class Simulation:
 
         #initial simulation time
         self.time = 0.0
-
-        #length of the longest algebraic path
-        self.path_length = 1
 
         #initialize logging for logging mode
         self._initialize_logger()
@@ -217,11 +216,11 @@ class Simulation:
         #check if blocks from connections are in simulation
         self._check_blocks_are_managed()
 
-        #set numerical integration solver
+        #set numerical integration solver (block local)
         self._set_solver()
 
-        #assemble the system for simulation
-        self._assemble()
+        #assemble the system graph for simulation
+        self._assemble_graph()
 
 
     def __str__(self):
@@ -578,87 +577,17 @@ class Simulation:
 
     # system assembly -------------------------------------------------------------
 
-    def _assemble(self):
+    def _assemble_graph(self):
 
         #assemble blocks internally
         for block in self.blocks:
             block.assemble()
 
-        #assemble system for simulation
-        self._assemble_components_alg_depth()
-        self._assemble_blocks_dyn()
+        #assemble graph for simulation
+        self.graph = Graph(self.blocks, self.connections)
+        self._logger_info(f"GRAPH (depth: {len(self.graph)}, loops: {self.graph.has_loops})")
 
 
-    def _assemble_components_alg_depth(self):
-        """Assemble lists of system components, ordered by their 
-        algebraic depth in the DAG.
-
-        Perform upstream depth first search on the DAG to assign 
-        each block their number of consecutive algebraic dependencies 
-        (algebraic depth). This is also used to assign the outgoing 
-        connections similarly.
-        """
-
-        #initial max algebraic depth (longest algebraic path)
-        max_depth = 0
-
-        #loop detection flag
-        loops = False
-
-        #assembly of blocks by their algebraic depth
-        self._blocks_alg_depth = defaultdict(list)
-        self._blocks_alg_loop = []
-        
-        #assembly of connections by their algebraic depth
-        self._connections_alg_depth = defaultdict(list)
-        self._connections_alg_loop = []
-
-        #construct mapping for connections between blocks
-        ust_con_map = upstream_connection_map(self.connections)
-
-        #construct mapping from blocks to outgoing connections
-        block_con_map = defaultdict(list)
-        for con in self.connections:
-            block_con_map[con.source.block].append(con)
-        
-        #iterate blocks to calculate their algebraic depths
-        for blk in self.blocks:
-            depth = upstream_path_length_dfs(ust_con_map, blk) 
-
-            #None -> alg. loop upstream taints downstream components
-            if depth is None:
-                self._blocks_alg_loop.append(blk)
-
-                #find outgoing connections and assign them aswell
-                for con in block_con_map[blk]:
-                    self._connections_alg_loop.append(con)
-
-                #loop detection flag
-                loops = True
-
-            else:
-                self._blocks_alg_depth[depth].append(blk)
-
-                #find outgoing connections and assign them aswell
-                for con in block_con_map[blk]:
-                    self._connections_alg_depth[depth].append(con)
-
-                #update max depth
-                if depth > max_depth:
-                    max_depth = depth
-
-        self._alg_depth = max_depth
-
-        self._logger_info(f"ASSEMBLE (alg. depth: {max_depth}, alg. loops: {loops})")
-
-
-    def _assemble_blocks_dyn(self):
-        """Assemble a list of dynamic blocks, containing an 
-        internal integration engine
-        """
-        self._blocks_dyn = [blk for blk in self.blocks if blk.engine]
-
-        self._logger_info(f"ASSEMBLE (num. dyn. blocks: {len(self._blocks_dyn)})")
 
 
     # topological checks ----------------------------------------------------------
@@ -712,15 +641,21 @@ class Simulation:
         self.engine = self.Solver()
 
         #iterate all blocks and set integration engines with tolerances
+        self._blocks_dyn = []
         for block in self.blocks:
             block.set_solver(self.Solver, **self.solver_kwargs)
-
+            
+            #add dynamic blocks to list
+            if block.engine:
+                self._blocks_dyn.append(block)
+        
         #logging message
         self._logger_info(
-            "SOLVER -> {} (adaptive: {}, implicit: {})".format(
+            "SOLVER (blocks: {}) -> {} (adaptive: {}, explicit: {})".format(
+                len(self._blocks_dyn),
                 self.engine,
                 self.engine.is_adaptive, 
-                not self.engine.is_explicit
+                self.engine.is_explicit
                 )
             )
 
@@ -874,37 +809,37 @@ class Simulation:
             evaluation time for system function
         """
 
-        #iterations form algebraic depth
-        iterations_min = self._alg_depth + 1
-
         #perform gauss-seidel iterations without error checking
-        for it in range(iterations_min):
+        for d, blocks_dag, connections_dag in self.graph.dag():
 
             #update blocks at algebraic depth
-            for block in self._blocks_alg_depth[it]:
+            for block in blocks_dag:
                 if block: block.update(t)
 
             #update connenctions at algebraic depth (data transfer)
-            for connection in self._connections_alg_depth[it]:
+            for connection in connections_dag:
                 if connection: connection.update()
 
-        #no algebraic loop blocks -> early exit
-        if not self._blocks_alg_loop:
-            return self._alg_depth+1
+        #no algebraic loops -> early exit
+        if not self.graph.has_loops:
+            return d+1
+
+        #get blocks and connections that are tainted by loop
+        blocks_loop, connections_loop = self.graph.loop()
 
         #perform jacobi fixed-point iterations on algebraic loops
-        for it in range(iterations_min, self.iterations_max):        
+        for it in range(d+1, self.iterations_max):        
 
             #update algebraic loop blocks
             max_error = 0.0
-            for block in self._blocks_alg_loop:
+            for block in blocks_loop:
                 if not block: continue
                 err = block.update_err(t)
                 if err > max_error:
                     max_error = err
 
             #update algebraic loop connenctions (data transfer)
-            for connection in self._connections_alg_loop:
+            for connection in connections_loop:
                 if connection: connection.update()
 
             #return number of iterations if converged

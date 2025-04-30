@@ -20,13 +20,7 @@ from .connection import Connection
 
 from .blocks._block import Block
 
-from .utils.graph import (
-    downstream_connection_map,
-    upstream_connection_map, 
-    upstream_path_length_dfs, 
-    path_length_dfs
-    )
-
+from .utils.graph import Graph
 from .utils.register import Register
 from .utils.portreference import PortReference
 
@@ -131,6 +125,9 @@ class Subsystem(Block):
     def __init__(self, blocks=None, connections=None):
         super().__init__()
 
+        #internal graph representation
+        self.graph = None
+
         #internal connecions
         self.connections = [] if connections is None else connections
         
@@ -170,14 +167,16 @@ class Subsystem(Block):
         Basically the same as in the 'Simulation' class.
         """
 
-        #build downstream connection map
-        dst_con_map = downstream_connection_map(self.connections)
+        #no graph yet -> no passthrough anyway
+        if not self.graph:
+            return 0
 
         #compute algebraic path from interface back to itself (internal path length)
-        length = path_length_dfs(dst_con_map, self.interface, self.interface)
+        length = self.graph.distance(self.interface, self.interface)
 
         #hit internal algebraic loop (inf)
-        if length is None: return None
+        if length is None: 
+            return None
 
         return int(length > 0)
 
@@ -249,79 +248,11 @@ class Subsystem(Block):
         for block in self.blocks:
             block.assemble()
 
-        #assemble system for simulation
-        self._assemble_components_alg_depth()
-        self._assemble_blocks_dyn()
+        #assemble graph for simulation
+        self.graph = Graph(self.blocks, self.connections)
 
-
-    def _assemble_components_alg_depth(self):
-        """Assemble lists of internal system components, ordered by 
-        their algebraic depth in the DAG.
-
-        Perform upstream depth first search on the DAG to assign 
-        each block their number of consecutive algebraic dependencies 
-        (algebraic depth). This is also used to assign the outgoing 
-        connections similarly.
-        """
-
-        #initial max algebraic depth (longest algebraic path)
-        max_depth = 0
-
-        #assembly of blocks by their algebraic depth
-        self._blocks_alg_depth = defaultdict(list)
-        self._blocks_alg_loop = []
-        
-        #assembly of connections by their algebraic depth
-        self._connections_alg_depth = defaultdict(list)
-        self._connections_alg_loop = []
-
-        #assembly of initerface connections
-        self._connections_interface = []
-
-        #construct mapping for connections between blocks
-        ust_con_map = upstream_connection_map(self.connections)
-
-        #construct mapping from blocks to outgoing connections
-        block_con_map = defaultdict(list)
-        for con in self.connections:
-            block_con_map[con.source.block].append(con)
-        
-        #iterate blocks to calculate their algebraic depths
-        for blk in self.blocks:
-            depth = upstream_path_length_dfs(ust_con_map, blk) 
-
-            #None -> alg. loop upstream taints downstream components
-            if depth is None:
-                self._blocks_alg_loop.append(blk)
-
-                #find outgoing connections and assign them aswell
-                for con in block_con_map[blk]:
-                    self._connections_alg_loop.append(con)
-
-            else:
-                self._blocks_alg_depth[depth].append(blk)
-
-                #find outgoing connections and assign them aswell
-                for con in block_con_map[blk]:
-                    self._connections_alg_depth[depth].append(con)
-
-                #update max depth
-                if depth > max_depth:
-                    max_depth = depth
-
-        #find outgoing connections from interface
-        for con in block_con_map[self.interface]:
-            self._connections_interface.append(con)
-
-        self._alg_depth = max_depth
-
-
-    def _assemble_blocks_dyn(self):
-        """Assemble a list of dynamic blocks, containing an 
-        internal integration engine
-        """
+        #assemble list of dynamic blocks
         self._blocks_dyn = [blk for blk in self.blocks if blk.engine]
-
 
 
     # visualization -------------------------------------------------------------------------
@@ -527,18 +458,18 @@ class Subsystem(Block):
         """
 
         #update interface outgoing connections
-        for connection in self._connections_interface:
+        for connection in self.graph.outgoing_connections(self.interface):
             if connection: connection.update()
 
         #perform gauss-seidel iterations without error checking
-        for it in range(self._alg_depth + 1):
+        for _, blocks_dag, connections_dag in self.graph.dag():
 
             #update blocks at algebraic depth
-            for block in self._blocks_alg_depth[it]:
+            for block in blocks_dag:
                 if block: block.update(t)
 
             #update connenctions at algebraic depth (data transfer)
-            for connection in self._connections_alg_depth[it]:
+            for connection in connections_dag:
                 if connection: connection.update()
 
 
@@ -562,16 +493,23 @@ class Subsystem(Block):
         #update DAG first
         self.update(t)
 
+        #no algebraic loops -> early exit
+        if not self.graph.has_loops:
+            return 0.0
+
+        #get blocks and connections that are tainted by loop
+        blocks_loop, connections_loop = self.graph.loop()
+
         #update algebraic loop blocks afterwards
         max_error = 0.0
-        for block in self._blocks_alg_loop:
+        for block in blocks_loop:
             if not block: continue
             err = block.update_err(t)
             if err > max_error:
                 max_error = err
 
         #update algebraic loop connenctions (data transfer)
-        for connection in self._connections_alg_loop:
+        for connection in connections_loop:
             if connection: connection.update()
 
         #return subsystem convergence error

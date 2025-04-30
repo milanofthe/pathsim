@@ -13,9 +13,29 @@ from collections import defaultdict
 from functools import cache
 
 
-# PATH ESTIMATION ======================================================================
+# HELPER METHODS =======================================================================
 
-def downstream_connection_map(connections):
+def outgoing_block_connection_map(connections):
+    """Construct a mapping from blocks to their outgoing connections.
+
+    Parameters
+    ----------
+    connections : list[Connection]
+        connections of the graph
+
+    Returns
+    -------
+    block_connection_map : defaultdict[Block, list[Connection]]
+        outgoing connections of block
+    """
+    block_connection_map = defaultdict(list)
+    for con in connections:
+        src_blk = con.source.block
+        block_connection_map[src_blk].append(con)
+    return block_connection_map
+
+
+def downstream_block_block_map(connections):
     """Construct a connection map (directed graph) from the list of
     connections in downstream (source -> targets) orientation.
 
@@ -37,7 +57,7 @@ def downstream_connection_map(connections):
     return connection_map
 
 
-def upstream_connection_map(connections):
+def upstream_block_block_map(connections):
     """Construct a connection map (directed graph) from the list of
     connections in upstream (targets -> source) orientation.
 
@@ -268,3 +288,129 @@ def path_length_dfs(connection_map, start_block, end_block):
         return (best + n_len) if best else 0   
 
     return dfs(start_block)
+
+
+# GRAPH CLASS ==========================================================================
+
+class Graph:
+
+    """Representation of a directed graph, defined by blocks (nodes) 
+    and edges (connections).
+
+    Manages graph analysis methods.
+
+    """
+
+    def __init__(self, blocks=None, connections=None):
+
+        self.blocks      = [] if blocks is None else blocks
+        self.connections = [] if connections is None else connections
+
+        #loop flag
+        self.has_loops = False
+
+        #initialize graph orderings
+        self._blocks_dag = defaultdict(list)
+        self._blocks_loop = []
+        
+        self._connections_dag = defaultdict(list)
+        self._connections_loop = []
+
+        #construct mappings for connections between blocks
+        self.upst_blk_blk_map = upstream_block_block_map(self.connections)
+        self.dnst_blk_blk_map = downstream_block_block_map(self.connections)
+        self.outg_blk_con_map = outgoing_block_connection_map(self.connections)
+
+        #assemble dag and loops
+        self._assemble()
+
+
+    def __bool__(self):
+        return True
+
+
+    def __len__(self):
+        return self._alg_depth
+
+
+    def _assemble(self):
+        """Assemble components, ordered by their algebraic depth in 
+        the DAG.
+
+        Perform upstream depth first search on the DAG to assign 
+        each block their number of consecutive algebraic dependencies 
+        (algebraic depth). This is also used to assign the outgoing 
+        connections similarly.
+        """
+
+        #initial max algebraic depth (longest algebraic path)
+        max_depth = 0
+
+        #loop detection flag
+        self.has_loops = False 
+
+        #iterate blocks to calculate their algebraic depths
+        for blk in self.blocks:
+            depth = upstream_path_length_dfs(self.upst_blk_blk_map, blk) 
+
+            #None -> alg. loop upstream taints downstream components
+            if depth is None:
+                self._blocks_loop.append(blk)
+                self._connections_loop.extend(self.outg_blk_con_map[blk])
+
+                #loop detection flag
+                self.has_loops = True
+
+            else:
+                self._blocks_dag[depth].append(blk)
+                self._connections_dag[depth].extend(self.outg_blk_con_map[blk])
+
+                #update max depth
+                if depth > max_depth:
+                    max_depth = depth
+
+        self._alg_depth = max_depth
+
+
+    def outgoing_connections(self, block):
+        return self.outg_blk_con_map[block]
+
+
+    def distance(self, start_block, end_block):
+        """Compute the algebraic distance / path length between two 
+        blocks in the graph.
+        """
+
+        #blocks are not part of same graph -> no algebraic path
+        if (start_block not in self.dnst_blk_blk_map or 
+            end_block not in self.dnst_blk_blk_map):
+            return 0
+
+        #use depth first search
+        return path_length_dfs(self.dnst_blk_blk_map, start_block, end_block)
+
+
+    def dag(self):
+        """Generator that yields blocks and connections 
+        at each algebraich depth level.
+    
+        Yields
+        ------
+        tuple[int, list[Block], list[Connection]]
+            blocks and connections at current algebraic depth, 
+            together with the depth 'd'
+        """
+        for d in range(self._alg_depth + 1):
+            yield (d, self._blocks_dag[d], self._connections_dag[d])
+
+
+    def loop(self):
+        """Returns the blocks and connections that are part 
+        of algebraic loops.
+
+        Returns
+        -------
+        tuple[list[Block], list[Connection]]
+        """
+        return (self._blocks_loop, self._connections_loop)
+
