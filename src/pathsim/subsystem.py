@@ -154,6 +154,9 @@ class Subsystem(Block):
         #validate the internal connections upon initialization
         self._check_connections()
 
+        #assemble internal graph
+        self._assemble_graph()
+
 
     def __len__(self):
         """Recursively compute the longest signal path in the subsytem by 
@@ -170,6 +173,10 @@ class Subsystem(Block):
         #no graph yet -> no passthrough anyway
         if not self.graph:
             return 0
+
+        #internal loops -> tainted (inf)
+        if self.graph.has_loops:
+            return None
 
         #compute algebraic path from interface back to itself (internal path length)
         length = self.graph.distance(self.interface, self.interface)
@@ -235,24 +242,11 @@ class Subsystem(Block):
                     raise ValueError(_msg)
 
 
-    # subsystem assembly ----------------------------------------------------------
+    # subsystem graph assembly --------------------------------------------------------------
 
-    def assemble(self):
-        """Assemble internals of subsystem for simulation.
-
-        Assemble internal blocks (recursively assemble nested subsystems)
-        and the internal DAG and dynamic blocks for timestepping
-        """
-
-        #assemble blocks internally
-        for block in self.blocks:
-            block.assemble()
-
-        #assemble graph for simulation
+    def _assemble_graph(self):
+        """Assemble internal graph of subsystem for simulation."""
         self.graph = Graph(self.blocks, self.connections)
-
-        #assemble list of dynamic blocks
-        self._blocks_dyn = [blk for blk in self.blocks if blk.engine]
 
 
     # visualization -------------------------------------------------------------------------
@@ -447,14 +441,24 @@ class Subsystem(Block):
 
     # methods for block output and state updates --------------------------------------------
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """Update the instant time components of the internal blocks 
         to evaluate the (distributed) system equation.
+
+        Collect convergence errors of internal blocks for algebraic 
+        loop resolution.
 
         Parameters
         ----------
         t : float
             evaluation time 
+        error_control : bool
+            activate error control
+
+        Returns
+        ------- 
+        max_error : float
+            error tolerance of system equation convergence
         """
 
         #update interface outgoing connections
@@ -466,45 +470,29 @@ class Subsystem(Block):
 
             #update blocks at algebraic depth
             for block in blocks_dag:
-                if block: block.update(t)
+                if block: block.update(t, False)
 
             #update connenctions at algebraic depth (data transfer)
             for connection in connections_dag:
                 if connection: connection.update()
 
-
-    def update_err(self, t):
-        """Update the instant time components of the internal blocks 
-        to evaluate the (distributed) system equation.
-
-        Collect convergence errors of internal blocks.
-
-        Parameters
-        ----------
-        t : float
-            evaluation time 
-
-        Returns
-        ------- 
-        max_error : float
-            error tolerance of system equation convergence
-        """
-
-        #update DAG first
-        self.update(t)
-
-        #no algebraic loops -> early exit
-        if not self.graph.has_loops:
+        #no error control required algebraic loops -> early exit
+        if not error_control:
             return 0.0
 
         #iterate DAG depths of broken loops
         max_error = 0.0
-        for d, blocks_loop, connections_loop in self.graph.loop():
+        for _, blocks_loop, connections_loop in self.graph.loop():
 
             #update blocks at algebraic depth
             for block in blocks_loop:
-                if not block: continue
-                err = block.update_err(t)
+
+                #skip incative blocks
+                if not block: 
+                    continue
+
+                #update block with error control enabled
+                err = block.update(t, True)
                 if err > max_error:
                     max_error = err
 
@@ -618,9 +606,12 @@ class Subsystem(Block):
         #set internal dummy engine
         self.engine = Solver()
 
-        #iterate all blocks and set integration engines
+        #set integration engines and assemble list of dynamic blocks
+        self._blocks_dyn = []
         for block in self.blocks:
             block.set_solver(Solver, **solver_args)
+            if block.engine:
+                self._blocks_dyn.append(block)
 
 
     def revert(self):

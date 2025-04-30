@@ -82,28 +82,22 @@ class Switch(Block):
         self.state = state
 
 
-    def update(self, t):
-        """Update switch output depending on inputs
+    def update(self, t, error_control=False):
+        """Update switch output depending on inputs and switch state.
 
         Parameters
         ----------
         t : float
             evaluation time
-        """
-        self.outputs.update_from_array(self.inputs[self.state])
-
-
-    def update_err(self, t):
-        """Update switch output depending on inputs
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
+        error_control : bool
+            activate error control
 
         Returns
         -------
         err : float
             absolute deviation for convergence control
         """
-        return self.outputs.update_from_array_max_err(self.inputs[self.state])
+        if error_control:        
+            return self.outputs.update_from_array_max_err(self.inputs[self.state])
+        self.outputs.update_from_array(self.inputs[self.state])
+        return 0.0

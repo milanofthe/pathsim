@@ -222,20 +222,6 @@ class Block(Serializable):
         if self.op_dyn: self.op_dyn.reset()
 
 
-    def assemble(self):
-        """Assemble internals of the block. Can implement optional preprocessing 
-        of block internals before running the simulation. Compilation, ordering, 
-        whatever.
-
-        Note
-        ----
-        Most blocks dont implement this method, only really relevant if the 
-        block needs some preprocessing before the simulation is run, that is 
-        only dependent on the internals of the blocks, such as 'Subsystem'.
-        """
-        pass
-
-
     def linearize(self, t):
         """Linearize the algebraic and dynamic components of the block.
 
@@ -407,13 +393,17 @@ class Block(Serializable):
 
     # methods for block output and state updates ----------------------------------------
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """The 'update' method is called iteratively for all blocks to evaluate the 
         algbebraic components of the global system ode from the DAG. 
 
         It is meant for instant time blocks (blocks that dont have a delay due to the 
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
         directly based on the 'inputs' and possibly internal states. 
+
+        It computes and returns the absolute difference between the new output and 
+        the previous output (before the call) to track convergence of the fixed-point 
+        iteration.
 
         Note
         ----
@@ -425,7 +415,13 @@ class Block(Serializable):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control
 
+        Returns
+        -------
+        error : float
+            absolute error to previous iteration for convergence control
         """
 
         #no internal algebraic operator -> early exit
@@ -440,62 +436,14 @@ class Block(Serializable):
             x = self.engine.get()
             y = self.op_alg(x, u, t)
         else: 
-            y = self.op_alg(u)            
+            y = self.op_alg(u)           
+
+        #error control required
+        if error_control:
+            return self.outputs.update_from_array_max_err(y)
 
         self.outputs.update_from_array(y)
-
-
-    def update_err(self, t):
-        """The 'update_err' method is called iteratively for all blocks to evaluate the 
-        algbebraic components of the global system ode and specifically to resolve 
-        algebraic loops (fixed-point iteraion). 
-
-        It is meant for instant time blocks (blocks that dont have a delay due to the 
-        timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
-        directly based on the 'inputs' and possibly internal states. 
-
-        It computes and returns the absolute difference between the new output and 
-        the previous output (before the call) to track convergence of the fixed-point 
-        iteration.
-        
-        Note
-        ----
-        Basically the same as the 'update' method but with additional error calculation 
-        step at the end for convergence control.
-
-        Note
-        ----
-        The implementation of the 'update_err' method in the base 'Block' class is intended 
-        as a fallback and is not performance optimized. Special blocks might reimplement 
-        this method differently for higher performance, for example SISO or MISO blocks.
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-
-        Returns
-        -------
-        error : float
-            absolute error to previous iteration for convergence control
-        """
-
-        #no internal algebraic operator -> early exit
-        if self.op_alg is None:
-            return 0.0
-
-        #block inputs 
-        u = self.inputs.to_array()
-
-        #no internal state -> standard 'Operator'
-        if self.engine: 
-            x = self.engine.get()
-            y = self.op_alg(x, u, t)
-        else: 
-            y = self.op_alg(u)            
-
-        #set outputs to new values and check convergence
-        return self.outputs.update_from_array_max_err(y)
+        return 0.0
 
 
     def solve(self, t, dt):

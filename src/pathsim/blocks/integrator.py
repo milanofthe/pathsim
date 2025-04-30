@@ -85,7 +85,7 @@ class Integrator(Block):
             self.engine = Solver.cast(self.engine, **solver_args)
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """update system equation fixed point loop
 
         Note
@@ -97,6 +97,9 @@ class Integrator(Block):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
+            (not applicable here because non-algebraic)
 
         Returns
         -------
@@ -104,10 +107,6 @@ class Integrator(Block):
             deviation to previous iteration for convergence control
         """
         self.outputs.update_from_array(self.engine.get())
-
-
-    def update_err(self, t):
-        self.update(t)
         return 0.0
 
 

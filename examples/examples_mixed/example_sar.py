@@ -65,6 +65,9 @@ class SAR(Block):
                 )
             ]
 
+    def __len__(self):
+        return 0
+
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
 

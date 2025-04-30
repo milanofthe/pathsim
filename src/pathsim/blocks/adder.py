@@ -117,28 +117,16 @@ class Adder(Block):
                 )
 
 
-    def update(self, t):
-        """update system equation in gauss-seidel iteration,
-        no error control
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-        """
-        u = self.inputs.to_array()
-        y = self.op_alg(u)
-        self.outputs.update_from_array(y)
-
-
-    def update_err(self, t):
+    def update(self, t, error_control=False):
         """update system equation in fixed point loop for 
-        algebraic loops, with error control
+        algebraic loops, with optional error control
 
         Parameters
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
 
         Returns
         -------
@@ -147,4 +135,7 @@ class Adder(Block):
         """
         u = self.inputs.to_array()
         y = self.op_alg(u)
-        return self.outputs.update_from_array_max_err(y)
+        if error_control:
+            return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)
+        return 0.0

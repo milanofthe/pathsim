@@ -106,13 +106,9 @@ class SquareWaveSource(Block):
         return 0
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * square_wave(t + tau, self.frequency)
-
-
-    def update_err(t):
-        self.update(t)
         return 0.0
 
 
@@ -141,13 +137,9 @@ class TriangleWaveSource(Block):
         return 0
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * triangle_wave(t + tau, self.frequency)
-
-
-    def update_err(t):
-        self.update(t)
         return 0.0
 
 
@@ -176,13 +168,9 @@ class SinusoidalSource(Block):
         return 0
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         omega = 2*np.pi*self.frequency
         self.outputs[0] = self.amplitude * np.sin(omega*t + self.phase)
-
-
-    def update_err(t):
-        self.update(t)
         return 0.0
 
 
@@ -211,12 +199,8 @@ class GaussianPulseSource(Block):
         return 0
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         self.outputs[0] = self.amplitude * gaussian(t-self.tau, self.f_max)
-
-
-    def update_err(t):
-        self.update(t)
         return 0.0
 
 
@@ -242,12 +226,8 @@ class StepSource(Block):
         return 0
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         self.outputs[0] = self.amplitude * float(t > self.tau)
-
-
-    def update_err(t):
-        self.update(t)
         return 0.0
 
 
@@ -369,16 +349,11 @@ class ChirpSource(Block):
             self.n_samples += 1
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """update the block output, assebble phase and evaluate the sinusoid"""
         _phase = 2 * np.pi * (self.engine.get() + self.sig_white * self.noise_1) + self.phase
         self.outputs[0] = self.amplitude * np.sin(_phase)
-        
-
-    def update_err(t):
-        self.update(t)
         return 0.0
-
 
     def solve(self, t, dt):
         """advance implicit solver of implicit integration engine, evaluate 

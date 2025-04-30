@@ -110,26 +110,7 @@ class Function(Block):
         self.op_alg = Operator(func=lambda x: func(*x))
 
 
-    def update(self, t):
-        """Evaluate function block as part of algebraic component 
-        of global system DAE.
-
-        Without convergence control for speed.
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-        """
-
-        #apply operator to get output
-        y = self.op_alg(self.inputs.to_array())
-
-        #set outputs to new values
-        self.outputs.update_from_array(y)
-
-
-    def update_err(self, t):
+    def update(self, t, error_control=False):
         """Evaluate function block as part of algebraic component 
         of global system DAE. 
 
@@ -139,6 +120,8 @@ class Function(Block):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
 
         Returns
         -------
@@ -148,6 +131,7 @@ class Function(Block):
                 
         #apply operator to get output
         y = self.op_alg(self.inputs.to_array())
-
-        #set outputs to new values and return deviation
-        return self.outputs.update_from_array_max_err(y)
+        if error_control:
+            return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)
+        return 0.0

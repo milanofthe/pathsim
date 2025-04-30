@@ -63,13 +63,9 @@ class Comparator(Block):
             ]
 
 
-    def update(self, t):
+    def update(self, t, error_control=0):
         if self.inputs[0] >= self.threshold:
             self.outputs[0] = max(self.span)
         else:
             self.outputs[0] = min(self.span)
-
-    def update_err(t):
-        self.update(t)
-        return 0.0
-    
+        return 0.0    

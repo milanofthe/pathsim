@@ -99,22 +99,7 @@ class Differentiator(Block):
         else: self.engine = Solver.cast(self.engine, **solver_args)
 
 
-    def update(self, t):
-        """update system equation fixed point loop,
-        without convergence control
-    
-        Parameters
-        ----------
-        t : float
-            evaluation time
-
-        """
-        x, u = self.engine.get(), self.inputs[0]
-        y = self.op_alg(x, u, t)
-        self.outputs.update_from_array(y)
-
-
-    def update_err(self, t):
+    def update(self, t, error_control=False):
         """update system equation fixed point loop,
         with convergence control
     
@@ -122,6 +107,8 @@ class Differentiator(Block):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
 
         Returns
         -------
@@ -130,8 +117,11 @@ class Differentiator(Block):
         """
         x, u = self.engine.get(), self.inputs[0]
         y = self.op_alg(x, u, t)
-        return self.outputs.update_from_array_max_err(y)
-
+        if error_control:
+            return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)
+        return 0.0
+        
 
     def solve(self, t, dt):
         """advance solution of implicit update equation

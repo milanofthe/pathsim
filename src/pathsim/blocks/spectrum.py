@@ -397,7 +397,7 @@ class Spectrum(Block):
                 wrt.writerow(sample)
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -410,6 +410,8 @@ class Spectrum(Block):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control (not applicable for this block)
 
         Returns
         -------

@@ -78,7 +78,7 @@ class WhiteNoise(Block):
             self.n_samples += 1
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -91,17 +91,17 @@ class WhiteNoise(Block):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
+            (not applicable here because source block)
 
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            absolute error to previous iteration for 
+            convergence control
         """
         self.outputs[0] = self.noise
-
-
-    def update_err(self, t):
-        self.update(t)
         return 0.0
 
 
@@ -193,7 +193,7 @@ class PinkNoise(Block):
             self.noise = pink_sample * self.sigma
 
             
-    def update(self, t):
+    def update(self, t, error_control=False):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -206,19 +206,19 @@ class PinkNoise(Block):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
+            (not applicable here because source block)
 
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            absolute error to previous iteration for 
+            convergence control
         """
         self.outputs[0] = self.noise
-        
-
-    def update_err(self, t):
-        self.update(t)
         return 0.0
-
+        
 
 class SinusoidalPhaseNoiseSource(Block):
     """Sinusoidal source with cumulative and white phase noise
@@ -302,7 +302,29 @@ class SinusoidalPhaseNoiseSource(Block):
         self.t_max = 0
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+    
+        Note
+        ----
+        no direct passthrough, so the 'update' method 
+        is optimized for this case        
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        error_control : bool
+            activate error control 
+            (not applicable here, because source block)
+
+        Returns
+        -------
+        error : float
+            absolute error to previous iteration for 
+            convergence control
+        """
 
         #compute phase error
         phase_error = self.sig_white * self.noise_1 + self.sig_cum * self.engine.get()
@@ -310,9 +332,6 @@ class SinusoidalPhaseNoiseSource(Block):
         #set output
         self.outputs[0] = self.amplitude * np.sin(self.omega*t + self.phase + phase_error)
         
-
-    def update_err(self, t):
-        self.update(t)
         return 0.0
 
 

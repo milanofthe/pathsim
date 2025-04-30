@@ -50,7 +50,7 @@ connections = [
     Connection(A3, I1)
     ]
 
-# Create a simulation instance from the blocks and connections
+#create a simulation instance from the blocks and connections
 Sim = Simulation(
     blocks, 
     connections, 
@@ -64,7 +64,7 @@ Sim = Simulation(
 if __name__ == "__main__":
 
     # Run the simulation for 25 seconds
-    Sim.run(duration=25)
+    Sim.run(duration=50)
 
     # Plot the results directly from the scope
     Sc.plot(lw=2)

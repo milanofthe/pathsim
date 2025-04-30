@@ -581,12 +581,6 @@ class Simulation:
 
         #time the graph construction
         with Timer(verbose=False) as T:
-
-            #assemble blocks internally
-            for block in self.blocks:
-                block.assemble()
-
-            #assemble graph for simulation
             self.graph = Graph(self.blocks, self.connections)
 
         self._logger_info(
@@ -818,9 +812,9 @@ class Simulation:
         #perform gauss-seidel iterations without error checking
         for d, blocks_dag, connections_dag in self.graph.dag():
 
-            #update blocks at algebraic depth
+            #update blocks at algebraic depth (no error control)
             for block in blocks_dag:
-                if block: block.update(t)
+                if block: block.update(t, False)
 
             #update connenctions at algebraic depth (data transfer)
             for connection in connections_dag:
@@ -837,10 +831,15 @@ class Simulation:
             max_error = 0.0
             for d, blocks_loop, connections_loop in self.graph.loop():
 
-                #update blocks at algebraic depth
+                #update blocks at algebraic depth (with error control)
                 for block in blocks_loop:
-                    if not block: continue
-                    err = block.update_err(t)
+
+                    #skip incative blocks
+                    if not block: 
+                        continue
+                    
+                    #block update with error control
+                    err = block.update(t, True)
                     if err > max_error:
                         max_error = err
 

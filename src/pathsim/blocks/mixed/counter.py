@@ -56,13 +56,10 @@ class Counter(Block):
         return 0
 
 
-    def update(self, t):
+    def update(self, t, error_control=0):
         #start + number of detected events
         self.outputs[0] = self.start + len(self.E)
-
-    def update_err(t):
-        self.update(t)
-        return 0
+        return 0.0
 
 
 class CounterUp(Counter):

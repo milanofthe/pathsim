@@ -81,24 +81,28 @@ class Delay(Block):
         self._buffer.clear()
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """Evaluation of the buffer at different times.
 
         Parameters
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
+            (not applicable here because non-algebraic)
+
+        Returns
+        -------
+        error : float
+            deviation to previous iteration for convergence control
         """
 
         #retrieve value from buffer
         y = self._buffer.get(t)
         self.outputs.update_from_array(y)
-
-
-    def update_err(self, t):
-        self.update(t)
         return 0.0
-        
+
 
     def sample(self, t):
         """Sample input values and time of sampling 

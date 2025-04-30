@@ -69,7 +69,7 @@ class RNG(Block):
             self.n_samples += 1
 
 
-    def update(self, t):
+    def update(self, t, error_control=False):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -77,10 +77,9 @@ class RNG(Block):
         ----------
         t : float
             evaluation time
+        error_control : bool
+            activate error control 
+            (not applicable here because sink)
         """
         self.outputs[0] = self.val
-
-
-    def update(self, t):
-        self.update(t)
         return 0.0
