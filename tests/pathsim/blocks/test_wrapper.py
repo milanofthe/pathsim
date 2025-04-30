@@ -51,13 +51,13 @@ class TestWrapper(unittest.TestCase):
         self.assertRaises(TypeError, ev.resolve,0) # I don't believe is is expected ? 
         # Must be NotImplementedError no ?
     
-    def test_assert_update_event_tau(self):
+    def test_update_event_tau(self):
         W = Wrapper()
         W.tau = 2
         ev = W.events[0]
         self.assertEqual(W.tau,ev.t_start)
     
-    def test_assert_update_event_period(self):
+    def test_update_event_period(self):
         W = Wrapper()
         W.T = 2
         ev = W.events[0]
@@ -73,7 +73,6 @@ class TestWrapper(unittest.TestCase):
         with self.assertRaises(ValueError):
             W.T = -1
         
-
     def test_trigger_event(self):
 
         class SinSample(Wrapper):
@@ -83,20 +82,22 @@ class TestWrapper(unittest.TestCase):
         W = SinSample()
         ev = W.events[0]
         ev.buffer(0)
+        ev.resolve(0)
+        
         de, cl, ra = ev.detect(0.1)
         self.assertFalse(de)
         self.assertFalse(cl)
         self.assertEqual(ra, 1)
 
         for t in range(1,10):
-            x = t+0.2*t
-            de, cl, ra = ev.detect(x)
+            de, cl, ra = ev.detect(t)
             self.assertTrue(de)
             self.assertTrue(cl)
             self.assertEqual(ra, 0)
+            ev.buffer(t)
+            ev.resolve(t)
 
-            ev.buffer(x)
-            de, cl, ra = ev.detect(x)
+            de, cl, ra = ev.detect(t+0.1)
             self.assertFalse(de)
             self.assertFalse(cl)
             self.assertEqual(ra, 1)
