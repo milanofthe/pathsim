@@ -406,7 +406,6 @@ class Simulation:
                 "dt_max": self.dt_max,
                 "Solver": self.Solver.__name__,
                 "tolerance_fpi": self.tolerance_fpi,
-                "iterations_min": self.iterations_min,
                 "iterations_max": self.iterations_max,
                 **self.solver_kwargs
                 }
@@ -595,6 +594,7 @@ class Simulation:
         (algebraic depth). This is also used to assign the outgoing 
         connections similarly.
         """
+
         #initial max algebraic depth (longest algebraic path)
         max_depth = 0
 
@@ -639,12 +639,16 @@ class Simulation:
 
         self._alg_depth = max_depth
 
+        self._logger_info(f"ASSEMBLE ALG (alg depth: {max_depth})")
+
 
     def _assemble_blocks_dyn(self):
         """Assemble a list of dynamic blocks, containing an 
         internal integration engine
         """
         self._blocks_dyn = [blk for blk in self.blocks if blk.engine]
+
+        self._logger_info(f"ASSEMBLE DYN (num dyn blocks: {len(self._blocks_dyn)})")
 
 
     # topological checks ----------------------------------------------------------

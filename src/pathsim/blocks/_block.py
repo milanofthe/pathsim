@@ -395,8 +395,7 @@ class Block(Serializable):
 
     def update(self, t):
         """The 'update' method is called iteratively for all blocks to evaluate the 
-        algbebraic components of the global system ode and resolve algebraic loops 
-        (fixed-point iteraion). 
+        algbebraic components of the global system ode from the DAG. 
 
         It is meant for instant time blocks (blocks that dont have a delay due to the 
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
@@ -433,9 +432,9 @@ class Block(Serializable):
 
 
     def update_err(self, t):
-        """The 'update' method is called iteratively for all blocks to evaluate the 
-        algbebraic components of the global system ode and resolve algebraic loops 
-        (fixed-point iteraion). 
+        """The 'update_err' method is called iteratively for all blocks to evaluate the 
+        algbebraic components of the global system ode and specifically to resolve 
+        algebraic loops (fixed-point iteraion). 
 
         It is meant for instant time blocks (blocks that dont have a delay due to the 
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
@@ -444,10 +443,15 @@ class Block(Serializable):
         It computes and returns the absolute difference between the new output and 
         the previous output (before the call) to track convergence of the fixed-point 
         iteration.
+        
+        Note
+        ----
+        Basically the same as the 'update' method but with additional error calculation 
+        step at the end for convergence control.
 
         Note
         ----
-        The implementation of the 'update' method in the base 'Block' class is intended 
+        The implementation of the 'update_err' method in the base 'Block' class is intended 
         as a fallback and is not performance optimized. Special blocks might reimplement 
         this method differently for higher performance, for example SISO or MISO blocks.
 

@@ -18,6 +18,8 @@ from pathsim.blocks import (
     Scope
     )
 
+from pathsim.solvers import RKBS32
+
 
 # 1st ORDER SYSTEM ======================================================================
 
@@ -45,10 +47,13 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True)
-
-
-Sim._assemble_components_alg_depth()
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=dt, 
+    Solver=RKBS32,
+    log=True
+    )
 
 # Run Example ===========================================================================
 
