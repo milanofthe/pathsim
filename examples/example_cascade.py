@@ -1,0 +1,100 @@
+#########################################################################################
+##
+##                         PathSim Example for Cascade-controller 
+##
+#########################################################################################
+
+# IMPORTS ===============================================================================
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from pathsim import Simulation, Connection, Subsystem, Interface
+from pathsim.blocks import Source, TransferFunction, Adder, Scope, PID
+from pathsim.blocks.rf import WhiteNoise
+
+from pathsim.solvers import RKCK54
+
+
+# SYSTEM SETUP AND SIMULATION ===========================================================
+
+# define the plant as a subsystem -------------------------------------------------------
+
+in1 = Interface()
+
+p11 = TransferFunction(Poles=[-1], Residues=[10], Const=0)
+p12 = TransferFunction(Poles=[-1], Residues=[1], Const=0)
+p13 = TransferFunction(Poles=[-1], Residues=[1], Const=0)
+
+p2 = TransferFunction(Poles=[-2], Residues=[3], Const=0)
+
+a1 = Adder()
+a2 = Adder()
+
+d1 = WhiteNoise(spectral_density=5e-5)
+d2 = WhiteNoise(spectral_density=5e-5)
+
+plant = Subsystem(
+    blocks=[p11, p12, p13, p2, a1, a2, d1, d2, in1],
+    connections=[
+        Connection(in1, p2),
+        Connection(p2, a2[0]),
+        Connection(d2, a2[1]),
+        Connection(a2, p11, in1[1]),
+        Connection(p11, p12),
+        Connection(p12, p13),
+        Connection(p13, a1[0]),
+        Connection(d1, a1[1]),
+        Connection(a1, in1[0])
+        ]
+    )
+
+
+# define control loops ------------------------------------------------------------------
+
+#source function
+def f_s(t):
+    if t>60: return 0.5
+    elif t>20: return 1
+    else: return 0 
+
+stp = Source(f_s)
+
+c1 = PID(Kp=0.015, Ki=0.015/0.716, Kd=0.0, f_max=10.0)
+c2 = PID(Kp=0.244, Ki=0.244/0.134, Kd=0.0, f_max=10.0)
+
+e1 = Adder("+-")
+e2 = Adder("+-")
+
+sc0 = Scope(labels=["setpoint", "plant 1", "plant 2"])
+sc1 = Scope(labels=["err 1", "pid 1"])
+sc2 = Scope(labels=["err 2", "pid 2"])
+
+Sim = Simulation(
+    blocks=[stp, plant, c1, c2, e1, e2, sc0, sc1, sc2],
+    connections=[
+        Connection(stp, e1[0], sc0[0]),
+        Connection(plant[0], e1[1], sc0[1]),
+        Connection(e1, c1, sc1[0]),
+        Connection(c1, e2[0], sc1[1]),
+        Connection(plant[1], e2[1], sc0[2]),
+        Connection(e2, c2, sc2[0]),
+        Connection(c2, plant, sc2[1])
+        ],
+    Solver=RKCK54,
+    tolerance_lte_rel=1e-4,
+    tolerance_lte_abs=1e-6
+    )
+
+
+# Run Example ===========================================================================
+
+if __name__ == "__main__":
+
+    #run the simulation
+    Sim.run(100)
+
+    #quickly plot all scopes
+    Sim.plot()
+
+    plt.show()
