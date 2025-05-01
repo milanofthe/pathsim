@@ -793,15 +793,21 @@ class Simulation:
         Effectively evaluates the right hand side function of the global 
         system ODE/DAE
 
-            dx/dt = f(x, t) <- this one (ODE system function)
-                0 = g(x, t) <- and this one (algebraic constraints)
+        .. math:: 
+    
+            \\begin{equnarray}
+                \\dot{x} &= f(x, t) \\\\
+                       0 &= g(x, t) 
+            \\end{equnarray}
 
-        by converging the whole system to a fixed-point at a given point 
-        in time 't'.
+        by converging the whole system (´f´ and ´g´) to a fixed-point at a given point 
+        in time ´t´.
 
-        If no algebraic loops are present in the system, it usually converges
-        already after 'iterations_min' as long as the path length has been 
-        used as an estimate for the minimum number of iterations.
+        If no algebraic loops are present in the system, convergence is 
+        guaranteed after the first stage (evaluation of the DAG), otherwise 
+        Gauss-Seidel iterations are performed as a second stage on the DAGs 
+        (broken cycles) of blocks that are part of or tainted by upstream 
+        algebraic loops.
 
         Parameters
         ----------
@@ -810,11 +816,11 @@ class Simulation:
         """
 
         #perform gauss-seidel iterations without error checking
-        for d, blocks_dag, connections_dag in self.graph.dag():
+        for _, blocks_dag, connections_dag in self.graph.dag():
 
             #update blocks at algebraic depth (no error control)
             for block in blocks_dag:
-                if block: block.update(t, False)
+                if block: block.update(t)
 
             #update connenctions at algebraic depth (data transfer)
             for connection in connections_dag:
@@ -822,14 +828,14 @@ class Simulation:
 
         #no algebraic loops -> early exit
         if not self.graph.has_loops:
-            return d+1
+            return 1
 
-        #perform jacobi fixed-point iterations on algebraic loops
-        for it in range(d+1, self.iterations_max):       
+        #perform gauss-seidel iterations on algebraic loops
+        for it in range(1, self.iterations_max):       
             
             #iterate DAG depths of broken loops
             max_error = 0.0
-            for d, blocks_loop, connections_loop in self.graph.loop():
+            for _, blocks_loop, connections_loop in self.graph.loop():
 
                 #update blocks at algebraic depth (with error control)
                 for block in blocks_loop:
@@ -839,7 +845,7 @@ class Simulation:
                         continue
                     
                     #block update with error control
-                    err = block.update(t, True)
+                    err = block.update(t)
                     if err > max_error:
                         max_error = err
 
@@ -849,7 +855,7 @@ class Simulation:
 
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
-                return it+1
+                return it
 
         #not converged -> error
         self._logger_error(

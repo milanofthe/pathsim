@@ -156,7 +156,7 @@ class Pulse(Block):
         self._phase_start_time = self.tau
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """Calculate the pulse output value based on the current phase.
         Performs linear interpolation during 'rising' and 'falling' phases.
 
@@ -164,9 +164,6 @@ class Pulse(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because non-algebraic)
 
         Returns
         -------

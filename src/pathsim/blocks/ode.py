@@ -133,7 +133,7 @@ class ODE(Block):
             self.engine = Solver.cast(self.engine, **solver_args)
         
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -146,9 +146,12 @@ class ODE(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because non-algebraic)
+
+        Returns
+        -------
+        error : float
+            absolute error to previous iteration for convergence 
+            control (always '0.0' because non-algebraic)
         """
         self.outputs.update_from_array(self.engine.get())
         return 0.0

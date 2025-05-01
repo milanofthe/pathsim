@@ -64,24 +64,19 @@ class Amplifier(Block):
             )
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation in fixed point loop
 
         Parameters
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for 
-            convergence control
+            max absolute error to previous iteration 
+            for convergence control
         """
         y = self.op_alg(self.inputs[0])
-        if error_control:
-            return self.outputs.update_from_array_max_err(y)
-        self.outputs.update_from_array(y)
-        return 0.0
+        return self.outputs.update_from_array_max_err(y)

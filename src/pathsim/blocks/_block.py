@@ -393,7 +393,7 @@ class Block(Serializable):
 
     # methods for block output and state updates ----------------------------------------
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """The 'update' method is called iteratively for all blocks to evaluate the 
         algbebraic components of the global system ode from the DAG. 
 
@@ -415,18 +415,16 @@ class Block(Serializable):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            max absolute error to previous iteration for convergence control
         """
 
         #no internal algebraic operator -> early exit
         if self.op_alg is None:
-            return
+            return 0.0
 
         #block inputs 
         u = self.inputs.to_array()
@@ -438,12 +436,8 @@ class Block(Serializable):
         else: 
             y = self.op_alg(u)           
 
-        #error control required
-        if error_control:
-            return self.outputs.update_from_array_max_err(y)
-
-        self.outputs.update_from_array(y)
-        return 0.0
+        #error control 
+        return self.outputs.update_from_array_max_err(y)
 
 
     def solve(self, t, dt):

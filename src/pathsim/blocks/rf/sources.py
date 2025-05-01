@@ -82,7 +82,8 @@ class SquareWaveSource(Block):
     Note
     ----
     This block is purely analog with no internal events. 
-    Not to be confused with a clock that has internal scheduled events
+    Not to be confused with a clock that has internal scheduled events.
+    If you want tight timing, use an event based source instead.
     
     Parameters
     ----------
@@ -106,7 +107,7 @@ class SquareWaveSource(Block):
         return 0
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * square_wave(t + tau, self.frequency)
         return 0.0
@@ -137,7 +138,7 @@ class TriangleWaveSource(Block):
         return 0
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * triangle_wave(t + tau, self.frequency)
         return 0.0
@@ -168,7 +169,7 @@ class SinusoidalSource(Block):
         return 0
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         omega = 2*np.pi*self.frequency
         self.outputs[0] = self.amplitude * np.sin(omega*t + self.phase)
         return 0.0
@@ -199,7 +200,7 @@ class GaussianPulseSource(Block):
         return 0
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         self.outputs[0] = self.amplitude * gaussian(t-self.tau, self.f_max)
         return 0.0
 
@@ -226,7 +227,7 @@ class StepSource(Block):
         return 0
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         self.outputs[0] = self.amplitude * float(t > self.tau)
         return 0.0
 
@@ -349,7 +350,7 @@ class ChirpSource(Block):
             self.n_samples += 1
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update the block output, assebble phase and evaluate the sinusoid"""
         _phase = 2 * np.pi * (self.engine.get() + self.sig_white * self.noise_1) + self.phase
         self.outputs[0] = self.amplitude * np.sin(_phase)

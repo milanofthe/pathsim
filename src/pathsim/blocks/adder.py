@@ -117,7 +117,12 @@ class Adder(Block):
                 )
 
 
-    def update(self, t, error_control=False):
+    def __len__(self):
+        """Purely algebraic block"""
+        return 1
+
+
+    def update(self, t):
         """update system equation in fixed point loop for 
         algebraic loops, with optional error control
 
@@ -125,17 +130,13 @@ class Adder(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            absolute error to previous iteration for 
+            convergence control
         """
         u = self.inputs.to_array()
         y = self.op_alg(u)
-        if error_control:
-            return self.outputs.update_from_array_max_err(y)
-        self.outputs.update_from_array(y)
-        return 0.0
+        return self.outputs.update_from_array_max_err(y)

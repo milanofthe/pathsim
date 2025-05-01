@@ -78,7 +78,7 @@ class WhiteNoise(Block):
             self.n_samples += 1
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -91,15 +91,12 @@ class WhiteNoise(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because source block)
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for 
-            convergence control
+            absolute error to previous iteration for convergence 
+            control (here '0.0' because source-type block)
         """
         self.outputs[0] = self.noise
         return 0.0
@@ -193,7 +190,7 @@ class PinkNoise(Block):
             self.noise = pink_sample * self.sigma
 
             
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -206,15 +203,12 @@ class PinkNoise(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because source block)
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for 
-            convergence control
+            absolute error to previous iteration for convergence 
+            control (here '0.0' because source-type block)
         """
         self.outputs[0] = self.noise
         return 0.0
@@ -302,7 +296,7 @@ class SinusoidalPhaseNoiseSource(Block):
         self.t_max = 0
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
@@ -315,15 +309,12 @@ class SinusoidalPhaseNoiseSource(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here, because source block)
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for 
-            convergence control
+            absolute error to previous iteration for convergence 
+            control (here '0.0' because source-type block)
         """
 
         #compute phase error

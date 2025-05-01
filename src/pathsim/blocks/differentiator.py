@@ -99,7 +99,7 @@ class Differentiator(Block):
         else: self.engine = Solver.cast(self.engine, **solver_args)
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation fixed point loop,
         with convergence control
     
@@ -107,20 +107,16 @@ class Differentiator(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            max absolute error to previous iteration 
+            for convergence control
         """
         x, u = self.engine.get(), self.inputs[0]
         y = self.op_alg(x, u, t)
-        if error_control:
-            return self.outputs.update_from_array_max_err(y)
-        self.outputs.update_from_array(y)
-        return 0.0
+        return self.outputs.update_from_array_max_err(y)
         
 
     def solve(self, t, dt):

@@ -52,23 +52,19 @@ class Multiplier(Block):
             )
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation
 
         Parameters
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            maximum absolute error to previous iteration 
+            for convergence control
         """
         u = self.inputs.to_array()
-        if error_control:
-            return self.outputs.update_from_array_max_err(self.op_alg(u))
-        self.outputs.update_from_array(self.op_alg(u))
-        return 0.0
+        return self.outputs.update_from_array_max_err(self.op_alg(u))

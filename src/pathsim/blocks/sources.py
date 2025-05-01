@@ -35,21 +35,19 @@ class Constant(Block):
         return 0
         
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation fixed point loop
 
         Parameters
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because source)
 
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            absolute error to previous iteration for convergence 
+            control (always '0.0' because source-type)
         """
         self.outputs[0] = self.value
         return 0.0
@@ -118,7 +116,7 @@ class Source(Block):
         return 0
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation fixed point loop 
         by evaluating the internal function 'func'
 
@@ -131,14 +129,12 @@ class Source(Block):
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because source)
 
         Returns
         -------
         error : float
-            relative error to previous iteration for convergence control
+            absolute error to previous iteration for convergence 
+            control (always `0.0` because source-type)
         """
         self.outputs[0] = self.func(t)
         return 0.0

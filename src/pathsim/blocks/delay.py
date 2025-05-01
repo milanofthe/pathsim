@@ -81,21 +81,20 @@ class Delay(Block):
         self._buffer.clear()
 
 
-    def update(self, t, error_control=False):
-        """Evaluation of the buffer at different times.
+    def update(self, t):
+        """Evaluation of the buffer at different times 
+        via interpolation.
 
         Parameters
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because non-algebraic)
 
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            deviation to previous iteration for convergence 
+            control (always '0.0' because non-algebraic)
         """
 
         #retrieve value from buffer

@@ -359,27 +359,25 @@ class Scope(Block):
                 wrt.writerow(sample)
 
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
         Note
         ----
         Scope has no passthrough, so the 'update' method 
-        is optimized for this case        
+        is optimized for this case (does nothing)       
 
         Parameters
         ----------
         t : float
             evaluation time
-        error_control : bool
-            activate error control 
-            (not applicable here because sink)
 
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            absolute error to previous iteration for convergence 
+            control (always '0.0' because sink-type)
         """
         return 0.0
 

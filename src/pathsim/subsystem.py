@@ -245,7 +245,9 @@ class Subsystem(Block):
     # subsystem graph assembly --------------------------------------------------------------
 
     def _assemble_graph(self):
-        """Assemble internal graph of subsystem for simulation."""
+        """Assemble internal graph of subsystem for fast 
+        algebraic evaluation during simulation.
+        """
         self.graph = Graph(self.blocks, self.connections)
 
 
@@ -441,7 +443,7 @@ class Subsystem(Block):
 
     # methods for block output and state updates --------------------------------------------
 
-    def update(self, t, error_control=False):
+    def update(self, t):
         """Update the instant time components of the internal blocks 
         to evaluate the (distributed) system equation.
 
@@ -452,13 +454,12 @@ class Subsystem(Block):
         ----------
         t : float
             evaluation time 
-        error_control : bool
-            activate error control
 
         Returns
         ------- 
         max_error : float
-            error tolerance of system equation convergence
+            max deviation to previous iteration at evaluation 
+            of alg. components
         """
 
         #update interface outgoing connections
@@ -470,14 +471,14 @@ class Subsystem(Block):
 
             #update blocks at algebraic depth
             for block in blocks_dag:
-                if block: block.update(t, False)
+                if block: block.update(t)
 
             #update connenctions at algebraic depth (data transfer)
             for connection in connections_dag:
                 if connection: connection.update()
 
-        #no error control required algebraic loops -> early exit
-        if not error_control:
+        #no internal algebraic loops -> early exit
+        if not self.graph.has_loops:
             return 0.0
 
         #iterate DAG depths of broken loops
@@ -492,7 +493,7 @@ class Subsystem(Block):
                     continue
 
                 #update block with error control enabled
-                err = block.update(t, True)
+                err = block.update(t)
                 if err > max_error:
                     max_error = err
 

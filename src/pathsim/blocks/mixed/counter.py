@@ -56,7 +56,27 @@ class Counter(Block):
         return 0
 
 
-    def update(self, t, error_control=0):
+    def update(self, t):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+    
+        Note
+        ----
+        no direct passthrough, so the 'update' method 
+        is optimized for this case        
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            absolute error to previous iteration for convergence 
+            control (here '0.0' because source-type block)
+        """
+        
         #start + number of detected events
         self.outputs[0] = self.start + len(self.E)
         return 0.0
