@@ -522,7 +522,7 @@ class Simulation:
         block.set_solver(self.Solver, **self.solver_kwargs)
 
         #add to dynamic list if solver was initialized
-        if block.engine:
+        if block.engine and block not in self._blocks_dyn:
             self._blocks_dyn.append(block)
 
         #add block to global blocklist
@@ -591,14 +591,17 @@ class Simulation:
     # system assembly -------------------------------------------------------------
 
     def _assemble_graph(self):
+        """Build the internal graph representation for fast system function 
+        evaluation and algebraic loop resolution.
+        """
 
         #time the graph construction
         with Timer(verbose=False) as T:
             self.graph = Graph(self.blocks, self.connections)
 
         self._logger_info(
-            "GRAPH (depth: {}, loops: {}, runtime:{})".format(
-                self.graph._alg_depth, self.graph.has_loops, T
+            "GRAPH (size: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
+                len(self.graph), *self.graph.depth(), T
                 )
             )
 
@@ -664,7 +667,7 @@ class Simulation:
         
         #logging message
         self._logger_info(
-            "SOLVER (blocks: {}) -> {} (adaptive: {}, explicit: {})".format(
+            "SOLVER (dyn. blocks: {}) -> {} (adaptive: {}, explicit: {})".format(
                 len(self._blocks_dyn),
                 self.engine,
                 self.engine.is_adaptive, 
