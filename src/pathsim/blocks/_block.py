@@ -33,7 +33,7 @@ class Block(Serializable):
     The block can spawn discrete events that are handled by the main simulation 
     for triggers, discrete time blocks, etc.
 
-    Mathematically the block behaviour is defined by two operators in most cases
+    Mathematically the block behavior is defined by two operators in most cases
 
     .. math::
     
@@ -55,8 +55,8 @@ class Block(Serializable):
         y = f_\\mathrm{alg}(u)
     
 
-    Notes
-    -----
+    Note
+    ----
     This block is not intended to be used directly and serves as a base 
     class definition for other blocks to be inherited.
     
@@ -67,15 +67,15 @@ class Block(Serializable):
         input value register of block
     outputs : Register
         output value register of block
-    engine : None, Solver
+    engine : None | Solver
         numerical integrator instance
     events : list[Event]
         list of internal events, for mixed signal blocks
     _active : bool
         flag that sets the block active or inactive   
-    op_alg : Operator, DynamicOperator, None
+    op_alg : Operator | DynamicOperator | None
         internal callable operator for algebraic components of block
-    op_dyn : DynamicOperator, None
+    op_dyn : DynamicOperator | None
         internal callable operator for dynamic (ODE) components of block
     """
 

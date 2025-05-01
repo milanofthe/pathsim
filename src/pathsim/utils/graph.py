@@ -291,14 +291,39 @@ class Graph:
     """Representation of a directed graph, defined by blocks (nodes) 
     and edges (connections).
 
-    Manages graph analysis methods.
+    Manages graph analysis methods, detect algebraic loops, sort blocks and 
+    connections into algebraic levels by depth in directed acyclic graph (DAG). 
+    Does the same for algebraic loop blocks and connections (DAG for open loops).
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     blocks : list[blocks] | None
         blocks / nodes of the graph
     connections : list[Connection] | None
         connections / edges of the graph
+
+    Attributes
+    ----------
+    has_loops : bool
+        flag to indicate if graph has algebraic loops
+    _alg_depth : int
+        algebraic depth of DAG (number of alg. levels)
+    _loop_depth : int
+        algebraic depth of broken loop DAG (number of alg. levels in loops)
+    _blocks_dag : defaultdict[int, list[Block]]
+        algebraic levels of blocks in internal DAG
+    _blocks_loop_dag : defaultdict[int, list[Block]]
+        algebraic levels of blocks in broken loops DAG
+    _connections_dag : defaultdict[int, list[Connection]]
+        algebraic levels of connections in internal DAG
+    _connections_loop_dag : defaultdict[int, list[Connection]]
+        algebraic levels of connections in broken loops DAG
+    _upst_blk_blk_map : defaultdict[Block, set[Block]]
+        map for upstream connections between blocks
+    _dnst_blk_blk_map : defaultdict[Block, set[Block]]
+        map for downstream connections between blocks
+    _outg_blk_con_map : defaultdict[Block, list[Connection]]
+        map for outgoing connections of blocks
     """
 
     def __init__(self, blocks=None, connections=None):
@@ -309,6 +334,10 @@ class Graph:
         #loop flag
         self.has_loops = False
 
+        #depths
+        self._alg_depth = 0
+        self._loop_depth = 0
+
         #initialize graph orderings
         self._blocks_dag = defaultdict(list)
         self._blocks_loop_dag = defaultdict(list)
@@ -317,9 +346,9 @@ class Graph:
         self._connections_loop_dag = defaultdict(list)
 
         #construct mappings for connections between blocks
-        self.upst_blk_blk_map = upstream_block_block_map(self.connections)
-        self.dnst_blk_blk_map = downstream_block_block_map(self.connections)
-        self.outg_blk_con_map = outgoing_block_connection_map(self.connections)
+        self._upst_blk_blk_map = upstream_block_block_map(self.connections)
+        self._dnst_blk_blk_map = downstream_block_block_map(self.connections)
+        self._outg_blk_con_map = outgoing_block_connection_map(self.connections)
 
         #assemble dag and loops
         self._assemble()
@@ -331,6 +360,11 @@ class Graph:
 
     def __len__(self):
         return len(self.blocks)
+
+
+    def depth(self):
+        return self._alg_depth, self._loop_depth
+
 
     def _build_loop_depths(self, blocks_loop):
         """Populate the defaultdicts that order **only the blocks/connections
@@ -360,15 +394,15 @@ class Graph:
         blocks in Gauss–Seidel order (shallow -> deep) if desired.
         """
 
-        # safety: nothing to do
-        if not blocks_loop:  return
+        #safety, nothing to do
+        if not blocks_loop: return
 
         loop_set = set(blocks_loop)
         depth_of  = {}
 
         #collect entry nodes
         for blk in loop_set:
-            preds = self.upst_blk_blk_map[blk]
+            preds = self._upst_blk_blk_map[blk]
             if not preds or any(p not in loop_set for p in preds):
                 depth_of[blk] = 0
                 self._blocks_loop_dag[0].append(blk)
@@ -387,9 +421,9 @@ class Graph:
             cur_d = depth_of[cur]
 
             #add outgoing connections at this depth (for convenience)
-            self._connections_loop_dag[cur_d].extend(self.outg_blk_con_map[cur])
+            self._connections_loop_dag[cur_d].extend(self._outg_blk_con_map[cur])
 
-            for nxt in self.dnst_blk_blk_map[cur]:
+            for nxt in self._dnst_blk_blk_map[cur]:
                 
                 #leaves the loop -> ignore
                 if nxt not in loop_set: continue
@@ -397,13 +431,13 @@ class Graph:
                 #already visited
                 if nxt in depth_of: continue
                 
-                depth_of[nxt] = cur_d+1
-                self._blocks_loop_dag[cur_d+1].append(nxt)
+                depth_of[nxt] = cur_d + 1
+                self._blocks_loop_dag[cur_d + 1].append(nxt)
                 
                 q.append(nxt)
 
         #finally calculate depth of loop DAG
-        self._loop_depth = max(self._blocks_loop_dag.keys())
+        self._loop_depth = max(self._blocks_loop_dag) + 1
 
 
     def _assemble(self):
@@ -424,7 +458,7 @@ class Graph:
 
         #iterate blocks to calculate their algebraic depths
         for blk in self.blocks:
-            depth = upstream_path_length_dfs(self.upst_blk_blk_map, blk) 
+            depth = upstream_path_length_dfs(self._upst_blk_blk_map, blk) 
 
             #None -> alg. loop upstream taints downstream components
             if depth is None:
@@ -433,10 +467,10 @@ class Graph:
                 
             else:
                 self._blocks_dag[depth].append(blk)
-                self._connections_dag[depth].extend(self.outg_blk_con_map[blk])
+                self._connections_dag[depth].extend(self._outg_blk_con_map[blk])
 
         #compute total algebraic depth of DAG
-        self._alg_depth = max(self._blocks_dag) if self._blocks_dag else 0
+        self._alg_depth = max(self._blocks_dag) + 1 if self._blocks_dag else 0
         
         #build the DAG for the broken loops
         self._build_loop_depths(blocks_loop)
@@ -456,7 +490,7 @@ class Graph:
         list[Connections]
             connections from the graph that have 'block' as their source
         """
-        return self.outg_blk_con_map[block]
+        return self._outg_blk_con_map[block]
 
 
     def distance(self, start_block, end_block):
@@ -466,12 +500,12 @@ class Graph:
         """
 
         #blocks are not part of same graph -> no algebraic path
-        if (start_block not in self.dnst_blk_blk_map or 
-            end_block not in self.dnst_blk_blk_map):
+        if (start_block not in self._dnst_blk_blk_map or 
+            end_block not in self._dnst_blk_blk_map):
             return 0
 
         #use depth first search
-        return distance_path_length_dfs(self.dnst_blk_blk_map, start_block, end_block)
+        return distance_path_length_dfs(self._dnst_blk_blk_map, start_block, end_block)
 
 
     def dag(self):
@@ -484,7 +518,7 @@ class Graph:
             blocks and connections at current algebraic depth, 
             together with the depth 'd'
         """
-        for d in range(self._alg_depth+1):
+        for d in range(self._alg_depth):
             yield (d, self._blocks_dag[d], self._connections_dag[d])
 
 
@@ -500,5 +534,5 @@ class Graph:
             blocks and connections at current algebraic depth of 
             broken loop, together with the depth 'd'
         """
-        for d in range(self._loop_depth+1):
+        for d in range(self._loop_depth):
             yield (d, self._blocks_loop_dag[d], self._connections_loop_dag[d])
