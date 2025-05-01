@@ -224,7 +224,7 @@ def distance_path_length_dfs(connection_map, start_block, end_block):
     Parameters
     ----------
     connection_map : dict[Block, set[Block]]
-        Adjacency map in downstream (source → targets) orientation.
+        Adjacency map in downstream (source -> targets) orientation.
     start_block, end_block : Block
         Start and end nodes of interest.  They may be identical; a zero-length
         self-path is then possible.
