@@ -217,12 +217,7 @@ class Subsystem(Block):
         -------
         bool
         """
-        if isinstance(other, Block): 
-            return other in self.blocks
-        elif isinstance(other, Connection): 
-            return other in self.connections
-        else: 
-            return False
+        return other in self.blocks or other in self.connections
 
 
     def _check_connections(self):

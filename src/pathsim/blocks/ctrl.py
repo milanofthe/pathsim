@@ -37,7 +37,7 @@ class PID(Block):
     As a practical choice set `f_max` to 3x the highest expected signal frequency.
     Since this block uses an approximation of real differentiation, the approximation will 
     not hold if there are high frequency components present in the signal. For example if 
-    you have discontinuities such as steps or squere waves.
+    you have discontinuities such as steps or square waves.
 
 
     Example
@@ -319,4 +319,3 @@ class AntiWindupPID(PID):
             jac_x=_jac_x_g_pid,
             jac_u=_jac_u_g_pid,
             )
-

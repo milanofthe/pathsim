@@ -256,15 +256,12 @@ class Simulation:
         -------
         bool
         """
-        if isinstance(other, Block): 
-            return other in self.blocks
-        elif isinstance(other, Connection): 
-            return other in self.connections
-        elif isinstance(other, Event): 
-            return other in self.events
-        else: 
-            return False
-
+        return (
+            other in self.blocks or 
+            other in self.connections or 
+            other in self.events
+            )
+        
 
     # logger methods --------------------------------------------------------------
 
