@@ -46,8 +46,7 @@ class ProgressTracker:
                 progress = current_time / 10.0
 
                 tracker.update(progress, dt=current_dt)
-                if progress >= 1.0: # Optional early exit condition
-                    break
+                
 
     Parameters
     ----------
