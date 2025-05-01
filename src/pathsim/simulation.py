@@ -27,7 +27,6 @@ from ._constants import (
     SIM_TIMESTEP_MIN,
     SIM_TIMESTEP_MAX,
     SIM_TOLERANCE_FPI,
-    SIM_ITERATIONS_MIN,
     SIM_ITERATIONS_MAX,
     LOG_ENABLE
     )

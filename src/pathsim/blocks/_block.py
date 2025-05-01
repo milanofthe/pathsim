@@ -13,8 +13,6 @@
 
 # IMPORTS ===============================================================================
 
-import numpy as np
-
 from ..utils.register import Register
 from ..utils.serialization import Serializable
 from ..utils.portreference import PortReference
