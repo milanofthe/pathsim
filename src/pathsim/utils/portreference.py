@@ -48,33 +48,17 @@ class PortReference:
         self.ports = ports 
 
 
-    def set(self, values):
-        """Sets the input ports of the reference block with values.
-
-        Note
-        ----
-        If more values then ports, `zip` automatically stops iteration 
-        after all ports. If more ports then values, `itertools.cycle` is 
-        used to fill all the ports repeatedly.
+    def to(self, other):
+        """Transfer the data between two `PortReference` instances, 
+        in this direction `self` -> `other`.
 
         Parameters
         ----------
-        values : list[obj], list[float]
-            values to set at block input ports
+        other : PortReference
+            the `PortReference` instance to transfer data to from `self`
         """
-        for p, v in zip(self.ports, cycle(values)):
-            self.block.set(p, v)
-
-
-    def get(self):
-        """Returns the values of the output ports of the reference block.
-        
-        Returns
-        -------
-        out : list[obj], list[float]
-            values from block output ports
-        """
-        return [self.block.get(p) for p in self.ports]
+        for p_s, p_o in zip(self.ports, other.ports):
+            other.block.set(p_o, self.block.get(p_s))
 
 
     def to_dict(self):

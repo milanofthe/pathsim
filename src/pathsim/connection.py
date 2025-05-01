@@ -231,9 +231,8 @@ class Connection:
         """Transfers data from the source block output port 
         to the target block input port.
         """
-        vals = self.source.get()
         for trg in self.targets:
-            trg.set(vals)
+            self.source.to(trg)
 
 
 class Duplex(Connection):
@@ -269,5 +268,5 @@ class Duplex(Connection):
         """
 
         #bidirectional data transfer
-        self.target.set(self.source.get())
-        self.source.set(self.target.get())
+        self.target.to(self.source)
+        self.source.to(self.target)
