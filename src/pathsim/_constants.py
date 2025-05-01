@@ -16,7 +16,7 @@ TOLERANCE = 1e-16
 SIM_TIMESTEP = 0.01         # transient simulation timestep (initial) 
 SIM_TIMESTEP_MIN = 1e-16    # min allowed transient timestep
 SIM_TIMESTEP_MAX =  None    # max allowed transient timestep
-SIM_TOLERANCE_FPI = 1e-12   # tolerance for optimizer / alg. loop solver
+SIM_TOLERANCE_FPI = 1e-10   # tolerance for optimizer / alg. loop solver
 SIM_ITERATIONS_MAX = 200    # max number of optimizer / alg. loop solver iterations
 
 
