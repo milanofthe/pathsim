@@ -15,27 +15,33 @@ from pathsim.solvers import RKCK54
 
 class DiscretePID(Wrapper):
     """
-    Discrete PID controller
+    Discrete PID controller implementation using the Wrapper class
 
     Parameters
     ----------
     T : float
-        sampling period
+        sampling period for the PID controller
+    tau : float
+        delay on Schedule event (see Schedule class)
     Kp : float
         proportional gain
-    Ti : float
-        integral time constant
-    Td : float
-        derivative time constant
+    Ki : float
+        integral gain
+    Kd : float
+        derivative  gain
 
     Attributes
     ----------
     Kp : float
         proportional gain
-    Ti : float
-        integral time constant
-    Td : float
-        derivative time constant
+    Ki : float
+        integral gain
+    Kd : float
+        derivative  gain
+    integral : float
+        integral value for the PID controller
+    prev_error : float
+        previous error value for derivative part in the PID controller
 
     """
     
@@ -61,7 +67,7 @@ class DiscretePID(Wrapper):
         Returns
         -------
         output : float
-            output
+            output of PID controller to correct the system
         """
         self.integral += error * self.T
         derivative = (error - self.prev_error) / self.T if self.T != 0 else 0
@@ -69,7 +75,6 @@ class DiscretePID(Wrapper):
         self.prev_error = error
         
         return output
-
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
 
