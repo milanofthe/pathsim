@@ -16,20 +16,29 @@ from ..optim.operator import Operator
 
 class Wrapper(Block):
     """
-    
+    Wrapper block for discrete implementation and external code integration.
+
+    The `Wrapper` class is designed to trigger the `_run_wrapper` method at fixed intervals 
+    using an internal scheduled event. This makes it particularly useful for wrapping 
+    external code or implementing discrete-time systems within the simulation framework.
+
+    The block uses the `Schedule` class to periodically call the `_run_wrapper` method, 
+    which must be implemented by subclasses. The inputs and outputs of the block are 
+    handled through the `inputs` and `outputs` registers, enabling seamless integration 
+    with other blocks in the simulation. 
     ...
 
     Parameters
     ----------
     T : float
-        sampling period
+        sampling period for the wrapped function
     tau : float
-        delay 
+        delay time for the start time of the event
         
     Attributes
     ----------
-    events : list[Schedule]
-        internal scheduled event for periodic sampling
+    events : list[event]
+        internal event. The first is used for periodic sampling the _run_wrapper method
     tau : float
         delau time for the start time of the event
     T : float
