@@ -176,7 +176,7 @@ class Block(Serializable):
             size of block (default 1) and number 
             of internal states (from internal engine)
         """
-        n_x = len(self.engine) if self.engine else 0
+        nx = len(self.engine) if self.engine else 0
         return 1, nx
 
 

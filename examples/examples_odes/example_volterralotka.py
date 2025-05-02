@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Integrator, Constant, Adder, Amplifier, Multiplier
-from pathsim.solvers import RKBS32, RKCK54
+from pathsim.solvers import RKBS32
 
 
 # VOLTERRA-LOTKA SYSTEM =================================================================
