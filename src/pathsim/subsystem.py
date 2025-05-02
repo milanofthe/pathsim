@@ -220,6 +220,8 @@ class Subsystem(Block):
         return other in self.blocks or other in self.connections
 
 
+    # methods for verification ----------------------------------------------------------
+
     def _check_connections(self):
         """Check if connections are valid and if there is no input port 
         that recieves multiple outputs and could be overwritten unintentionally.
@@ -244,6 +246,26 @@ class Subsystem(Block):
         algebraic evaluation during simulation.
         """
         self.graph = Graph(self.blocks, self.connections)
+
+
+    # methods for access to metadata --------------------------------------------------------
+
+    def size(self):
+        """Get size information from subsystem, recursively assembled 
+        from internal blocks, including nested subsystems.
+
+        Returns
+        -------
+        sizes : tuple[int]
+            size of block (default 1) and number 
+            of internal states (from internal engine)
+        """
+        total_n, total_nx = 0, 0
+        for block in self.blocks:
+            n, nx = block.size()
+            total_n += n
+            total_nx += nx
+        return total_n, total_nx
 
 
     # visualization -------------------------------------------------------------------------

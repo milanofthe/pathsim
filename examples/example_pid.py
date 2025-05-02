@@ -21,7 +21,8 @@ from pathsim.optim import Value
 K = 0.4
 
 #pid parameters
-Kp, Ki, Kd = Value.array([1.5, 0.5, 0.1]) 
+# Kp, Ki, Kd = Value.array([1.5, 0.5, 0.1]) 
+Kp, Ki, Kd = 1.5, 0.5, 0.1
 
 #source function
 def f_s(t):

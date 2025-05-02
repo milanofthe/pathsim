@@ -164,6 +164,22 @@ class Block(Serializable):
         return self._active
 
 
+    # methods for access to metadata ----------------------------------------------------
+
+    def size(self):
+        """Get size information from block, such as 
+        number of internal states, etc.
+
+        Returns
+        -------
+        sizes : tuple[int]
+            size of block (default 1) and number 
+            of internal states (from internal engine)
+        """
+        n_x = len(self.engine) if self.engine else 0
+        return 1, nx
+
+
     # methods for visualization ---------------------------------------------------------
 
     def plot(self, *args, **kwargs):

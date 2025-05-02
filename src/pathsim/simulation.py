@@ -261,7 +261,27 @@ class Simulation:
             other in self.connections or 
             other in self.events
             )
-        
+
+
+    # methods for access to metadata ----------------------------------------------
+
+    def size(self):
+        """Get size information of the simulation, such as total number 
+        of blocks and dynamic states, with recursive retrieval from subsystems
+
+        Returns
+        -------
+        sizes : tuple[int]
+            size of block (default 1) and number 
+            of internal states (from internal engine)
+        """
+        total_n, total_nx = 0, 0
+        for block in self.blocks:
+            n, nx = block.size()
+            total_n += n
+            total_nx += nx
+        return total_n, total_nx
+
 
     # logger methods --------------------------------------------------------------
 

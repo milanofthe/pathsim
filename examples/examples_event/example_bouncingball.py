@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Integrator, Constant, Function, Adder, Scope
-from pathsim.solvers import RKBS32
+from pathsim.solvers import RKF21
 
 from pathsim.events import ZeroCrossing
 
@@ -25,7 +25,7 @@ dt = 0.01
 g = 9.81
 
 #elasticity of bounce
-b = 0.9
+b = 0.95
 
 #initial values
 x0, v0 = 1, 5
@@ -61,7 +61,7 @@ def func_act(t):
 E1 = ZeroCrossing(
     func_evt=func_evt,                 
     func_act=func_act, 
-    tolerance=1e-4
+    tolerance=1e-6
     )
 
 events = [E1]
@@ -71,11 +71,8 @@ Sim = Simulation(
     blocks, 
     connections, 
     events, 
-    dt=dt, 
-    dt_max=5*dt,
-    log=True, 
-    Solver=RKBS32, 
-    tolerance_lte_rel=1e-5, 
+    Solver=RKF21, 
+    tolerance_lte_rel=1e-4, 
     tolerance_lte_abs=1e-7
     )
 
@@ -85,7 +82,7 @@ Sim = Simulation(
 if __name__ == "__main__":
 
     #run the simulation
-    Sim.run(10)
+    Sim.run(20)
 
     #read the recordings from the scope
     time, [x] = Sc.read()

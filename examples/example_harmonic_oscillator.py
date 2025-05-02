@@ -63,8 +63,8 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    # Run the simulation for 25 seconds
-    Sim.run(duration=50)
+    # Run the simulation for 30 seconds
+    Sim.run(duration=30)
 
     # Plot the results directly from the scope
     Sc.plot(lw=2)
