@@ -19,7 +19,7 @@ from ..optim.operator import Operator
 
 class Function(Block):
     """Arbitrary MIMO function block, defined by a callable object, 
-    i.e. function or lambda expression.
+    i.e. function or `lambda` expression.
 
     The function can have multiple arguments that are then provided 
     by the input channels of the function block.
@@ -83,6 +83,23 @@ class Function(Block):
         a**2 -> outputs[0]
         a*b  -> outputs[1]
         b/c  -> outputs[2]
+
+    Because the `Function` block only has a single argument, it can be 
+    used to decorate a function and make it a `PathSim` block. This might 
+    be handy in some cases to keep definitions concise and localized 
+    in the code:
+
+    .. code.block:: python
+        
+        from pathsim.blocks import Function
+
+        #does the same as the definition above
+            
+        @Function
+        def fn(a, b, c):
+            return a**2, a*b, b/c
+
+        #'fn' is now a PathSim block
 
 
     Parameters

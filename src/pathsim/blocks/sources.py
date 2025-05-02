@@ -94,6 +94,25 @@ class Source(Block):
             return np.sin(omega * t)
 
         src = Source(f)
+     
+    Because the `Source` block only has a single argument, it can be 
+    used to decorate a function and make it a `PathSim` block. This might 
+    be handy in some cases to keep definitions concise and localized 
+    in the code:
+
+    .. code.block:: python
+        
+        import numpy as np
+        from pathsim.blocks import Source
+
+        #does the same as the definition above
+            
+        @Source
+        def src(t):
+            omega = 100
+            return np.sin(omega * t)
+
+        #'src' is now a PathSim block
 
 
     Parameters
