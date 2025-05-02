@@ -3,13 +3,13 @@
 ##                                PORT REFERENCE CLASS 
 ##                              (utils/portreference.py)
 ##                              
-##                                 Milan Rother 2025
+##                                  Milan Rother 2025
 ##
 #########################################################################################
 
 # IMPORTS ===============================================================================
 
-from itertools import cycle
+# no dependencies
 
 
 # CLASS =================================================================================
@@ -29,6 +29,9 @@ class PortReference:
     ports : list[int]
         list of port indices
     """
+
+    __slots__ = ["block", "ports"]
+
 
     def __init__(self, block=None, ports=[0]):
 
@@ -57,8 +60,8 @@ class PortReference:
         other : PortReference
             the `PortReference` instance to transfer data to from `self`
         """
-        for p_s, p_o in zip(self.ports, other.ports):
-            other.block.set(p_o, self.block.get(p_s))
+        for a, b in zip(other.ports, self.ports):
+            other.block.set(a, self.block.get(b))
 
 
     def to_dict(self):

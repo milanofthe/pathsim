@@ -15,7 +15,6 @@ from pathsim.blocks import Adder, Scope, Source
 from pathsim.blocks.mixed import SampleHold, Comparator, DAC
 from pathsim.blocks.rf import ButterworthLowpassFilter
 
-
 from pathsim.solvers import RKBS32
 
 

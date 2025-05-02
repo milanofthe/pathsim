@@ -6,7 +6,7 @@
 ##              This module implements the 'Connection' class that transfers
 ##                data between the blocks and their input/output channels
 ##
-##                                  Milan Rother 2023/24
+##                               Milan Rother 2023/24/2025
 ##
 #########################################################################################
 
@@ -117,6 +117,9 @@ class Connection:
     targets : tuple[PortReference], tuple[Block]
         target blocks and optional target input ports
     """
+
+    __slots__ = ["source", "targets", "_active"]
+
 
     def __init__(self, source, *targets):
         
@@ -240,6 +243,9 @@ class Duplex(Connection):
     connections between two blocks by grouping together the inputs and 
     outputs of the blocks into an IO-pair.
     """
+
+    __slots__ = ["source", "target", "targets", "_active"]
+
 
     def __init__(self, source, target):
         
