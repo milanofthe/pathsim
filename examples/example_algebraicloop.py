@@ -47,7 +47,7 @@ connections = [
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
 Sim = Simulation(blocks, connections, dt=dt, log=True)
-    
+
 
 # Run Example ===========================================================================
 
