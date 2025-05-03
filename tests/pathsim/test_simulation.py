@@ -46,7 +46,7 @@ class TestSimulation(unittest.TestCase):
     only very minimal functonality
     """
 
-    def test_init(self):
+    def test_init_default(self):
 
         #test default initialization
         Sim = Simulation(log=False)
@@ -59,6 +59,9 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.tolerance_fpi, SIM_TOLERANCE_FPI)
         self.assertEqual(Sim.iterations_max, SIM_ITERATIONS_MAX)
         self.assertFalse(Sim.log)
+
+
+    def test_init_sepecific(self):
 
         #test specific initialization
         B1, B2, B3 = Block(), Block(), Block()
@@ -92,9 +95,32 @@ class TestSimulation(unittest.TestCase):
         C2 = Connection(B2, B3)
         C3 = Connection(B3, B2) # <-- overrides B2
         with self.assertRaises(ValueError):
-            Sim = Simulation(blocks=[B1, B2, B3], 
-                             connections=[C1, C2, C3],
-                             log=False)
+            Sim = Simulation(
+                blocks=[B1, B2, B3], 
+                connections=[C1, C2, C3],
+                log=False
+                )
+
+
+    def test_contains(self):
+
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        C2 = Connection(B2, B3)
+        C3 = Connection(B3, B1)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C3],
+            log=False
+            )
+
+        self.assertTrue(B1 in Sim)
+        self.assertTrue(B2 in Sim)
+        self.assertTrue(B3 in Sim)
+
+        self.assertTrue(C1 in Sim)
+        self.assertTrue(C2 not in Sim)
+        self.assertTrue(C3 in Sim)
 
 
     def test_add_block(self):
@@ -118,9 +144,11 @@ class TestSimulation(unittest.TestCase):
         B1, B2, B3 = Block(), Block(), Block()
         C1 = Connection(B1, B2)
 
-        Sim = Simulation(blocks=[B1, B2, B3], 
-                         connections=[C1],
-                         log=False)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1],
+            log=False
+            )
 
         self.assertEqual(Sim.connections, [C1])
 
@@ -175,6 +203,37 @@ class TestSimulation(unittest.TestCase):
         self.assertTrue(isinstance(I2.engine, RKCK54))
         self.assertEqual(B1.engine, None)
         self.assertEqual(B2.engine, None)
+
+
+    def test_size(self):    
+
+        #test 3 alg. blocks
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        C2 = Connection(B2, B3)
+        C3 = Connection(B3, B1)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C2, C3],
+            log=False
+            )  
+
+        n, nx = Sim.size()
+        self.assertEqual(n, 3)
+        self.assertEqual(nx, 0)
+
+        #test 1 dyn, 1 alg block
+        B1, B2 = Block(), Integrator()
+        C1 = Connection(B1, B2)
+        Sim = Simulation(
+            blocks=[B1, B2], 
+            connections=[C1],
+            log=False
+            )  
+
+        n, nx = Sim.size()
+        self.assertEqual(n, 2)
+        self.assertEqual(nx, 1)
 
 
     def test_update(self): 
