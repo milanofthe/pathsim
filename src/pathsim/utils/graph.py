@@ -417,7 +417,7 @@ class Graph:
                 
                 #enqueue downstream neighbors that are in this SCC
                 for next_blk in self._dnst_blk_blk_map[blk]:
-                    if next_blk in scc_set and next_blk not in visited:
+                    if next_blk in scc and next_blk not in visited:
                         queue.append((next_blk, local_depth + 1))
             
             #assign blocks to global depths based on local depths
