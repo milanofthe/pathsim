@@ -15,7 +15,6 @@ from pathsim.blocks import Adder, Scope, Source
 from pathsim.blocks.mixed import SampleHold, Comparator, DAC
 from pathsim.blocks.rf import ButterworthLowpassFilter
 
-
 from pathsim.solvers import RKBS32
 
 
@@ -64,6 +63,9 @@ class SAR(Block):
                 func_act=_step
                 )
             ]
+
+    def __len__(self):
+        return 0
 
 
 # SYSTEM SETUP AND SIMULATION ===========================================================

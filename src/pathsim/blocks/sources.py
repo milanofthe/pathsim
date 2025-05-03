@@ -28,6 +28,11 @@ class Constant(Block):
     def __init__(self, value=1):
         super().__init__()
         self.value = value
+
+
+    def __len__(self):
+        """No algebraic passthrough"""
+        return 0
         
 
     def update(self, t):
@@ -41,7 +46,8 @@ class Constant(Block):
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            absolute error to previous iteration for convergence 
+            control (always '0.0' because source-type)
         """
         self.outputs[0] = self.value
         return 0.0
@@ -88,6 +94,25 @@ class Source(Block):
             return np.sin(omega * t)
 
         src = Source(f)
+     
+    Because the `Source` block only has a single argument, it can be 
+    used to decorate a function and make it a `PathSim` block. This might 
+    be handy in some cases to keep definitions concise and localized 
+    in the code:
+
+    .. code.block:: python
+        
+        import numpy as np
+        from pathsim.blocks import Source
+
+        #does the same as the definition above
+            
+        @Source
+        def src(t):
+            omega = 100
+            return np.sin(omega * t)
+
+        #'src' is now a PathSim block
 
 
     Parameters
@@ -103,6 +128,11 @@ class Source(Block):
             raise ValueError(f"'{func}' is not callable")
 
         self.func = func
+
+
+    def __len__(self):
+        """No algebraic passthrough"""
+        return 0
 
 
     def update(self, t):
@@ -122,7 +152,8 @@ class Source(Block):
         Returns
         -------
         error : float
-            relative error to previous iteration for convergence control
+            absolute error to previous iteration for convergence 
+            control (always `0.0` because source-type)
         """
         self.outputs[0] = self.func(t)
         return 0.0

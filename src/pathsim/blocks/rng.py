@@ -73,11 +73,6 @@ class RNG(Block):
         """update system equation for fixed point loop, 
         here just setting the outputs
     
-        Note
-        ----
-        no direct passthrough, so the 'update' method 
-        is optimized for this case        
-
         Parameters
         ----------
         t : float
@@ -86,7 +81,8 @@ class RNG(Block):
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            absolute error to previous iteration for convergence 
+            control (always '0.0' because source-type)
         """
         self.outputs[0] = self.val
         return 0.0

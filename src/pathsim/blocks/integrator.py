@@ -101,7 +101,8 @@ class Integrator(Block):
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            deviation to previous iteration for convergence 
+            control (always '0.0' because non-algebraic)
         """
         self.outputs.update_from_array(self.engine.get())
         return 0.0

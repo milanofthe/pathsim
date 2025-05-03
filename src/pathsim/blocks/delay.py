@@ -82,7 +82,8 @@ class Delay(Block):
 
 
     def update(self, t):
-        """Evaluation of the buffer at different times.
+        """Evaluation of the buffer at different times 
+        via interpolation.
 
         Parameters
         ----------
@@ -92,12 +93,14 @@ class Delay(Block):
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            deviation to previous iteration for convergence 
+            control (always '0.0' because non-algebraic)
         """
 
         #retrieve value from buffer
         y = self._buffer.get(t)
-        return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)
+        return 0.0
 
 
     def sample(self, t):

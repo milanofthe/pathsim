@@ -21,9 +21,6 @@ from pathsim.blocks import (
 
 # 1st ORDER SYSTEM ======================================================================
 
-#simulation timestep
-dt = 0.025
-
 #step delay
 tau = 3
 
@@ -45,8 +42,12 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True)
-
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=0.01, 
+    log=True
+    )
 
 # Run Example ===========================================================================
 

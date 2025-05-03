@@ -366,7 +366,7 @@ class Scope(Block):
         Note
         ----
         Scope has no passthrough, so the 'update' method 
-        is optimized for this case        
+        is optimized for this case (does nothing)       
 
         Parameters
         ----------
@@ -376,7 +376,8 @@ class Scope(Block):
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
+            absolute error to previous iteration for convergence 
+            control (always '0.0' because sink-type)
         """
         return 0.0
 

@@ -21,7 +21,7 @@ x1_0 = 2
 x2_0 = 0
 
 #van der Pol parameter
-mu = 1000
+mu = 10000
 
 #simulation timestep
 dt = 0.05
@@ -60,9 +60,9 @@ Sim = Simulation(
     connections, 
     dt=dt, 
     log=True, 
-    Solver=GEAR52A, 
+    Solver=ESDIRK43, 
     tolerance_lte_abs=1e-5, 
-    tolerance_lte_rel=1e-2,
+    tolerance_lte_rel=1e-3,
     tolerance_fpi=1e-9
     )
 

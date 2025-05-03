@@ -13,8 +13,6 @@
 
 # IMPORTS ===============================================================================
 
-import numpy as np
-
 from ..utils.register import Register
 from ..utils.serialization import Serializable
 from ..utils.portreference import PortReference
@@ -33,7 +31,7 @@ class Block(Serializable):
     The block can spawn discrete events that are handled by the main simulation 
     for triggers, discrete time blocks, etc.
 
-    Mathematically the block behaviour is defined by two operators in most cases
+    Mathematically the block behavior is defined by two operators in most cases
 
     .. math::
     
@@ -55,8 +53,8 @@ class Block(Serializable):
         y = f_\\mathrm{alg}(u)
     
 
-    Notes
-    -----
+    Note
+    ----
     This block is not intended to be used directly and serves as a base 
     class definition for other blocks to be inherited.
     
@@ -67,15 +65,15 @@ class Block(Serializable):
         input value register of block
     outputs : Register
         output value register of block
-    engine : None, Solver
+    engine : None | Solver
         numerical integrator instance
     events : list[Event]
         list of internal events, for mixed signal blocks
     _active : bool
         flag that sets the block active or inactive   
-    op_alg : Operator, DynamicOperator, None
+    op_alg : Operator | DynamicOperator | None
         internal callable operator for algebraic components of block
-    op_dyn : DynamicOperator, None
+    op_dyn : DynamicOperator | None
         internal callable operator for dynamic (ODE) components of block
     """
 
@@ -164,6 +162,22 @@ class Block(Serializable):
 
     def __bool__(self):
         return self._active
+
+
+    # methods for access to metadata ----------------------------------------------------
+
+    def size(self):
+        """Get size information from block, such as 
+        number of internal states, etc.
+
+        Returns
+        -------
+        sizes : tuple[int]
+            size of block (default 1) and number 
+            of internal states (from internal engine)
+        """
+        nx = len(self.engine) if self.engine else 0
+        return 1, nx
 
 
     # methods for visualization ---------------------------------------------------------
@@ -395,8 +409,7 @@ class Block(Serializable):
 
     def update(self, t):
         """The 'update' method is called iteratively for all blocks to evaluate the 
-        algbebraic components of the global system ode and resolve algebraic loops 
-        (fixed-point iteraion). 
+        algbebraic components of the global system ode from the DAG. 
 
         It is meant for instant time blocks (blocks that dont have a delay due to the 
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
@@ -420,7 +433,7 @@ class Block(Serializable):
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            max absolute error to previous iteration for convergence control
         """
 
         #no internal algebraic operator -> early exit
@@ -435,14 +448,9 @@ class Block(Serializable):
             x = self.engine.get()
             y = self.op_alg(x, u, t)
         else: 
-            y = self.op_alg(u)            
+            y = self.op_alg(u)           
 
-        #no passthrough -> early exit
-        if len(self) == 0:
-            self.outputs.update_from_array(y)
-            return 0.0
-
-        #set outputs to new values and check convergence
+        #error control 
         return self.outputs.update_from_array_max_err(y)
 
 

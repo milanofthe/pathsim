@@ -18,13 +18,10 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import SSPRK33
+from pathsim.solvers import RK4
 
 
 # HARMONIC OSCILLATOR INITIAL VALUE PROBLEM =============================================
-
-#simulation timestep
-dt = 0.1
 
 #initial position and velocity
 x0, v0 = 2, 5
@@ -53,17 +50,21 @@ connections = [
     Connection(A3, I1)
     ]
 
-# Create a simulation instance from the blocks and connections
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
-
+#create a simulation instance from the blocks and connections
+Sim = Simulation(
+    blocks, 
+    connections, 
+    dt=0.1,
+    Solver=RK4
+    )
 
 
 # Run Example ===========================================================================
 
 if __name__ == "__main__":
 
-    # Run the simulation for 25 seconds
-    Sim.run(duration=25)
+    # Run the simulation for 30 seconds
+    Sim.run(duration=30)
 
     # Plot the results directly from the scope
     Sc.plot(lw=2)

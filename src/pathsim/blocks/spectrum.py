@@ -124,6 +124,9 @@ class Spectrum(Block):
 
     
     def _kernel(self, x, u, t):
+        """Helper method that defines the kernel for the internal 
+        running fourier transform (RFT)
+        """
         if self.alpha == 0: return np.kron(u, np.exp(-1j * self.omega * t))
         return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
 
@@ -138,14 +141,8 @@ class Spectrum(Block):
         solver_kwargs : dict
             parameters for solver initialization
         """
-        
-        if self.engine is None:
-            #initialize 
-            self.engine = Solver(0.0, **solver_kwargs)
-
-        else:
-            #change solver if already initialized
-            self.engine = Solver.cast(self.engine, **solver_kwargs)
+        if self.engine is None: self.engine = Solver(0.0, **solver_kwargs)
+        else: self.engine = Solver.cast(self.engine, **solver_kwargs)
 
         
     def reset(self):
@@ -415,6 +412,7 @@ class Spectrum(Block):
         -------
         error : float
             deviation to previous iteration for convergence control
+            (for this block '0', because sink-type)
         """
         return 0.0
 

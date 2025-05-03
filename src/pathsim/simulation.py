@@ -18,6 +18,8 @@ import json
 import datetime
 import logging
 
+from collections import defaultdict
+
 from pathsim import __version__
 
 from ._constants import (
@@ -25,12 +27,11 @@ from ._constants import (
     SIM_TIMESTEP_MIN,
     SIM_TIMESTEP_MAX,
     SIM_TOLERANCE_FPI,
-    SIM_ITERATIONS_MIN,
     SIM_ITERATIONS_MAX,
     LOG_ENABLE
     )
 
-from .utils.utils import path_length_dfs
+from .utils.graph import Graph
 from .utils.analysis import Timer
 from .utils.portreference import PortReference
 from .utils.progresstracker import ProgressTracker
@@ -110,40 +111,49 @@ class Simulation:
     events : list[Event]
         list of event trackers (zero crossing detection, schedule, etc.)
     dt : float
-        transient simulation timestep in time units
+        transient simulation timestep in time units, 
+        default see ´SIM_TIMESTEP´ in ´_constants.py´
     dt_min : float
-        lower bound for transient simulation timestep, default '0.0'
+        lower bound for transient simulation timestep, 
+        default see ´SIM_TIMESTEP_MIN´ in ´_constants.py´
     dt_max : float
-        upper bound for transient simulation timestep, default 'None'
+        upper bound for transient simulation timestep, 
+        default see ´SIM_TIMESTEP_MAX´ in ´_constants.py´
     Solver : Solver 
-        solver class for numerical integration from pathsim.solvers
+        ODE solver class for numerical integration from ´pathsim.solvers´,
+        default is ´pathsim.solvers.ssprk22.SSPRK22´ (2nd order expl. Runge Kutta)
     tolerance_fpi : float
-        absolute tolerance for convergence of fixed-point iterations
-    iterations_min : int
-        minimum number of fixed-point iterations for system function evaluation
+        absolute tolerance for convergence of algebraic loops 
+        and internal optimizers of implicit ODE solvers, 
+        default see ´SIM_TOLERANCE_FPI´ in ´_constants.py´
     iterations_max : int
-        maximum allowed number of fixed-point iterations for system function evaluation
-    log : bool, string
-        flag to enable logging (alternatively a path to a log file can be specified)
+        maximum allowed number of iterations for implicit ODE 
+        solver optimizers and algebraic loop solver, 
+        default see ´SIM_ITERATIONS_MAX´ in ´_constants.py´
+    log : bool | string
+        flag to enable logging, default see ´LOG_ENABLE´ in ´_constants.py´
+        (alternatively a path to a log file can be specified)
     solver_kwargs : dict
-        additional parameters for numerical solvers such as abs and rel tolerance
+        additional parameters for numerical solvers such as absolute 
+        (´tolerance_lte_abs´) and relative (´tolerance_lte_rel´) tolerance, 
+        defaults are defined in ´_constants.py´
 
     Attributes
     ----------
     time : float
-        global simulation time
-    _active_blocks : list[Block]
-        list of active blocks to be included in simulation loop
-    _active_connections : list[Connection]
-        list of active connections to be included in simulation loop
-    _active_events : list[Event]
-        list of active events to be included in simulation loop
-    path_length : int
-        estimated length of the longest algebraic path
+        global simulation time, starting at ´0.0´
+    graph : Graph
+        internal graph representation for fast system funcion 
+        evluations using DAG with algebraic depths
     engine : Solver
-        global integrator instance
+        global integrator (ODE solver) instance serving as a dummy to 
+        get attributes and access to intermediate evaluation stages
     logger : logging.Logger
         global simulation logger
+    _needs_buffering : bool
+        flag for buffering system state
+    _blocks_dyn : list[Block]
+        list of blocks with internal ´Solver´ instances (stateful) 
     """
 
     def __init__(
@@ -156,7 +166,6 @@ class Simulation:
         dt_max=SIM_TIMESTEP_MAX, 
         Solver=SSPRK22, 
         tolerance_fpi=SIM_TOLERANCE_FPI, 
-        iterations_min=SIM_ITERATIONS_MIN, 
         iterations_max=SIM_ITERATIONS_MAX, 
         log=LOG_ENABLE,
         **solver_kwargs
@@ -167,11 +176,6 @@ class Simulation:
         self.connections = []
         self.events      = []
 
-        #active system components (determined dynamically)
-        self._active_blocks      = []
-        self._active_connections = []
-        self._active_events      = []
-
         #simulation timestep and bounds
         self.dt     = dt
         self.dt_min = dt_min
@@ -180,8 +184,11 @@ class Simulation:
         #numerical integrator to be used (class definition)
         self.Solver = Solver
 
-        #numerical integrator instance -> initialized later
-        self.engine = None
+        #numerical integrator instance
+        self.engine = Solver()
+
+        #internal system graph -> initialized later
+        self.graph = None
 
         #error tolerance for fixed point loop and implicit solver
         self.tolerance_fpi = tolerance_fpi
@@ -190,7 +197,6 @@ class Simulation:
         self.solver_kwargs = solver_kwargs
 
         #iterations for fixed-point loop
-        self.iterations_min = iterations_min
         self.iterations_max = iterations_max
 
         #enable logging flag
@@ -199,8 +205,11 @@ class Simulation:
         #initial simulation time
         self.time = 0.0
 
-        #length of the longest algebraic path
-        self.path_length = 1
+        #flag for state buffering (transient)
+        self._needs_buffering = True
+
+        #collection of blocks with internal ODE solvers
+        self._blocks_dyn = []
 
         #initialize logging for logging mode
         self._initialize_logger()
@@ -208,18 +217,12 @@ class Simulation:
         #prepare and add blocks (including internal events)
         if blocks is not None:
             for block in blocks:
-                self.add_block(
-                    block, 
-                    recompute_path=False
-                    )
+                self.add_block(block)
 
         #check and add connections
         if connections is not None:
             for connection in connections:
-                self.add_connection(
-                    connection, 
-                    recompute_path=False
-                    )
+                self.add_connection(connection)
 
         #check and add events
         if events is not None:
@@ -229,11 +232,8 @@ class Simulation:
         #check if blocks from connections are in simulation
         self._check_blocks_are_managed()
 
-        #set numerical integration solver
-        self._set_solver()
-
-        #find length of longest algebraic path
-        self._algebraic_path_length()
+        #assemble the system graph for simulation
+        self._assemble_graph()
 
 
     def __str__(self):
@@ -256,14 +256,31 @@ class Simulation:
         -------
         bool
         """
-        if isinstance(other, Block): 
-            return other in self.blocks
-        elif isinstance(other, Connection): 
-            return other in self.connections
-        elif isinstance(other, Event): 
-            return other in self.events
-        else: 
-            return False
+        return (
+            other in self.blocks or 
+            other in self.connections or 
+            other in self.events
+            )
+
+
+    # methods for access to metadata ----------------------------------------------
+
+    def size(self):
+        """Get size information of the simulation, such as total number 
+        of blocks and dynamic states, with recursive retrieval from subsystems
+
+        Returns
+        -------
+        sizes : tuple[int]
+            size of block (default 1) and number 
+            of internal states (from internal engine)
+        """
+        total_n, total_nx = 0, 0
+        for block in self.blocks:
+            n, nx = block.size()
+            total_n += n
+            total_nx += nx
+        return total_n, total_nx
 
 
     # logger methods --------------------------------------------------------------
@@ -332,8 +349,8 @@ class Simulation:
         kwargs : dict
             kwargs for the plot method
         """
-        for block in self._active_blocks:
-            block.plot(*args, **kwargs)
+        for block in self.blocks:
+            if block: block.plot(*args, **kwargs)
 
 
     # serialization/deserialization -----------------------------------------------
@@ -417,7 +434,6 @@ class Simulation:
                 "dt_max": self.dt_max,
                 "Solver": self.Solver.__name__,
                 "tolerance_fpi": self.tolerance_fpi,
-                "iterations_min": self.iterations_min,
                 "iterations_max": self.iterations_max,
                 **self.solver_kwargs
                 }
@@ -502,22 +518,16 @@ class Simulation:
 
     # adding system components ----------------------------------------------------
 
-    def add_block(self, block, recompute_path=True):
+    def add_block(self, block):
         """Adds a new block to the simulation, initializes its local solver 
         instance and collects internal events of the new block. 
 
         This works dynamically for running simulations.
 
-        Recomputes the length of the longest internal algebraic signal path
-        if specified in the argument. This is for dynamically adding blocks
-        mid simulation.
-
         Parameters
         ----------
         block : Block 
             block to add to the simulation
-        recompute_path : bool 
-            flag for recomputing the algebraic path length
         """
 
         #check if block already in block list
@@ -528,38 +538,32 @@ class Simulation:
         #initialize numerical integrator of block
         block.set_solver(self.Solver, **self.solver_kwargs)
 
+        #add to dynamic list if solver was initialized
+        if block.engine and block not in self._blocks_dyn:
+            self._blocks_dyn.append(block)
+
         #add block to global blocklist
         self.blocks.append(block)
-
-        #add block to active list if active
-        if block:
-            self._active_blocks.append(block)
 
         #add events of block to global event list
         for event in block.get_events():
             self.add_event(event)
 
-        #recompute algebraic path length
-        if recompute_path:
-            self._algebraic_path_length()
+        #if graph already exists, it needs to be rebuilt
+        if self.graph:
+            self._assemble_graph()
 
 
-    def add_connection(self, connection, recompute_path=True):
+    def add_connection(self, connection):
         """Adds a new connection to the simulaiton and checks if 
         the new connection overwrites any existing connections.
 
         This works dynamically for running simulations.
 
-        Recomputes the length of the longest internal algebraic 
-        signal path if specified in the argument. This is for 
-        dynamically adding connections mid simulation.
-
         Parameters
         ----------
         connection : Connection
             connection to add to the simulation
-        recompute_path : bool 
-            flag for recomputing the algebraic path length
         """
 
         #check if connection already in connection list
@@ -576,13 +580,9 @@ class Simulation:
         #add connection to global connection list
         self.connections.append(connection)
 
-        #add connection to active connection list if active
-        if connection:
-            self._active_connections.append(connection)
-
-        #recompute algebraic path length
-        if recompute_path:
-            self._algebraic_path_length()
+        #if graph already exists, it needs to be rebuilt
+        if self.graph:
+            self._assemble_graph()
 
 
     def add_event(self, event):
@@ -604,50 +604,26 @@ class Simulation:
         #add event to global event list
         self.events.append(event)
 
-        #add event to active event list if active
-        if event:
-            self._active_events.append(event)
+
+    # system assembly -------------------------------------------------------------
+
+    def _assemble_graph(self):
+        """Build the internal graph representation for fast system function 
+        evaluation and algebraic loop resolution.
+        """
+
+        #time the graph construction
+        with Timer(verbose=False) as T:
+            self.graph = Graph(self.blocks, self.connections)
+
+        self._logger_info(
+            "GRAPH (size: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
+                len(self.graph), *self.graph.depth(), T
+                )
+            )
 
 
     # topological checks ----------------------------------------------------------
-
-    def _algebraic_path_length(self):
-        """Perform recursive depth first search to compute the length of the 
-        longest signal path through algebraic (instant time) blocks, 
-        information can travel within a single timestep.
-    
-        The depth first search leverages the '__len__' method of the blocks 
-        for contribution of each block to the total signal path. 
-
-        This enables 'Subsystem' blocks to recursively propagate their internal 
-        length upward the hierarchies.
-
-        The result 'path_length' can be used as a an estimate for the 
-        minimum number of fixed-point iterations in the '_update' method in 
-        the main simulation loop.
-        """
-
-        #reset path length (at least 1)
-        self.path_length = 1
-
-        #iterate all possible starting blocks (nodes of directed graph)
-        for block in self._active_blocks:
-
-            #recursively compute the longest path via depth first search
-            _path_length = path_length_dfs(self._active_connections, block)
-
-            #update global algebraic path length
-            if _path_length > self.path_length:
-                self.path_length = _path_length
-
-        #logging message
-        self._logger_info(f"ALGEBRAIC PATH DFS (path_length: {self.path_length})")
-
-        #set 'iterations_min' for fixed-point loop if not provided globally
-        if self.iterations_min is None:
-            self.iterations_min = self.path_length
-            self._logger_info(f"SET 'iterations_min' -> {self.path_length}")
-
 
     def _check_blocks_are_managed(self):
         """Check whether the blocks that are part of the connections are 
@@ -667,17 +643,6 @@ class Simulation:
                 self._logger_warning(
                     f"{blk} in 'connections' but not in 'blocks'!"
                     )
-
-
-    def _update_active_components(self):
-        """Assemble internal lists of active system components to 
-        be updated during the simulation loop.
-
-        This gets called at every timestep.
-        """
-        self._active_blocks      = [blk for blk in self.blocks      if blk]
-        self._active_connections = [con for con in self.connections if con]
-        self._active_events      = [evt for evt in self.events      if evt]
 
 
     # solver management -----------------------------------------------------------
@@ -709,15 +674,21 @@ class Simulation:
         self.engine = self.Solver()
 
         #iterate all blocks and set integration engines with tolerances
+        self._blocks_dyn = []
         for block in self.blocks:
             block.set_solver(self.Solver, **self.solver_kwargs)
-
+            
+            #add dynamic blocks to list
+            if block.engine:
+                self._blocks_dyn.append(block)
+        
         #logging message
         self._logger_info(
-            "SOLVER -> {} (adaptive: {}, implicit: {})".format(
+            "SOLVER (dyn. blocks: {}) -> {} (adaptive: {}, explicit: {})".format(
+                len(self._blocks_dyn),
                 self.engine,
                 self.engine.is_adaptive, 
-                not self.engine.is_explicit
+                self.engine.is_explicit
                 )
             )
 
@@ -757,7 +728,7 @@ class Simulation:
             event.reset()
 
         #evaluate system function
-        self._update(time)
+        self._update(self.time)
 
 
     # linearization ---------------------------------------------------------------
@@ -809,8 +780,8 @@ class Simulation:
         """
 
         #buffer states for event detection (with timestamp)
-        for event in self._active_events:
-            event.buffer(t)
+        for event in self.events:
+            if event: event.buffer(t)
 
 
     def _detected_events(self, t):
@@ -830,7 +801,10 @@ class Simulation:
 
         #iterate all event managers
         detected_events = []
-        for event in self._active_events:
+        for event in self.events:
+
+            #skip inactive events
+            if not event: continue
             
             #check if an event is detected
             detected, close, ratio = event.detect(t)
@@ -852,15 +826,21 @@ class Simulation:
         Effectively evaluates the right hand side function of the global 
         system ODE/DAE
 
-            dx/dt = f(x, t) <- this one (ODE system function)
-                0 = g(x, t) <- and this one (algebraic constraints)
+        .. math:: 
+    
+            \\begin{equnarray}
+                \\dot{x} &= f(x, t) \\\\
+                       0 &= g(x, t) 
+            \\end{equnarray}
 
-        by converging the whole system to a fixed-point at a given point 
-        in time 't'.
+        by converging the whole system (´f´ and ´g´) to a fixed-point at a given point 
+        in time ´t´.
 
-        If no algebraic loops are present in the system, it usually converges
-        already after 'iterations_min' as long as the path length has been 
-        used as an estimate for the minimum number of iterations.
+        If no algebraic loops are present in the system, convergence is 
+        guaranteed after the first stage (evaluation of the DAG), otherwise 
+        Gauss-Seidel iterations are performed as a second stage on the DAGs 
+        (broken cycles) of blocks that are part of or tainted by upstream 
+        algebraic loops.
 
         Parameters
         ----------
@@ -868,36 +848,49 @@ class Simulation:
             evaluation time for system function
         """
 
-        #perform minimum number of fixed-point iterations without error checking
-        for _iteration in range(self.iterations_min):
-                        
-            #update connenctions (data transfer)
-            for connection in self._active_connections:
-                connection.update()
+        #perform gauss-seidel iterations without error checking
+        for _, blocks_dag, connections_dag in self.graph.dag():
 
-            #update all blocks
-            for block in self._active_blocks:
-                block.update(t)
+            #update blocks at algebraic depth (no error control)
+            for block in blocks_dag:
+                if block: block.update(t)
 
-        #perform fixed-point iterations until convergence with error checking
-        for iteration in range(self.iterations_min, self.iterations_max):
-                        
-            #update connenctions (data transfer)
-            for connection in self._active_connections:
-                connection.update()
+            #update connenctions at algebraic depth (data transfer)
+            for connection in connections_dag:
+                if connection: connection.update()
 
-            #update instant time blocks
+        #no algebraic loops -> early exit
+        if not self.graph.has_loops:
+            return 1
+
+        #perform gauss-seidel iterations on algebraic loops
+        for it in range(1, self.iterations_max):       
+            
+            #iterate DAG depths of broken loops
             max_error = 0.0
-            for block in self._active_blocks:
-                error = block.update(t)
-                if error > max_error:
-                    max_error = error
+            for _, blocks_loop, connections_loop in self.graph.loop():
+
+                #update blocks at algebraic depth (with error control)
+                for block in blocks_loop:
+
+                    #skip incative blocks
+                    if not block: 
+                        continue
+                    
+                    #block update with error control
+                    err = block.update(t)
+                    if err > max_error:
+                        max_error = err
+
+                #update connenctions at algebraic depth (data transfer)
+                for connection in connections_loop:
+                    if connection: connection.update() 
 
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
-                return iteration + 1
+                return it
 
-        #not converged
+        #not converged -> error
         self._logger_error(
             "fixed-point loop in '_update' not converged (iters: {}, err: {})".format(
                 self.iterations_max, max_error), 
@@ -937,21 +930,27 @@ class Simulation:
         total_evals = 0
 
         #perform fixed-point iterations to solve implicit update equation
-        for iteration in range(self.iterations_max):
+        for it in range(self.iterations_max):
 
             #evaluate system equation (this is a fixed point loop)
             total_evals += self._update(t)
 
             #advance solution of implicit solver
             max_error = 0.0
-            for block in self._active_blocks:
+            for block in self._blocks_dyn:
+
+                #skip inactive blocks
+                if not block: 
+                    continue
+                
+                #advance solution (internal optimizer)
                 error = block.solve(t, dt)
                 if error > max_error:
                     max_error = error
 
             #check for convergence (only error)
             if max_error <= self.tolerance_fpi:
-                return True, total_evals, iteration + 1
+                return True, total_evals, it+1
 
         #not converged in 'self.iterations_max' steps
         return False, total_evals, self.iterations_max
@@ -985,9 +984,6 @@ class Simulation:
         #log message begin of steady state solver
         self._logger_info(f"STEADYSTATE -> STARTING (reset: {reset})")
 
-        #assemble active system components
-        self._update_active_components()
-
         #solve for steady state at current time
         with Timer(verbose=False) as T:
             success, evals, iters = self._solve(self.time, self.dt)
@@ -1020,8 +1016,10 @@ class Simulation:
         when local truncation error is too large and timestep has to be 
         retaken with smaller timestep. 
         """
-        for block in self._active_blocks:
-            block.revert()
+
+        #revert block states
+        for block in self._blocks_dyn:
+            if block: block.revert()
 
 
     def _sample(self, t):
@@ -1034,8 +1032,8 @@ class Simulation:
         t : float
             time where to sample
         """
-        for block in self._active_blocks:
-            block.sample(t)
+        for block in self.blocks:
+            if block: block.sample(t)
 
 
     def _buffer_blocks(self, dt):
@@ -1052,13 +1050,12 @@ class Simulation:
         dt : float
             timestep
         """
-
         #buffer the dummy engine
         self.engine.buffer(dt)
 
         #buffer internal states of stateful blocks
-        for block in self._active_blocks:
-            block.buffer(dt)
+        for block in self._blocks_dyn:
+            if block: block.buffer(dt)
 
 
     def _step(self, t, dt):
@@ -1097,8 +1094,12 @@ class Simulation:
         success, max_error_norm, relevant_scales = True, 0.0, []
 
         #step blocks and get error estimates if available
-        for block in self._active_blocks:
+        for block in self._blocks_dyn:
 
+            #skip inactive blocks
+            if not block: continue
+
+            #step the block
             suc, err_norm, scl = block.step(t, dt)
             
             #check solver stepping success
@@ -1153,9 +1154,6 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #assemble active system components
-        self._update_active_components()
-
         #buffer states for event system
         self._buffer_events(self.time)
 
@@ -1187,7 +1185,7 @@ class Simulation:
             event.resolve(self.time + ratio * dt)  
 
             #after resolve, evaluate system equation again -> propagate event
-            total_evals += self._update(time_dt)      
+            total_evals += self._update(time_dt)  
 
         #sample data after successful timestep (+dt)
         self._sample(time_dt)
@@ -1231,9 +1229,6 @@ class Simulation:
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
-
-        #assemble active system components
-        self._update_active_components()
 
         #buffer states for event system
         self._buffer_events(self.time)
@@ -1326,9 +1321,6 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #assemble active system components
-        self._update_active_components()
-
         #buffer states for event system
         self._buffer_events(self.time)
 
@@ -1347,13 +1339,10 @@ class Simulation:
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time_stage, dt)
 
-        #if step not successful -> revert to previous state
+        #if step not successful -> roll back timestep
         if not success:
             self._revert()
-            
-            #after revert, evaluate system equation again -> reset for buffer
             total_evals += self._update(self.time) 
-
             return False, error_norm, scale, total_evals, 0
 
         #system time after timestep
@@ -1365,7 +1354,7 @@ class Simulation:
         #handle detected events chronologically after timestep (+dt)
         for event, close, ratio in self._detected_events(time_dt):
 
-            #close enough to event (ratio approx 1) -> resolve it
+            #close enough to event (ratio approx 1.0) -> resolve it
             if close:
                 event.resolve(time_dt)
 
@@ -1375,10 +1364,7 @@ class Simulation:
             #not close enough -> roll back timestep (secant step)
             else:
                 self._revert()
-
-                #after revert, evaluate system equation again -> reset for buffer
                 total_evals += self._update(self.time) 
-
                 return False, error_norm, ratio, total_evals, 0
         
         #sample data after successful timestep (+dt)
@@ -1433,9 +1419,6 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #assemble active system components
-        self._update_active_components()
-
         #buffer states for event system
         self._buffer_events(self.time)
 
@@ -1463,13 +1446,10 @@ class Simulation:
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time_stage, dt)
 
-        #if step not successful and adaptive -> roll back timestep
+        #if step not successful -> roll back timestep
         if not success:
             self._revert()
-            
-            #after revert, evaluate system equation again -> reset for buffer
             total_evals += self._update(self.time) 
-
             return False, error_norm, scale, total_evals, total_solver_its
 
         #system time after timestep
@@ -1491,12 +1471,9 @@ class Simulation:
             #not close enough -> roll back timestep (secant step)
             else:
                 self._revert()
-
-                #after revert, evaluate system equation again -> reset for buffer
                 total_evals += self._update(self.time) 
-
                 return False, error_norm, ratio, total_evals, total_solver_its
-        
+
         #sample data after successful timestep (+dt)
         self._sample(time_dt)
 
@@ -1625,13 +1602,13 @@ class Simulation:
             for _ in tracker:
 
                 #advance the simulation by one (effective) timestep '_dt'
-                success, error_norm, scale, evals, solver_its = self.timestep(
+                success, error_norm, scale, *_ = self.timestep(
                     dt=_dt, 
                     adaptive=_adaptive
                     )
 
                 #perform adaptive rescale
-                if adaptive:            
+                if _adaptive:            
 
                     #if no error estimate and rescale -> back to default timestep
                     if not error_norm and scale == 1:

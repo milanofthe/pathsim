@@ -64,9 +64,28 @@ class Comparator(Block):
 
 
     def update(self, t):
+        """update system equation for fixed point loop, 
+        here just setting the outputs
+    
+        Note
+        ----
+        no direct passthrough, so the 'update' method 
+        is optimized for this case        
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+
+        Returns
+        -------
+        error : float
+            absolute error to previous iteration for convergence 
+            control (here '0.0' because discrete block)
+        """
+
         if self.inputs[0] >= self.threshold:
             self.outputs[0] = max(self.span)
         else:
             self.outputs[0] = min(self.span)
-
-        return 0.0
+        return 0.0    

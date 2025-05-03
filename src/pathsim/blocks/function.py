@@ -19,7 +19,7 @@ from ..optim.operator import Operator
 
 class Function(Block):
     """Arbitrary MIMO function block, defined by a callable object, 
-    i.e. function or lambda expression.
+    i.e. function or `lambda` expression.
 
     The function can have multiple arguments that are then provided 
     by the input channels of the function block.
@@ -84,6 +84,23 @@ class Function(Block):
         a*b  -> outputs[1]
         b/c  -> outputs[2]
 
+    Because the `Function` block only has a single argument, it can be 
+    used to decorate a function and make it a `PathSim` block. This might 
+    be handy in some cases to keep definitions concise and localized 
+    in the code:
+
+    .. code.block:: python
+        
+        from pathsim.blocks import Function
+
+        #does the same as the definition above
+            
+        @Function
+        def fn(a, b, c):
+            return a**2, a*b, b/c
+
+        #'fn' is now a PathSim block
+
 
     Parameters
     ---------- 
@@ -112,7 +129,9 @@ class Function(Block):
 
     def update(self, t):
         """Evaluate function block as part of algebraic component 
-        of global system DAE.
+        of global system DAE. 
+
+        With convergence control for algebraic loop solver.
 
         Parameters
         ----------
@@ -122,11 +141,10 @@ class Function(Block):
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            max absolute error to previous iteration 
+            for convergence control
         """
                 
         #apply operator to get output
         y = self.op_alg(self.inputs.to_array())
-
-        #set outputs to new values and return deviation
         return self.outputs.update_from_array_max_err(y)

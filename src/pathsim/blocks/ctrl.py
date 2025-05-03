@@ -37,7 +37,7 @@ class PID(Block):
     As a practical choice set `f_max` to 3x the highest expected signal frequency.
     Since this block uses an approximation of real differentiation, the approximation will 
     not hold if there are high frequency components present in the signal. For example if 
-    you have discontinuities such as steps or squere waves.
+    you have discontinuities such as steps or square waves.
 
 
     Example
@@ -128,11 +128,11 @@ class PID(Block):
         #initialize the numerical integration engine with kernel
         if not self.engine: self.engine = Solver(np.zeros(2), **solver_args)
         #change solver if already initialized    
-        else: self.engine = Solver.cast(self.engine, **solver_args)    
+        else: self.engine = Solver.cast(self.engine, **solver_args)
 
 
     def update(self, t):
-        """update system equation fixed point loop
+        """update system equation fixed point loop, with convergence control
     
         Parameters
         ----------
@@ -142,11 +142,17 @@ class PID(Block):
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            max absolute error to previous iteration for convergence control
         """
         x, u = self.engine.get(), self.inputs[0]
         y = self.op_alg(x, u, t)
-        return self.outputs.update_from_array_max_err(y)
+        
+        #error control, when alg. passthrough
+        if self.Kp or self.Kd:
+            return self.outputs.update_from_array_max_err(y)
+
+        self.outputs.update_from_array(y) 
+        return 0.0
 
 
     def solve(self, t, dt):
@@ -313,4 +319,3 @@ class AntiWindupPID(PID):
             jac_x=_jac_x_g_pid,
             jac_u=_jac_u_g_pid,
             )
-
