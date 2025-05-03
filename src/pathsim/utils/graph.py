@@ -322,7 +322,7 @@ class Graph:
 
     def _assemble(self):
         """Constructs two separate DAG orderings of the graph components.
-        
+    
         This method performs two key operations:
         
         1. Constructs the main DAG for acyclic portions:
@@ -331,19 +331,19 @@ class Graph:
            - Acyclic blocks are placed in _blocks_dag at their calculated depth
            
         2. Constructs a DAG for loop components:
-           - Only considers blocks already identified as part of loops
-           - Uses non-propagating mode to treat cycles as termination points
-           - Organizes loop blocks into levels in _blocks_loop_dag
+           - Identifies strongly connected components (SCCs) to find separate loops
+           - For each SCC, finds proper entry points
+           - Builds a level structure for each loop using BFS from entry points
+           - Organizes all loop blocks into levels in _blocks_loop_dag
            
         The result is two separate ordered representations:
         - A standard DAG for acyclic portions (_blocks_dag/_connections_dag)
-        - A "broken loop" DAG (_blocks_loop_dag/_connections_loop_dag) that 
-          treats loop reentry points as termination points, allowing loops
-          to be processed in a deterministic order.
+        - A "broken loop" DAG (_blocks_loop_dag/_connections_loop_dag) with
+          proper entry points and topological ordering for all loops.
         """
 
         #collect blocks involved in algebraic loops 
-        blocks_loop = []
+        blocks_loop = set()
 
         #reset flag for loop detection
         self.has_loops = False
@@ -356,7 +356,7 @@ class Graph:
 
             #None -> upstream alg. loop taints downstream components
             if depth is None:
-                blocks_loop.append(blk)
+                blocks_loop.add(blk)
                 self.has_loops = True
                 
             else:
@@ -366,19 +366,138 @@ class Graph:
 
         #compute total algebraic depth of DAG
         self._alg_depth = max(self._blocks_dag) + 1 if self._blocks_dag else 0
+
+        #build the DAG for loop blocks with proper entry points
+        if not self.has_loops:
+            self._loop_depth = 0
+            return
         
-        #build the DAG for the loop blocks by treating cycles as termination points
-        for blk in blocks_loop:
+        #build the DAG for loop blocks with proper entry points
+        sccs = self._find_strongly_connected_components(blocks_loop)
+        
+        #track global depth counter for all loop blocks
+        current_depth = 0
+        
+        # Process each strongly connected component separately
+        for scc in sccs:
+            
+            #find entry points for this SCC
+            entry_points = []
+            for blk in scc:
+                # A block is an entry point if:
+                # 1. It has no predecessors within this SCC, or
+                # 2. It has at least one predecessor outside this SCC
+                pred = self._upst_blk_blk_map[blk]
+                scc_pred = pred.intersection(set(scc))
+                
+                if not scc_pred or len(pred) > len(scc_pred):
+                    entry_points.append(blk)
+            
+            #if no natural entry points, choose one block as artificial entry
+            if not entry_points:
+                entry_points = [scc[0]]
+            
+            #perform BFS from entry points for this SCC
+            visited = set()
+            queue = deque([(entry_point, 0) for entry_point in entry_points])
+            max_local_depth = 0
+            
+            #map to store local depths within this SCC
+            local_depths = defaultdict(float)
+            
+            while queue:
+                blk, local_depth = queue.popleft()
+                
+                if blk in visited:
+                    continue
+                    
+                visited.add(blk)
+                local_depths[blk] = local_depth
+                max_local_depth = max(max_local_depth, local_depth)
+                
+                #enqueue downstream neighbors that are in this SCC
+                for next_blk in self._dnst_blk_blk_map[blk]:
+                    if next_blk in scc_set and next_blk not in visited:
+                        queue.append((next_blk, local_depth + 1))
+            
+            #assign blocks to global depths based on local depths
+            for blk in scc:
+                global_depth = current_depth + local_depths[blk]
+                self._blocks_loop_dag[global_depth].append(blk)
+                self._connections_loop_dag[global_depth].extend(self._outg_blk_con_map[blk])
+            
+            #update global depth counter for the next SCC
+            current_depth += max_local_depth + 1
+    
+        #compute depth of loop DAG
+        self._loop_depth = max(self._blocks_loop_dag) + 1 if self._blocks_loop_dag else 0
 
-            #use non-propagating mode and restrict to only loop blocks
-            depth = algebraic_depth_dfs(self._upst_blk_blk_map, blk, blocks_loop, False)
 
-            #add block to the loop DAG at its calculated depth
-            self._blocks_loop_dag[depth].append(blk)
-            self._connections_loop_dag[depth].extend(self._outg_blk_con_map[blk])
+    def _find_strongly_connected_components(self, blocks):
+        """Finds strongly connected components (SCCs) in the subgraph 
+        defined by blocks.
+        
+        Uses Tarjan's algorithm to identify separate loop structures.
+        
+        Parameters
+        ----------
+        blocks : list[Block]
+            Blocks to consider for SCC analysis
+        
+        Returns
+        -------
+        list[list[Block]]
+            List of SCCs, where each SCC is a list of blocks
+        """
+        block_set = set(blocks)
+        index_counter = [0]
+        index = {}  # node -> index
+        lowlink = {}  # node -> lowlink
+        onstack = set()  # nodes currently on stack
+        stack = []
+        result = []
+        
+        def strongconnect(node):
+            #set the depth index for node
+            index[node] = index_counter[0]
+            lowlink[node] = index_counter[0]
+            index_counter[0] += 1
+            stack.append(node)
+            onstack.add(node)
+            
+            #consider successors
+            for successor in self._dnst_blk_blk_map[node]:
+                if successor not in block_set:
+                    continue
+                    
+                if successor not in index:
+                    #successor has not yet been visited; recurse on it
+                    strongconnect(successor)
+                    lowlink[node] = min(lowlink[node], lowlink[successor])
+                elif successor in onstack:
+                    #successor is in stack and hence in the current SCC
+                    lowlink[node] = min(lowlink[node], index[successor])
+            
+            #if node is a root node, pop the stack and generate an SCC
+            if lowlink[node] == index[node]:
+                scc = []
 
-        #finally calculate depth of loop DAG
-        self._loop_depth = max(self._blocks_loop_dag) + 1 if self.has_loops else 0
+                while True:
+                    successor = stack.pop()
+                    onstack.remove(successor)
+                    scc.append(successor)
+                    if successor == node:
+                        break
+
+                if len(scc) > 1 or any(node in self._dnst_blk_blk_map[node] for node in scc):
+                    result.append(scc)
+        
+        #find SCCs for all nodes
+        for node in blocks:
+            if node not in index:
+                strongconnect(node)
+        
+        return result
 
 
     def outgoing_connections(self, block):

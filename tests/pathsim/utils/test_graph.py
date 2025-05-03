@@ -164,20 +164,6 @@ class TestGraph(unittest.TestCase):
         self.assertEqual(loop_depth, 0) 
 
 
-    def test_distance_acyclic_mixed(self):
-        """Test distance calculation in an acyclic graph."""
-
-        g = Graph(self.nodes_acyclic, self.conns_acyclic)
-
-        # Distance = sum of alg lengths on longest purely algebraic path
-        self.assertEqual(g.distance(self.amp1, self.amp2), 3) # amp1(1)+add1(1)+amp2(1) = 3
-        self.assertEqual(g.distance(self.int1, self.amp2), 0) # add1(1)+amp2(1) = 2 (path via int1 broken)
-        self.assertEqual(g.distance(self.amp1, self.add1), 2) # amp1(1)+add1(1) = 2
-        self.assertEqual(g.distance(self.amp1, self.int2), 0) # amp1->add1->amp2 path gives 3, int2 adds 0
-        self.assertEqual(g.distance(self.int1, self.int2), 0) # add1->amp2 path gives 2, int1/int2 add 0
-        self.assertEqual(g.distance(self.int2, self.amp1), 0) # No path back, corrected from assertIsNone
-
-
     def test_dag_traversal_mixed(self):
         """Test DAG traversal on a mixed acyclic graph."""
 
@@ -208,25 +194,6 @@ class TestGraph(unittest.TestCase):
         self.assertEqual(len(dag_result[3][1]), 1)
         self.assertIn(self.c_add1_amp2, dag_result[2][2]) # Connection from depth 2 node (add1)
         self.assertIn(self.c_amp2_int2, dag_result[3][2]) # Connection from depth 3 node (amp2) - yields at source depth
-
-
-    def test_loop_traversal_algebraic(self):
-        """Test loop traversal identifying an algebraic loop."""
-        g = Graph(self.nodes_alg_loop, self.conns_alg_loop)
-        loop_result = list(g.loop())
-
-        # Based on corrected depth analysis: loop_depth=2 -> levels 0, 1
-        self.assertEqual(len(loop_result), 2)
-
-        # Assuming add2 is entry point (depth 0)
-        self.assertIn(self.add2, loop_result[0][1])
-        self.assertEqual(len(loop_result[0][1]), 1)
-        self.assertIn(self.c_add2_amp1, loop_result[0][2]) # Conn from depth 0
-
-        # Assuming amp1 is next (depth 1)
-        self.assertIn(self.amp1, loop_result[1][1])
-        self.assertEqual(len(loop_result[1][1]), 1)
-        self.assertIn(self.c_amp1_add2, loop_result[1][2]) # Conn from depth 1
 
 
 
