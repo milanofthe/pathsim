@@ -77,7 +77,7 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(200)
+    Sim.run(100)
 
     #plot the results directly from the scope
     Sc.plot()

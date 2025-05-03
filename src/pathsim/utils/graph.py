@@ -79,75 +79,71 @@ def upstream_block_block_map(connections):
     return connection_map
 
 
-def _block_meta(block):
-    """Return a triple: (alg_len, is_hidden_loop, is_algebraic)
-
-    * `len(block) is None` -> (0,  True,  False)
-    * `len(block) == 0`    -> (0,  False, False)
-    * `len(block) > 0`     -> (len, False, True)
-    """
-    raw = len(block)
-    if raw is None:
-        return 0, True, False
-    return raw, False, raw > 0
-
-
-def _dfs_generic(graph_map, node, propagate_inf, start, stack=frozenset()):
-    """Internal DFS that implements all path-length semantics.
-
+def algebraic_depth_dfs(graph_map, node, node_set=None, propagate_inf=True, stack=frozenset()):
+    """Computes the longest algebraic path length using depth-first search.
+    
+    This function determines the longest algebraic path length from a given node,
+    traversing the graph in the direction specified by the graph_map. It can
+    operate in two modes controlled by the propagate_inf parameter:
+    
+    - In propagate mode (propagate_inf=True): Cycles and hidden loops cause the
+      entire result to be marked as infinite (None). Used for detecting algebraic
+      loops that affect the entire system.
+    - In non-propagate mode (propagate_inf=False): Cycles and hidden loops act as
+      termination points (return 0). Used for constructing a DAG from components
+      that would otherwise form a cycle.
+    
     Parameters
     ----------
     graph_map : dict[Block, set[Block]]
-        Neighbour map *in the traversal direction*:
-        * upstream call  -> {target : {sources}}
-        * downstream call -> {source : {targets}}
-
+        Adjacency map in the direction of traversal:
+        - For upstream traversal: {target : {sources}}
+        - For downstream traversal: {source : {targets}}
     node : Block
-        Current block in the recursion.
-
-    propagate_inf : bool
-        *True*  ->  an 'infinite' branch (algebraic loop or hidden-loop block)
-        propagates upstream to taint the **entire** result (`None`).
-        (*Used by upstream_path_length_dfs*.)
-
-        *False* ->  an infinite branch is clipped locally; the overall
-        result is only `None` if the **start** block itself lies in/with
-        an algebraic loop or is a hidden-loop block.
-        (*Used by downstream_path_length_dfs*.)
-
-    start : Block
-        Block for which the public API was invoked; needed to recognise
-        whether a detected cycle involves the start node.
-
+        Starting block for the traversal.
+    node_set : set[Block] | None, optional
+        Optional set of blocks to restrict the search to.
+        If None, all blocks in the graph_map are considered.
+    propagate_inf : bool, default=True
+        Controls how cycles and hidden loops are handled:
+        - True: Infinite paths propagate and taint the entire result (None)
+        - False: Infinite paths simply terminate that branch (0)
     stack : frozenset[Block], optional
-        Blocks on the current recursion path (immutable for hashability).
-        Do **not** supply manually; the first call leaves this argument
-        at its default.
-
+        Blocks on the current recursion path (used for cycle detection).
+        Internal use only - do not supply manually.
+    
     Returns
     -------
     int | None
-        * Positive integer – longest finite algebraic path length.
-        * 0 – no algebraic blocks reachable before a path-breaking
-          non-algebraic block.
-        * None – result is “infinite” under the rules described above.
+        - Positive integer: Length of longest finite algebraic path
+        - 0: No algebraic path exists (all paths broken by non-algebraic blocks)
+        - None: Infinite path length (due to algebraic loops or hidden loops)
     """
     @cache
     def dfs(cur, stk):
-        alg_len, hidden_loop, is_alg = _block_meta(cur)
 
-        #hidden loop block
-        if hidden_loop:
-            return None if (propagate_inf or cur is start) else 0
+        #skip irrelevant nodes -> terminates
+        if node_set is not None: 
+            if cur not in node_set:
+                return 0
 
-        #cycle detection
-        if cur in stk:
-            #non-algebraic blocks stop the walk
-            return None if (propagate_inf or cur is start) else 0
+        alg_len = len(cur)
 
         #non-algebraic block -> stops path 
         if alg_len == 0:
             return 0
+
+        #hidden loop block
+        if alg_len is None: 
+
+            #taint entire result or terminate
+            return None if propagate_inf else 0
+            
+        #cycle detection
+        if cur in stk:
+
+            #taint entire result or terminate
+            return None if propagate_inf else 0
 
         #recurse to neighbours
         best = 0
@@ -157,134 +153,89 @@ def _dfs_generic(graph_map, node, propagate_inf, start, stack=frozenset()):
             sub = dfs(nbr, nxt_stk)
 
             if sub is None:
-
-                if propagate_inf:
-                    #taint entire result
-                    return None           
-
-                #downstream mode –> ignore this branch
-                continue
+                #taint entire result or terminate
+                return None if propagate_inf else 0
 
             #update best length
             best = max(best, sub)
 
         #count this algebraic block
-        return best + alg_len              
+        return best + alg_len
 
     return dfs(node, stack)
 
 
-def upstream_path_length_dfs(connection_map, starting_block):
-    """Longest algebraic path length ending at `starting_block`, walking
-    **upstream** (targets -> sources).
-
-    * Stops – and finishes that branch – as soon as a *non-algebraic* block
-      (`len==0`) is reached.
-
-    * If any upstream branch hits an *algebraic loop* **or** a *hidden-loop*
-      block (`len is None`), the path length is considered **infinite** and
-      the function returns **None**.
-
-    * Otherwise returns the maximum finite algebraic length (>=0).
-    """
-    return _dfs_generic(
-        connection_map,
-        starting_block,
-        propagate_inf=True,   # upstream -> infinite branches taint whole result
-        start=starting_block
-    )
-
-
-def downstream_path_length_dfs(connection_map, starting_block):
-    """Longest algebraic path length starting from `starting_block`, 
-    walking **downstream** (source -> targets).
-
-    * Traversal *immediately* stops on a non-algebraic block, a hidden-loop
-      block, or a loop farther downstream; those branches contribute 0.
-
-    * The result is **None** only if the starting block itself is part of an
-      algebraic loop or is a hidden-loop block.  Branch-local loops do *not*
-      taint the answer.
-
-    * Otherwise returns the maximum finite algebraic length (≥0).
-    """
-    return _dfs_generic(
-        connection_map,
-        starting_block,
-        propagate_inf=False,  # downstream -> infinite branches local
-        start=starting_block
-    )
-
-
-def distance_path_length_dfs(connection_map, start_block, end_block):
-    """Return the length of the *longest purely-algebraic* directed path 
-    from `src_block` to `dst_block` following the `connection_map` 
-    orientation (source -> targets).
-
+def has_algebraic_path(connection_map, start_block, end_block, node_set=None):
+    """Determines if an algebraic path exists between two blocks.
+    
+    An algebraic path exists if there is a directed path from start_block to 
+    end_block consisting entirely of algebraic blocks (blocks with len > 0).
+    This function can also detect algebraic self-feedback loops when 
+    start_block and end_block are the same.
+    
     Parameters
     ----------
     connection_map : dict[Block, set[Block]]
         Adjacency map in downstream (source -> targets) orientation.
-    start_block, end_block : Block
-        Start and end nodes of interest.  They may be identical; a zero-length
-        self-path is then possible.
-
+    start_block : Block
+        Starting block for the path search.
+    end_block : Block
+        Target block to reach.
+    node_set : set[Block] | None, optional
+        Optional set of blocks to restrict the search to.
+        If None, all blocks in the connection_map are considered.
+        
     Returns
     -------
-    int | None
-        * 0      – No algebraic path exists (either no path at all, or every
-                   path is broken by at least one non-algebraic block
-                   ``len(b)==0``).
-        * >0     – Length of the longest purely-algebraic path (sum of
-                   ``len(b)`` for all blocks on that path).
-        * None   – At least one candidate path runs into
-                     * an **algebraic loop** (cycle containing a
-                       ``len(b)>0`` block), **or**
-                     * a **hidden-loop block** where ``len(b) is None``.
-                   Because such a loop makes the algebraic influence
-                   'infinite', we propagate the value `None`.
+    bool
+        True if an algebraic path exists, False otherwise.
+        
+    Note
+    ----
+    - Self-feedback loops (when start_block equals end_block) are detected by
+      finding a path that returns to the start block after traversing at least
+      one other node.
+    - Non-algebraic blocks (len == 0) break the path and prevent an algebraic
+      connection from being established.
+    - The function uses depth-first search with cycle detection to avoid
+      infinite recursion.
     """
-    @cache
-    def dfs(node, stack=frozenset()):
-        n_len = len(node)
+    # Create a visited set to avoid recomputing nodes
+    visited = set()
+    
+    def dfs(current):
         
-        #hidden loop block -> abort with None
-        if n_len is None:
-            return None
-
-        #block is non-algebraic -> breaks path
-        if n_len == 0:
-            return 0
-
-        #reached destination after leaving it once -> base length (include end if algebraic)
-        if node is end_block and stack:
-            return n_len
-
-        #cycle detection
-        if node in stack:
-            
-            #least one algebraic block? -> algebraic cycle  
-            cycle_alg = any(len(b) and len(b) > 0 for b in stack | {node})
-            return None if cycle_alg else 0
-
-        #explore targets
-        best = 0
-        for nxt in connection_map.get(node, ()):
-
-            #skip non alg targets
-
-
-            sub = dfs(nxt, stack | {node})
-
-            #loop upstream of end -> propagate
-            if sub is None:
-                return None          
-            
-            best = max(best, sub)
+        #skip if already visited or not in node_set (if specified)
+        if current in visited or (node_set is not None and current not in node_set):
+            return False
         
-        #if all branches broken -> 0
-        return (best + n_len) 
+        #mark as visited
+        visited.add(current)
+        
+        #check if we reached the end block
+        if current is end_block:
+            
+            #for self-loops, we need to find a path back to the start
+            if start_block is not end_block:
+                return True
+                
+        #non-algebraic blocks break the path
+        if len(current) == 0:
+            return False
+        
+        #explore neighbors
+        for next_block in connection_map.get(current, ()):
 
+            #self-loops -> True if we find end_block AND it's through a path (not directly)
+            if next_block is end_block and start_block is end_block:
+                return True
+                
+            if dfs(next_block):
+                return True
+                
+        return False
+    
+    #start the search
     return dfs(start_block)
 
 
@@ -369,114 +320,65 @@ class Graph:
         return self._alg_depth, self._loop_depth
 
 
-    def _build_loop_depths(self, blocks_loop):
-        """Populate the defaultdicts that order **only the blocks/connections
-        which belong to algebraic loops** by an internal “depth”.
-
-        A purely internal, breadth-first layering is used:
-
-        1.  **Entry set**  (depth 0) = every block in the loop sub-graph
-            that either
-              * has an upstream predecessor outside the loop, **or**
-              * has no predecessors at all
-            If the SCC is completely self-contained (no entry), pick one
-            arbitrary seed so the loop still gets an ordering.
-
-        2.  Perform a BFS that walks *only edges whose target is also in the
-            loop.*  Every time we traverse an algebraic edge we enqueue the
-            target with depth = parent + 1.
-
-        The result is stored in:
-
-        .. code-block::
-
-            self._blocks_loop_dag[depth]       ->  list[Block]
-            self._connections_loop_dag[depth]  ->  list[Connection]
-
-        Depth values are purely relative but let the solver update loop
-        blocks in Gauss–Seidel order (shallow -> deep) if desired.
-        """
-
-        #safety, nothing to do
-        if not blocks_loop: return
-
-        loop_set = set(blocks_loop)
-        depth_of  = {}
-
-        #collect entry nodes
-        for blk in loop_set:
-            preds = self._upst_blk_blk_map[blk]
-            if not preds or any(p not in loop_set for p in preds):
-                depth_of[blk] = 0
-                self._blocks_loop_dag[0].append(blk)
-
-        #self-contained SCC -> seed with first block
-        if not depth_of:
-            seed = blocks_loop[0]
-            depth_of[seed] = 0
-            self._blocks_loop_dag[0].append(seed)
-
-        #BFS level-by-level inside the loop
-        q = deque(self._blocks_loop_dag[0])
-
-        while q:
-            cur = q.popleft()
-            cur_d = depth_of[cur]
-
-            #add outgoing connections at this depth (for convenience)
-            self._connections_loop_dag[cur_d].extend(self._outg_blk_con_map[cur])
-
-            for nxt in self._dnst_blk_blk_map[cur]:
-                
-                #leaves the loop -> ignore
-                if nxt not in loop_set: continue
-
-                #already visited
-                if nxt in depth_of: continue
-                
-                depth_of[nxt] = cur_d + 1
-                self._blocks_loop_dag[cur_d + 1].append(nxt)
-                
-                q.append(nxt)
-
-        #finally calculate depth of loop DAG
-        self._loop_depth = max(self._blocks_loop_dag) + 1
-
-
     def _assemble(self):
-        """Assemble components, ordered by their algebraic depth in 
-        the DAG.
-
-        Perform upstream depth first search on the DAG to assign 
-        each block their number of consecutive algebraic dependencies 
-        (algebraic depth). This is also used to assign the outgoing 
-        connections similarly.
+        """Constructs two separate DAG orderings of the graph components.
+        
+        This method performs two key operations:
+        
+        1. Constructs the main DAG for acyclic portions:
+           - Computes algebraic depth for each block using upstream traversal
+           - Blocks in algebraic loops are identified (depth = None) and collected
+           - Acyclic blocks are placed in _blocks_dag at their calculated depth
+           
+        2. Constructs a DAG for loop components:
+           - Only considers blocks already identified as part of loops
+           - Uses non-propagating mode to treat cycles as termination points
+           - Organizes loop blocks into levels in _blocks_loop_dag
+           
+        The result is two separate ordered representations:
+        - A standard DAG for acyclic portions (_blocks_dag/_connections_dag)
+        - A "broken loop" DAG (_blocks_loop_dag/_connections_loop_dag) that 
+          treats loop reentry points as termination points, allowing loops
+          to be processed in a deterministic order.
         """
 
-        #collect tainted blocks 
+        #collect blocks involved in algebraic loops 
         blocks_loop = []
 
-        #flag for loop detection
+        #reset flag for loop detection
         self.has_loops = False
 
         #iterate blocks to calculate their algebraic depths
         for blk in self.blocks:
-            depth = upstream_path_length_dfs(self._upst_blk_blk_map, blk) 
 
-            #None -> alg. loop upstream taints downstream components
+            #use 'inf' propagating mode to detect loops
+            depth = algebraic_depth_dfs(self._upst_blk_blk_map, blk, None, True)
+
+            #None -> upstream alg. loop taints downstream components
             if depth is None:
                 blocks_loop.append(blk)
                 self.has_loops = True
                 
             else:
+                #add block to the DAG at its calculated depth
                 self._blocks_dag[depth].append(blk)
                 self._connections_dag[depth].extend(self._outg_blk_con_map[blk])
 
         #compute total algebraic depth of DAG
         self._alg_depth = max(self._blocks_dag) + 1 if self._blocks_dag else 0
         
-        #build the DAG for the broken loops
-        self._build_loop_depths(blocks_loop)
+        #build the DAG for the loop blocks by treating cycles as termination points
+        for blk in blocks_loop:
+
+            #use non-propagating mode and restrict to only loop blocks
+            depth = algebraic_depth_dfs(self._upst_blk_blk_map, blk, blocks_loop, False)
+
+            #add block to the loop DAG at its calculated depth
+            self._blocks_loop_dag[depth].append(blk)
+            self._connections_loop_dag[depth].extend(self._outg_blk_con_map[blk])
+
+        #finally calculate depth of loop DAG
+        self._loop_depth = max(self._blocks_loop_dag) + 1 if self.has_loops else 0
 
 
     def outgoing_connections(self, block):
@@ -496,19 +398,32 @@ class Graph:
         return self._outg_blk_con_map[block]
 
 
-    def distance(self, start_block, end_block):
-        """Compute the algebraic distance / path length between two blocks 
-        in the downstream arangement ('start_block' -> 'end_block') in the 
-        graph.
-        """
+    def is_algebraic_path(self, start_block, end_block):
+        """Check if two blocks are connected through a 
+        purely algebraic path.
+        
+        Parameters
+        ----------
+        start_block : Block
+            starting block of path
+        end_block : Block
+            end block of path
+        
+        Returns
+        -------
+        bool
+            Is there a purely algebraic path between 
+            the two blocks? 
+
+        """ 
 
         #blocks are not part of same graph -> no algebraic path
         if (start_block not in self._dnst_blk_blk_map or 
             end_block not in self._dnst_blk_blk_map):
-            return 0
+            return False
 
-        #use depth first search
-        return distance_path_length_dfs(self._dnst_blk_blk_map, start_block, end_block)
+        #use depth first search to see if there is a path
+        return has_algebraic_path(self._dnst_blk_blk_map, start_block, end_block)
 
 
     def dag(self):

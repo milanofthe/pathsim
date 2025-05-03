@@ -178,14 +178,9 @@ class Subsystem(Block):
         if self.graph.has_loops:
             return None
 
-        #compute algebraic path from interface back to itself (internal path length)
-        length = self.graph.distance(self.interface, self.interface)
-
-        #hit internal algebraic loop (inf)
-        if length is None: 
-            return None
-
-        return int(length > 0)
+        #check if algebraic path from interface back to itself 
+        is_alg = self.graph.is_algebraic_path(self.interface, self.interface)
+        return int(is_alg)
 
 
     def __call__(self):
