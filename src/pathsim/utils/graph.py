@@ -238,9 +238,9 @@ def distance_path_length_dfs(connection_map, start_block, end_block):
         * >0     – Length of the longest purely-algebraic path (sum of
                    ``len(b)`` for all blocks on that path).
         * None   – At least one candidate path runs into
-                     • an **algebraic loop** (cycle containing a
+                     * an **algebraic loop** (cycle containing a
                        ``len(b)>0`` block), **or**
-                     • a **hidden-loop block** where ``len(b) is None``.
+                     * a **hidden-loop block** where ``len(b) is None``.
                    Because such a loop makes the algebraic influence
                    'infinite', we propagate the value `None`.
     """
@@ -252,9 +252,13 @@ def distance_path_length_dfs(connection_map, start_block, end_block):
         if n_len is None:
             return None
 
-        #reached destination -> base length (include end if algebraic)
-        if node is end_block:
-            return 0 if n_len == 0 else n_len
+        #block is non-algebraic -> breaks path
+        if n_len == 0:
+            return 0
+
+        #reached destination after leaving it once -> base length (include end if algebraic)
+        if node is end_block and stack:
+            return n_len
 
         #cycle detection
         if node in stack:
@@ -263,13 +267,12 @@ def distance_path_length_dfs(connection_map, start_block, end_block):
             cycle_alg = any(len(b) and len(b) > 0 for b in stack | {node})
             return None if cycle_alg else 0
 
-        #block is non-algebraic -> breaks path
-        if n_len == 0:
-            return 0
-
         #explore targets
         best = 0
         for nxt in connection_map.get(node, ()):
+
+            #skip non alg targets
+
 
             sub = dfs(nxt, stack | {node})
 
@@ -280,7 +283,7 @@ def distance_path_length_dfs(connection_map, start_block, end_block):
             best = max(best, sub)
         
         #if all branches broken -> 0
-        return (best + n_len) if best else 0   
+        return (best + n_len) 
 
     return dfs(start_block)
 

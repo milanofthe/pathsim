@@ -26,7 +26,6 @@ from pathsim.blocks import (
     Adder
     )
 
-
 from pathsim._constants import (
     SIM_TIMESTEP,
     SIM_TIMESTEP_MIN,
@@ -34,7 +33,6 @@ from pathsim._constants import (
     SIM_TOLERANCE_FPI,
     SIM_ITERATIONS_MAX
     )
-
 
 
 # TESTS ================================================================================
