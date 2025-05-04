@@ -18,3 +18,4 @@ There is an even more comprehensive collection of example dynamical system simul
    examples/thermostat
    examples/fmcw_radar
    examples/stick_slip
+   examples/vanderpol_subsystem

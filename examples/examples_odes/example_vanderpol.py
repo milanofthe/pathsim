@@ -46,8 +46,6 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=0.1, 
-    log=True, 
     Solver=GEAR52A, 
     tolerance_lte_abs=1e-5, 
     tolerance_lte_rel=1e-3,
