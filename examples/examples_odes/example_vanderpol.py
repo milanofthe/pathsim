@@ -39,7 +39,7 @@ blocks = [VDP, Sco]
 #the connections between the blocks
 connections = [
     Connection(VDP, Sco),
-    Connection(VDP[1], Sco[1])
+    # Connection(VDP[1], Sco[1])
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
@@ -61,6 +61,6 @@ if __name__ == "__main__":
 
     #plotting
     Sco.plot(".-")
-    Sco.plot2D()
+    # Sco.plot2D()
 
     plt.show()

@@ -86,6 +86,12 @@ Lets run the simulation and look at the results:
     Sco.plot(".-")
 
 
+.. image:: figures/vanderpol_result.png
+   :width: 700
+   :align: center
+   :alt: results of Van der Pol system as ODE block
+
+
 
 Van der Pol - as a Subsystem
 ----------------------------
@@ -149,8 +155,7 @@ Now, `VDP` behaves just like the :class:`.ODE` block from above. Lets continue w
 
     #the connections between the blocks in the main system
     connections = [
-        Connection(VDP, Sco),
-        # Connection(VDP[1], Sco[1])
+        Connection(VDP, Sco)
         ]
 
     #initialize simulation with the blocks, connections, timestep and logging enabled
@@ -173,6 +178,7 @@ Run the simulation and see what happens:
     #plotting
     Sco.plot(".-")
 
-
-
-
+.. image:: figures/vanderpol_subsystem_result.png
+   :width: 700
+   :align: center
+   :alt: results of Van der Pol system as a Subsystem
