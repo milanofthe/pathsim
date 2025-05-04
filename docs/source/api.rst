@@ -2,8 +2,7 @@
 API Reference
 =============
 
-
-The basic object hierarchy of PathSim is shown in the diagramm below.
+The basic object hierarchy of PathSim is shown in the diagramm below. The :class:`.Simulation` manages the system components (derivatives of :class:`.Block` and :class:`.Event`, :class:`.Connection`). 
 
 .. image:: figures/pathsim_object_hierarchy.png
    :width: 700
@@ -14,7 +13,8 @@ The basic object hierarchy of PathSim is shown in the diagramm below.
 System Definition and Simulation
 --------------------------------
 
-The following modules serve the system definition and simulation.
+The following modules serve the system definition and simulation. In PathSim, systems are defined by instantiating blocks from the block library :mod:`.blocks` and connecting them using :class:`.Connection` objects. PathSim also supports hierarchical modling through subsystems with the :class:`.Subsystem` class, which holds internal blocks and connections and behaves just like a normal block from the outside.
+
 
 .. toctree::
    :maxdepth: 3
@@ -24,25 +24,25 @@ The following modules serve the system definition and simulation.
    
 .. toctree::
    :maxdepth: 3
-   :caption: Subsystem
+   :caption: Subsystem (hierarchical modeling)
 
    modules/pathsim.subsystem
    
 .. toctree::
    :maxdepth: 3
-   :caption: Connections
+   :caption: Connection 
 
    modules/pathsim.connection
    
 .. toctree::
    :maxdepth: 5
-   :caption: Blocks
+   :caption: Block Library
 
    modules/pathsim.blocks
 
 .. toctree::
    :maxdepth: 5
-   :caption: Events
+   :caption: Event Library
 
    modules/pathsim.events
 
@@ -70,7 +70,7 @@ The numerical ODE solvers, available in PathSim are structured like this:
 Optimizers and Automatic Differentiation
 ----------------------------------------
 
-The `pathsim.optim` module contains a range of nonlinear solvers / optimizers that are primarily used for the implicit update equation of implicit ODE solvers and for the steadystate solver. This module also includes the automatic differentiation framework.
+The :mod:`.optim` module contains a range of nonlinear solvers / optimizers that are primarily used for the implicit update equation of implicit ODE solvers and for the steadystate solver. This module also includes the automatic differentiation framework.
 
 .. toctree::
    :maxdepth: 4
