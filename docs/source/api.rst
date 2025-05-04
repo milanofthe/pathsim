@@ -2,7 +2,7 @@
 API Reference
 =============
 
-The basic object hierarchy of PathSim is shown in the diagramm below. The :class:`Simulation` manages the system components (derivatives of :class:`Block` and :class:`Event`, :class:`Connection`). 
+The basic object hierarchy of PathSim is shown in the diagramm below. The :class:`.Simulation` manages the system components (derivatives of :class:`.Block` and :class:`.Event`, :class:`.Connection`). 
 
 .. image:: figures/pathsim_object_hierarchy.png
    :width: 700

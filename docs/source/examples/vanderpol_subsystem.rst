@@ -19,10 +19,10 @@ PathSim supplies a specific block to define differential equations, the :class:`
 
 .. math::
 
-    \begin{equnarray}
+    \begin{eqnarray}
         \dot{x}_1 &= x_2 \\
         \dot{x}_2 &= \mu (1 - x_1^2) x_2 - x_1
-    \end{equnarray}
+    \end{eqnarray}
 
 As a block diagram it would look like this:
 
