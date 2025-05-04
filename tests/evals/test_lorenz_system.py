@@ -13,6 +13,7 @@ from scipy.integrate import solve_ivp
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import (
+    ODE,
     Scope, 
     Integrator, 
     Constant, 
@@ -22,13 +23,15 @@ from pathsim.blocks import (
     )
 
 from pathsim.solvers import (
-    RKF21, RKBS32, RKF45, RKCK54, RKDP54, RKV65, RKF78, RKDP87
+    RKF21, RKBS32, RKF45, RKCK54, 
+    RKDP54, RKV65, RKF78, RKDP87
     )
 
 
 # TESTCASE =============================================================================
 
 class TestLorenzSystem(unittest.TestCase):
+    """Lorenz system built from distinct components"""
 
     def setUp(self):
 
@@ -135,6 +138,70 @@ class TestLorenzSystem(unittest.TestCase):
 
                     #checking the global truncation error -> larger
                     self.assertAlmostEqual(np.max(abs(x-xr)), tol, 2)  
+
+
+class TestLorenzODE(unittest.TestCase):
+    """Lorenz system as an ODE block"""
+
+    def setUp(self):
+
+        # parameters 
+        sigma, rho, beta = 10, 28, 8/3
+
+        xyz_0 = np.array([1.0, 1.0, 1.0])
+
+        def f_lorenz(_x, u, t):
+            x, y, z = _x
+            return np.array([sigma*(y-x), x*(rho-z)-y, x*y-beta*z])
+
+        lor = ODE(f_lorenz, initial_value=xyz_0)
+
+        self.sco = Scope(labels=["x", "y", "z"])
+
+        self.Sim = Simulation(
+            blocks=[lor, self.sco],
+            connections=[
+                Connection(lor[0], self.sco[0]),
+                Connection(lor[1], self.sco[1]),
+                Connection(lor[2], self.sco[2])
+                ],
+            log=False
+            )
+
+        # build reference solution with scipy integrator
+        def f_lorenz_(t, _x):
+            x, y, z = _x
+            return np.array([sigma*(y-x), x*(rho-z)-y, x*y-beta*z])
+        sol = solve_ivp(f_lorenz_, [0, 5], xyz_0, method="RK45", rtol=0.0, atol=1e-12, dense_output=True)
+        self._reference = sol.sol
+
+
+    def test_eval_solvers(self):
+
+        #test for different solvers
+        for SOL in [RKBS32, RKF45, RKCK54, RKDP54, RKV65, RKDP87]:
+
+            #test for different tolerances
+            for tol in [1e-5, 1e-6, 1e-7]:
+
+                with self.subTest("subtest solver with tolerance", SOL=str(SOL), tol=tol):            
+
+                    self.Sim.reset()
+                    self.Sim._set_solver(
+                        SOL, 
+                        tolerance_lte_rel=0.0, 
+                        tolerance_lte_abs=tol
+                        )
+
+                    self.Sim.run(5)
+
+                    time, [x, y, z] = self.sco.read()
+                    xr, yr, zr = self._reference(time)
+
+                    #checking the global truncation error -> larger
+                    self.assertAlmostEqual(np.max(abs(x-xr)), tol, 2)  
+
+
 
 
 # RUN TESTS LOCALLY ====================================================================
