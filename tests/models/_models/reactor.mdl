@@ -168,7 +168,6 @@
     "dt_max": null,
     "Solver": "GEAR52A",
     "tolerance_fpi": 1e-12,
-    "iterations_min": 1,
     "iterations_max": 200,
     "tolerance_lte_abs": 1e-06,
     "tolerance_lte_rel": 0.0001

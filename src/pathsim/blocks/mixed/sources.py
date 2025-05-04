@@ -163,12 +163,13 @@ class Pulse(Block):
         Parameters
         ----------
         t : float
-            current simulation time
+            evaluation time
 
         Returns
         -------
         error : float
-            always 0.0 for this source block
+            deviation to previous iteration for convergence control
+            (always '0.0', because no passthrough)
         """
 
         #calculate output based on phase
@@ -183,7 +184,7 @@ class Pulse(Block):
         elif self._phase == 'low':
             self.outputs[0] = 0.0
 
-        return 0.0 
+        return 0.0
 
 
     def __len__(self):
@@ -247,6 +248,10 @@ class Clock(Block):
                 )
             ]
 
+    def __len__(self):
+        #no algebraic passthrough
+        return 0
+
 
 class SquareWave(Block):
     """Discrete time square wave source.
@@ -296,6 +301,10 @@ class SquareWave(Block):
                 )
             ]
 
+    def __len__(self):
+        #no algebraic passthrough
+        return 0
+
 
 class Step(Block):
     """Discrete time unit step block.
@@ -334,3 +343,7 @@ class Step(Block):
                 func_act=stp_up
                 )
             ]
+
+    def __len__(self):
+        #no algebraic passthrough
+        return 0

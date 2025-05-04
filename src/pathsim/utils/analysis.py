@@ -49,6 +49,10 @@ class Timer(ContextDecorator):
         self.time = None
 
 
+    def __float__(self):
+        return self.time
+
+
     def __repr__(self):
         if self.time is None: return None
         return f"{self.time*1e3:.3f}ms" 
@@ -76,10 +80,9 @@ def timer(func):
 
     @wraps(func)
     def wrap_func(*args, **kwargs):
-        t1 = perf_counter()
-        result = func(*args, **kwargs)
-        t2 = perf_counter()
-        print(f"Function '{func.__name__!r}' executed in {(t2 - t1)*1e3:.2f}ms")
+        with Timer(verbose=False) as T:
+            result = func(*args, **kwargs)
+        print(f"Function '{func.__name__!r}' executed in {T}")
         return result
     return wrap_func
 

@@ -53,7 +53,7 @@ class Multiplier(Block):
 
 
     def update(self, t):
-        """update system equation in fixed point loop
+        """update system equation
 
         Parameters
         ----------
@@ -63,7 +63,8 @@ class Multiplier(Block):
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence control
+            maximum absolute error to previous iteration 
+            for convergence control
         """
         u = self.inputs.to_array()
         return self.outputs.update_from_array_max_err(self.op_alg(u))

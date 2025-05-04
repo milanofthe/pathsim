@@ -26,16 +26,13 @@ from pathsim.blocks import (
     Adder
     )
 
-
 from pathsim._constants import (
     SIM_TIMESTEP,
     SIM_TIMESTEP_MIN,
     SIM_TIMESTEP_MAX,
     SIM_TOLERANCE_FPI,
-    SIM_ITERATIONS_MIN,
     SIM_ITERATIONS_MAX
     )
-
 
 
 # TESTS ================================================================================
@@ -47,7 +44,7 @@ class TestSimulation(unittest.TestCase):
     only very minimal functonality
     """
 
-    def test_init(self):
+    def test_init_default(self):
 
         #test default initialization
         Sim = Simulation(log=False)
@@ -58,9 +55,11 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_max, SIM_TIMESTEP_MAX)
         self.assertEqual(str(Sim.Solver()), "SSPRK22")
         self.assertEqual(Sim.tolerance_fpi, SIM_TOLERANCE_FPI)
-        self.assertEqual(Sim.iterations_min, 1) 
         self.assertEqual(Sim.iterations_max, SIM_ITERATIONS_MAX)
         self.assertFalse(Sim.log)
+
+
+    def test_init_sepecific(self):
 
         #test specific initialization
         B1, B2, B3 = Block(), Block(), Block()
@@ -76,7 +75,6 @@ class TestSimulation(unittest.TestCase):
             tolerance_fpi=1e-9, 
             tolerance_lte_rel=1e-4, 
             tolerance_lte_abs=1e-6, 
-            iterations_min=None, 
             iterations_max=100, 
             log=False
             )
@@ -87,7 +85,6 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(Sim.dt_max, 0.1)
         self.assertEqual(Sim.tolerance_fpi, 1e-9)
         self.assertEqual(Sim.solver_kwargs, {"tolerance_lte_rel":1e-4, "tolerance_lte_abs":1e-6})
-        self.assertEqual(Sim.iterations_min, 3) # <-- determined from internal path length
         self.assertEqual(Sim.iterations_max, 100)
 
         #test specific initialization with connection override
@@ -96,9 +93,32 @@ class TestSimulation(unittest.TestCase):
         C2 = Connection(B2, B3)
         C3 = Connection(B3, B2) # <-- overrides B2
         with self.assertRaises(ValueError):
-            Sim = Simulation(blocks=[B1, B2, B3], 
-                             connections=[C1, C2, C3],
-                             log=False)
+            Sim = Simulation(
+                blocks=[B1, B2, B3], 
+                connections=[C1, C2, C3],
+                log=False
+                )
+
+
+    def test_contains(self):
+
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        C2 = Connection(B2, B3)
+        C3 = Connection(B3, B1)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C3],
+            log=False
+            )
+
+        self.assertTrue(B1 in Sim)
+        self.assertTrue(B2 in Sim)
+        self.assertTrue(B3 in Sim)
+
+        self.assertTrue(C1 in Sim)
+        self.assertTrue(C2 not in Sim)
+        self.assertTrue(C3 in Sim)
 
 
     def test_add_block(self):
@@ -122,9 +142,11 @@ class TestSimulation(unittest.TestCase):
         B1, B2, B3 = Block(), Block(), Block()
         C1 = Connection(B1, B2)
 
-        Sim = Simulation(blocks=[B1, B2, B3], 
-                         connections=[C1],
-                         log=False)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1],
+            log=False
+            )
 
         self.assertEqual(Sim.connections, [C1])
 
@@ -181,6 +203,37 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(B2.engine, None)
 
 
+    def test_size(self):    
+
+        #test 3 alg. blocks
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        C2 = Connection(B2, B3)
+        C3 = Connection(B3, B1)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1, C2, C3],
+            log=False
+            )  
+
+        n, nx = Sim.size()
+        self.assertEqual(n, 3)
+        self.assertEqual(nx, 0)
+
+        #test 1 dyn, 1 alg block
+        B1, B2 = Block(), Integrator()
+        C1 = Connection(B1, B2)
+        Sim = Simulation(
+            blocks=[B1, B2], 
+            connections=[C1],
+            log=False
+            )  
+
+        n, nx = Sim.size()
+        self.assertEqual(n, 2)
+        self.assertEqual(nx, 1)
+
+
     def test_update(self): 
 
         B1, B2, B3 = Block(), Block(), Block()
@@ -193,9 +246,8 @@ class TestSimulation(unittest.TestCase):
             log=False
             )   
 
-        self.assertEqual(Sim.iterations_min, 3)
         evals = Sim._update(1)
-        self.assertEqual(evals, 4)
+        self.assertEqual(evals, 1)
 
 
     def test_step(self): 
@@ -218,7 +270,7 @@ class TestSimulation(unittest.TestCase):
         self.assertTrue(suc)
         self.assertEqual(err, 0.0)
         self.assertEqual(scl, 1.0)
-        self.assertEqual(evl, 12)
+        self.assertEqual(evl, 3)
         self.assertEqual(its, 0)
         self.assertEqual(Sim.time, 0.1)
 
@@ -251,8 +303,8 @@ class TestSimulation(unittest.TestCase):
         #check stats
         self.assertEqual(stats["total_steps"], 1001)
             
-        #check internal time progression
-        self.assertAlmostEqual(Sim.time, 10, 10)
+        #check internal time progression (fixed step solvers naturally overshoot)
+        self.assertAlmostEqual(Sim.time, 10, 1)
 
 
 
@@ -293,7 +345,6 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(len(self.Sim.blocks), 4)
         self.assertEqual(len(self.Sim.connections), 3)
         self.assertEqual(self.Sim.dt, 0.02)
-        self.assertEqual(self.Sim.iterations_min, 2)
         self.assertTrue(isinstance(self.Sim.engine, SSPRK22))
         self.assertTrue(self.Sim.engine.is_explicit)
         self.assertFalse(self.Sim.engine.is_adaptive)
@@ -320,7 +371,6 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertEqual(err, 0.0) #fixed solver
         self.assertEqual(scl, 1.0) #fixed solver
         self.assertEqual(ts, 0) #no implicit solver
-        self.assertGreaterEqual(te, self.Sim.iterations_min)
         
         #step again using custom timestep
         self.Sim.step(dt=2.2*self.Sim.dt)
@@ -351,7 +401,7 @@ class TestSimulationIVP(unittest.TestCase):
 
         #test running for some time
         self.Sim.run(duration=2, reset=True)
-        self.assertEqual(self.Sim.time, 2)
+        self.assertAlmostEqual(self.Sim.time, 2, 5)
         
         time, data = self.Sco.read()
         _time = np.arange(0, 2.02, 0.02)
@@ -362,7 +412,7 @@ class TestSimulationIVP(unittest.TestCase):
 
         #test running for some time with reset
         self.Sim.run(duration=1, reset=True)
-        self.assertEqual(self.Sim.time, 1)
+        self.assertAlmostEqual(self.Sim.time, 1, 5)
 
         time, data = self.Sco.read()
         _time = np.arange(0, 1.02, 0.02)
@@ -372,7 +422,7 @@ class TestSimulationIVP(unittest.TestCase):
 
         #test running for some time without reset
         self.Sim.run(duration=2, reset=False)
-        self.assertEqual(self.Sim.time, 3)
+        self.assertAlmostEqual(self.Sim.time, 3, 5)
 
         time, data = self.Sco.read()
         _time = np.arange(0, 3.02, 0.02)

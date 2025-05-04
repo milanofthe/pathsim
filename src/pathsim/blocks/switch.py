@@ -83,15 +83,21 @@ class Switch(Block):
 
 
     def update(self, t):
-        """Update switch output depending on inputs
-
-        Note
-        ----
-        MISO block has optimized 'update' method 
+        """Update switch output depending on inputs and switch state.
 
         Parameters
         ----------
         t : float
             evaluation time
+
+        Returns
+        -------
+        err : float
+            absolute deviation for convergence control
         """
+        
+        #early exit without error control
+        if self.state is None: 
+            self.outputs[0] = 0.0
+            return 0.0
         return self.outputs.update_from_array_max_err(self.inputs[self.state])

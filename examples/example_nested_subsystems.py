@@ -91,10 +91,10 @@ Sim = Simulation(
     connections, 
     dt=dt, 
     log=True, 
-    Solver=GEAR52A, 
+    Solver=ESDIRK43, 
     tolerance_lte_abs=1e-6, 
     tolerance_lte_rel=1e-3,
-    tolerance_fpi=1e-8
+    tolerance_fpi=1e-7
     )
 
 

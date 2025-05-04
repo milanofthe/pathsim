@@ -1,3 +1,5 @@
+.. _ref-bouncing-ball:
+
 Bouncing Ball
 -------------
 

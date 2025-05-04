@@ -82,7 +82,8 @@ class SquareWaveSource(Block):
     Note
     ----
     This block is purely analog with no internal events. 
-    Not to be confused with a clock that has internal scheduled events
+    Not to be confused with a clock that has internal scheduled events.
+    If you want tight timing, use an event based source instead.
     
     Parameters
     ----------
@@ -100,6 +101,10 @@ class SquareWaveSource(Block):
         self.amplitude = amplitude
         self.frequency = frequency
         self.phase = phase
+
+
+    def __len__(self):
+        return 0
 
 
     def update(self, t):
@@ -129,6 +134,10 @@ class TriangleWaveSource(Block):
         self.phase = phase
 
 
+    def __len__(self):
+        return 0
+
+
     def update(self, t):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * triangle_wave(t + tau, self.frequency)
@@ -154,6 +163,10 @@ class SinusoidalSource(Block):
         self.amplitude = amplitude
         self.frequency = frequency
         self.phase = phase
+
+
+    def __len__(self):
+        return 0
 
 
     def update(self, t):
@@ -183,6 +196,10 @@ class GaussianPulseSource(Block):
         self.tau = tau
 
 
+    def __len__(self):
+        return 0
+
+
     def update(self, t):
         self.outputs[0] = self.amplitude * gaussian(t-self.tau, self.f_max)
         return 0.0
@@ -204,6 +221,10 @@ class StepSource(Block):
 
         self.amplitude = amplitude
         self.tau = tau
+
+
+    def __len__(self):
+        return 0
 
 
     def update(self, t):
@@ -292,6 +313,10 @@ class ChirpSource(Block):
         self.t_max = 0
 
 
+    def __len__(self):
+        return 0
+
+
     def reset(self):
         #reset inputs and outputs
         self.inputs  = {0:0.0}  
@@ -330,7 +355,6 @@ class ChirpSource(Block):
         _phase = 2 * np.pi * (self.engine.get() + self.sig_white * self.noise_1) + self.phase
         self.outputs[0] = self.amplitude * np.sin(_phase)
         return 0.0
-
 
     def solve(self, t, dt):
         """advance implicit solver of implicit integration engine, evaluate 

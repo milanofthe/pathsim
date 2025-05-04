@@ -57,10 +57,9 @@ Sim = Simulation(
     dt=dt, 
     log=True, 
     Solver=RKCK54, 
-    tolerance_lte_rel=1e-6, 
-    tolerance_lte_abs=1e-8
+    tolerance_lte_rel=1e-5, 
+    tolerance_lte_abs=1e-7
     )
-
 
 
 # Run Example ===========================================================================

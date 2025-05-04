@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection, Interface, Subsystem
-from pathsim.blocks import Integrator, Scope, Function
+from pathsim.blocks import Integrator, Scope, Adder, Multiplier, Amplifier, Function
 from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR52A
 
 
@@ -23,23 +23,27 @@ x2_0 = 0
 #van der Pol parameter
 mu = 1000
 
-#simulation timestep
-dt = 0.05
-
 #blocks that define the system
 Sco = Scope()
 
 #subsystem with two separate integrators to emulate ODE block
 If = Interface()
+
 I1 = Integrator(x1_0)
 I2 = Integrator(x2_0)
-Fn = Function(lambda x1, x2: mu*(1 - x1**2)*x2 - x1)
+Fn = Function(lambda a: 1 - a**2)
+Pr = Multiplier()
+Ad = Adder("-+")
+Am = Amplifier(mu)
 
-sub_blocks = [If, I1, I2, Fn]
+sub_blocks = [If, I1, I2, Fn, Pr, Ad, Am]
 sub_connections = [
-    Connection(I2, I1, Fn[1], If[1]), 
-    Connection(I1, Fn, If), 
-    Connection(Fn, I2)
+    Connection(I2, I1, Pr[0], If[1]), 
+    Connection(I1, Fn, Ad[0], If[0]), 
+    Connection(Fn, Pr[1]),
+    Connection(Pr, Am),
+    Connection(Am, Ad[1]),
+    Connection(Ad, I2)
     ]
 
 #the subsystem acts just like a normal block
@@ -58,12 +62,10 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=dt, 
-    log=True, 
     Solver=GEAR52A, 
     tolerance_lte_abs=1e-5, 
-    tolerance_lte_rel=1e-2,
-    tolerance_fpi=1e-9
+    tolerance_lte_rel=1e-3, 
+    tolerance_fpi=1e-8 
     )
 
 
@@ -72,7 +74,7 @@ Sim = Simulation(
 if __name__ == "__main__":
 
     #run simulation for some number of seconds
-    Sim.run(3*mu)
+    Sim.run(4*mu)
 
     Sco.plot(".-", lw=1.5)
 

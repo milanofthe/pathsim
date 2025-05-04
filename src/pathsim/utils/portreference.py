@@ -3,13 +3,13 @@
 ##                                PORT REFERENCE CLASS 
 ##                              (utils/portreference.py)
 ##                              
-##                                 Milan Rother 2025
+##                                  Milan Rother 2025
 ##
 #########################################################################################
 
 # IMPORTS ===============================================================================
 
-from itertools import cycle
+# no dependencies
 
 
 # CLASS =================================================================================
@@ -30,6 +30,9 @@ class PortReference:
         list of port indices
     """
 
+    __slots__ = ["block", "ports"]
+
+
     def __init__(self, block=None, ports=[0]):
 
         #type validation for ports
@@ -48,33 +51,17 @@ class PortReference:
         self.ports = ports 
 
 
-    def set(self, values):
-        """Sets the input ports of the reference block with values.
-
-        Note
-        ----
-        If more values then ports, `zip` automatically stops iteration 
-        after all ports. If more ports then values, `itertools.cycle` is 
-        used to fill all the ports repeatedly.
+    def to(self, other):
+        """Transfer the data between two `PortReference` instances, 
+        in this direction `self` -> `other`.
 
         Parameters
         ----------
-        values : list[obj], list[float]
-            values to set at block input ports
+        other : PortReference
+            the `PortReference` instance to transfer data to from `self`
         """
-        for p, v in zip(self.ports, cycle(values)):
-            self.block.set(p, v)
-
-
-    def get(self):
-        """Returns the values of the output ports of the reference block.
-        
-        Returns
-        -------
-        out : list[obj], list[float]
-            values from block output ports
-        """
-        return [self.block.get(p) for p in self.ports]
+        for a, b in zip(other.ports, self.ports):
+            other.block.set(a, self.block.get(b))
 
 
     def to_dict(self):
