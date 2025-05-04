@@ -6,3 +6,4 @@ The tests for **PathSim** use `unittest` and follow a two tier approach:
 
 2. Tests in [tests/evals]() are top-down and implement specific dynamical systems, simulate them and compare the results to reference solutions. They test complexity, permutations, and ultimately ensure accuracy and functionality of the whole framework.
 
+There is a third directory [tests/models]() that has automatic testing for exported PathSim model files. Its just an additional layer that ensures, models can be loaded and run. This is slightly decoupled from the main test suite.
