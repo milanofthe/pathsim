@@ -92,6 +92,7 @@ Lets run the simulation and look at the results:
    :alt: results of Van der Pol system as ODE block
 
 
+.. _ref-vanderpol-subsystem:
 
 Van der Pol - as a Subsystem
 ----------------------------
