@@ -15,7 +15,7 @@ Key Features:
 - **Hot-swappable** blocks and solvers during simulation
 - Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
 - Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
-- **Modular and hierarchical** modeling with (nested) subsystems (see :ref:`ref-vanderpol-subsystem`)
+- **Modular and hierarchical** modeling with (nested) subsystems (see :class:`.Subsystem` and :ref:`ref-vanderpol-subsystem`)
 - **Event handling** system to detect and resolve discrete events (zero-crossing detection, see :ref:`ref-bouncing-ball`)
 - Automatic differentiation for **fully differentiable** system simulations (see :ref:`ref-tutorials-ad`)
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
