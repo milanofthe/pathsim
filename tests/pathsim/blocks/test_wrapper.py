@@ -80,13 +80,17 @@ class TestWrapper(unittest.TestCase):
         W = Wrapper()
         W.tau = 2
         ev = W.Evt
+        ev_l = W.events[0]
         self.assertEqual(W.tau,ev.t_start)
+        self.assertEqual(W.tau,ev_l.t_start)
     
     def test_assert_update_event_period(self):
         W = Wrapper()
         W.T = 2
         ev = W.Evt
+        ev_l = W.events[0]
         self.assertEqual(W.T,ev.t_period)
+        self.assertEqual(W.T,ev_l.t_period)
     
     def test_wrong_tau(self):
         W = Wrapper()
