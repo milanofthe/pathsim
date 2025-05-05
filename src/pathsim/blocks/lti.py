@@ -69,7 +69,7 @@ class StateSpace(Block):
     Parameters
     ----------
     A, B, C, D : array_like
-        state space matrices
+        real valued state space matrices
     initial_value : array_like, None
         initial state / initial condition
 
@@ -244,6 +244,13 @@ class TransferFunctionPRC(StateSpace):
 
 
 class TransferFunction(TransferFunctionPRC): 
+    """Alias for `TransferFunctionPRC`.
+
+    .. warning::
+
+        This class will be deprecated in the future as it is an alias for `TransferFunctionPRC`.
+        Please use `TransferFunctionPRC` for future code.
+    """
     
     def __init__(self, Poles=[], Residues=[], Const=0.0):
         super().__init__(Poles, Residues, Const)
