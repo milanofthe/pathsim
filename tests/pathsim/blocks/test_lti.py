@@ -12,7 +12,11 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.lti import StateSpace, TransferFunctionPRC
+from pathsim.blocks.lti import (
+    StateSpace, 
+    TransferFunctionPRC, 
+    TansferFunction
+    )
 
 #base solver for testing
 from pathsim.solvers._solver import Solver 
