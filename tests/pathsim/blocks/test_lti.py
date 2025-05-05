@@ -12,7 +12,7 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.lti import StateSpace, TransferFunction
+from pathsim.blocks.lti import StateSpace, TransferFunctionPRC
 
 #base solver for testing
 from pathsim.solvers._solver import Solver 
@@ -164,9 +164,9 @@ class TestStateSpace(unittest.TestCase):
             self.assertTrue(np.all(s==r))
 
 
-class TestTransferFunction(unittest.TestCase):
+class TestTransferFunctionPRC(unittest.TestCase):
     """
-    Test the implementation of the 'TransferFunction' block class
+    Test the implementation of the 'TransferFunctionPRC' block class
 
     inherits most methods from the 'StateSpace' block, so only 
     testing ot the initialization is required
@@ -176,17 +176,17 @@ class TestTransferFunction(unittest.TestCase):
 
         #test default initialization        
         with self.assertRaises(ValueError):
-            T = TransferFunction()
+            T = TransferFunctionPRC()
 
         #test specific initialization (siso)
-        T = TransferFunction(Poles=2, Residues=0.5, Const=5.5)
+        T = TransferFunctionPRC(Poles=2, Residues=0.5, Const=5.5)
         self.assertEqual(T.A, 2)
         self.assertEqual(T.B, 1)
         self.assertEqual(T.C, 0.5)
         self.assertEqual(T.D, 5.5)
 
         #test specific initialization (mimo)
-        T = TransferFunction(Poles=np.array([1, 2]), 
+        T = TransferFunctionPRC(Poles=np.array([1, 2]), 
                              Residues=2*np.ones((2, 2)), 
                              Const=np.ones(2))
         self.assertTrue(np.all(T.A == np.diag(np.array([1, 2]))))
