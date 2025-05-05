@@ -30,6 +30,8 @@ class Wrapper(Block):
 
     Parameters
     ----------
+    func : callable
+        function that defines algebraic block IO behaviour
     T : float
         sampling period for the wrapped function
     tau : float
