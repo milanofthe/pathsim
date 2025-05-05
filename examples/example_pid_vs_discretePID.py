@@ -13,9 +13,10 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope, PID, Wrapper
 from pathsim.solvers import RKCK54
 
+
 class DiscretePID(Wrapper):
     """
-    Discrete PID controller implementation using the Wrapper class
+    Discrete PID controller
 
     Parameters
     ----------
@@ -75,6 +76,7 @@ class DiscretePID(Wrapper):
         self.prev_error = error
         
         return output
+
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
 
