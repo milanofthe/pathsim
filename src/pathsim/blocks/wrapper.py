@@ -45,11 +45,14 @@ class Wrapper(Block):
         sampling period for the event
     """
 
-    def __init__(self, T=1, tau=0):
+    def __init__(self,func=None, T=1, tau=0):
         super().__init__()
         self._T   = T
         self._tau = tau
-        self.op_alg = Operator(func=lambda x: self._run_wrapper(*x))
+
+        #assign func to wrap (direct initialization)
+        if callable(func):
+            self.wrapped = func
 
         def _sample(t):
 
@@ -57,19 +60,19 @@ class Wrapper(Block):
             u = self.inputs.to_array()
 
             #compute operator output
-            y = self.op_alg(u)
+            y = self.wrapped(*u)
 
             #update block outputs
             self.outputs.update_from_array(y)
 
         #internal scheduled events
-        self.events = [
-            Schedule(
+        self.Evt = Schedule(
                 t_start=tau,
                 t_period=T,
                 func_act=_sample
-                ),
-            ]
+                )
+        self.events = [self.Evt]
+
 
     def update(self, t):
         """Update system equation for fixed point loop.
@@ -91,11 +94,7 @@ class Wrapper(Block):
             here returns '0.0', because no direct passthrough
         """
         return 0.0
-
-    def _run_wrapper(self):
-        """Method needed to be overcharged, every inputs need to be 1D"""
-        raise NotImplementedError("Wrapper method _run_wrapper need to be overcharged")
-
+    
     @property
     def tau(self):
         """Getter for tau
@@ -119,7 +118,7 @@ class Wrapper(Block):
         if value < 0:
             raise ValueError("tau must be non-negative")
         self._tau = value
-        self.events[0].t_start = value
+        self.Evt.t_start = value
 
     @property
     def T(self):
@@ -143,6 +142,10 @@ class Wrapper(Block):
         if value <= 0:
             raise ValueError("T must be positive")
         self._T = value
-        self.events[0].t_period = value
-
-
+        self.Evt.t_period = value
+    
+    @classmethod
+    def dec(cls, T=1, tau=0):
+        def decorator(func):
+            return cls(func, T, tau)
+        return decorator
