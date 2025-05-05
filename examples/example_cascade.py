@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection, Subsystem, Interface
-from pathsim.blocks import Source, TransferFunction, Adder, Scope, PID
+from pathsim.blocks import Source, TransferFunctionZPG, Adder, Scope, PID
 from pathsim.blocks.rf import WhiteNoise
 
 from pathsim.solvers import RKCK54
@@ -22,11 +22,8 @@ from pathsim.solvers import RKCK54
 
 in1 = Interface()
 
-p11 = TransferFunction(Poles=[-1], Residues=[10], Const=0)
-p12 = TransferFunction(Poles=[-1], Residues=[1], Const=0)
-p13 = TransferFunction(Poles=[-1], Residues=[1], Const=0)
-
-p2 = TransferFunction(Poles=[-2], Residues=[3], Const=0)
+p1 = TransferFunctionZPG(Zeros=[], Poles=[-1, -1, -1], Gain=10)
+p2 = TransferFunctionZPG(Zeros=[], Poles=[-2], Gain=3)
 
 a1 = Adder()
 a2 = Adder()
@@ -35,15 +32,13 @@ d1 = WhiteNoise(spectral_density=5e-5)
 d2 = WhiteNoise(spectral_density=5e-5)
 
 plant = Subsystem(
-    blocks=[p11, p12, p13, p2, a1, a2, d1, d2, in1],
+    blocks=[p1, p2, a1, a2, d1, d2, in1],
     connections=[
         Connection(in1, p2),
         Connection(p2, a2[0]),
         Connection(d2, a2[1]),
-        Connection(a2, p11, in1[1]),
-        Connection(p11, p12),
-        Connection(p12, p13),
-        Connection(p13, a1[0]),
+        Connection(a2, p1, in1[1]),
+        Connection(p1, a1[0]),
         Connection(d1, a1[1]),
         Connection(a1, in1[0])
         ]
