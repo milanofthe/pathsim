@@ -37,8 +37,8 @@ class Wrapper(Block):
         
     Attributes
     ----------
-    events : list[event]
-        internal event. The first is used for periodic sampling the _run_wrapper method
+    Evt : 
+        internal event. Used for periodic sampling the wrapped method
     tau : float
         delau time for the start time of the event
     T : float
