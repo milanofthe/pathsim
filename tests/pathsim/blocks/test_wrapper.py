@@ -22,45 +22,70 @@ class TestWrapper(unittest.TestCase):
 
     def test_init(self):
         W = Wrapper()
+    
+    def test_init_with_dec(self):
+        @Wrapper.dec(T=2, tau=0.5)
+        def func1(a, b, c):
+            return a + 1, b + 2, c + 3
+        self.assertEqual(func1.T,2)
+        self.assertEqual(func1.tau,0.5)
+        self.assertEqual(func1.wrapped(1,2,3), (2, 4, 6))
+    
+    def test_init_with_func(self):
+        def func(a, b, c):
+            return a + 1, b + 2, c + 3
+        func1 = Wrapper(func=func, T=2, tau=0.5)
+        self.assertEqual(func1.T,2)
+        self.assertEqual(func1.tau,0.5)
+        self.assertEqual(func1.wrapped(1,2,3), (2, 4, 6))
+    
+    def test_init_with_func_as_class(self):
+        class Func(Wrapper):
+            def wrapped(self, a, b, c):
+                return a + 1, b + 2, c + 3
+        func1 = Func(T=2, tau=0.5)
+        self.assertEqual(func1.T,2)
+        self.assertEqual(func1.tau,0.5)
+        self.assertEqual(func1.wrapped(1,2,3), (2, 4, 6))
 
     def test_raise_not_overcharged(self):
         W = Wrapper()
-        self.assertRaises(NotImplementedError, W._run_wrapper)
-
+        with self.assertRaises(AttributeError):
+            W.wrapped()
 
     def test_overcharge(self):
-    	class SinSample(Wrapper):
-    		def _run_wrapper(self, x):
-    			return np.sin(x)
-    	W = SinSample()
+        class SinSample(Wrapper):
+            def wrapped(self, x):
+              return np.sin(x)
+        W = SinSample()
 
     def test_wrapped_func(self):
         class SinSample(Wrapper):
-            def _run_wrapper(self, x):
+            def wrapped(self, x):
                 return np.sin(x)
 
         W = SinSample()
 
         for t in range(10):
-            self.assertEqual(W._run_wrapper(t), np.sin(t))
+            self.assertEqual(W.wrapped(t), np.sin(t))
 
     def test_trigger_event_error(self):
 
         W = Wrapper()
-        ev = W.events[0]
-        self.assertRaises(TypeError, ev.resolve,0) # I don't believe is is expected ? 
-        # Must be NotImplementedError no ?
+        ev = W.Evt
+        with self.assertRaises(AttributeError):
+            ev.resolve(0)
     
-    def test_update_event_tau(self):
+    def test_assert_update_event_tau(self):
         W = Wrapper()
         W.tau = 2
-        ev = W.events[0]
+        ev = W.Evt
         self.assertEqual(W.tau,ev.t_start)
     
-    def test_update_event_period(self):
+    def test_assert_update_event_period(self):
         W = Wrapper()
         W.T = 2
-        ev = W.events[0]
+        ev = W.Evt
         self.assertEqual(W.T,ev.t_period)
     
     def test_wrong_tau(self):
@@ -73,14 +98,15 @@ class TestWrapper(unittest.TestCase):
         with self.assertRaises(ValueError):
             W.T = -1
         
+
     def test_trigger_event(self):
 
         class SinSample(Wrapper):
-            def _run_wrapper(self, x):
+            def wrapped(self, x):
                 return np.sin(x)
 
         W = SinSample()
-        ev = W.events[0]
+        ev = W.Evt
         ev.buffer(0)
         ev.resolve(0)
         
