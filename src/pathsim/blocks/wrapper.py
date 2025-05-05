@@ -18,7 +18,7 @@ class Wrapper(Block):
     """
     Wrapper block for discrete implementation and external code integration.
 
-    The `Wrapper` class is designed to trigger the `_run_wrapper` method at fixed intervals 
+    The `Wrapper` class is designed to trigger the `wrapped` method at fixed intervals 
     using an internal scheduled event. This makes it particularly useful for wrapping 
     external code or implementing discrete-time systems within the simulation framework.
 
@@ -146,6 +146,7 @@ class Wrapper(Block):
     
     @classmethod
     def dec(cls, T=1, tau=0):
+        """ decorator class for direct instance access from func"""
         def decorator(func):
             return cls(func, T, tau)
         return decorator
