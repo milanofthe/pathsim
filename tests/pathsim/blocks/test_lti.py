@@ -15,7 +15,8 @@ import numpy as np
 from pathsim.blocks.lti import (
     StateSpace, 
     TransferFunctionPRC, 
-    TansferFunction
+    TransferFunctionZPG,
+    TransferFunctionNumDen
     )
 
 #base solver for testing
@@ -173,7 +174,7 @@ class TestTransferFunctionPRC(unittest.TestCase):
     Test the implementation of the 'TransferFunctionPRC' block class
 
     inherits most methods from the 'StateSpace' block, so only 
-    testing ot the initialization is required
+    testing of the initialization is required
     """
 
     def test_init(self):
@@ -197,6 +198,70 @@ class TestTransferFunctionPRC(unittest.TestCase):
         self.assertTrue(np.all(T.B == np.ones(2)))
         self.assertTrue(np.all(T.C == 2*np.ones(2)))
         self.assertTrue(np.all(T.D == np.ones(2)))
+
+
+class TestTransferFunctionZPG (unittest.TestCase):
+    """
+    Test the implementation of the 'TransferFunctionZPG' block class
+
+    inherits most methods from the 'StateSpace' block, so only 
+    testing of the initialization is required
+    """
+
+    def test_init(self):
+
+        #test initialization
+        T = TransferFunctionZPG(Zeros=[], Poles=[-3], Gain=1)
+        self.assertEqual(T.A, -3)
+        self.assertEqual(T.B, 1)
+        self.assertEqual(T.C, 1)
+        self.assertEqual(T.D, 0)
+
+        #test with scipy
+        from scipy.signal import ZerosPolesGain as ZPG
+
+        ss = ZPG([3, 5, 1], [-1, -1, 4, 7], 20).to_ss()
+        T = TransferFunctionZPG([3, 5, 1], [-1, -1, 4, 7], 20)
+        self.assertTrue(np.allclose(T.A, ss.A))
+        self.assertTrue(np.allclose(T.B, ss.B))
+        self.assertTrue(np.allclose(T.C, ss.C))
+        self.assertTrue(np.allclose(T.D, ss.D))
+
+        ss = ZPG([2, 3], [0, -1, -1000], -0.1).to_ss()
+        T = TransferFunctionZPG([2, 3], [0, -1, -1000], -0.1)
+        self.assertTrue(np.allclose(T.A, ss.A))
+        self.assertTrue(np.allclose(T.B, ss.B))
+        self.assertTrue(np.allclose(T.C, ss.C))
+        self.assertTrue(np.allclose(T.D, ss.D))
+
+
+
+class TestTransferFunctionNumDen (unittest.TestCase):
+    """
+    Test the implementation of the 'TransferFunctionNumDen' block class
+
+    inherits most methods from the 'StateSpace' block, so only 
+    testing of the initialization is required
+    """
+
+    def test_init(self):
+
+        from scipy.signal import TransferFunction as TF
+
+        ss = TF([1], [-1]).to_ss()
+        T = TransferFunctionNumDen([1], [-1])
+        self.assertTrue(np.allclose(T.A, ss.A))
+        self.assertTrue(np.allclose(T.B, ss.B))
+        self.assertTrue(np.allclose(T.C, ss.C))
+        self.assertTrue(np.allclose(T.D, ss.D))
+
+        ss = TF([3, 5, 1], [-1, -1, -4, -7]).to_ss()
+        T = TransferFunctionNumDen([3, 5, 1], [-1, -1, -4, -7])
+        self.assertTrue(np.allclose(T.A, ss.A))
+        self.assertTrue(np.allclose(T.B, ss.B))
+        self.assertTrue(np.allclose(T.C, ss.C))
+        self.assertTrue(np.allclose(T.D, ss.D))
+
 
 
 # RUN TESTS LOCALLY ====================================================================

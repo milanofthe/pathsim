@@ -300,7 +300,7 @@ class TransferFunctionZPG(StateSpace):
         gain term of transfer function 
     """
 
-    def __init__(self, Zeros=[], Poles=[], Gain=0.0):
+    def __init__(self, Zeros=[], Poles=[], Gain=1.0):
 
         #parameters of transfer function in zeros-poles-gain form
         self.Zeros, self.Poles, self.Gain = Zeros, Poles, Gain
