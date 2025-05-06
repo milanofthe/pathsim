@@ -94,8 +94,10 @@ This documentation is structured in the following way. There are a number of **e
 .. toctree::
    :maxdepth: 2
 
-   tutorials
    examples
+   tutorials
+   roadmap
+   contributing
    api
    
 
