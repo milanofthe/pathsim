@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pathsim import Simulation, Connection
-from pathsim.blocks import Source, Scope, TransferFunction
+from pathsim.blocks import Source, Scope, TransferFunctionPRC
 from pathsim.solvers import RKCK54, GEAR52A
 
 
@@ -29,7 +29,7 @@ residues = [-0.2,      -0.2j,       0.2j,     0.3,     0.3]
 
 #blocks and connections
 Sr = Source(lambda t: int(t>=tau))
-TF = TransferFunction(Poles=poles, Residues=residues, Const=const)
+TF = TransferFunctionPRC(Poles=poles, Residues=residues, Const=const)
 Sc = Scope(labels=["step", "response"])
 
 blocks = [Sr, TF, Sc]

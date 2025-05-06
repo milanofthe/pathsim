@@ -12,6 +12,9 @@
 
 import numpy as np
 
+from scipy.signal import ZerosPolesGain
+from scipy.signal import TransferFunction as _TransferFunction
+
 from ._block import Block
 
 from ..utils.register import Register
@@ -66,7 +69,7 @@ class StateSpace(Block):
     Parameters
     ----------
     A, B, C, D : array_like
-        state space matrices
+        real valued state space matrices
     initial_value : array_like, None
         initial state / initial condition
 
@@ -188,10 +191,10 @@ class StateSpace(Block):
         return self.engine.step(f, dt)
 
 
-class TransferFunction(StateSpace):
+class TransferFunctionPRC(StateSpace):
     """This block defines a LTI (MIMO for pole residue) transfer function.
 
-    The transfer function is defined in pole-residue form
+    The transfer function is defined in pole-residue-constant (PRC) form
 
     .. math::
         
@@ -228,12 +231,9 @@ class TransferFunction(StateSpace):
         constant term of transfer function
     """
 
-    def __init__(self, 
-                 Poles=[], 
-                 Residues=[], 
-                 Const=0.0):
+    def __init__(self, Poles=[], Residues=[], Const=0.0):
 
-        #model parameters of transfer function in pole-residue form
+        #parameters of transfer function in pole-residue-const form
         self.Const, self.Poles, self.Residues = Const, Poles, Residues
 
         #Statespace realization of transfer function
@@ -241,3 +241,121 @@ class TransferFunction(StateSpace):
 
         #initialize statespace model
         super().__init__(A, B, C, D)
+
+
+class TransferFunction(TransferFunctionPRC): 
+    """Alias for `TransferFunctionPRC`.
+
+    .. warning::
+
+        This class will be deprecated in the future as it is an alias for `TransferFunctionPRC`.
+        Please use `TransferFunctionPRC` for future code.
+    """
+    
+    def __init__(self, Poles=[], Residues=[], Const=0.0):
+        super().__init__(Poles, Residues, Const)
+
+        import warnings
+        warnings.warn(
+            "'TransferFunction' is an alias for 'TransferFunctionPRC' and will be deprecated in the future!"
+            )
+
+
+class TransferFunctionZPG(StateSpace):
+    """This block defines a LTI (SISO) transfer function.
+
+    The transfer function is defined in zeros-poles-gain (ZPG) form
+
+    .. math::
+        
+        \\mathbf{H}(s) = k \\frac{(s - z_1)(s - z_2)\\cdots(s - z_m)}{(s - p_1)(s - p_2)\\cdots(s - p_n)}
+
+    where `Zeros` are the scalar (possibly complex conjugate) zeros of the 
+    transfer function, and `Poles` are the poles (denominator zeros) of the 
+    transfer function. `Gain` is the scalar factor `k`.
+    
+    Upon initialization, the state space realization of the transfer function is 
+    computed using `scipy.signal.ZerosPolesGain(Zeros, Poles, Gain).to_ss()`.
+
+    The resulting state space model of the form
+
+    .. math::
+        
+        \\begin{eqnarray}
+            \\dot{x} &= \\mathbf{A} x + \\mathbf{B} u \\\\
+                   y &= \\mathbf{C} x + \\mathbf{D} u 
+        \\end{eqnarray}
+
+    is handled the same as the 'StateSpace' block, where `A`, `B`, `C` and `D` 
+    are the state space matrices, `x` is the internal state, `u` the input and 
+    `y` the output vector.
+        
+    Parameters
+    ----------
+    Poles : array_like
+        transfer function poles
+    Zeros : array_like
+        transfer function zeros
+    Gain : float
+        gain term of transfer function 
+    """
+
+    def __init__(self, Zeros=[], Poles=[], Gain=1.0):
+
+        #parameters of transfer function in zeros-poles-gain form
+        self.Zeros, self.Poles, self.Gain = Zeros, Poles, Gain
+
+        #build scipy object -> convert to statespace
+        sp_SS = ZerosPolesGain(Zeros, Poles, Gain).to_ss()
+
+        #initialize statespace model
+        super().__init__(sp_SS.A, sp_SS.B, sp_SS.C, sp_SS.D)
+
+
+class TransferFunctionNumDen(StateSpace):
+    """This block defines a LTI (SISO) transfer function.
+
+    The transfer function is defined in polynomial (numerator-denominator) form
+
+    .. math::
+        
+        \\mathbf{H}(s) = \\frac{b_n + b_{n-1} s + \\dots + b_{0} s^n}{a_m + a_{m-1} s + \\dots + a_{0} s^m}
+
+    where `Num` is the list of numerator polynomial coefficients and `Den` the 
+    list of denominator coefficients.
+    
+    Upon initialization, the state space realization of the transfer function is 
+    computed using `scipy.signal.TransferFunction(Num, Den).to_ss()`.
+
+    The resulting state space model of the form
+
+    .. math::
+        
+        \\begin{eqnarray}
+            \\dot{x} &= \\mathbf{A} x + \\mathbf{B} u \\\\
+                   y &= \\mathbf{C} x + \\mathbf{D} u 
+        \\end{eqnarray}
+
+    is handled the same as the 'StateSpace' block, where `A`, `B`, `C` and `D` 
+    are the state space matrices, `x` is the internal state, `u` the input and 
+    `y` the output vector.
+        
+    Parameters
+    ----------
+    Num : array_like
+        numerator polynomial coefficients
+    Den : array_like
+        denominator polynomial coefficients
+    """
+
+    def __init__(self, Num=[], Den=[]):
+
+        #parameters of transfer function in numerator-denominator
+        self.Num, self.Den = Num, Den
+
+        #build scipy object -> convert to statespace
+        sp_SS = _TransferFunction(Num, Den).to_ss()
+
+        #initialize statespace model
+        super().__init__(sp_SS.A, sp_SS.B, sp_SS.C, sp_SS.D)
+
