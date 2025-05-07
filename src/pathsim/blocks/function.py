@@ -89,7 +89,7 @@ class Function(Block):
     be handy in some cases to keep definitions concise and localized 
     in the code:
 
-    .. code.block:: python
+    .. code-block:: python
 
         from pathsim.blocks import Function
 

@@ -100,7 +100,7 @@ class Source(Block):
     be handy in some cases to keep definitions concise and localized 
     in the code:
 
-    .. code.block:: python
+    .. code-block:: python
         
         import numpy as np
         from pathsim.blocks import Source

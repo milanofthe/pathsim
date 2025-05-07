@@ -37,7 +37,10 @@ For the full **documentation**, tutorials and API-reference visit [Read the Docs
 
 The source code can be found in the [GitHub repository](https://github.com/milanofthe/pathsim) and is fully open source under **MIT license**. Consider starring PathSim to support its development.
 
-Check out the [roadmap](https://github.com/milanofthe/pathsim/blob/master/ROADMAP.md) to see what the future holds for **PathSim** or if you want to contribute but need ideas how!
+
+## Contributing and Future
+
+If you want to contribute to **PathSim**s development, check out the [community guidelines](https://pathsim.readthedocs.io/en/latest/contributing). If you are curious about what the future holds for **PathSim**, check out the [roadmap](https://pathsim.readthedocs.io/en/latest/roadmap)!
 
 
 ## Installation
