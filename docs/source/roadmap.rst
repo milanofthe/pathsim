@@ -4,6 +4,11 @@ Development Roadmap
 ===================
 This is a preliminary roadmap for PathSim's development. To be fair, its more a collection of ideas and potential directions then a real roadmap. The items are ordered by category. If you want to contribute (check out the :ref:`ref-contributing` guidelines), you can take on one or more of them!
 
+Blocks
+------
+- adding more convenience blocks, for example math operations or different kinds of sources 
+- refactor the block library for clarity, currently for example, different sources are separated throughout the submodules
+
 Solvers
 -------
 - multistep methods (:class:`.BDF`, :class:`.GEAR`) need startup methods to build history, to maintain consistency order globally
