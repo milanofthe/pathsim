@@ -16,7 +16,6 @@ release = __version__
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings.
 extensions = [
     'sphinx.ext.autodoc',  # Core Sphinx library for auto doc generation
     'sphinx.ext.napoleon', # Support for NumPy and Google style docstrings
@@ -50,7 +49,20 @@ autodoc_default_options = {
 autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
 # -- Options for MyST Parser -----------------------------------------------
-source_suffix = ['.rst', '.md']
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
+
+myst_update_mathjax = False
+myst_heading_anchors = 3  
+myst_url_schemes = ("http", "https") 
+myst_enable_extensions = [
+    "colon_fence",
+    "deflist",
+    "linkify",
+]
 
 # Add support to link variables in other projects, used in the docstrings
 intersphinx_mapping = {
