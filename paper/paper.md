@@ -206,14 +206,14 @@ The results (plotted from the `Scope`) show the evolution of ball accross time. 
 
 Another classic dynamical system is the *Van der Pol* oscillator, which is described by the second order nonlinear ODE
 
-```math
+$$
 \begin{eqnarray}
     \dot{x}_1 &= x_2 \\
     \dot{x}_2 &= \mu (1 - x_1^2) x_2 - x_1
 \end{eqnarray}
-```
+$$
 
-where the parameter $\\mu$ controls the *stiffness*. Stiffness in dynamical systems typically arises when the (local) internal time constants (eigenvalues of the Jacobian) are on vastly different scales, or when very steep gradients are encountered. This forces explicit integrators to take extremely small timesteps in order for the discretized system to be stable. Implicit solvers have larger areas of stability and are therefore a better choice for stiff problems like the *Van der Pol* system for large $\\mu$. In this example, we select the parameter $\\mu = 1000$ as a torture test to demonstrate PathSim's ability to handle severe stiffness. 
+where the parameter $\mu$ controls the *stiffness*. Stiffness in dynamical systems typically arises when the (local) internal time constants (eigenvalues of the Jacobian) are on vastly different scales, or when very steep gradients are encountered. This forces explicit integrators to take extremely small timesteps in order for the discretized system to be stable. Implicit solvers have larger areas of stability and are therefore a better choice for stiff problems like the *Van der Pol* system for large $\mu$. In this example, we select the parameter $\mu = 1000$ as a torture test to demonstrate PathSim's ability to handle severe stiffness. 
 
 ![Block diagram representation of the *Van der Pol* ODE built from distinct PathSim blocks. Schematic visualization of the encapsulation into a `Subsystem`.](assets/vanderpol_g.png)
 
@@ -288,7 +288,7 @@ Sco.plot(".-")
 
 Again, visualizing the results directy from the `Scope` block.
 
-![Simulation results plotted from the PathSim `Scope` for the bouncing ball dynamics, including the detected events.](assets/vanderpol_result_g.png)
+![Simulation results plotted from the PathSim `Scope` for *Van der Pol* Subsystem.](assets/vanderpol_result_g.png)
 
 # References
 
