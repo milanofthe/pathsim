@@ -34,6 +34,7 @@ Performance
 
 Documentation
 -------------
+- testing of code blocks in the :ref:`ref-examples` section through either `jupyter-book` integration, or `doctest`
 - the integrators (:class:`.Solver` child classes) would benefit from more descriptive docstrings for the api reference including explanations and references (literature) to the specific method used and also some usage suggestions to make solver choice easier and more transparent for the user
 - add more tutorials to the docs, that focus on:
    - types of analyses and visualization methods (transient -> :class:`.Scope`, frequency -> :class:`.Spectrum`, steadystate -> ??)
