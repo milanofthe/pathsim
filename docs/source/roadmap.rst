@@ -34,6 +34,8 @@ Performance
 
 Documentation
 -------------
+- testing of code blocks in the :ref:`ref-examples` section through either `jupyter-book` integration, or `doctest`
+- add the standalone examples from the `repo <https://github.com/milanofthe/pathsim/blob/master/examples>`_ to the :ref:`ref-examples` section in the docs with additional explanations as for the other examples
 - the integrators (:class:`.Solver` child classes) would benefit from more descriptive docstrings for the api reference including explanations and references (literature) to the specific method used and also some usage suggestions to make solver choice easier and more transparent for the user
 - add more tutorials to the docs, that focus on:
    - types of analyses and visualization methods (transient -> :class:`.Scope`, frequency -> :class:`.Spectrum`, steadystate -> ??)
