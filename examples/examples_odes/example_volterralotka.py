@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
-from pathsim.blocks import Scope, Integrator, Constant, Adder, Amplifier, Multiplier
+from pathsim.blocks import Scope, Integrator, Adder, Amplifier, Multiplier
 from pathsim.solvers import RKBS32
 
 
