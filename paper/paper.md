@@ -59,13 +59,11 @@ PathSim employs a decentralized, object-oriented design centered around three pr
 
 # PathSim Modelling Flow
 
-PathSim is a script based modelling framework, with no built in graphical user interface. Therefore it makes sense to start from the block diagram of the system to be modelled. The following sections demonstrate PathSims modelling and simulation flow. The examples cover classical dynamical systems such as the *harmonic oscillator*, the *bouncing ball* (to showcase the event handling system) and the *Van der Pol* system (as a stiff subsystem).
-
-## Harmonic Oscillator
+PathSim is a script based modelling framework with no built in graphical user interface. Therefore it makes sense to start from the block diagram of the system to be modelled. This section demonstrates PathSims modelling and simulation flow on a classical example dynamical system, the *harmonic oscillator*.
 
 The figure below shows the mechanical representation of the harmonic oscillator to the left and its block diagram to the right.
 
-![Mechanical representation of the harmonic oscillator to the left and its block diagram to the right.](assets/harmonic_oscillator_g.png)
+![Mechanical representation of the harmonic oscillator to the left and its block diagram to the right as a schematic viasualization to help with the assembly of the system im PathSim (PathSim is purely script based)](assets/harmonic_oscillator_g.png)
 
 Translating it to PathSim involves importing the blocks from the block library, instantiating them with their correct parameters, connecting them with the `Connection` object and passing everything to the `Simulation`.
 
@@ -115,175 +113,7 @@ The `Scope` block enables fast plotting of the simulation results as well as the
 
 ![Simulation results plotted from the PathSim `Scope` for the harmonic oscillator example.](assets/harmonic_oscillator_result_g.png)
 
-
-## Bouncing Ball
-
-The classical example for demonstrating event handling is the bouncing ball. The ball accelerates downward due to gravity and onece it hits the floor, it bounces back. The dynamics of this system are discontinuous due to the jump in velocity (sign change) exactly at the bounce. This is called a discrete event, specifically a zero-crossing event. Systems like this require the location and resolution of discrete events within the timestep and are not easily solved with standard numerical ODE solvers. **PathSim** implements an event management system, that can track the system state and locate and resolve specified events. 
-
-![Schematic of the bouncing ball dynamics to the left and the corresponding block diagram with two distinct integrators and the event handler to the righ.](assets/bouncing_ball_g.png)
-
-The following code block defines the bouncing ball system in PathSim, utilizing the `ZeroCrossing` event manager to track the height of the ball and trigger the jump in velocity.
-
-```python
-from pathsim import Simulation, Connection
-from pathsim.blocks import Integrator, Constant, Scope
-from pathsim.events import ZeroCrossing #event manager
-from pathsim.solvers import RKBS32 #adaptive solver
-
-#elasticity of bounce and gravitational acceleration
-b, g = 0.9, 9.81
-
-#initial conditions
-x0, v0 = 1, 5
-
-#blocks that define the system
-Ix = Integrator(x0)     # v -> x
-Iv = Integrator(v0)     # a -> v 
-Cn = Constant(-g)       # gravitational acceleration
-Sc = Scope(labels=["x", "v"])
-
-blocks = [Ix, Iv, Cn, Sc]
-
-#the connections between the blocks
-connections = [
-    Connection(Cn, Iv),
-    Connection(Iv, Ix),
-    Connection(Ix, Sc[0])
-    ]
-
-#event function for zero crossing detection
-def func_evt(t):
-    *_, x = Ix() #get block outputs and states
-    return x
-
-#action function for state transformation
-def func_act(t):
-    *_, x = Ix()
-    *_, v = Iv()
-    Ix.engine.set(abs(x))
-    Iv.engine.set(-b*v)
-
-#events (zero crossing)
-E1 = ZeroCrossing(
-    func_evt=func_evt,                 
-    func_act=func_act, 
-    tolerance=1e-4
-    )
-
-events = [E1]
-             
-#initialize simulation from blocks, connections and events
-Sim = Simulation(
-    blocks, 
-    connections, 
-    events, 
-    dt=0.01, 
-    dt_max=0.04,
-    Solver=RKBS32
-    )
-
-#run the simulation
-Sim.run(10)
-
-#read the recordings from the scope direclty
-time, [data_x] = Sc.read()  
-
-#plot the recordings from the scope
-fig, ax = Sc.plot()
-
-#add detected events to scope plot
-for t in E1: 
-    ax.axvline(t, ls="--", c="k")
-
-```
-
-The results (plotted from the `Scope`) show the evolution of ball accross time. The dashed lines indicate the locations of the bounces (detected events):
-
-![Simulation results plotted from the PathSim `Scope` for the bouncing ball dynamics, including the detected events.](assets/bouncing_ball_result_events_g.png)
-
-
-## Van der Pol System
-
-Another classic dynamical system is the *Van der Pol* oscillator, which is described by the second order nonlinear ODE
-
-$$\ddot{x} = \mu (1 - x^2) \dot{x} - x$$
-
-where the parameter $\mu$ controls the *stiffness*. Stiffness in dynamical systems typically arises when the (local) internal time constants (eigenvalues of the Jacobian) are on vastly different scales, or when very steep gradients are encountered. This forces explicit integrators to take extremely small timesteps in order for the discretized system to be stable. Implicit solvers have larger areas of stability and are therefore a better choice for stiff problems like the *Van der Pol* system for large $\mu$. In this example, we select the parameter $\mu = 1000$ as a torture test to demonstrate PathSim's ability to handle severe stiffness. 
-
-![Block diagram representation of the *Van der Pol* ODE built from distinct PathSim blocks. Schematic visualization of the encapsulation into a `Subsystem`.](assets/vanderpol_g.png)
-
-The following code implements the *Van der Pol* system with the basic **PathSim** blocks and encapsulates it into a `Subsystem`. 
-
-```python
-
-from pathsim import Simulation, Connection, Interface, Subsystem
-from pathsim.blocks import Integrator, Scope, Adder, Multiplier, Amplifier, Function
-from pathsim.solvers import ESDIRK43 # <- implicit solver for stiff systems
-
-#initial condition
-x1_0 = 2
-x2_0 = 0
-
-#van der Pol parameter
-mu = 1000 # <- very stiff
-
-#subsystem to emulate the ODE
-If = Interface()
-I1 = Integrator(x1_0)
-I2 = Integrator(x2_0)
-Fn = Function(lambda a: 1 - a**2)
-Pr = Multiplier()
-Ad = Adder("-+")
-Am = Amplifier(mu)
-
-sub_blocks = [If, I1, I2, Fn, Pr, Ad, Am]
-sub_connections = [
-    Connection(I2, I1, Pr[0], If[1]),
-    Connection(I1, Fn, Ad[0], If[0]),
-    Connection(Fn, Pr[1]),
-    Connection(Pr, Am),
-    Connection(Am, Ad[1]),
-    Connection(Ad, I2)
-    ]
-
-#the subsystem acts just like a normal block
-VDP = Subsystem(sub_blocks, sub_connections)
-```
-
-The subsystem `VDP` can now be treated like a regular block and included in the main simulation:
-
-```python
-#scope for plotting
-Sco = Scope(labels=["$x_1$"])
-
-#blocks of the main system
-blocks = [VDP, Sco]
-
-#the connections between the blocks in the main system
-connections = [
-    Connection(VDP, Sco)
-    ]
-
-#initialize simulation with the blocks, connections, and implicit solver
-Sim = Simulation(
-    blocks,
-    connections,
-    Solver=ESDIRK43,
-    tolerance_lte_abs=1e-5,
-    tolerance_lte_rel=1e-3,
-    tolerance_fpi=1e-8
-    )
-
-#run the simulation
-Sim.run(4*mu)
-
-#plot results from scope
-Sco.plot(".-")
-```
-
-Again, visualizing the results directy from the `Scope` block.
-
-![Simulation results plotted from the PathSim `Scope` for *Van der Pol* Subsystem.](assets/vanderpol_result_g.png)
+There more *examples* of dynamical system simulations present in the PathSim repository and, with further explanations, in the documentation. The examples cover all features PathSim has to offer, including hierarchical modelling through *subsystems*, examples of *stiff dynamics* with implicit solver and discrete dynamics with *event handling*.
 
 # References
 
