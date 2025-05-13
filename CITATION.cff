@@ -1,11 +1,26 @@
-cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+cff-version: "1.2.0"
 authors:
-  - family-names: "Rother"
-    given-names: "Milan"
+- family-names: Rother
+  given-names: Milan
+  orcid: "https://orcid.org/0009-0006-5964-6115"
+doi: 10.5281/zenodo.15367933
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Rother
+    given-names: Milan
     orcid: "https://orcid.org/0009-0006-5964-6115"
-title: "PathSim - A System Simulation Framework"
-version: 0.5.6
-date-released: 2025-03-07
-url: "https://github.com/milanofthe/pathsim"
-doi: "https://doi.org/10.5281/zenodo.14992799"
+  date-published: 2025-05-13
+  doi: 10.21105/joss.08158
+  issn: 2475-9066
+  issue: 109
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 8158
+  title: PathSim - A System Simulation Framework
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.08158"
+  volume: 10
+title: PathSim - A System Simulation Framework
