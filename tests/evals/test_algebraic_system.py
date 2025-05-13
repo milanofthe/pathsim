@@ -10,12 +10,7 @@ import unittest
 import numpy as np
 
 from pathsim import Simulation, Connection
-from pathsim.blocks import Constant, Source, Function, Multiplier, Amplifier, Adder, Scope
-
-from pathsim.solvers import (
-    RKF21, RKBS32, RKF45, RKCK54, RKDP54, RKV65, RKF78, RKDP87, 
-    ESDIRK32, ESDIRK43, ESDIRK54, ESDIRK85, GEAR52A
-    )
+from pathsim.blocks import Constant, Source, Function, Amplifier, Adder, Scope
 
 
 # TESTCASE =============================================================================
