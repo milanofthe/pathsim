@@ -24,7 +24,7 @@ x2_0 = 0
 mu = 1000
 
 #blocks that define the system
-Sco = Scope()
+Sco = Scope(labels=["$x_1$", "$x_2$"])
 
 #subsystem with two separate integrators to emulate ODE block
 If = Interface()
@@ -55,7 +55,7 @@ blocks = [VDP, Sco]
 #the connections between the blocks in the main system
 connections = [
     Connection(VDP, Sco),
-    # Connection(VDP[1], Sco[1])
+    Connection(VDP[1], Sco[1])
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
@@ -74,7 +74,7 @@ Sim = Simulation(
 if __name__ == "__main__":
 
     #run simulation for some number of seconds
-    Sim.run(4*mu)
+    Sim.run(5*mu)
 
     Sco.plot(".-", lw=1.5)
 
