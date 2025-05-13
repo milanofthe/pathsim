@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope, PID
-from pathsim.solvers import RKCK54
+from pathsim.solvers import RKCK54, RKBS32
 from pathsim.optim import Value
 
 
