@@ -115,11 +115,11 @@ The `Scope` block enables fast plotting of the simulation results as well as the
 
 There are more *examples* of dynamical system simulations present in the **PathSim** repository and, with further explanations, in the documentation. The examples cover all features **PathSim** has to offer, including hierarchical modelling through *subsystems*, examples of *stiff dynamics* with implicit solver and discrete dynamics with *event handling*. 
 
-The figures below show a variety of systems and simulation results obtained with **PathSim**. 
+The figures below showcase more dynamical systems and simulation results obtained with **PathSim**. 
 
-![Visualization of the *Van der Pol* system built from distinct components as a block diagram and the simulation results for a very stiff case ($\\mu=1000$). This example is available in the repository.](assets/vanderpol_g.png)
+![Visualization of the *Van der Pol* system built from distinct components as a block diagram and the simulation results for a very stiff case ($\mu=1000$). This example showcases PathSims ability to handle stiff systems, it is available in the repository.](assets/vanderpol_g.png)
 
-![Visualization of the *bouncing ball*, a classical example for discrete event handling. This example is available in the repository.](assets/bouncing_ball_g.png)
+![Visualization of the *bouncing ball*, a classical example for discrete event handling. This example showcases Pathsims event handling mechanism for detecting and resolving discrete events (*zero-crossings* in this case). It is available in the repository.](assets/bouncing_ball_g.png)
 
 
 # References
