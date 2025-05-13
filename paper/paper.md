@@ -47,7 +47,7 @@ MathWorks Simulink [@Simulink] is the defacto industry standard for system model
 
 Several Python tools for simulating dynamical systems have emerged over the years. Standard ODE solvers like `scipy.integrate.solve_ivp` [@virtanen2020scipy] offer robust integration but lack a structured framework for modeling complex, interconnected systems or handling discrete events natively Uses have to manually derive the govering system equations. The *Python Control Systems Library* [@pythoncontrol] is a popular package for modeling and optimizing dynamical systems from the control engineering perspective primarily. The package `tbcontrol` [@tbcontrol] similarly focuses on control systems. Libraries like `SimuPy` [@Margolis2017; @SimuPyRepo] provide a block-based modeling approach similar to PathSim, leveraging SymPy for symbolic definition and SciPy solvers for integration. Other frameworks like `Collimator` [@pycollimator] offer graphical interfaces and JAX-based acceleration but require compilation and introduce dependencies beyond the standard scientific Python stack. `bdsim` [@bdsimRepo] also provides block diagram simulation, based on Scipy solvers, with a strong focus on robotics but without event handling. 
 
-PathSim differentiates itself by offering a script-based block-diagram interface with a *decentralized architecture*, native integration of both *automatic differentiation* and *discrete event handling* into the full simulation loop, capable of handling *algebraic loops*, and a *built-in library* of independently implemented and verified ODE solvers (beyond wrapping SciPy). Its fully open under *MIT-License* with *minimal core dependencies*.
+PathSim differentiates itself by offering a script-based block-diagram interface with a *decentralized architecture*, native integration of both *automatic differentiation* and *discrete event handling* into the full simulation loop, capable of handling *algebraic loops*, and a *built-in library* of independently implemented and verified ODE solvers (beyond wrapping SciPy). It is fully open under *MIT-License* with *minimal core dependencies*.
 
 # Architecture and Design
 
@@ -59,7 +59,7 @@ PathSim employs a decentralized, object-oriented design centered around three pr
 
 # PathSim Modelling Flow
 
-PathSim is a script based modelling framework with no built in graphical user interface. Therefore it makes sense to start from the block diagram of the system to be modelled. This section demonstrates PathSims modelling and simulation flow on a classical example dynamical system, the *harmonic oscillator*.
+PathSim is a script based modelling framework with no built in graphical user interface. Therefore it makes sense to start from the block diagram of the system to be modelled. This section demonstrates PathSim's modelling and simulation flow on a classical example dynamical system, the *harmonic oscillator*.
 
 The figure below shows the mechanical representation of the harmonic oscillator to the left and its block diagram to the right.
 
@@ -117,9 +117,9 @@ There are more *examples* of dynamical system simulations present in the **PathS
 
 The figures below showcase more dynamical systems and simulation results obtained with **PathSim**. 
 
-![Visualization of the *Van der Pol* system built from distinct components as a block diagram and the simulation results for a very stiff case ($\mu=1000$) using one of PathSims implicit ODE solvers (`ESDIRK43`). This example showcases PathSims ability to handle stiff systems, it is available in the repository.](assets/vanderpol_g.png)
+![Visualization of the *Van der Pol* system built from distinct components as a block diagram and the simulation results for a very stiff case ($\mu=1000$) using one of PathSim's implicit ODE solvers (`ESDIRK43`). This example showcases PathSim's ability to handle stiff systems, it is available in the repository.](assets/vanderpol_g.png)
 
-![Visualization of the *bouncing ball*, a classical example for discrete event handling. This example showcases Pathsims event handling mechanism for detecting and resolving discrete events (*zero-crossings* in this case). It is available in the repository.](assets/bouncing_ball_g.png)
+![Visualization of the *bouncing ball*, a classical example for discrete event handling. This example showcases PathSim's event handling mechanism for detecting and resolving discrete events (*zero-crossings* in this case). It is available in the repository.](assets/bouncing_ball_g.png)
 
 
 # References
