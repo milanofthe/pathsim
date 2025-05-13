@@ -117,7 +117,7 @@ There are more *examples* of dynamical system simulations present in the **PathS
 
 The figures below showcase more dynamical systems and simulation results obtained with **PathSim**. 
 
-![Visualization of the *Van der Pol* system built from distinct components as a block diagram and the simulation results for a very stiff case ($\mu=1000$). This example showcases PathSims ability to handle stiff systems, it is available in the repository.](assets/vanderpol_g.png)
+![Visualization of the *Van der Pol* system built from distinct components as a block diagram and the simulation results for a very stiff case ($\mu=1000$) using one of PathSims implicit ODE solvers (`ESDIRK43`). This example showcases PathSims ability to handle stiff systems, it is available in the repository.](assets/vanderpol_g.png)
 
 ![Visualization of the *bouncing ball*, a classical example for discrete event handling. This example showcases Pathsims event handling mechanism for detecting and resolving discrete events (*zero-crossings* in this case). It is available in the repository.](assets/bouncing_ball_g.png)
 
