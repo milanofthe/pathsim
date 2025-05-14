@@ -177,13 +177,13 @@ class TestAdder(unittest.TestCase):
         A = Adder()
 
         #set block inputs
-        A.set(0, 1)
+        A.inputs[0] = 1
 
         #update block
         err = A.update(None)
 
         #test if update was correct
-        self.assertEqual(A.get(0), 1)
+        self.assertEqual(A.outputs[0], 1)
 
         #test if error was computed correctly
         self.assertGreater(err, 0)
@@ -200,15 +200,15 @@ class TestAdder(unittest.TestCase):
         A = Adder()
 
         #set block inputs
-        A.set(0, 1)
-        A.set(1, 2.0)
-        A.set(2, 3.1)
+        A.inputs[0] = 1
+        A.inputs[1] = 2.0
+        A.inputs[2] = 3.1
 
         #update block
         err = A.update(None)
 
         #test if update was correct
-        self.assertEqual(A.get(0), 6.1)
+        self.assertEqual(A.outputs[0], 6.1)
 
         #test if error was computed correctly
         self.assertGreater(err, 0)
