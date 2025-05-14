@@ -72,30 +72,30 @@ class TestSwitch(unittest.TestCase):
         #test if error is correctly 0
         self.assertEqual(S.update(0), 0.0)
 
-        S.set(0, 3)
+        S.inputs[0] = 3
         S.update(0)
 
         #test if no passthrough
-        self.assertEqual(S.get(0), 0.0)
+        self.assertEqual(S.outputs[0], 0.0)
 
         #test switch setting
         S = Switch(3)
         self.assertEqual(S.state, 3)
 
-        S.set(0, 3)
-        S.set(1, 4)
-        S.set(2, 5)
-        S.set(3, 6)
-        S.set(4, 7)
+        S.inputs[0] = 3
+        S.inputs[1] = 4
+        S.inputs[2] = 5
+        S.inputs[3] = 6
+        S.inputs[4] = 7
 
         S.update(0)
 
-        self.assertEqual(S.get(0), 6)
+        self.assertEqual(S.outputs[0], 6)
 
         S.select(1)
         S.update(0)
 
-        self.assertEqual(S.get(0), 4)
+        self.assertEqual(S.outputs[0], 4)
 
 
 # RUN TESTS LOCALLY ====================================================================
