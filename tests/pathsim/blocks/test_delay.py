@@ -83,26 +83,26 @@ class TestDelay(unittest.TestCase):
 
         for t in range(100):
 
-            D.set(0, t)
+            D.inputs[0] = t
             D.sample(t)
 
             err = D.update(t)
 
             #test if delay is correctly applied
-            self.assertEqual(D.get(0), max(0, t-10))
+            self.assertEqual(D.outputs[0], max(0, t-10))
 
         #test delay with local interpolation
         D = Delay(tau=10.5)
 
         for t in range(100):
 
-            D.set(0, t)
+            D.inputs[0] = t
             D.sample(t)
 
             err = D.update(t)
 
             #test if delay is correctly applied
-            self.assertEqual(D.get(0), max(0, t-10.5))
+            self.assertEqual(D.outputs[0], max(0, t-10.5))
 
 
 # RUN TESTS LOCALLY ====================================================================
