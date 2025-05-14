@@ -53,7 +53,7 @@ class TestRNG(unittest.TestCase):
 
         #test if reset worked
         self.assertEqual(R.n_samples, 0)
-        self.assertEqual(R.get(0), 0.0)
+        self.assertEqual(R.outputs[0], 0.0)
 
 
     def test_sample(self):
@@ -66,13 +66,13 @@ class TestRNG(unittest.TestCase):
             #test sample counter
             self.assertEqual(R.n_samples, t)
 
-            old = R.get(0)
+            old = R.outputs[0]
 
             R.sample(t)
             R.update(t)
 
             #test if new random value is sampled
-            self.assertNotEqual(old, R.get(0))
+            self.assertNotEqual(old, R.outputs[0])
 
 
         #next test finite sampling rate (samples every two seconds)
@@ -83,18 +83,18 @@ class TestRNG(unittest.TestCase):
             #test sample counter 
             self.assertEqual(R.n_samples, t//2)
 
-            old = R.get(0)
+            old = R.outputs[0]
 
             R.sample(t)
             R.update(t)
 
             if t%2 == 0:
                 #test if value remains the same is sampled
-                self.assertEqual(old, R.get(0))
+                self.assertEqual(old, R.outputs[0])
 
             else:
                 #test if new random value is sampled
-                self.assertNotEqual(old, R.get(0))
+                self.assertNotEqual(old, R.outputs[0])
                 
 
 # RUN TESTS LOCALLY ====================================================================

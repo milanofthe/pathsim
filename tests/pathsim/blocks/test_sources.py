@@ -27,33 +27,33 @@ class TestConstant(unittest.TestCase):
         C = Constant(value=5)
 
         self.assertEqual(C.value, 5)
-        self.assertEqual(C.get(0), 0)
+        self.assertEqual(C.outputs[0], 0)
 
 
     def test_update(self):
 
         C = Constant(value=5)
 
-        self.assertEqual(C.get(0), 0)
+        self.assertEqual(C.outputs[0], 0)
 
         C.update(0)
 
-        self.assertEqual(C.get(0), 5)
+        self.assertEqual(C.outputs[0], 5)
 
 
     def test_reset(self):
 
         C = Constant(value=5)
 
-        self.assertEqual(C.get(0), 0)
+        self.assertEqual(C.outputs[0], 0)
 
         C.update(0)
 
-        self.assertEqual(C.get(0), 5)
+        self.assertEqual(C.outputs[0], 5)
         
         C.reset()
 
-        self.assertEqual(C.get(0), 0)
+        self.assertEqual(C.outputs[0], 0)
 
 
 class TestSource(unittest.TestCase):
@@ -89,7 +89,7 @@ class TestSource(unittest.TestCase):
         err = S.update(1)
 
         #test if update was correct
-        self.assertEqual(S.get(0), f(1))
+        self.assertEqual(S.outputs[0], f(1))
 
         #test if error is allways 0
         self.assertEqual(err, 0)
@@ -98,7 +98,7 @@ class TestSource(unittest.TestCase):
         err = S.update(2)
 
         #test if update was correct
-        self.assertEqual(S.get(0), f(2))
+        self.assertEqual(S.outputs[0], f(2))
 
         #test if error is allways 0
         self.assertEqual(err, 0)
@@ -107,7 +107,7 @@ class TestSource(unittest.TestCase):
         err = S.update(3)
 
         #test if update was correct
-        self.assertEqual(S.get(0), f(3))
+        self.assertEqual(S.outputs[0], f(3))
 
         #test if error is allways 0
         self.assertEqual(err, 0)
