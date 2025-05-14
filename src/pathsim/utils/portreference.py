@@ -66,7 +66,7 @@ class PortReference:
             the `PortReference` instance to transfer data to from `self`
         """
         for a, b in zip(other.ports, self.ports):
-            other.block.set(a, self.block.get(b))
+            other.block.inputs[a] = self.block.outputs[b]
 
 
     def to_dict(self):
