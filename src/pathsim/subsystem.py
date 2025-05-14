@@ -410,30 +410,13 @@ class Subsystem(Block):
 
     # methods for inter-block data transfer -------------------------------------------------
 
-    def set(self, port, value):
-        """The 'set' method of the 'Subsystem' sets the output 
-        values of the 'Interface' block.
-    
-        Parameters
-        ----------
-        port : int
-            input port to set value to
-        value : numeric
-            value to set at input port (of subsystem)
-        """
-        self.interface.set_output(port, value)
+    @property    
+    def inputs(self):
+        return self.interface.outputs
 
-
-    def get(self, port):
-        """The 'get' method of the 'Subsystem' retrieves the input 
-        values of the 'Interface' block.
-    
-        Parameters
-        ----------
-        port : int
-            output port (of subsystem) to retrieve value from
-        """
-        return self.interface.get_input(port)
+    @property
+    def outputs(self):
+        return self.interface.inputs
 
 
     # methods for data recording ------------------------------------------------------------
