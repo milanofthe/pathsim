@@ -54,7 +54,7 @@ class TestScope(unittest.TestCase):
 
         for t in range(10):
 
-            S.set(0, t)
+            S.inputs[0] = t
             S.sample(t)
 
         #test that we have some recording
@@ -73,7 +73,7 @@ class TestScope(unittest.TestCase):
 
         for t in range(10):
 
-            S.set(0, t)
+            S.inputs[0] = t
             S.sample(t)
 
             #test most recent recording
@@ -84,9 +84,10 @@ class TestScope(unittest.TestCase):
 
         for t in range(10):
 
-            S.set(0, t)
-            S.set(1, 2*t)
-            S.set(2, 3*t)
+
+            S.inputs[0] = t
+            S.inputs[1] = 2*t
+            S.inputs[2] = 3*t
             S.sample(t)
 
             #test most recent recording
@@ -102,7 +103,7 @@ class TestScope(unittest.TestCase):
 
         for t in _time:
 
-            S.set(0, t)
+            S.inputs[0] = t
             S.sample(t)
 
         time, result = S.read()
@@ -118,9 +119,9 @@ class TestScope(unittest.TestCase):
 
         for t in _time:
 
-            S.set(0, t)
-            S.set(1, 2*t)
-            S.set(2, 3*t)
+            S.inputs[0] = t
+            S.inputs[1] = 2*t
+            S.inputs[2] = 3*t
             S.sample(t)
 
         time, result = S.read()
@@ -141,7 +142,7 @@ class TestScope(unittest.TestCase):
 
         for t in _time:
 
-            S.set(0, t)
+            S.inputs[0] = t
             S.sample(t)
 
         time, result = S.read()
@@ -162,7 +163,7 @@ class TestScope(unittest.TestCase):
 
         for t in _time:
 
-            S.set(0, t)
+            S.inputs[0] = t
             S.sample(t)
 
         time, result = S.read()
