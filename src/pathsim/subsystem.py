@@ -41,15 +41,9 @@ class Interface(Block):
     - Handles data transfer to and from the internal subsystem blocks 
       to and from the inputs and outputs of the subsystem.
     """
-
     def __len__(self):
         return 0
     
-    def set_output(self, port, value): 
-        self.outputs[port] = value
-    
-    def get_input(self, port): 
-        return self.inputs[port]
 
 
 # MAIN SUBSYSTEM CLASS ==================================================================
