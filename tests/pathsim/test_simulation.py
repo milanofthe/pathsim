@@ -363,7 +363,7 @@ class TestSimulationIVP(unittest.TestCase):
 
         #check if reset was sucecssful
         self.assertEqual(self.Sim.time, 0.0)
-        self.assertEqual(self.Int.get(0), self.Int.initial_value)
+        self.assertEqual(self.Int.outputs[0], self.Int.initial_value)
 
         #step using global timestep
         success, err, scl, te, ts = self.Sim.timestep()
@@ -375,7 +375,7 @@ class TestSimulationIVP(unittest.TestCase):
         #step again using custom timestep
         self.Sim.step(dt=2.2*self.Sim.dt)
         self.assertEqual(self.Sim.time, 3.2*self.Sim.dt)
-        self.assertLess(self.Int.get(0), self.Int.initial_value)
+        self.assertLess(self.Int.outputs[0], self.Int.initial_value)
 
         #test if scope recorded correctly
         time, data = self.Sco.read()
@@ -387,7 +387,7 @@ class TestSimulationIVP(unittest.TestCase):
 
         #check if reset was successful
         self.assertEqual(self.Sim.time, 0.0)
-        self.assertEqual(self.Int.get(0), self.Int.initial_value)
+        self.assertEqual(self.Int.outputs[0], self.Int.initial_value)
 
 
     def test_run(self):
@@ -397,7 +397,7 @@ class TestSimulationIVP(unittest.TestCase):
 
         #check if reset was successful
         self.assertEqual(self.Sim.time, 0.0)
-        self.assertEqual(self.Int.get(0), self.Int.initial_value)
+        self.assertEqual(self.Int.outputs[0], self.Int.initial_value)
 
         #test running for some time
         self.Sim.run(duration=2, reset=True)
