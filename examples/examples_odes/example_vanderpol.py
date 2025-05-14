@@ -20,7 +20,7 @@ from pathsim.solvers import ESDIRK32, ESDIRK43, ESDIRK54, ESDIRK85, GEAR21, GEAR
 x0 = np.array([2, 0])
 
 #van der Pol parameter
-mu = 10000
+mu = 1000
 
 def func(x, u, t):
     return np.array([x[1], mu*(1 - x[0]**2)*x[1] - x[0]])
@@ -46,7 +46,7 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    Solver=ESDIRK43, 
+    Solver=GEAR52A, 
     tolerance_lte_abs=1e-5, 
     tolerance_lte_rel=1e-3,
     tolerance_fpi=1e-8
@@ -57,7 +57,7 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(4*mu)
+    Sim.run(3*mu)
 
     #plotting
     Sco.plot(".-")
