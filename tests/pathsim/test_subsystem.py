@@ -24,49 +24,15 @@ from pathsim.connection import Connection
 class TestInterface(unittest.TestCase):
     """
     Test the implementation of the 'Interface' class
+    
+
+    'Interface' is just a container that inherits everything from 'Block'
     """
 
-    def test_set_output(self):
+    def test_len(self):
         I = Interface()
+        self.assertEqual(len(I), 0)
 
-        #test that outputs are zero
-        self.assertEqual(I.outputs[0], 0.0)
-        self.assertEqual(len(I.outputs), 1)
-
-        #test if output is correctly set
-        I.set_output(0, 0.2)
-        I.set_output(1, 1.3)
-        I.set_output(2, 2.4)
-        I.set_output(3, 3.5)
-        
-        self.assertEqual(I.get(0), 0.2)
-        self.assertEqual(I.get(1), 1.3)
-        self.assertEqual(I.get(2), 2.4)
-        self.assertEqual(I.get(3), 3.5)
-
-
-    def test_get_input(self):
-
-        I = Interface()
-
-        #test that inputs are zero
-
-        self.assertEqual(I.inputs[0], 0.0)
-        self.assertEqual(len(I.inputs), 1)
-
-        #test default retrieval        
-        self.assertEqual(I.get_input(2), 0.0)
-
-        #test if input is correctly retrieved
-        I.set(0, 0.2)
-        I.set(1, 1.3)
-        I.set(2, 2.4)
-        I.set(3, 3.5)
-        
-        self.assertEqual(I.get_input(0), 0.2)
-        self.assertEqual(I.get_input(1), 1.3)
-        self.assertEqual(I.get_input(2), 2.4)
-        self.assertEqual(I.get_input(3), 3.5)
 
 
 class TestSubsystem(unittest.TestCase):
@@ -106,7 +72,7 @@ class TestSubsystem(unittest.TestCase):
             S = Subsystem(blocks=[B1, B2, B3, I1], connections=[C1, C2, C3])
 
 
-    def test_set(self): 
+    def test_inputs_property(self): 
 
         B1 = Block()
         I1 = Interface()
@@ -116,16 +82,16 @@ class TestSubsystem(unittest.TestCase):
         self.assertEqual(S.interface.outputs[0], 0.0)
         self.assertEqual(len(S.interface.outputs), 1)
         
-        S.set(0, 1.1)
-        S.set(1, 2.2)
-        S.set(2, 3.3)
+        S.inputs[0] = 1.1
+        S.inputs[1] = 2.2
+        S.inputs[2] = 3.3
 
         self.assertEqual(S.interface.outputs[0], 1.1)
         self.assertEqual(S.interface.outputs[1], 2.2)
         self.assertEqual(S.interface.outputs[2], 3.3)
 
 
-    def test_get(self): 
+    def test_outputs_property(self): 
 
         B1 = Block()
         I1 = Interface()
@@ -136,9 +102,9 @@ class TestSubsystem(unittest.TestCase):
         S.interface.inputs[1] = 2.2
         S.interface.inputs[2] = 3.3
 
-        self.assertEqual(S.get(0), 1.1)
-        self.assertEqual(S.get(1), 2.2)
-        self.assertEqual(S.get(2), 3.3)
+        self.assertEqual(S.outputs[0], 1.1)
+        self.assertEqual(S.outputs[1], 2.2)
+        self.assertEqual(S.outputs[2], 3.3)
 
 
     def test_update(self): 
