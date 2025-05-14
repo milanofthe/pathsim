@@ -23,11 +23,11 @@ class Embedding:
 
         u = self.source(t)  
 
-        self.block.set(0, u)
+        self.block.inputs[0] = u
         self.block.update(t)
         self.block.sample(t)
 
-        return self.block.get(0), self.expected(t)
+        return self.block.outputs[0], self.expected(t)
 
 
     def check_MIMO(self, t):
@@ -35,7 +35,7 @@ class Embedding:
         U = self.source(t)
 
         for i, u in enumerate(U):
-            self.block.set(i, u)
+            self.block.inputs[i] = u
         self.block.update(t)
         self.block.sample(t)
 
