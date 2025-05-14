@@ -132,6 +132,9 @@ class Connection:
         #flag to set connection active
         self._active = True
 
+        #validate port dimensions at connection creation
+        self._validate_dimensions()
+
 
     def __str__(self):
         """String representation of the connection using the 
@@ -160,6 +163,16 @@ class Connection:
         if isinstance(other, Block): 
             return other in self.get_blocks()
         return False
+
+
+    def _validate_dimensions(self):
+        """Check the dimensions of the source and target ports, 
+        if they dont match, raises an exception.
+        """
+        n_src = len(self.source)
+        for trg in self.targets:
+            if len(trg) != n_src:
+                raise ValueError(f"Source and target have different number of ports!")
 
 
     def get_blocks(self):

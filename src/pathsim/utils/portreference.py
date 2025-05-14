@@ -51,6 +51,11 @@ class PortReference:
         self.ports = ports 
 
 
+    def __len__(self):
+        """The number of ports managed by 'PortReference'"""
+        return len(self.ports)
+
+
     def to(self, other):
         """Transfer the data between two `PortReference` instances, 
         in this direction `self` -> `other`.
