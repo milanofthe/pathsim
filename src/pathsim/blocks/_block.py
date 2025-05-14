@@ -387,37 +387,6 @@ class Block(Serializable):
         return _inputs, _outputs, _states
 
 
-    def set(self, port, value):
-        """Set the value of an input port of the block.
-
-        Parameters
-        ----------
-        port : int
-            input port number
-        value : int, float, complex
-            value to set at input register port
-        """        
-        self.inputs[port] = value
-
-
-    def get(self, port):
-        """Get the value of an output port of the block.
-        
-        Uses the 'get' method of 'outputs' dict with default value '0.0'.
-        
-        Parameters
-        ----------
-        port : int
-            output port number
-
-        Returns
-        -------
-        value : int, float, complex
-            value of the output register port
-        """
-        return self.outputs[port]
-
-
     # methods for block output and state updates ----------------------------------------
 
     def update(self, t):
