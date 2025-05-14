@@ -117,7 +117,19 @@ class Subsystem(Block):
     """
 
     def __init__(self, blocks=None, connections=None):
-        super().__init__()
+
+        #internal integration engine as 'None'
+        self.engine = None
+
+        #flag to set block (subsystem) active
+        self._active = True
+
+        #internal discrete events (for mixed signal blocks)
+        self.events = []
+
+        #operators for algebraic and dynamic components (not here)
+        self.op_alg = None
+        self.op_dyn = None
 
         #internal graph representation
         self.graph = None
@@ -278,9 +290,7 @@ class Subsystem(Block):
     # system management ---------------------------------------------------------------------
 
     def reset(self):
-        """Reset the subsystem and all internal blocks"""
-
-        super().reset()
+        """Reset the subsystem interface and all internal blocks"""
 
         #reset interface
         self.interface.reset()
