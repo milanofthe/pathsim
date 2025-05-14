@@ -119,16 +119,16 @@ class TestStateSpace(unittest.TestCase):
         S.set_solver(Solver)
 
         #test if output is zero 
-        self.assertEqual(S.get(0), 0.0)
+        self.assertEqual(S.outputs[0], 0.0)
         
-        S.set(0, 3.3)
+        S.inputs[0] = 3.3
         err = S.update(0)
 
         #test if error is correctly 0
         self.assertGreater(err, 0.0)
 
         #test if engine state is calculated correctly
-        self.assertAlmostEqual(S.get(0), 2.2, 8)
+        self.assertAlmostEqual(S.outputs[0], 2.2, 8)
 
 
     def test_embedding_siso(self):

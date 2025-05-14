@@ -106,13 +106,13 @@ class TestMultiplier(unittest.TestCase):
         M = Multiplier()
 
         #set block inputs
-        M.set(0, 1)
+        M.inputs[0] = 1
 
         #update block
         err = M.update(None)
 
         #test if update was correct
-        self.assertEqual(M.get(0), 1)
+        self.assertEqual(M.outputs[0], 1)
 
         #test if error was computed correctly
         self.assertGreater(err, 0)
@@ -129,15 +129,15 @@ class TestMultiplier(unittest.TestCase):
         M = Multiplier()
 
         #set block inputs
-        M.set(0, 1)
-        M.set(1, 2.0)
-        M.set(2, 3.1)
+        M.inputs[0] = 1
+        M.inputs[1] = 2.0
+        M.inputs[2] = 3.1
 
         #update block
         err = M.update(None)
 
         #test if update was correct
-        self.assertEqual(M.get(0), 6.2)
+        self.assertEqual(M.outputs[0], 6.2)
 
         #test if error was computed correctly
         self.assertGreater(err, 0)
