@@ -175,34 +175,6 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(B.outputs[1], 0.0)
 
 
-    def test_set(self):
-
-        B = Block()
-
-        B.set(0, 1)
-        self.assertEqual(B.inputs[0], 1)
-
-        B.set(0, 2)
-        self.assertEqual(B.inputs[0], 2)
-
-        B.set(2, 3)
-        self.assertEqual(B.inputs[2], 3)
-
-
-    def test_get(self):
-
-        B = Block()
-
-        B.outputs.update_from_array([0, 2, 1])
-
-        self.assertEqual(B.get(0), 0)
-        self.assertEqual(B.get(1), 2)
-        self.assertEqual(B.get(2), 1)
-
-        #undefined output -> defaults to 0.0
-        self.assertEqual(B.get(100), 0.0)
-
-
     def test_update(self):
 
         B = Block()

@@ -95,19 +95,23 @@ class Connection:
 
         C = Connection(B1[0:2], B2[1:3])
 
-
-    Slicing can also be used for one-to-many connections where this:
+    
+    Port definitions also support lists and tuples of 'int'. For example the slice 
+    above is identical to this:
     
     .. code-block:: python
 
-        C = Connection(B1, B2[0], B2[1])
+        C = Connection(B1[0, 1], B2[1, 2])
 
 
-    would be equivalent to this:
-    
+    Or to be more programmatic about it, like this:
+
     .. code-block:: python
+    
+        prts_1 = [0, 1]
+        prts_2 = [1, 2]
 
-        C = Connection(B1, B2[0:2])
+        C = Connection(B1[prts_1], B2[prts_2])
 
 
     Parameters
@@ -131,6 +135,9 @@ class Connection:
 
         #flag to set connection active
         self._active = True
+
+        #validate port dimensions at connection creation
+        self._validate_dimensions()
 
 
     def __str__(self):
@@ -160,6 +167,16 @@ class Connection:
         if isinstance(other, Block): 
             return other in self.get_blocks()
         return False
+
+
+    def _validate_dimensions(self):
+        """Check the dimensions of the source and target ports, 
+        if they dont match, raises an exception.
+        """
+        n_src = len(self.source)
+        for trg in self.targets:
+            if len(trg) != n_src:
+                raise ValueError(f"Source and target have different number of ports!")
 
 
     def get_blocks(self):

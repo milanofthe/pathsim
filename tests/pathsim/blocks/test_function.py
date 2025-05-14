@@ -172,13 +172,13 @@ class TestFunction(unittest.TestCase):
         F = Function(func=f)
 
         #set block inputs
-        F.set(0, 3)
+        F.inputs[0] = 3
 
         #update block
         err = F.update(None)
 
         #test if update was correct
-        self.assertEqual(F.get(0), f(3))
+        self.assertEqual(F.outputs[0], f(3))
 
         #test if error was computed correctly
         self.assertGreater(err, 0)
@@ -198,15 +198,15 @@ class TestFunction(unittest.TestCase):
         F = Function(func=f)
 
         #set block inputs
-        F.set(0, 3)
-        F.set(1, 2)
-        F.set(2, 1)
+        F.inputs[0] = 3
+        F.inputs[1] = 2
+        F.inputs[2] = 1
 
         #update block
         err = F.update(None)
 
         #test if update was correct
-        self.assertEqual(F.get(0), f(3, 2, 1))
+        self.assertEqual(F.outputs[0], f(3, 2, 1))
 
         #test if error was computed correctly
         self.assertGreater(err, 0)
@@ -226,15 +226,15 @@ class TestFunction(unittest.TestCase):
         F = Function(func=f)
 
         #set block inputs
-        F.set(0, 3)
+        F.inputs[0] = 3
 
         #update block
         err = F.update(None)
 
         #test if update was correct
-        self.assertEqual(F.get(0), 9)
-        self.assertEqual(F.get(1), 6)
-        self.assertEqual(F.get(2), 1)
+        self.assertEqual(F.outputs[0], 9)
+        self.assertEqual(F.outputs[1], 6)
+        self.assertEqual(F.outputs[2], 1)
 
         #test if error was computed correctly
         self.assertGreater(err, 0)
@@ -254,16 +254,16 @@ class TestFunction(unittest.TestCase):
         F = Function(func=f)
 
         #set block inputs
-        F.set(0, 3)
-        F.set(1, 2)
-        F.set(2, 1)
+        F.inputs[0] = 3
+        F.inputs[1] = 2
+        F.inputs[2] = 1
 
         #update block
         err = F.update(None)
 
         #test if update was correct
-        self.assertEqual(F.get(0), 7)
-        self.assertEqual(F.get(1), 3)
+        self.assertEqual(F.outputs[0], 7)
+        self.assertEqual(F.outputs[1], 3)
 
         #test if error was computed correctly
         self.assertGreater(err, 0)

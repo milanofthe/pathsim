@@ -123,7 +123,7 @@ class Block(Serializable):
 
         Parameters
         ----------
-        key : int, slice
+        key : int, slice, list, tuple
             port indices
 
         Returns
@@ -133,26 +133,39 @@ class Block(Serializable):
         """
 
         if isinstance(key, slice):
+
             #slice validation
             if key.stop is None: raise ValueError("Port slice cannot be open ended!")
             if key.stop == 0: raise ValueError("Port slice cannot end with 0!")
 
+            #start, step handling
+            start = 0 if key.start is None else key.start
+            step  = 1 if key.step  is None else key.step
+
             #build port list
-            ports = list(
-                range(
-                0 if key.start is None else key.start, 
-                key.stop, 
-                1 if key.step is None else key.step
-                )
-            )
+            ports = list(range(start, key.stop, step))
             return PortReference(self, ports)
 
+        elif isinstance(key, (tuple, list)):
+
+            #port type validation
+            for k in key:
+                if not isinstance(k, int):
+                    raise ValueError(f"Port must be 'int' but is '{type(k)}'!")
+            
+            #duplicate validation
+            if len(set(key)) < len(key):
+                raise ValueError("Ports cannot be duplicates!")
+
+            return PortReference(self, list(key))
+
         elif isinstance(key, int):
+
             #standard integer key
             return PortReference(self, [key])
 
         else:
-            raise ValueError(f"Port has to be 'int' or 'slice' but is '{type(key)}'!")
+            raise ValueError(f"Port has to be 'int', 'tuple', 'list' or 'slice' but is '{type(key)}'!")
 
 
     def __call__(self):
@@ -372,37 +385,6 @@ class Block(Serializable):
         _outputs = self.outputs.to_array()
         _states  = self.engine.get() if self.engine else []
         return _inputs, _outputs, _states
-
-
-    def set(self, port, value):
-        """Set the value of an input port of the block.
-
-        Parameters
-        ----------
-        port : int
-            input port number
-        value : int, float, complex
-            value to set at input register port
-        """        
-        self.inputs[port] = value
-
-
-    def get(self, port):
-        """Get the value of an output port of the block.
-        
-        Uses the 'get' method of 'outputs' dict with default value '0.0'.
-        
-        Parameters
-        ----------
-        port : int
-            output port number
-
-        Returns
-        -------
-        value : int, float, complex
-            value of the output register port
-        """
-        return self.outputs[port]
 
 
     # methods for block output and state updates ----------------------------------------

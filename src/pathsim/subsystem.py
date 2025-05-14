@@ -41,15 +41,9 @@ class Interface(Block):
     - Handles data transfer to and from the internal subsystem blocks 
       to and from the inputs and outputs of the subsystem.
     """
-
     def __len__(self):
         return 0
     
-    def set_output(self, port, value): 
-        self.outputs[port] = value
-    
-    def get_input(self, port): 
-        return self.inputs[port]
 
 
 # MAIN SUBSYSTEM CLASS ==================================================================
@@ -123,7 +117,19 @@ class Subsystem(Block):
     """
 
     def __init__(self, blocks=None, connections=None):
-        super().__init__()
+
+        #internal integration engine as 'None'
+        self.engine = None
+
+        #flag to set block (subsystem) active
+        self._active = True
+
+        #internal discrete events (for mixed signal blocks)
+        self.events = []
+
+        #operators for algebraic and dynamic components (not here)
+        self.op_alg = None
+        self.op_dyn = None
 
         #internal graph representation
         self.graph = None
@@ -284,9 +290,7 @@ class Subsystem(Block):
     # system management ---------------------------------------------------------------------
 
     def reset(self):
-        """Reset the subsystem and all internal blocks"""
-
-        super().reset()
+        """Reset the subsystem interface and all internal blocks"""
 
         #reset interface
         self.interface.reset()
@@ -410,30 +414,13 @@ class Subsystem(Block):
 
     # methods for inter-block data transfer -------------------------------------------------
 
-    def set(self, port, value):
-        """The 'set' method of the 'Subsystem' sets the output 
-        values of the 'Interface' block.
-    
-        Parameters
-        ----------
-        port : int
-            input port to set value to
-        value : numeric
-            value to set at input port (of subsystem)
-        """
-        self.interface.set_output(port, value)
+    @property    
+    def inputs(self):
+        return self.interface.outputs
 
-
-    def get(self, port):
-        """The 'get' method of the 'Subsystem' retrieves the input 
-        values of the 'Interface' block.
-    
-        Parameters
-        ----------
-        port : int
-            output port (of subsystem) to retrieve value from
-        """
-        return self.interface.get_input(port)
+    @property
+    def outputs(self):
+        return self.interface.inputs
 
 
     # methods for data recording ------------------------------------------------------------

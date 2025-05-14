@@ -77,7 +77,7 @@ class TestIntegrator(unittest.TestCase):
         self.assertEqual(err, 0.0)
 
         #test if engine state is retrieved correctly
-        self.assertEqual(I.get(0), 5.5)
+        self.assertEqual(I.outputs[0], 5.5)
 
 
 # RUN TESTS LOCALLY ====================================================================

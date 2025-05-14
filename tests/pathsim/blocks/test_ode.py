@@ -122,7 +122,7 @@ class TestODE(unittest.TestCase):
         self.assertEqual(err, 0.0)
 
         #test if engine state is retrieved correctly
-        self.assertEqual(D.get(0), 0.0)
+        self.assertEqual(D.outputs[0], 0.0)
 
 
 # RUN TESTS LOCALLY ====================================================================

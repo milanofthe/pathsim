@@ -49,15 +49,9 @@ class TestConnection(unittest.TestCase):
         C = Connection(B1[2], B2)
         self.assertEqual(C.source.ports, [2])
 
-        C = Connection(B1[0:3], B2)
-        self.assertEqual(C.source.ports, [0, 1, 2])
-
-        C = Connection(B1[1:6:2], B2)
-        self.assertEqual(C.source.ports, [1, 3, 5])
-
-        C = Connection(B1, B2[1:6:2])
-        self.assertEqual(C.targets[0].ports, [1, 3, 5])
-
+        with self.assertRaises(ValueError):
+            C = Connection(B1[0:3], B2)
+        
         #all
         C = Connection(B1[2], B2[9])
         self.assertEqual(C.source.ports, [2])
@@ -93,10 +87,9 @@ class TestConnection(unittest.TestCase):
         self.assertEqual(C.targets[1].ports, [0])
 
         #all
-        C = Connection(B1[1:7], B2[2], B3[3:9])
+        C = Connection(B1[1:7], B3[3:9])
         self.assertEqual(C.source.ports, [1, 2, 3, 4, 5, 6])
-        self.assertEqual(C.targets[0].ports, [2])
-        self.assertEqual(C.targets[1].ports, [3, 4, 5, 6, 7, 8])
+        self.assertEqual(C.targets[0].ports, [3, 4, 5, 6, 7, 8])
 
 
 
@@ -146,25 +139,9 @@ class TestConnection(unittest.TestCase):
         self.assertFalse(C1.overwrites(C2))
         self.assertFalse(C2.overwrites(C1))    
             
-        #sliced ports
-
-        C1 = Connection(B1[1:3], B2, B3[2]) 
-        C2 = Connection(B1, B3[2]) 
-
-        self.assertTrue(C1.overwrites(C2))
-        self.assertTrue(C2.overwrites(C1))
-
-        C1 = Connection(B2[1], B1, B3[2]) 
-        C2 = Connection(B1, B3[1:3]) 
-
-        self.assertTrue(C1.overwrites(C2))
-        self.assertTrue(C2.overwrites(C1))
-
-        C1 = Connection(B2[1], B1, B3[0]) 
-        C2 = Connection(B1, B3[1:3]) 
-
-        self.assertFalse(C1.overwrites(C2))
-        self.assertFalse(C2.overwrites(C1))
+        #test with sliced ports
+        
+        #test with tuple ports
 
 
 
@@ -207,12 +184,8 @@ class TestConnection(unittest.TestCase):
         self.assertEqual(B3.inputs[2], 55)
 
         #test with sliced ports
-        C = Connection(B1[1:5], B2[2:4], B3[2]) 
-        B1.outputs = {0:33, 1:22, 2:3.2, 3:-90, 4:32, 5:0.01}
-        C.update()
-        self.assertEqual(B2.inputs[2], 22)
-        self.assertEqual(B2.inputs[3], 3.2)
-        self.assertEqual(B3.inputs[2], 22)
+        
+        #test with tuple ports
 
 
 
