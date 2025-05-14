@@ -80,9 +80,9 @@ class TestDifferentiator(unittest.TestCase):
         self.assertEqual(err, 0.0)
 
         #test if state is retrieved correctly
-        self.assertEqual(D.get(0), 0.0)
+        self.assertEqual(D.outputs[0], 0.0)
 
-        D.set(0, 2)
+        D.inputs[0] = 2
 
         err = D.update(0)
 
