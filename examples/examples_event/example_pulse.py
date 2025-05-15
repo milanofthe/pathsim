@@ -45,7 +45,7 @@ E = Schedule(
     t_start=tau1, 
     t_end=tau2, 
     t_period=tau2-tau1, 
-    tolerance=1e-6
+    # tolerance=1e-6
     )
 
 events = [E]
