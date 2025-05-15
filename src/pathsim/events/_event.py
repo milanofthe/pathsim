@@ -156,7 +156,7 @@ class Event(Serializable):
         Returns
         -------
         float | None
-            estimated time of event
+            estimated time until next event
         """
         return None
 

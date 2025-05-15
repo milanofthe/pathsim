@@ -85,7 +85,7 @@ class Schedule(Event):
 
 
     def estimate(self, t):
-        """Estimate the time of the next scheduled event.
+        """Estimate the time until the next scheduled event.
 
         Parameters
         ----------
@@ -95,9 +95,9 @@ class Schedule(Event):
         Returns
         -------
         float
-            estimated time of event
+            estimated time until next event
         """
-        return self._next()
+        return self._next() - t
 
 
     def buffer(self, t):

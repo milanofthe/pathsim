@@ -766,6 +766,37 @@ class Simulation:
 
     # event system helpers --------------------------------------------------------
 
+    def _estimate_events(self, t):
+        """Estimate the time until the next.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time for event estimation
+
+        Returns
+        -------
+        float | None
+            esimated time until next event (delta)
+        """
+
+        dt_evt_min = None
+        for event in self.events:
+
+            #skip inactive events
+            if not event: continue
+
+            #get the estimate
+            dt_evt = event.estimate(self.time)
+            
+            #check if estimate available and smaller than min
+            if dt_evt_min is None or (dt_evt is not None and dt_evt < dt_evt_min):
+                dt_evt_min = dt_evt
+
+        #return time until next event or None
+        return dt_evt_min
+
+
     def _buffer_events(self, t):
         """Buffer states for event monitoring before the timestep 
         is taken. 
@@ -1614,12 +1645,20 @@ class Simulation:
                     if not error_norm and scale == 1:
                         _dt = self.dt
 
-                    #apply bounds to timestep after rescale
-                    _dt = np.clip(scale*_dt, self.dt_min, self.dt_max)
+                    #rescale due to error control
+                    _dt = scale * _dt
 
+                    #estimate time until next event and adjust timestep
+                    _dt_evt = self._estimate_events(self.time)
+                    if _dt_evt is not None and _dt_evt < _dt:
+                        _dt = _dt_evt
+                        
                     #rescale if in danger of overshooting 'end_time' at next step
                     if self.time + _dt > end_time:
                         _dt = end_time - self.time
+
+                    #apply bounds to timestep after rescale
+                    _dt = np.clip(_dt, self.dt_min, self.dt_max)
 
                 #compute simulation progress
                 progress = np.clip((self.time - start_time)/duration, 0.0, 1.0)
