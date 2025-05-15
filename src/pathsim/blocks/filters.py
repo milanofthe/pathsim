@@ -14,8 +14,7 @@ from scipy.signal import butter, tf2ss
 
 from math import factorial
 
-from ..lti import StateSpace
-
+from .lti import StateSpace
 
 
 # FILTER BLOCKS =========================================================================
