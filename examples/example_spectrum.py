@@ -14,11 +14,7 @@ from pathsim import Simulation, Connection
 #the standard blocks are imported like this
 from pathsim.blocks import (
     Scope, 
-    Spectrum
-    )
-
-#special blocks (for example from 'rf' module) are imported like this
-from pathsim.blocks.rf import (
+    Spectrum,
     ButterworthLowpassFilter,
     GaussianPulseSource
     )

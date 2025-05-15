@@ -190,7 +190,7 @@ class TriangleWaveSource(Block):
         return 0
 
 
-    def _triangle_wave(t, f):
+    def _triangle_wave(self, t, f):
         """triangle wave with amplitude '1' and frequency 'f'
 
         Parameters
@@ -270,7 +270,7 @@ class GaussianPulseSource(Block):
         return 0
 
 
-    def _gaussian(t, f_max):
+    def _gaussian(self, t, f_max):
         """gaussian pulse with its maximum at t=0
         
         Parameters
@@ -520,6 +520,24 @@ class ChirpPhaseNoiseSource(Block):
         return 0
 
 
+    def _triangle_wave(self, t, f):
+        """triangle wave with amplitude '1' and frequency 'f'
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        f : float
+            trig wave frequency
+
+        Returns
+        -------
+        out : float
+            trig wave value
+        """
+        return 2 * abs(t*f - np.floor(t*f + 0.5)) - 1
+
+
     def reset(self):
         super().reset()
 
@@ -557,7 +575,7 @@ class ChirpPhaseNoiseSource(Block):
     def solve(self, t, dt):
         """advance implicit solver of implicit integration engine, evaluate 
         the triangle wave and cumulative noise RNG"""
-        f = self.BW * (1 + triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
+        f = self.BW * (1 + self._triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
         self.engine.solve(f, None, dt)
 
         #no error for chirp source
@@ -567,12 +585,31 @@ class ChirpPhaseNoiseSource(Block):
     def step(self, t, dt):
         """compute update step with integration engine, evaluate the triangle wave 
         and cumulative noise RNG"""
-        f = self.BW * (1 + triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
+        f = self.BW * (1 + self._triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
         self.engine.step(f, dt)
 
         #no error control for chirp source
         return True, 0.0, 1.0
         
+
+class ChirpSource(ChirpPhaseNoiseSource):
+
+    def __init__(
+        self, 
+        amplitude=1, 
+        f0=1, 
+        BW=1, 
+        T=1, 
+        phase=0, 
+        sig_cum=0, 
+        sig_white=0, 
+        sampling_rate=10):
+        super().__init__(amplitude, f0, BW, T, phase, sig_cum, sig_white, sampling_rate)
+
+        import warnings
+        warnings.warn("'ChirpSource' block will be deprecated and is currently an alias, use 'ChirpPhaseNoiseSource' instead")
+
+
 
 # SPECIAL DISCRETE SOURCE BLOCKS ========================================================
 

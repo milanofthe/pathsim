@@ -11,9 +11,7 @@ import numpy as np
 
 from pathsim import Simulation, Connection
 
-from pathsim.blocks import Scope, Source
-from pathsim.blocks.rf import ButterworthLowpassFilter
-from pathsim.blocks.mixed import ADC, DAC
+from pathsim.blocks import Scope, Source, ButterworthLowpassFilter, ADC, DAC
 
 from pathsim.solvers import RKBS32
 

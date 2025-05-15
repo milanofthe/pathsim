@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pathsim import Simulation, Connection
-from pathsim.blocks import Scope
-from pathsim.blocks.rf import SquareWaveSource, ButterworthLowpassFilter
+from pathsim.blocks import Scope, SquareWaveSource, ButterworthLowpassFilter
 from pathsim.solvers import SSPRK33, RKCK54
 from pathsim.optim import Value
 

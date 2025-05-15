@@ -13,8 +13,10 @@ from scipy.signal import firwin
 
 from pathsim import Simulation, Connection
 
-from pathsim.blocks import Integrator, Adder, Scope, Source 
-from pathsim.blocks.mixed import SampleHold, DAC, Comparator, FIR
+from pathsim.blocks import (
+    Integrator, Adder, Scope, Source, 
+    SampleHold, DAC, Comparator, FIR
+    )
 
 from pathsim.solvers import RKBS32
 
