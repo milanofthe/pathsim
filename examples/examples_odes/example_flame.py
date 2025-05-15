@@ -14,7 +14,6 @@ from pathsim.blocks import Scope, Integrator, Adder, Function
 from pathsim.solvers import ESDIRK32, ESDIRK43, GEAR52A
 
 
-
 # FLAME INITIAL VALUE PROBLEM ===========================================================
 
 #flame parameter (very stiff)

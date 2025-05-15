@@ -142,6 +142,25 @@ class Event(Serializable):
             self._history = self.func_evt(t), t
 
 
+    def estimate(self, t):
+        """Estimate the time of the next event, based on history or internal schedule.
+
+        This improves simulation performance by estimating events before the simulation 
+        step such that fewer steps have to be rejected for event location. 
+              
+        Parameters
+        ----------
+        t : float 
+            evaluation time for estimation 
+        
+        Returns
+        -------
+        float | None
+            estimated time of event
+        """
+        return None
+
+
     def detect(self, t):
         """Evaluate the event function and decide if an event has occured. 
         Can also use the history of the event function evaluation from 
