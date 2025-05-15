@@ -84,6 +84,22 @@ class Schedule(Event):
         return self.t_start + len(self._times) * self.t_period
 
 
+    def estimate(self, t):
+        """Estimate the time of the next scheduled event.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time for estimation 
+        
+        Returns
+        -------
+        float
+            estimated time of event
+        """
+        return self._next()
+
+
     def buffer(self, t):
         """Buffer the current time to history
         
