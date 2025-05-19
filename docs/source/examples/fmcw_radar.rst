@@ -27,11 +27,8 @@ Lets start by importing the requred classes from `PathSim`:
 
     from pathsim import Simulation, Connection
 
-    #the standard blocks
-    from pathsim.blocks import Multiplier, Scope, Adder, Spectrum, Delay
-
-    #we also need some special blocks from the rf (radio-frequency) library
-    from pathsim.blocks.rf import ChirpSource, ButterworthLowpassFilter
+    #from the block library
+    from pathsim.blocks import Multiplier, Scope, Adder, Spectrum, Delay, ChirpSource, ButterworthLowpassFilter
 
 
 Now lets define the system parameters starting with the :class:`.ChirpSource`, which is defined by the starting frequency, the bandwith and the ramp duration. 
