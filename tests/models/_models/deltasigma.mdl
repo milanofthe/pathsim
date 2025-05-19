@@ -41,7 +41,7 @@
       {
         "id": 2922243578512,
         "type": "SampleHold",
-        "module": "pathsim.blocks.mixed.samplehold",
+        "module": "pathsim.blocks.samplehold",
         "metadata": {},
         "params": {
           "T": 0.01,
@@ -51,7 +51,7 @@
       {
         "id": 2922243579184,
         "type": "Comparator",
-        "module": "pathsim.blocks.mixed.comparator",
+        "module": "pathsim.blocks.comparator",
         "metadata": {},
         "params": {
           "threshold": 0,
@@ -65,7 +65,7 @@
       {
         "id": 2922243579856,
         "type": "DAC",
-        "module": "pathsim.blocks.mixed.converters",
+        "module": "pathsim.blocks.converters",
         "metadata": {},
         "params": {
           "n_bits": 1,
@@ -80,7 +80,7 @@
       {
         "id": 2922243580192,
         "type": "FIR",
-        "module": "pathsim.blocks.mixed.fir",
+        "module": "pathsim.blocks.fir",
         "metadata": {},
         "params": {
           "coeffs": {

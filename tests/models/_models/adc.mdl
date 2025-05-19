@@ -23,7 +23,7 @@
       {
         "id": 2800412155184,
         "type": "DAC",
-        "module": "pathsim.blocks.mixed.converters",
+        "module": "pathsim.blocks.converters",
         "metadata": {},
         "params": {
           "n_bits": 8,
@@ -38,7 +38,7 @@
       {
         "id": 2800412154512,
         "type": "ADC",
-        "module": "pathsim.blocks.mixed.converters",
+        "module": "pathsim.blocks.converters",
         "metadata": {},
         "params": {
           "n_bits": 8,
@@ -53,7 +53,7 @@
       {
         "id": 2800412155520,
         "type": "ButterworthLowpassFilter",
-        "module": "pathsim.blocks.rf.filters",
+        "module": "pathsim.blocks.filters",
         "metadata": {},
         "params": {
           "Fc": 10.0,
