@@ -7,17 +7,12 @@ This is a preliminary roadmap for PathSim's development. To be fair, its more a 
 Blocks
 ------
 - adding more convenience blocks, for example math operations or different kinds of sources 
-- refactor the block library for clarity, currently for example, different sources are separated throughout the submodules
 
 Solvers
 -------
 - multistep methods (:class:`.BDF`, :class:`.GEAR`) need startup methods to build history, to maintain consistency order globally
 - make solver term :math:`\dot{x}` accessible for solving index 1 DAEs, especially for stiffly accurate :class:`.DIRK` and :class:`.ESDIRK` methods, will be the basis for future `DAE` blocks
 - add interpolant within timestep to solvers for dense output and to improve interpolation for the event mechanism 
-
-Events
-------
-- separate checks for event types in simulation loop, purely time dependent events (:class:`.Schedule`) can be estimated before the timestep is taken and therefore be approached without backtracking, which would improve performance (maybe add some method `Event.estimate(t)`)
 
 Analysis
 --------
