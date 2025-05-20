@@ -12,7 +12,7 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.sources import Source, Constant
+from pathsim.blocks.sources import Source, Constant, TriangleWaveSource
 
 
 # TESTS ================================================================================
@@ -111,6 +111,30 @@ class TestSource(unittest.TestCase):
 
         #test if error is allways 0
         self.assertEqual(err, 0)
+
+
+class TestTriangleWaveSource(unittest.TestCase):
+    """
+    Test the implementation of the 'TriangleWaveSource' block class
+    """
+    def test_init(self):
+
+        #default
+        S = TriangleWaveSource()
+
+        self.assertEqual(S.amplitude, 1)
+        self.assertEqual(S.frequency, 1)
+        self.assertEqual(S.phase, 0)
+
+        #specific
+        S = TriangleWaveSource(frequency=12, amplitude=0.01, phase=np.pi/2)
+
+        self.assertEqual(S.amplitude, 0.01)
+        self.assertEqual(S.frequency, 12)
+        self.assertEqual(S.phase, np.pi/2)
+
+
+
 
 
 # RUN TESTS LOCALLY ====================================================================
