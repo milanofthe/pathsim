@@ -19,12 +19,8 @@ from pathsim.blocks import (
     Adder,
     Spectrum,
     Delay,
-    RealtimeScope
-    )
-
-#special blocks (for example from 'rf' module) are imported like this
-from pathsim.blocks.rf import (
-    ChirpSource, 
+    RealtimeScope,
+    ChirpPhaseNoiseSource, 
     ButterworthLowpassFilter
     )
 
@@ -52,7 +48,7 @@ R = c0 * tau / 2
 f_trg = 2 * R * B / (T * c0)
 
 #initialize blocks
-Src = ChirpSource(f0=f_min, BW=B, T=T)
+Src = ChirpPhaseNoiseSource(f0=f_min, BW=B, T=T)
 Add = Adder()
 Dly = Delay(tau)
 Mul = Multiplier()
@@ -88,10 +84,10 @@ if __name__ == "__main__":
     Sim.run(T)
 
     #plot the recording of the scope
-    Sco.plot(lw=2)
+    Sco.plot()
 
     #plot the spectrum
-    Spc.plot(lw=2)
+    Spc.plot()
     Spc.ax.set_xscale("log")
     Spc.ax.set_yscale("log")
 

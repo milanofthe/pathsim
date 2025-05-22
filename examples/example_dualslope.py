@@ -11,8 +11,10 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 
-from pathsim.blocks import Integrator, Adder, Amplifier, Scope, Source, Constant, Switch
-from pathsim.blocks.mixed import SampleHold, Comparator
+from pathsim.blocks import (
+    Integrator, Adder, Amplifier, Scope, Source, 
+    Constant, Switch, SampleHold, Comparator
+    )
 
 from pathsim.events import Schedule, ZeroCrossingDown
 

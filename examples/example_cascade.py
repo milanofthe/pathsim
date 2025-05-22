@@ -10,8 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection, Subsystem, Interface
-from pathsim.blocks import Source, TransferFunctionZPG, Adder, Scope, PID
-from pathsim.blocks.rf import WhiteNoise
+from pathsim.blocks import Source, TransferFunctionZPG, Adder, Scope, PID, WhiteNoise
 
 from pathsim.solvers import RKCK54
 

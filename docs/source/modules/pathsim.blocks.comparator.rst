@@ -1,7 +1,7 @@
-pathsim.blocks.rf.sources module
+pathsim.blocks.comparator module
 ================================
 
-.. automodule:: pathsim.blocks.rf.sources
+.. automodule:: pathsim.blocks.comparator
    :members:
    :show-inheritance:
    :undoc-members:

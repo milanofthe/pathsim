@@ -10,7 +10,7 @@
       {
         "id": 1900458348224,
         "type": "SquareWaveSource",
-        "module": "pathsim.blocks.rf.sources",
+        "module": "pathsim.blocks.sources",
         "metadata": {},
         "params": {
           "frequency": 1,
@@ -21,7 +21,7 @@
       {
         "id": 1900458348560,
         "type": "ButterworthLowpassFilter",
-        "module": "pathsim.blocks.rf.filters",
+        "module": "pathsim.blocks.filters",
         "metadata": {},
         "params": {
           "Fc": 2,

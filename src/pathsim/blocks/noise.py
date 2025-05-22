@@ -1,11 +1,9 @@
 #########################################################################################
 ##
-##                             SPECIAL RF NOISE SOURCES 
-##                               (blocks/rf/noise.py)
+##                             TIME DOMAIN NOISE SOURCES 
+##                                (blocks/noise.py)
 ##
-##            this module implements some noise sources for RF simulations
-##
-##                                Milan Rother 2024
+##                              Milan Rother 2024/25
 ##
 #########################################################################################
 
@@ -13,7 +11,7 @@
 
 import numpy as np
 
-from .._block import Block
+from ._block import Block
 
 
 # NOISE SOURCE BLOCKS ===================================================================
@@ -212,142 +210,3 @@ class PinkNoise(Block):
         """
         self.outputs[0] = self.noise
         return 0.0
-        
-
-class SinusoidalPhaseNoiseSource(Block):
-    """Sinusoidal source with cumulative and white phase noise
-
-    Parameters
-    ----------
-    frequency : float
-        frequency of the sinusoid
-    amplitude : float
-        amplitude of the sinusoid
-    phase : float
-        phase of the sinusoid
-    sig_cum : float
-        weight for cumulative phase noise contribution
-    sig_white : float
-        weight for white phase noise contribution
-    sampling_rate : float
-        number of samples per unit time for the internal RNG 
-    
-    Attributes
-    ----------
-    omega : float
-        angular frequency of the sinusoid, derived from `frequency`
-    noise_1 : float
-        internal noise value sampled from normal distribution
-    noise_2 : float
-        internal noise value sampled from normal distribution
-    n_samples : int
-        bin counter for sampling
-    t_max : float
-        most recent sampling time, to ensure timing for sampling bins
-    """
-
-    def __init__(
-        self, 
-        frequency=1, 
-        amplitude=1, 
-        phase=0, 
-        sig_cum=0, 
-        sig_white=0, 
-        sampling_rate=10
-        ):
-        super().__init__()
-
-        self.amplitude = amplitude
-        self.frequency = frequency
-        self.phase = phase
-        
-        self.sampling_rate = sampling_rate
-
-        self.omega = 2 * np.pi * self.frequency
-
-        self.sig_cum = sig_cum
-        self.sig_white = sig_white
-
-        #initial noise sampling
-        self.noise_1 = np.random.normal() 
-        self.noise_2 = np.random.normal() 
-
-        #bin counter
-        self.n_samples = 0
-        self.t_max = 0
-
-
-    def __len__(self):
-        return 0
-
-
-    def set_solver(self, Solver, **solver_kwargs):
-        #initialize the numerical integration engine 
-        if self.engine is None: self.engine = Solver(0.0, **solver_kwargs)
-        #change solver if already initialized
-        else: self.engine = Solver.cast(self.engine, **solver_kwargs)
-
-
-    def reset(self):
-        super().reset()
-
-        #reset block specific attributes
-        self.n_samples = 0
-        self.t_max = 0
-
-
-    def update(self, t):
-        """update system equation for fixed point loop, 
-        here just setting the outputs
-    
-        Note
-        ----
-        no direct passthrough, so the 'update' method 
-        is optimized for this case        
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-
-        Returns
-        -------
-        error : float
-            absolute error to previous iteration for convergence 
-            control (here '0.0' because source-type block)
-        """
-
-        #compute phase error
-        phase_error = self.sig_white * self.noise_1 + self.sig_cum * self.engine.get()
-
-        #set output
-        self.outputs[0] = self.amplitude * np.sin(self.omega*t + self.phase + phase_error)
-        
-        return 0.0
-
-
-    def sample(self, t):
-        """
-        Sample from a normal distribution after successful timestep.
-        """
-        if (self.sampling_rate is None or 
-            self.n_samples < t * self.sampling_rate):
-            self.noise_1 = np.random.normal() 
-            self.noise_2 = np.random.normal() 
-            self.n_samples += 1
-
-
-    def solve(self, t, dt):
-        #advance solution of implicit update equation (no jacobian)
-        f = self.noise_2
-        self.engine.solve(f, None, dt)
-        return 0.0
-
-
-    def step(self, t, dt):
-        #compute update step with integration engine
-        f = self.noise_2
-        self.engine.step(f, dt)
-
-        #no error control for noise source
-        return True, 0.0, 1.0

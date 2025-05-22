@@ -91,7 +91,7 @@ Now lets implement this hybrid dynamical system into `PathSim` starting with imp
     #event managers
     from pathsim.events import ZeroCrossing, ZeroCrossingUp
 
-    #adaptive rxplicit integrator (for backtracking)
+    #adaptive explicit integrator (for backtracking)
     from pathsim.solvers import RKBS32
 
 

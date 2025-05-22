@@ -10,7 +10,7 @@
       {
         "id": 2135262629904,
         "type": "SquareWaveSource",
-        "module": "pathsim.blocks.rf.sources",
+        "module": "pathsim.blocks.sources",
         "metadata": {},
         "params": {
           "frequency": 0.5,
@@ -21,7 +21,7 @@
       {
         "id": 2135262630240,
         "type": "PinkNoise",
-        "module": "pathsim.blocks.rf.noise",
+        "module": "pathsim.blocks.noise",
         "metadata": {},
         "params": {
           "spectral_density": 0.05,
@@ -32,7 +32,7 @@
       {
         "id": 2135262630576,
         "type": "WhiteNoise",
-        "module": "pathsim.blocks.rf.noise",
+        "module": "pathsim.blocks.noise",
         "metadata": {},
         "params": {
           "spectral_density": 0.02,
@@ -51,7 +51,7 @@
       {
         "id": 2135262630912,
         "type": "ButterworthBandpassFilter",
-        "module": "pathsim.blocks.rf.filters",
+        "module": "pathsim.blocks.filters",
         "metadata": {},
         "params": {
           "Fc": {

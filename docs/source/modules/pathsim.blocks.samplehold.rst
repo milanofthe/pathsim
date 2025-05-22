@@ -1,7 +1,7 @@
-pathsim.blocks.mixed.converters module
+pathsim.blocks.samplehold module
 ======================================
 
-.. automodule:: pathsim.blocks.mixed.converters
+.. automodule:: pathsim.blocks.samplehold
    :members:
    :show-inheritance:
    :undoc-members:

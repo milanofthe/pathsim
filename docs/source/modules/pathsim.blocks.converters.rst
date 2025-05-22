@@ -1,7 +1,7 @@
-pathsim.blocks.rf.filters module
+pathsim.blocks.converters module
 ================================
 
-.. automodule:: pathsim.blocks.rf.filters
+.. automodule:: pathsim.blocks.converters
    :members:
    :show-inheritance:
    :undoc-members:

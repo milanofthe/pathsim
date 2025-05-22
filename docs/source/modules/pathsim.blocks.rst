@@ -20,6 +20,10 @@ pathsim.blocks
    pathsim.blocks.switch
    pathsim.blocks.spectrum
    pathsim.blocks.wrapper
-   pathsim.blocks.mixed
    pathsim.blocks.ctrl
-   pathsim.blocks.rf
+   pathsim.blocks.noise
+   pathsim.blocks.filters
+   pathsim.blocks.fir
+   pathsim.blocks.converters
+   pathsim.blocks.samplehold
+   pathsim.blocks.comparator

@@ -10,7 +10,7 @@
       {
         "id": 1638303485632,
         "type": "ChirpSource",
-        "module": "pathsim.blocks.rf.sources",
+        "module": "pathsim.blocks.sources",
         "metadata": {},
         "params": {
           "amplitude": 1,
@@ -51,7 +51,7 @@
       {
         "id": 1638303487648,
         "type": "ButterworthLowpassFilter",
-        "module": "pathsim.blocks.rf.filters",
+        "module": "pathsim.blocks.filters",
         "metadata": {},
         "params": {
           "Fc": 60000000.000000015,
