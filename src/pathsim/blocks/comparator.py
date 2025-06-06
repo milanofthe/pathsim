@@ -1,7 +1,7 @@
 #########################################################################################
 ##
-##                                COMPARATOR BLOCK
-##                           (blocks/mixed/comparator.py)
+##                                 COMPARATOR BLOCK
+##                              (blocks/comparator.py)
 ##
 ##                                Milan Rother 2024
 ##
@@ -11,8 +11,8 @@
 
 import numpy as np
 
-from .._block import Block
-from ...events.zerocrossing import ZeroCrossing
+from ._block import Block
+from ..events.zerocrossing import ZeroCrossing
 
 
 # MIXED SIGNAL BLOCKS ===================================================================

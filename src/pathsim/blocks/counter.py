@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                                  COUNTER BLOCK
-##                            (blocks/mixed/counter.py)
+##                               (blocks/counter.py)
 ##
 ##                                Milan Rother 2024
 ##
@@ -11,8 +11,8 @@
 
 import numpy as np
 
-from .._block import Block
-from ...events.zerocrossing import ZeroCrossing, ZeroCrossingUp, ZeroCrossingDown
+from ._block import Block
+from ..events.zerocrossing import ZeroCrossing, ZeroCrossingUp, ZeroCrossingDown
 
 
 # MIXED SIGNAL BLOCKS ===================================================================

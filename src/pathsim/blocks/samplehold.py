@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                              SAMPLE AND HOLD BLOCK
-##                           (blocks/mixed/samplehold.py)
+##                             (blocks/samplehold.py)
 ##
 ##                                Milan Rother 2024
 ##
@@ -9,8 +9,8 @@
 
 # IMPORTS ===============================================================================
 
-from .._block import Block
-from ...events.schedule import Schedule
+from ._block import Block
+from ..events.schedule import Schedule
 
 
 # MIXED SIGNAL BLOCKS ===================================================================

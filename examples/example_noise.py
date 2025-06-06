@@ -16,11 +16,7 @@ from pathsim.blocks import (
     Amplifier, 
     Adder, 
     Scope, 
-    Spectrum
-    )
-
-#special blocks (for example from 'rf' module) are imported like this
-from pathsim.blocks.rf import (
+    Spectrum,
     ButterworthBandpassFilter,
     SquareWaveSource, 
     WhiteNoise,

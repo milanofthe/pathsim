@@ -1,9 +1,9 @@
 #########################################################################################
 ##
-##                      DISCRETE-TIME FIR FILTER BLOCK
-##                         (blocks/mixed/fir.py) 
+##               DISCRETE-TIME FINITE-IMPULSE-RESPONSE (FIR) FILTER BLOCK
+##                                  (blocks/fir.py) 
 ##
-##                           Milan Rother 2025
+##                                 Milan Rother 2025
 ##
 #########################################################################################
 
@@ -12,14 +12,14 @@
 import numpy as np
 from collections import deque
 
-from .._block import Block    
-from ...events.schedule import Schedule 
+from ._block import Block    
+from ..events.schedule import Schedule 
 
 
 # FIR FILTER BLOCK ======================================================================
 
 class FIR(Block):
-    """Models a discrete-time Finite Impulse Response (FIR) filter.
+    """Models a discrete-time Finite-Impulse-Response (FIR) filter.
 
     This block applies an FIR filter to an input signal sampled periodically.
     The output at each sample time is a weighted sum of the current and a finite number 

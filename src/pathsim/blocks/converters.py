@@ -1,7 +1,7 @@
 #########################################################################################
 ##
 ##                            IDEAL AD AND DA CONVERTERS
-##                           (blocks/mixed/converters.py)
+##                              (blocks/converters.py)
 ##
 ##                                Milan Rother 2025
 ##
@@ -11,9 +11,9 @@
 
 import numpy as np
 
-from .._block import Block
-from ...events.schedule import Schedule
-from ...utils.register import Register
+from ._block import Block
+from ..events.schedule import Schedule
+from ..utils.register import Register
 
 
 # MIXED SIGNAL BLOCKS ===================================================================
