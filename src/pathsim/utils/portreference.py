@@ -58,7 +58,7 @@ class PortReference:
 
     def to(self, other):
         """Transfer the data between two `PortReference` instances, 
-        in this direction `self` -> `other`.
+        in this direction `self` -> `other`. From outputs to inputs.
 
         Parameters
         ----------
@@ -68,6 +68,52 @@ class PortReference:
         for a, b in zip(other.ports, self.ports):
             other.block.inputs[a] = self.block.outputs[b]
 
+
+    def get_inputs(self):
+        """Return the input values of the block at specified ports
+
+        Returns
+        -------
+        out : list[float, obj]
+            input values of block
+        """
+        return [self.block.inputs[p] for p in self.ports]
+
+
+    def set_inputs(self, vals):
+        """Set the block inputs with values at specified ports
+
+        Parameters
+        ----------
+        vals : list[float, obj]
+            values to set at block input ports
+        """
+        for v, p in zip(vals, self.ports):
+            self.block.inputs[p] = v
+
+
+    def get_outputs(self):
+        """Return the output values of the block at specified ports
+
+        Returns
+        -------
+        out : list[float, obj]
+            output values of block
+        """
+        return [self.block.outputs[p] for p in self.ports]
+
+
+    def set_outputs(self, vals):
+        """Set the block outputs with values at specified ports
+
+        Parameters
+        ----------
+        vals : list[float, obj]
+            values to set at block output ports
+        """
+        for v, p in zip(vals, self.ports):
+            self.block.outputs[p] = v
+        
 
     def to_dict(self):
         """Serialization into dict"""
