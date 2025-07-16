@@ -63,8 +63,8 @@ class Multiplier(Block):
         Returns
         -------
         error : float
-            maximum absolute error to previous iteration 
-            for convergence control
+            convergence control, default 0.0
         """
         u = self.inputs.to_array()
-        return self.outputs.update_from_array_max_err(self.op_alg(u))
+        self.outputs.update_from_array(self.op_alg(u))
+        return 0.0

@@ -134,9 +134,9 @@ class Adder(Block):
         Returns
         -------
         error : float
-            absolute error to previous iteration for 
-            convergence control
+            convergence control, default 0.0
         """
         u = self.inputs.to_array()
         y = self.op_alg(u)
-        return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)
+        return 0.0

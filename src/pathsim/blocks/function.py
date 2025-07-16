@@ -141,10 +141,10 @@ class Function(Block):
         Returns
         -------
         error : float
-            max absolute error to previous iteration 
-            for convergence control
+            convergence control, default 0.0
         """
                 
         #apply operator to get output
         y = self.op_alg(self.inputs.to_array())
-        return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)
+        return 0.0

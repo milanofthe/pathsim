@@ -92,12 +92,11 @@ class Switch(Block):
 
         Returns
         -------
-        err : float
-            absolute deviation for convergence control
+        error : float
+            convergence control, default 0.0
         """
         
         #early exit without error control
-        if self.state is None: 
-            self.outputs[0] = 0.0
-            return 0.0
-        return self.outputs.update_from_array_max_err(self.inputs[self.state])
+        if self.state is None: self.outputs[0] = 0.0
+        else: self.outputs[0] = self.inputs[self.state]
+        return 0.0

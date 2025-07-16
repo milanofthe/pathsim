@@ -93,8 +93,7 @@ class WhiteNoise(Block):
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence 
-            control (here '0.0' because source-type block)
+            convergence control, default 0.0
         """
         self.outputs[0] = self.noise
         return 0.0

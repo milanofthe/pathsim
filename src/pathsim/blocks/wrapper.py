@@ -88,12 +88,11 @@ class Wrapper(Block):
         ----------
         t : float
             evaluation time
-
+        
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence control
-            here returns '0.0', because no direct passthrough
+            convergence control, default 0.0
         """
         return 0.0
     

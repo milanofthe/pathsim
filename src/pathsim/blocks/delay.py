@@ -93,8 +93,7 @@ class Delay(Block):
         Returns
         -------
         error : float
-            deviation to previous iteration for convergence 
-            control (always '0.0' because non-algebraic)
+            convergence control, default 0.0
         """
 
         #retrieve value from buffer

@@ -415,7 +415,9 @@ class Block(Serializable):
         Returns
         -------
         error : float
-            max absolute error to previous iteration for convergence control
+            max absolute error to previous iteration for convergence control, only relevant 
+            for the subsystem block to propagate errors from internal accelerated connections 
+            (algebraic loops), default 0.0
         """
 
         #no internal algebraic operator -> early exit
@@ -432,8 +434,11 @@ class Block(Serializable):
         else: 
             y = self.op_alg(u)           
 
+        #update register
+        self.outputs.update_from_array(y)
+
         #error control 
-        return self.outputs.update_from_array_max_err(y)
+        return 0.0
 
 
     def solve(self, t, dt):

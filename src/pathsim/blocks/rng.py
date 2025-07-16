@@ -81,8 +81,7 @@ class RNG(Block):
         Returns
         -------
         error : float
-            absolute error to previous iteration for convergence 
-            control (always '0.0' because source-type)
+            convergence control, default 0.0
         """
         self.outputs[0] = self.val
         return 0.0
