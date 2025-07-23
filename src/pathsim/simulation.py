@@ -851,8 +851,7 @@ class Simulation:
     # solving system equations ----------------------------------------------------
 
 
-    def _update(self, t)
-        
+    def _update(self, t):        
         """Distribute information within the system by evaluating the directed acyclic graph 
         (DAG) formed by the algebraic passthroughs of the blocks and resolving algebraic loops 
         through accelerated fixed-point iterations.
