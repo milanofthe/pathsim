@@ -1667,7 +1667,8 @@ class Simulation:
             event.resolve(self.time)
 
             #evaluate system function again -> propagate event
-            initial_evals += self._update(self.time) 
+            self._update(self.time) 
+            initial_evals += 1
     
         #sampling states and inputs at 'self.time == starting_time' 
         self._sample(self.time)
