@@ -108,7 +108,72 @@ class TestPortReference(unittest.TestCase):
         self.assertEqual(B1.inputs[2], 312)
 
 
+    def test_get_inputs(self):
 
+        B = Block()
+
+        #default
+        PR = PortReference(B)
+        self.assertEqual(PR.get_inputs(), 0) 
+
+        #special
+        PR = PortReference(B, [0, 1, 2])
+        self.assertTrue(np.allclose(PR.get_inputs(), np.zeros(3))) 
+
+        B.inputs[0] = 3
+        B.inputs[1] = 2
+        self.assertTrue(np.allclose(PR.get_inputs(), np.array([3, 2, 0]))) 
+
+
+    def test_get_outputs(self):
+
+        B = Block()
+
+        #default
+        PR = PortReference(B)
+        self.assertEqual(PR.get_outputs(), 0) 
+
+        #special
+        PR = PortReference(B, [0, 1, 2])
+        self.assertTrue(np.allclose(PR.get_outputs(), np.zeros(3))) 
+
+        B.outputs[0] = 3
+        B.outputs[1] = 2
+        self.assertTrue(np.allclose(PR.get_outputs(), np.array([3, 2, 0]))) 
+
+
+    def test_set_inputs(self): 
+
+        B = Block()
+
+        #default
+        PR = PortReference(B)
+        PR.set_inputs([9])
+        self.assertEqual(B.inputs[0], 9) 
+
+        #special
+        PR = PortReference(B, [0, 1, 2])
+        PR.set_inputs([9, 8, 7])
+        self.assertEqual(B.inputs[0], 9)
+        self.assertEqual(B.inputs[1], 8)
+        self.assertEqual(B.inputs[2], 7) 
+
+
+    def test_set_outputs(self): 
+
+        B = Block()
+
+        #default
+        PR = PortReference(B)
+        PR.set_outputs([9])
+        self.assertEqual(B.outputs[0], 9) 
+
+        #special
+        PR = PortReference(B, [0, 1, 2])
+        PR.set_outputs([9, 8, 7])
+        self.assertEqual(B.outputs[0], 9)
+        self.assertEqual(B.outputs[1], 8)
+        self.assertEqual(B.outputs[2], 7)
 
 
 # RUN TESTS LOCALLY ====================================================================

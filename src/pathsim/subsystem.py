@@ -469,19 +469,10 @@ class Subsystem(Block):
         """Update the instant time components of the internal blocks 
         to evaluate the (distributed) system equation.
 
-        Collect convergence errors of internal blocks for algebraic 
-        loop resolution.
-
         Parameters
         ----------
         t : float
             evaluation time 
-
-        Returns
-        ------- 
-        max_error : float
-            max deviation to previous iteration at evaluation 
-            of alg. components
         """
 
         #evaluate DAG
