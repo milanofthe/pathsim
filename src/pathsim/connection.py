@@ -129,9 +129,9 @@ class Connection:
     _active : bool
         flag to set 'Connection' as active or inactive
     values : array
-        values to transmit, relevant for fixed point accelerator
+        values to transmit, relevant for fixed-point accelerator
     accelerator : None, Anderson
-        internal fixed point accelerator for algebraic loops
+        internal fixed-point accelerator for algebraic loops
     """
 
     __slots__ = ["source", "targets", "_active", "values", "accelerator"]
@@ -151,7 +151,7 @@ class Connection:
         #values to transmit as history
         self.values = None
 
-        #internal fixed point accelerator
+        #internal fixed-point accelerator
         self.accelerator = None
         
         #validate port dimensions at connection creation
@@ -274,7 +274,11 @@ class Connection:
 
 
     def step(self):
-        """Step the internal fixed point accelerator forward by one iteration.
+        """Step the internal fixed-point accelerator forward by one iteration.
+
+        If no previous values are available (prev_values is None), falls back to 
+        the 'update' method, which is essentially equivalent to a standard 
+        fixed-point update. 
     
         Returns
         -------
@@ -286,7 +290,7 @@ class Connection:
         self.values, prev_values = self.source.get_outputs(), self.values
 
         #initialize fixed point accelerator if not already available
-        if self.accelerator is None:
+        if not self.accelerator:
             self.accelerator = Anderson()
 
         #no previous value -> fallback to update method
@@ -294,14 +298,14 @@ class Connection:
             self.update()
             return 1.0
 
-        #update fixed point accelerator
+        #update fixed-point accelerator
         self.values, res = self.accelerator.step(prev_values, self.values)
 
         #transmit new values to all targets
         for trg in self.targets:
             trg.set_inputs(self.values)
 
-        #return the fixed point residual
+        #return the fixed-point residual
         return res
 
 
