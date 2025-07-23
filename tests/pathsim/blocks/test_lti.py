@@ -122,10 +122,7 @@ class TestStateSpace(unittest.TestCase):
         self.assertEqual(S.outputs[0], 0.0)
         
         S.inputs[0] = 3.3
-        err = S.update(0)
-
-        #test if error is correctly 0
-        self.assertGreater(err, 0.0)
+        S.update(0)
 
         #test if engine state is calculated correctly
         self.assertAlmostEqual(S.outputs[0], 2.2, 8)

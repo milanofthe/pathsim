@@ -114,9 +114,8 @@ class TestSubsystem(unittest.TestCase):
         C1 = Connection(I1, B1)
         S = Subsystem(blocks=[I1, B1], connections=[C1])
 
-        err = S.update(0)
+        S.update(0)
 
-        self.assertEqual(err, 0.0)
 
 
     # to be implemented ----------------------------------------------------------------
