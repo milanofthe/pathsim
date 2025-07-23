@@ -850,9 +850,12 @@ class Simulation:
 
     # solving system equations ----------------------------------------------------
 
-    def _update(self, t):
-        """Fixed-point iterations to resolve algebraic loops and distribute 
-        information within the system.
+
+    def _update(self, t)
+        
+        """Distribute information within the system by evaluating the directed acyclic graph 
+        (DAG) formed by the algebraic passthroughs of the blocks and resolving algebraic loops 
+        through accelerated fixed-point iterations.
         
         Effectively evaluates the right hand side function of the global 
         system ODE/DAE
@@ -868,11 +871,29 @@ class Simulation:
         in time ´t´.
 
         If no algebraic loops are present in the system, convergence is 
-        guaranteed after the first stage (evaluation of the DAG), otherwise 
-        Gauss-Seidel iterations are performed as a second stage on the DAGs 
-        (broken cycles) of blocks that are part of or tainted by upstream 
-        algebraic loops.
+        guaranteed after the first stage (evaluation of the DAG in '_dag'). 
 
+        Otherwise, accelerated fixed-point iterations ('_loops') are performed as a second 
+        stage on the DAGs (broken cycles) of blocks that are part of or tainted by upstream 
+        algebraic loops. 
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for system function
+        """
+
+        #evaluate DAG
+        self._dag(t)
+
+        #algebraic loops -> solve them
+        if self.graph.has_loops:   
+            self._loops(t)
+
+
+    def _dag(self, t):
+        """Update the directed acyclic graph components of the system.
+        
         Parameters
         ----------
         t : float
@@ -890,36 +911,47 @@ class Simulation:
             for connection in connections_dag:
                 if connection: connection.update()
 
-        #no algebraic loops -> early exit
-        if not self.graph.has_loops:
-            return 1
 
-        #perform gauss-seidel iterations on algebraic loops
-        for it in range(1, self.iterations_max):       
+    def _loops(self, t):
+        """Perform the algebraic loop solve of the system using accelerated 
+        fixed-point iterations on the broken loop directed graph.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time for system function
+        """
+
+        #perform solver iterations on algebraic loops
+        for it in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
             max_error = 0.0
             for _, blocks_loop, connections_loop in self.graph.loop():
 
-                #update blocks at algebraic depth (with error control)
+                #update blocks at algebraic depth
                 for block in blocks_loop:
+                    if block: block.update(t)
 
-                    #skip incative blocks
-                    if not block: 
-                        continue
+                #step accelerated connenctions at algebraic depth (data transfer)
+                for connection in connections_loop:
                     
-                    #block update with error control
-                    err = block.update(t)
+                    #skip inactive connections
+                    if not connection: 
+                        continue
+
+                    #reset solver at first iteration
+                    if it == 1: 
+                        connection.reset()
+
+                    #step fixed-point solver (for alg. loops)
+                    err = connection.step() 
                     if err > max_error:
                         max_error = err
 
-                #update connenctions at algebraic depth (data transfer)
-                for connection in connections_loop:
-                    if connection: connection.update() 
-
             #return number of iterations if converged
             if max_error <= self.tolerance_fpi:
-                return it
+                return
 
         #not converged -> error
         self._logger_error(
@@ -964,7 +996,8 @@ class Simulation:
         for it in range(self.iterations_max):
 
             #evaluate system equation (this is a fixed point loop)
-            total_evals += self._update(t)
+            self._update(t)
+            total_evals += 1            
 
             #advance solution of implicit solver
             max_error = 0.0
@@ -1047,7 +1080,6 @@ class Simulation:
         when local truncation error is too large and timestep has to be 
         retaken with smaller timestep. 
         """
-
         #revert block states
         for block in self._blocks_dyn:
             if block: block.revert()
@@ -1198,7 +1230,8 @@ class Simulation:
         for time_stage in self.engine.stages(self.time, dt):
 
             #evaluate system equation by fixed-point iteration
-            total_evals += self._update(time_stage) 
+            self._update(time_stage) 
+            total_evals += 1
 
             #timestep for dynamical blocks (with internal states)
             _1, error_norm, _3 = self._step(time_stage, dt)
@@ -1207,7 +1240,8 @@ class Simulation:
         time_dt = self.time + dt
 
         #evaluate system equation before sampling and event check (+dt)
-        total_evals += self._update(time_dt) 
+        self._update(time_dt) 
+        total_evals += 1
 
         #handle events chronologically after timestep (+dt)
         for event, _, ratio in self._detected_events(time_dt):
@@ -1216,7 +1250,8 @@ class Simulation:
             event.resolve(self.time + ratio * dt)  
 
             #after resolve, evaluate system equation again -> propagate event
-            total_evals += self._update(time_dt)  
+            self._update(time_dt)  
+            total_evals += 1
 
         #sample data after successful timestep (+dt)
         self._sample(time_dt)
@@ -1293,7 +1328,8 @@ class Simulation:
         time_dt = self.time + dt
 
         #evaluate system equation before sampling and event check (+dt)
-        total_evals += self._update(time_dt) 
+        self._update(time_dt) 
+        total_evals += 1
 
         #handle events chronologically after timestep (+dt)
         for event, _, ratio in self._detected_events(time_dt):
@@ -1302,7 +1338,8 @@ class Simulation:
             event.resolve(self.time + ratio * dt)  
 
             #after resolve, evaluate system equation again -> propagate event
-            total_evals += self._update(time_dt)      
+            self._update(time_dt)  
+            total_evals += 1    
 
         #sample data after successful timestep (+dt)
         self._sample(time_dt)
@@ -1365,7 +1402,8 @@ class Simulation:
         for time_stage in self.engine.stages(self.time, dt):
 
             #evaluate system equation by fixed-point iteration
-            total_evals += self._update(time_stage) 
+            self._update(time_stage) 
+            total_evals += 1
 
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time_stage, dt)
@@ -1373,14 +1411,16 @@ class Simulation:
         #if step not successful -> roll back timestep
         if not success:
             self._revert()
-            total_evals += self._update(self.time) 
+            self._update(self.time) 
+            total_evals += 1
             return False, error_norm, scale, total_evals, 0
 
         #system time after timestep
         time_dt = self.time + dt
 
         #evaluate system equation before sampling and event check (+dt)
-        total_evals += self._update(time_dt) 
+        self._update(time_dt) 
+        total_evals += 1
 
         #handle detected events chronologically after timestep (+dt)
         for event, close, ratio in self._detected_events(time_dt):
@@ -1390,12 +1430,14 @@ class Simulation:
                 event.resolve(time_dt)
 
                 #after resolve, evaluate system equation again -> propagate event
-                total_evals += self._update(time_dt) 
+                self._update(time_dt) 
+                total_evals += 1
     
             #not close enough -> roll back timestep (secant step)
             else:
                 self._revert()
-                total_evals += self._update(self.time) 
+                self._update(self.time) 
+                total_evals += 1
                 return False, error_norm, ratio, total_evals, 0
         
         #sample data after successful timestep (+dt)
@@ -1480,14 +1522,16 @@ class Simulation:
         #if step not successful -> roll back timestep
         if not success:
             self._revert()
-            total_evals += self._update(self.time) 
+            self._update(self.time) 
+            total_evals += 1
             return False, error_norm, scale, total_evals, total_solver_its
 
         #system time after timestep
         time_dt = self.time + dt
 
         #evaluate system equation before sampling and event check (+dt)
-        total_evals += self._update(time_dt) 
+        self._update(time_dt) 
+        total_evals += 1
 
         #handle detected events chronologically after timestep (+dt)
         for event, close, ratio in self._detected_events(time_dt):
@@ -1497,12 +1541,14 @@ class Simulation:
                 event.resolve(time_dt)
 
                 #after resolve, evaluate system equation again -> propagate event
-                total_evals += self._update(time_dt) 
+                self._update(time_dt) 
+                total_evals += 1
     
             #not close enough -> roll back timestep (secant step)
             else:
                 self._revert()
-                total_evals += self._update(self.time) 
+                self._update(self.time) 
+                total_evals += 1
                 return False, error_norm, ratio, total_evals, total_solver_its
 
         #sample data after successful timestep (+dt)
@@ -1604,7 +1650,8 @@ class Simulation:
         _dt = self.dt
 
         #initial system function evaluation 
-        initial_evals = self._update(self.time)
+        self._update(self.time)
+        initial_evals = 1
 
         #catch and resolve initial events
         for event, *_ in self._detected_events(self.time):
