@@ -9,7 +9,7 @@
 
 # IMPORTS ===============================================================================
 
-# no dependencies
+import numpy as np
 
 
 # CLASS =================================================================================
@@ -77,7 +77,7 @@ class PortReference:
         out : list[float, obj]
             input values of block
         """
-        return [self.block.inputs[p] for p in self.ports]
+        return np.array([self.block.inputs[p] for p in self.ports])
 
 
     def set_inputs(self, vals):
@@ -100,7 +100,7 @@ class PortReference:
         out : list[float, obj]
             output values of block
         """
-        return [self.block.outputs[p] for p in self.ports]
+        return np.array([self.block.outputs[p] for p in self.ports])
 
 
     def set_outputs(self, vals):
