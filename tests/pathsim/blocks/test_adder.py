@@ -180,19 +180,10 @@ class TestAdder(unittest.TestCase):
         A.inputs[0] = 1
 
         #update block
-        err = A.update(None)
+        A.update(None)
 
         #test if update was correct
         self.assertEqual(A.outputs[0], 1)
-
-        #test if error was computed correctly
-        self.assertGreater(err, 0)
-
-        #update block again
-        err = A.update(None)
-
-        #test error, now should be 0
-        self.assertEqual(err, 0)
 
 
     def test_update_multi(self):
@@ -205,20 +196,10 @@ class TestAdder(unittest.TestCase):
         A.inputs[2] = 3.1
 
         #update block
-        err = A.update(None)
+        A.update(None)
 
         #test if update was correct
         self.assertEqual(A.outputs[0], 6.1)
-
-        #test if error was computed correctly
-        self.assertGreater(err, 0)
-
-        #update block again
-        err = A.update(None)
-
-        #test error, now should be 0
-        self.assertEqual(err, 0)
-
 
 
 # RUN TESTS LOCALLY ====================================================================

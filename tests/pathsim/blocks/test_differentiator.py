@@ -74,20 +74,10 @@ class TestDifferentiator(unittest.TestCase):
         #test that input is zero
         self.assertEqual(D.inputs[0], 0.0)
 
-        err = D.update(0)
-
-        #test if error is correctly 0
-        self.assertEqual(err, 0.0)
+        D.update(0)
 
         #test if state is retrieved correctly
         self.assertEqual(D.outputs[0], 0.0)
-
-        D.inputs[0] = 2
-
-        err = D.update(0)
-
-        #test if error is correctly calculated
-        self.assertEqual(err, D.f_max*2)
 
 
 # RUN TESTS LOCALLY ====================================================================

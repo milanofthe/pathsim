@@ -69,9 +69,6 @@ class TestSwitch(unittest.TestCase):
         S = Switch()
         self.assertEqual(S.state, None)
 
-        #test if error is correctly 0
-        self.assertEqual(S.update(0), 0.0)
-
         S.inputs[0] = 3
         S.update(0)
 

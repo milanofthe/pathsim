@@ -125,20 +125,10 @@ class TestAmplifier(unittest.TestCase):
         A.inputs[0] = 1
 
         #update block
-        err = A.update(None)
+        A.update(None)
 
         #test if update was correct
         self.assertEqual(A.outputs[0], 5)
-
-        #test if error was computed correctly
-        self.assertGreater(err, 0)
-
-        #update block again
-        err = A.update(None)
-
-        #test error, now should be 0
-        self.assertEqual(err, 0)
-
 
 
 

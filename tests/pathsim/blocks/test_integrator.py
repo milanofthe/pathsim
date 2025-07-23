@@ -71,10 +71,7 @@ class TestIntegrator(unittest.TestCase):
         I = Integrator(initial_value=5.5)
         I.set_solver(Solver)
 
-        err = I.update(0)
-
-        #test if error is correctly 0
-        self.assertEqual(err, 0.0)
+        I.update(0)
 
         #test if engine state is retrieved correctly
         self.assertEqual(I.outputs[0], 5.5)
