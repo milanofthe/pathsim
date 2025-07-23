@@ -528,11 +528,11 @@ class Subsystem(Block):
         """
         
         #perform solver iterations on algebraic loops
-        for it in range(1, self.iterations_max):
+        for iteration in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
             max_error = 0.0
-            for _, blocks_loop, connections_loop in self.graph.loop():
+            for depth, blocks_loop, connections_loop in self.graph.loop():
 
                 #update blocks at algebraic depth (with error control)
                 for block in blocks_loop:
@@ -545,16 +545,24 @@ class Subsystem(Block):
                     if not connection: 
                         continue
 
-                    #reset solver at first iteration
-                    if it == 1: 
-                        connection.reset()
+                    #connections at first depth
+                    if loop_depth == 0:
 
-                    #step fixed-point solver (for alg. loops)
-                    err = connection.step() 
-                    if err > max_error:
-                        max_error = err
+                        #reset solver at first iteration
+                        if iteration == 1: 
+                            connection.reset()
 
-            #return number of iterations if converged
+                        #step fixed-point solver (for alg. loops)
+                        err = connection.step() 
+                        if err > max_error:
+                            max_error = err
+
+                    else:
+
+                        #connections at lower depths
+                        connection.update()
+
+            #check convergence
             if max_error <= self.tolerance_fpi:
                 return
 
