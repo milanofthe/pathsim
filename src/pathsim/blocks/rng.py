@@ -77,11 +77,5 @@ class RNG(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            convergence control, default 0.0
         """
         self.outputs[0] = self.val
-        return 0.0

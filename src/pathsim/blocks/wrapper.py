@@ -88,13 +88,9 @@ class Wrapper(Block):
         ----------
         t : float
             evaluation time
-        
-        Returns
-        -------
-        error : float
-            convergence control, default 0.0
         """
-        return 0.0
+        pass
+        
     
     @property
     def tau(self):

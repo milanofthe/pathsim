@@ -407,14 +407,8 @@ class Spectrum(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            deviation to previous iteration for convergence control
-            (for this block '0', because sink-type)
         """
-        return 0.0
+        pass
 
 
 class RealtimeSpectrum(Spectrum):

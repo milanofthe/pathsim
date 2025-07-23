@@ -137,14 +137,8 @@ class Function(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            convergence control, default 0.0
         """
                 
         #apply operator to get output
         y = self.op_alg(self.inputs.to_array())
         self.outputs.update_from_array(y)
-        return 0.0

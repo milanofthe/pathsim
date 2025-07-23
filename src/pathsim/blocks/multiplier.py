@@ -59,12 +59,6 @@ class Multiplier(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            convergence control, default 0.0
         """
         u = self.inputs.to_array()
         self.outputs.update_from_array(self.op_alg(u))
-        return 0.0

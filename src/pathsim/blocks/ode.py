@@ -146,14 +146,8 @@ class ODE(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            convergence control, default 0.0
         """
         self.outputs.update_from_array(self.engine.get())
-        return 0.0
 
 
     def solve(self, t, dt):

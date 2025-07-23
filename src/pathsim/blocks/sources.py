@@ -152,15 +152,8 @@ class Source(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            absolute error to previous iteration for convergence 
-            control (always `0.0` because source-type)
         """
         self.outputs[0] = self.func(t)
-        return 0.0
 
 
 # SPECIAL CONTINUOUS SOURCE BLOCKS ======================================================
@@ -211,7 +204,6 @@ class TriangleWaveSource(Block):
     def update(self, t):
         tau = self.phase/(2*np.pi*self.frequency)
         self.outputs[0] = self.amplitude * self._triangle_wave(t + tau, self.frequency)
-        return 0.0
 
 
 class SinusoidalSource(Block):
@@ -242,7 +234,6 @@ class SinusoidalSource(Block):
     def update(self, t):
         omega = 2*np.pi*self.frequency
         self.outputs[0] = self.amplitude * np.sin(omega*t + self.phase)
-        return 0.0
 
 
 class GaussianPulseSource(Block):
@@ -291,7 +282,6 @@ class GaussianPulseSource(Block):
 
     def update(self, t):
         self.outputs[0] = self.amplitude * self._gaussian(t-self.tau, self.f_max)
-        return 0.0
 
 
 class SinusoidalPhaseNoiseSource(Block):
@@ -390,12 +380,6 @@ class SinusoidalPhaseNoiseSource(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            absolute error to previous iteration for convergence 
-            control (here '0.0' because source-type block)
         """
 
         #compute phase error
@@ -403,8 +387,6 @@ class SinusoidalPhaseNoiseSource(Block):
 
         #set output
         self.outputs[0] = self.amplitude * np.sin(self.omega*t + self.phase + phase_error)
-        
-        return 0.0
 
 
     def sample(self, t):
@@ -570,7 +552,7 @@ class ChirpPhaseNoiseSource(Block):
         """update the block output, assebble phase and evaluate the sinusoid"""
         _phase = 2 * np.pi * (self.engine.get() + self.sig_white * self.noise_1) + self.phase
         self.outputs[0] = self.amplitude * np.sin(_phase)
-        return 0.0
+
 
     def solve(self, t, dt):
         """advance implicit solver of implicit integration engine, evaluate 
@@ -759,12 +741,6 @@ class PulseSource(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            deviation to previous iteration for convergence control
-            (always '0.0', because no passthrough)
         """
 
         #calculate output based on phase
@@ -778,8 +754,6 @@ class PulseSource(Block):
             self.outputs[0] = np.clip(_val, 0.0, self.amplitude)
         elif self._phase == 'low':
             self.outputs[0] = 0.0
-
-        return 0.0
 
 
     def __len__(self):

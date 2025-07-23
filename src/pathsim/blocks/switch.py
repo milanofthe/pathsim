@@ -89,14 +89,8 @@ class Switch(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            convergence control, default 0.0
         """
         
         #early exit without error control
         if self.state is None: self.outputs[0] = 0.0
         else: self.outputs[0] = self.inputs[self.state]
-        return 0.0

@@ -107,16 +107,10 @@ class Differentiator(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            convergence control, default 0.0
         """
         x, u = self.engine.get(), self.inputs[0]
         y = self.op_alg(x, u, t)
         self.outputs.update_from_array(y)
-        return 0.0
 
 
     def solve(self, t, dt):
