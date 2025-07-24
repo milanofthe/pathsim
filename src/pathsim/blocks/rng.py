@@ -77,12 +77,5 @@ class RNG(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            absolute error to previous iteration for convergence 
-            control (always '0.0' because source-type)
         """
         self.outputs[0] = self.val
-        return 0.0

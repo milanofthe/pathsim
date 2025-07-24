@@ -54,6 +54,10 @@ class Anderson:
         self.r_prev = None
 
 
+    def __bool__(self):
+        return True
+
+
     def solve(self, func, x0, iterations_max=100, tolerance=1e-6):
         """Solve the function 'func' with initial 
         value 'x0' up to a certain tolerance.

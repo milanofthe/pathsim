@@ -71,12 +71,5 @@ class Amplifier(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            max absolute error to previous iteration 
-            for convergence control
         """
-        y = self.op_alg(self.inputs[0])
-        return self.outputs.update_from_array_max_err(y)
+        self.outputs[0] = self.op_alg(self.inputs[0])

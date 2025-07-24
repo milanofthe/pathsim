@@ -69,17 +69,10 @@ class Counter(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            absolute error to previous iteration for convergence 
-            control (here '0.0' because source-type block)
         """
         
         #start + number of detected events
         self.outputs[0] = self.start + len(self.E)
-        return 0.0
 
 
 class CounterUp(Counter):

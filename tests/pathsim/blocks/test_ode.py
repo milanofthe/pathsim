@@ -116,10 +116,7 @@ class TestODE(unittest.TestCase):
         D = ODE()
         D.set_solver(Solver)
 
-        err = D.update(0)
-
-        #test if error is correctly 0
-        self.assertEqual(err, 0.0)
+        D.update(0)
 
         #test if engine state is retrieved correctly
         self.assertEqual(D.outputs[0], 0.0)

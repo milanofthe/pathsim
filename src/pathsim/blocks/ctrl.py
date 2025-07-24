@@ -138,21 +138,10 @@ class PID(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            max absolute error to previous iteration for convergence control
         """
         x, u = self.engine.get(), self.inputs[0]
         y = self.op_alg(x, u, t)
-        
-        #error control, when alg. passthrough
-        if self.Kp or self.Kd:
-            return self.outputs.update_from_array_max_err(y)
-
-        self.outputs.update_from_array(y) 
-        return 0.0
+        self.outputs.update_from_array(y)
 
 
     def solve(self, t, dt):

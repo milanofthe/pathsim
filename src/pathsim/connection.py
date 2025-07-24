@@ -16,6 +16,8 @@ import json
 
 from .utils.portreference import PortReference
 
+from .optim.anderson import Anderson
+
 
 # CLASSES ===============================================================================
 
@@ -120,9 +122,19 @@ class Connection:
         source block and optional source output port
     targets : tuple[PortReference], tuple[Block]
         target blocks and optional target input ports
+
+
+    Attributes
+    ----------
+    _active : bool
+        flag to set 'Connection' as active or inactive
+    values : array
+        values to transmit, relevant for fixed-point accelerator
+    accelerator : None, Anderson
+        internal fixed-point accelerator for algebraic loops
     """
 
-    __slots__ = ["source", "targets", "_active"]
+    __slots__ = ["source", "targets", "_active", "values", "accelerator"]
 
 
     def __init__(self, source, *targets):
@@ -136,8 +148,14 @@ class Connection:
         #flag to set connection active
         self._active = True
 
+        #values to transmit as history
+        self.values = None
+
+        #internal fixed-point accelerator
+        self.accelerator = None
+        
         #validate port dimensions at connection creation
-        self._validate_dimensions()
+        self._validate_dimensions()        
 
 
     def __str__(self):
@@ -253,6 +271,50 @@ class Connection:
         """
         for trg in self.targets:
             self.source.to(trg)
+
+
+    def step(self):
+        """Step the internal fixed-point accelerator forward by one iteration.
+
+        If no previous values are available (prev_values is None), falls back to 
+        the 'update' method, which is essentially equivalent to a standard 
+        fixed-point update. 
+    
+        Returns
+        -------
+        res : float
+            fixed point residual for convergence control
+        """
+
+        #get source values and previous values
+        self.values, prev_values = self.source.get_outputs(), self.values
+
+        #initialize fixed point accelerator if not already available
+        if not self.accelerator:
+            self.accelerator = Anderson()
+
+        #no previous value -> fallback to update method
+        if prev_values is None:
+            self.update()
+            return 1.0
+
+        #update fixed-point accelerator
+        self.values, res = self.accelerator.step(prev_values, self.values)
+
+        #transmit new values to all targets
+        for trg in self.targets:
+            trg.set_inputs(self.values)
+
+        #return the fixed-point residual
+        return res
+
+
+    def reset(self):
+        """Reset the internal fixed point accelerator which is used 
+        to resolve algebraic loops and the internal values"""
+        self.values = None
+        if self.accelerator: 
+            self.accelerator.reset()
 
 
 class Duplex(Connection):

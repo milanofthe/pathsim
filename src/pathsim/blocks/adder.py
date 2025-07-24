@@ -130,13 +130,7 @@ class Adder(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            absolute error to previous iteration for 
-            convergence control
         """
         u = self.inputs.to_array()
         y = self.op_alg(u)
-        return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)

@@ -76,9 +76,8 @@ class TestSource(unittest.TestCase):
 
         # Update block at different times
         for t in [1, 2, 3]:
-            err = S.update(t)
+            S.update(t)
             self.assertEqual(S.outputs[0], f(t))
-            self.assertEqual(err, 0)
 
     def test_decorator_usage(self):
         @Source
@@ -88,9 +87,8 @@ class TestSource(unittest.TestCase):
         # Check that my_source is now a Source block
         self.assertIsInstance(my_source, Source)
         
-        err = my_source.update(3)
+        my_source.update(3)
         self.assertEqual(my_source.outputs[0], 9)
-        self.assertEqual(err, 0)
 
     def test_len(self):
         S = Source()

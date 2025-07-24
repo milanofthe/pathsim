@@ -89,15 +89,8 @@ class Switch(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        err : float
-            absolute deviation for convergence control
         """
         
         #early exit without error control
-        if self.state is None: 
-            self.outputs[0] = 0.0
-            return 0.0
-        return self.outputs.update_from_array_max_err(self.inputs[self.state])
+        if self.state is None: self.outputs[0] = 0.0
+        else: self.outputs[0] = self.inputs[self.state]

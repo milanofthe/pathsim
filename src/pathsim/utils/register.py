@@ -103,45 +103,7 @@ class Register:
             if k not in self._values:
                 insort(self._sorted_keys, k)
             self._values[k] = a
-
-
-    def update_from_array_max_err(self, arr):
-        """Update the register values from an array in place and compute 
-        the maximum absolute deviation, which is used in the main simulation 
-        loop for convergencechecks of the fixed point iterations. 
-    
-        Note
-        ----
-        This method is performance critical, since it gets called **A LOT** 
-        and makes up a siginificant portion of all function calls during the 
-        main simulation loop! Its already profiled and optimized, so be 
-        careful with premature *improvements*.
-
-        Parameters
-        ----------
-        arr : numpy.ndarray, float
-            array or scalar that is used to update internal register values
-        
-        Returns
-        -------
-        err : float
-            maximum absolute deviation from previous register values
-        """
-        if np.isscalar(arr):
-            _err = abs(self._values[0] - arr)
-            self._values[0] = arr
-            return _err
-        
-        _max_err = 0.0
-        for k, a in enumerate(arr):
-            if k in self._values:
-                _max_err = max(_max_err, abs(self._values[k] - a))
-            else:
-                insort(self._sorted_keys, k)  
-            self._values[k] = a
-
-        return _max_err
-
+            
 
     def __setitem__(self, key, val):
         """Set the value of `_values`, wraps its setter method. 

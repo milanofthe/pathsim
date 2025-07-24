@@ -88,4 +88,3 @@ class Comparator(Block):
             self.outputs[0] = max(self.span)
         else:
             self.outputs[0] = min(self.span)
-        return 0.0    

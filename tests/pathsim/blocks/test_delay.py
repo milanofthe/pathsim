@@ -86,7 +86,7 @@ class TestDelay(unittest.TestCase):
             D.inputs[0] = t
             D.sample(t)
 
-            err = D.update(t)
+            D.update(t)
 
             #test if delay is correctly applied
             self.assertEqual(D.outputs[0], max(0, t-10))
@@ -99,7 +99,7 @@ class TestDelay(unittest.TestCase):
             D.inputs[0] = t
             D.sample(t)
 
-            err = D.update(t)
+            D.update(t)
 
             #test if delay is correctly applied
             self.assertEqual(D.outputs[0], max(0, t-10.5))

@@ -246,8 +246,7 @@ class TestSimulation(unittest.TestCase):
             log=False
             )   
 
-        evals = Sim._update(1)
-        self.assertEqual(evals, 1)
+        Sim._update(1)
 
 
     def test_step(self): 

@@ -89,18 +89,11 @@ class Delay(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            deviation to previous iteration for convergence 
-            control (always '0.0' because non-algebraic)
         """
 
         #retrieve value from buffer
         y = self._buffer.get(t)
         self.outputs.update_from_array(y)
-        return 0.0
 
 
     def sample(self, t):

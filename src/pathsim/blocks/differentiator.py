@@ -107,17 +107,11 @@ class Differentiator(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            max absolute error to previous iteration 
-            for convergence control
         """
         x, u = self.engine.get(), self.inputs[0]
         y = self.op_alg(x, u, t)
-        return self.outputs.update_from_array_max_err(y)
-        
+        self.outputs.update_from_array(y)
+
 
     def solve(self, t, dt):
         """advance solution of implicit update equation

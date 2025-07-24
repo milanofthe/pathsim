@@ -137,14 +137,8 @@ class Function(Block):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            max absolute error to previous iteration 
-            for convergence control
         """
                 
         #apply operator to get output
         y = self.op_alg(self.inputs.to_array())
-        return self.outputs.update_from_array_max_err(y)
+        self.outputs.update_from_array(y)

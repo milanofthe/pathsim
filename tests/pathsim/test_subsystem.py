@@ -59,6 +59,15 @@ class TestSubsystem(unittest.TestCase):
         self.assertEqual(len(S.blocks), 3)
         self.assertEqual(len(S.connections), 2)
 
+        #test with too many interfaces
+        B1, B2, B3 = Block(), Block(), Block()
+        I1 = Interface()
+        I2 = Interface()
+        C1 = Connection(I1, B1, B2, B3)
+        C2 = Connection(B1, I1)
+        with self.assertRaises(ValueError):
+            S = Subsystem(blocks=[B1, B2, B3, I1, I2], connections=[C1, C2])
+
 
     def test_check_connections(self):
 
@@ -114,12 +123,8 @@ class TestSubsystem(unittest.TestCase):
         C1 = Connection(I1, B1)
         S = Subsystem(blocks=[I1, B1], connections=[C1])
 
-        err = S.update(0)
+        S.update(0)
 
-        self.assertEqual(err, 0.0)
-
-
-    # to be implemented ----------------------------------------------------------------
 
     def test_contains(self):
 
@@ -168,7 +173,6 @@ class TestSubsystem(unittest.TestCase):
             connections=[C1]
             )  
 
-
         n, nx = S.size()
         self.assertEqual(n, 2)
         self.assertEqual(nx, 0) # <- no internal engine yet
@@ -193,6 +197,50 @@ class TestSubsystem(unittest.TestCase):
 
         #should be 1
         self.assertEqual(len(S), 0)
+
+
+    def test_call(self):
+
+        B1, B2, B3 = Block(), Block(), Block()
+        I1 = Interface()
+        C1 = Connection(I1, B1, B2, B3)
+        C2 = Connection(B1, I1)
+        S = Subsystem(blocks=[B1, B2, B3, I1], connections=[C1, C2])
+
+        #inputs, outputs, states
+        i, o, s = S()
+
+        #siso stateless
+        self.assertEqual(i, 0)
+        self.assertEqual(o, 0)
+        self.assertEqual(len(s), 0)
+
+
+    def test_on_off(self):
+
+        I1 = Interface()
+        B1 = Block()
+        C1 = Connection(I1, B1)
+        C2 = Connection(B1, I1)
+        S = Subsystem(
+            blocks=[I1, B1], 
+            connections=[C1, C2]
+            ) 
+
+        #default on
+        self.assertTrue(S._active)
+        self.assertTrue(B1._active)
+
+        S.off()
+
+        self.assertFalse(S._active)
+        self.assertFalse(B1._active)
+
+        S.on()
+
+        self.assertTrue(S._active)
+        self.assertTrue(B1._active)
+
 
 
 

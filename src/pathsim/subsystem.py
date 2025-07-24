@@ -24,6 +24,12 @@ from .utils.graph import Graph
 from .utils.register import Register
 from .utils.portreference import PortReference
 
+from ._constants import (
+    SIM_ITERATIONS_MAX,
+    SIM_TOLERANCE_FPI,
+    LOG_ENABLE
+    )
+
 
 # IO CLASS ==============================================================================
 
@@ -109,6 +115,12 @@ class Subsystem(Block):
         internal blocks of the subsystem
     connections : list[Connection]
         internal connections of the subsystem
+    tolerance_fpi : float
+        absolute tolerance for convergence of algebraic loops
+        default see ´SIM_TOLERANCE_FPI´ in ´_constants.py´
+    iterations_max : int
+        maximum allowed number of iterations for algebraic loop solver, 
+        default see ´SIM_ITERATIONS_MAX´ in ´_constants.py´
 
     Attributes
     ----------
@@ -116,13 +128,24 @@ class Subsystem(Block):
         internal interface block for data transfer to the outside
     """
 
-    def __init__(self, blocks=None, connections=None):
+    def __init__(self, 
+        blocks=None, 
+        connections=None,
+        tolerance_fpi=SIM_TOLERANCE_FPI, 
+        iterations_max=SIM_ITERATIONS_MAX
+        ):
 
         #internal integration engine as 'None'
         self.engine = None
 
         #flag to set block (subsystem) active
         self._active = True
+
+        #error tolerance for alg. loop solver
+        self.tolerance_fpi = tolerance_fpi
+
+        #max iterations for internal alg. loop solver
+        self.iterations_max = iterations_max
 
         #internal discrete events (for mixed signal blocks)
         self.events = []
@@ -446,19 +469,27 @@ class Subsystem(Block):
         """Update the instant time components of the internal blocks 
         to evaluate the (distributed) system equation.
 
-        Collect convergence errors of internal blocks for algebraic 
-        loop resolution.
-
         Parameters
         ----------
         t : float
             evaluation time 
+        """
 
-        Returns
-        ------- 
-        max_error : float
-            max deviation to previous iteration at evaluation 
-            of alg. components
+        #evaluate DAG
+        self._dag(t)
+
+        #algebraic loops -> solve them
+        if self.graph.has_loops:   
+            self._loops(t)
+
+        
+    def _dag(self, t):
+        """Update the directed acyclic graph components of the system.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time for system function
         """
 
         #update interface outgoing connections
@@ -476,33 +507,62 @@ class Subsystem(Block):
             for connection in connections_dag:
                 if connection: connection.update()
 
-        #no internal algebraic loops -> early exit
-        if not self.graph.has_loops:
-            return 0.0
 
-        #iterate DAG depths of broken loops
-        max_error = 0.0
-        for _, blocks_loop, connections_loop in self.graph.loop():
+    def _loops(self, t):
+        """Perform the algebraic loop solve of the system using accelerated 
+        fixed-point iterations on the broken loop directed graph.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time for system function
+        """
+        
+        #perform solver iterations on algebraic loops
+        for iteration in range(1, self.iterations_max):
+            
+            #iterate DAG depths of broken loops
+            max_error = 0.0
+            for depth, blocks_loop, connections_loop in self.graph.loop():
 
-            #update blocks at algebraic depth
-            for block in blocks_loop:
+                #update blocks at algebraic depth (with error control)
+                for block in blocks_loop:
+                    if block: block.update(t)                
 
-                #skip incative blocks
-                if not block: 
-                    continue
+                #step accelerated connenctions at algebraic depth (data transfer)
+                for connection in connections_loop:
+                    
+                    #skip inactive connections
+                    if not connection: 
+                        continue
 
-                #update block with error control enabled
-                err = block.update(t)
-                if err > max_error:
-                    max_error = err
+                    #connections at first depth
+                    if loop_depth == 0:
 
-            #update connenctions at algebraic depth (data transfer)
-            for connection in connections_loop:
-                if connection: connection.update() 
+                        #reset solver at first iteration
+                        if iteration == 1: 
+                            connection.reset()
 
-        #return subsystem convergence error
-        return max_error
+                        #step fixed-point solver (for alg. loops)
+                        err = connection.step() 
+                        if err > max_error:
+                            max_error = err
 
+                    else:
+
+                        #connections at lower depths
+                        connection.update()
+
+            #check convergence
+            if max_error <= self.tolerance_fpi:
+                return
+
+        #not converged -> error
+        raise RuntimeError(
+            "algebraic loop in 'Subsystem' not converged (iters: {}, err: {})".format(
+                self.iterations_max, max_error)
+            )
+        
 
     # methods for blocks with integration engines -------------------------------------------
 

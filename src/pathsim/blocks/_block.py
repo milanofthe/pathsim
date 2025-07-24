@@ -397,10 +397,6 @@ class Block(Serializable):
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
         directly based on the 'inputs' and possibly internal states. 
 
-        It computes and returns the absolute difference between the new output and 
-        the previous output (before the call) to track convergence of the fixed-point 
-        iteration.
-
         Note
         ----
         The implementation of the 'update' method in the base 'Block' class is intended 
@@ -411,11 +407,6 @@ class Block(Serializable):
         ----------
         t : float
             evaluation time
-
-        Returns
-        -------
-        error : float
-            max absolute error to previous iteration for convergence control
         """
 
         #no internal algebraic operator -> early exit
@@ -432,8 +423,8 @@ class Block(Serializable):
         else: 
             y = self.op_alg(u)           
 
-        #error control 
-        return self.outputs.update_from_array_max_err(y)
+        #update register
+        self.outputs.update_from_array(y)
 
 
     def solve(self, t, dt):

@@ -161,40 +161,6 @@ class TestRegister(unittest.TestCase):
         self.assertEqual(R[1], 1.0) 
 
 
-    def test_update_from_array_max_err(self):
-
-        #test with array, no change
-        R = Register(3)
-        R[0], R[1], R[2] = 1.0, 2.0, 3.0
-        arr = np.array([1.0, 2.0, 3.0])
-        max_err = R.update_from_array_max_err(arr)
-        self.assertEqual(max_err, 0.0)
-        np.testing.assert_array_equal(R.to_array(), arr)
-
-        #test with array, with change
-        R[0], R[1], R[2] = 1.0, 2.0, 3.0
-        arr = np.array([1.5, 1.0, 3.1]) 
-
-        #max error is abs(2.0 - 1.0) = 1.0
-        max_err = R.update_from_array_max_err(arr)
-        self.assertAlmostEqual(max_err, 1.0)
-        np.testing.assert_array_equal(R.to_array(), arr)
-
-        #test with scalar, no change
-        R = Register(1)
-        R[0] = 5.0
-        max_err = R.update_from_array_max_err(5.0)
-        self.assertEqual(max_err, 0.0)
-        self.assertEqual(R[0], 5.0)
-
-        #test with scalar, with change
-        R = Register(1)
-        R[0] = 5.0
-        max_err = R.update_from_array_max_err(7.5)
-        self.assertAlmostEqual(max_err, 2.5)
-        self.assertEqual(R[0], 7.5)
-
-
     def test_setitem(self):
         
         R = Register(1)

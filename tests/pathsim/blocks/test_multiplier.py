@@ -109,19 +109,10 @@ class TestMultiplier(unittest.TestCase):
         M.inputs[0] = 1
 
         #update block
-        err = M.update(None)
+        M.update(None)
 
         #test if update was correct
         self.assertEqual(M.outputs[0], 1)
-
-        #test if error was computed correctly
-        self.assertGreater(err, 0)
-
-        #update block again
-        err = M.update(None)
-
-        #test error, now should be 0
-        self.assertEqual(err, 0)
 
 
     def test_update_multi(self):
@@ -134,21 +125,10 @@ class TestMultiplier(unittest.TestCase):
         M.inputs[2] = 3.1
 
         #update block
-        err = M.update(None)
+        M.update(None)
 
         #test if update was correct
         self.assertEqual(M.outputs[0], 6.2)
-
-        #test if error was computed correctly
-        self.assertGreater(err, 0)
-
-        #update block again
-        err = M.update(None)
-
-        #test error, now should be 0
-        self.assertEqual(err, 0)
-
-
 
 
 
