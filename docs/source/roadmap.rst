@@ -24,7 +24,6 @@ Performance
 - fork-join block-level parallelization with Python 3.13 free-threading
 - more robust and adaptable steady state solver, perhaps through damping, or using `EUB` with convergence driven timestep control
 - exponential integrators for LTI blocks (:class:`.StateSpace`, :class:`.TransferFunction`) and for linearized dynamic blocks
-- more robust resolution of algebraic loops (currently implicitly handled through fixed point loop in :meth:`.Simulation._update`), probably: loop detection, accelerator injection
 - jit compilation of internal functions in the operators (:class:`.Operator`, :class:`.DynamicOperator`)
 
 Documentation
