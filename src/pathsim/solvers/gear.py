@@ -13,7 +13,6 @@ from collections import deque
 
 from ._solver import ImplicitSolver
 from .esdirk32 import ESDIRK32
-from . import DIRK3
 
 from .._constants import (
     TOLERANCE, 
