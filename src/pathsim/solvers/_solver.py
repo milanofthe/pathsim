@@ -11,6 +11,8 @@
 
 import numpy as np
 
+from collections import deque
+
 from .._constants import (
     TOLERANCE,
     SIM_TIMESTEP,
@@ -48,10 +50,10 @@ class Solver:
 
     Attributes
     ----------
-    x_0 : numeric, array[numeric]
-        internal 'working' initial value
     x : numeric, array[numeric]
         internal 'working' state
+    history : deque[numeric]
+        internal history of past results
     n : int
         order of integration scheme
     s : int
@@ -69,8 +71,8 @@ class Solver:
         tolerance_lte_rel=SOL_TOLERANCE_LTE_REL
         ):
 
-        #set buffer, state and initial condition    
-        self.x_0 = self.x = self.initial_value = initial_value
+        #set state and initial condition    
+        self.x = self.initial_value = initial_value
 
         #tolerances for local truncation error (for adaptive solvers)
         self.tolerance_lte_abs = tolerance_lte_abs  
@@ -78,6 +80,9 @@ class Solver:
 
         #flag to identify adaptive/fixed timestep solvers
         self.is_adaptive = False
+
+        #history of past solutions, default only one (initial value)
+        self.history = deque([initial_value], maxlen=1)
 
         #order of the integration scheme
         self.n = 1
@@ -151,7 +156,8 @@ class Solver:
         """
 
         #overwrite internal state with value
-        self.x = self.x_0 = x
+        self.x = x
+        self.history[0] = x
 
         #reset stage counter
         self.stage = 0
@@ -161,7 +167,8 @@ class Solver:
         """"Resets integration engine to initial value"""
 
         #overwrite state with initial value
-        self.x = self.x_0 = self.initial_value
+        self.x = self.initial_value
+        self.history = deque([self.initial_value], maxlen=1)
 
         #reset stage counter
         self.stage = 0
@@ -183,8 +190,8 @@ class Solver:
     
         """
 
-        #buffer internal state
-        self.x_0 = self.x
+        #buffer internal state to history
+        self.history.appendleft(self.x)
 
         #reset stage counter
         self.stage = 0
@@ -252,8 +259,9 @@ class Solver:
         the smaller timestep.
         """
         
-        #reset internal state to previous state
-        self.x = self.x_0
+        #reset internal state to previous state from history
+        self.x = self.history.popleft()
+
 
         #reset stage counter
         self.stage = 0   

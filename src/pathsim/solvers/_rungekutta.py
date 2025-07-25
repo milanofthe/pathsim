@@ -149,11 +149,14 @@ class ExplicitRungeKutta(ExplicitSolver):
         #buffer intermediate slope
         self.Ks[self.stage] = f
 
+        #get current state from history
+        x_0 = self.history[0]
+
         #compute slope at stage, faster then 'sum' comprehension
         slope = 0.0
         for i, b in enumerate(self.BT[self.stage]):
             slope = slope + self.Ks[i] * b
-        self.x = self.x_0 + dt * slope
+        self.x = x_0 + dt * slope
 
         #increment stage counter
         self.stage += 1
@@ -299,10 +302,13 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         #update timestep weighted slope 
         self.Ks[self.stage] = f
 
+        #get past state from history
+        x_0 = self.history[0]
+
         #compute slope (this is faster then 'sum' comprehension)
         slope = 0.0
         for i, a in enumerate(self.BT[self.stage]):
-            slope = slope + self.Ks[i]*a
+            slope = slope + self.Ks[i] * a
 
         #use the jacobian
         if J is not None:
@@ -311,11 +317,11 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             b = self.BT[self.stage][self.stage]
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, dt*slope + self.x_0, dt*b*J)
+            self.x, err = self.opt.step(self.x, x_0 + dt * slope, dt * b * J)
 
         else:
             #optimizer step (pure)
-            self.x, err = self.opt.step(self.x, dt*slope + self.x_0, None)
+            self.x, err = self.opt.step(self.x, x_0 + dt * slope, None)
 
         #return the fixed-point residual
         return err
@@ -352,11 +358,14 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         #compute final output if not stiffly accurate
         if self.A is not None and self.stage == self.s:
 
+            #get past state from history
+            x_0 = self.history[0]
+
             #compute slope (this is faster then 'sum' comprehension)
             slope = 0.0
             for i, a in enumerate(self.A):
                 slope = slope + self.Ks[i] * a
-            self.x = self.x_0 + dt * slope    
+            self.x = x_0 + dt * slope    
 
         #compute truncation error estimate in final stage
         return self.error_controller(dt)
