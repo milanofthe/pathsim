@@ -81,8 +81,8 @@ class Solver:
         #flag to identify adaptive/fixed timestep solvers
         self.is_adaptive = False
 
-        #history of past solutions, default only one (initial value)
-        self.history = deque([initial_value], maxlen=1)
+        #history of past solutions, default only one
+        self.history = deque([], maxlen=1)
 
         #order of the integration scheme
         self.n = 1
@@ -157,7 +157,6 @@ class Solver:
 
         #overwrite internal state with value
         self.x = x
-        self.history[0] = x
 
         #reset stage counter
         self.stage = 0
@@ -168,7 +167,7 @@ class Solver:
 
         #overwrite state with initial value
         self.x = self.initial_value
-        self.history = deque([self.initial_value], maxlen=1)
+        self.history.clear()
 
         #reset stage counter
         self.stage = 0
@@ -261,7 +260,6 @@ class Solver:
         
         #reset internal state to previous state from history
         self.x = self.history.popleft()
-
 
         #reset stage counter
         self.stage = 0   
@@ -532,8 +530,8 @@ class ImplicitSolver(Solver):
             integration timestep
         """
 
-        #buffer internal state
-        self.x_0 = self.x
+        #buffer internal state to history
+        self.history.appendleft(self.x)
 
         #reset stage counter
         self.stage = 0

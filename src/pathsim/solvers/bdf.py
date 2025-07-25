@@ -9,6 +9,8 @@
 
 # IMPORTS ==============================================================================
 
+from collections import deque
+
 from ._solver import ImplicitSolver
 
 
@@ -53,25 +55,22 @@ class BDF(ImplicitSolver):
 
         #bdf coefficients for orders 1 to 6
         self.K = {1:[1.0], 
-                  2:[-1/3, 4/3], 
-                  3:[2/11, -9/11, 18/11], 
-                  4:[-3/25, 16/25, -36/25, 48/25],
-                  5:[12/137, -75/137, 200/137, -300/137, 300/137],
-                  6:[-10/147, 72/147, -225/147, 400/147, -450/147, 360/147]}
+                  2:[4/3, -1/3], 
+                  3:[18/11, -9/11, 2/11], 
+                  4:[48/25, -36/25, 16/25, -3/25],
+                  5:[300/137, -300/137, 200/137, -75/137, 12/137],
+                  6:[ 360/147, -450/147, 400/147, -225/147, 72/147, -10/147]}
         self.F = {1:1.0, 2:2/3, 3:6/11, 4:12/25, 5:60/137, 6:60/147}
-
-        #bdf solution buffer
-        self.B = []
 
 
     def reset(self):
         """"Resets integration engine to initial state."""
 
-        #clear buffer
-        self.B = []
+        #clear history (BDF solution buffer)
+        self.history.clear()
 
         #overwrite state with initial value
-        self.x = self.x_0 = self.initial_value
+        self.x = self.initial_value
 
 
     def buffer(self, dt):
@@ -81,21 +80,13 @@ class BDF(ImplicitSolver):
         ----------
         dt : float
             integration timestep
-
         """
             
         #reset optimizer
         self.opt.reset()
 
-        #buffer state directly
-        self.x_0 = self.x
-
-        #add to buffer
-        self.B.append(self.x)
-
-        #truncate buffer if too long
-        if len(self.B) > self.n:
-            self.B.pop(0)
+        #add current solution to history
+        self.history.appendleft(self.x)
 
 
     def solve(self, f, J, dt):
@@ -117,18 +108,18 @@ class BDF(ImplicitSolver):
         """
 
         #buffer length for BDF order selection
-        n = min(len(self.B), self.n)
+        n = min(len(self.history), self.n)
 
         #fixed-point function update
-        g = self.F[n]*dt*f
-        for b, k in zip(self.B, self.K[n]):
-            g = g + b*k
+        g = self.F[n] * dt * f
+        for b, k in zip(self.history, self.K[n]):
+            g = g + b * k
 
         #use the jacobian
         if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, self.F[n]*dt*J)
+            self.x, err = self.opt.step(self.x, g, self.F[n] * dt * J)
 
         else:
             #optimizer step (pure)
@@ -159,6 +150,9 @@ class BDF2(BDF):
         #integration order (local)
         self.n = 2
 
+        #longer history for BDF
+        self.history = deque([], maxlen=2)
+
 
 class BDF3(BDF):
     """Fixed-step 3rd order Backward Differentiation Formula (BDF).
@@ -178,6 +172,9 @@ class BDF3(BDF):
 
         #integration order (local)
         self.n = 3
+
+        #longer history for BDF
+        self.history = deque([], maxlen=3)
 
 
 class BDF4(BDF):
@@ -199,6 +196,9 @@ class BDF4(BDF):
         #integration order (local)
         self.n = 4
 
+        #longer history for BDF
+        self.history = deque([], maxlen=4)
+
 
 class BDF5(BDF):
     """Fixed-step 5th order Backward Differentiation Formula (BDF).
@@ -218,6 +218,9 @@ class BDF5(BDF):
 
         #integration order (local)
         self.n = 5
+
+        #longer history for BDF
+        self.history = deque([], maxlen=5)
 
 
 class BDF6(BDF):
@@ -240,3 +243,6 @@ class BDF6(BDF):
 
         #integration order (local)
         self.n = 6
+
+        #longer history for BDF
+        self.history = deque([], maxlen=6)
