@@ -46,7 +46,7 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    Solver=ESDIRK43, 
+    Solver=GEAR52A, 
     tolerance_lte_abs=1e-5, 
     tolerance_lte_rel=1e-3,
     tolerance_fpi=1e-8

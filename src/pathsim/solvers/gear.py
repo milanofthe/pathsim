@@ -11,6 +11,8 @@
 
 import numpy as np
 
+from collections import deque
+
 from ._solver import ImplicitSolver
 
 from .._constants import (
@@ -36,7 +38,7 @@ def compute_bdf_coefficients(order, timesteps):
     ----------
     order : int
         order of the integration scheme
-    timesteps : list[float]
+    timesteps : array[float]
         timestep buffer (h_{n-j}; j=0,...,order-1)
     
     Returns
@@ -56,26 +58,26 @@ def compute_bdf_coefficients(order, timesteps):
         return 1.0, [1.0]
 
     # Compute timestep ratios rho_j = h_{n-j} / h_n
-    rho = np.array(timesteps[1:])/timesteps[0]
+    rho = timesteps[1:] / timesteps[0]
 
     # Compute normalized time differences theta_j
-    theta = -np.ones(order+1)
+    theta = -np.ones(order + 1)
     theta[0] = 0
-    for j in range(2, order+1):
-        theta[j] -= sum(rho[:j-1])
+    for j in range(2, order + 1):
+        theta[j] -= sum(rho[:j - 1])
 
     # Set up the linear system (p + 1 equations)
-    A = np.zeros((order+1, order+1))
-    b = np.zeros(order+1)
+    A = np.zeros((order + 1, order + 1))
+    b = np.zeros(order + 1)
     b[1] = 1 
-    for m in range(order+1):
+    for m in range(order + 1):
         A[m, :] = theta ** m 
 
     # Solve the linear system A * alpha = b
     alphas = np.linalg.solve(A, b)
 
     #return function and buffer weights
-    return 1/alphas[0], -alphas[1:]/alphas[0]
+    return 1 / alphas[0], -alphas[1:] / alphas[0]
 
 
 # BASE GEAR SOLVER =====================================================================
@@ -105,11 +107,8 @@ class GEAR(ImplicitSolver):
         #safety factor for error controller (if available)
         self.beta = SOL_BETA
 
-        #bdf solution buffer
-        self.B = []
-
         #gear timestep buffer
-        self.T = []
+        self.history_dt = deque([], maxlen=1)
 
         #flag adaptive timestep solver
         self.is_adaptive = True
@@ -122,11 +121,11 @@ class GEAR(ImplicitSolver):
         """"Resets integration engine to initial state."""
 
         #clear buffers 
-        self.B = []
-        self.T = []
+        self.history.clear()
+        self.history_dt.clear()
 
         #overwrite state with initial value
-        self.x = self.x_0 = self.initial_value
+        self.x = self.initial_value
 
 
     def buffer(self, dt):
@@ -142,23 +141,15 @@ class GEAR(ImplicitSolver):
 
         #reset optimizer
         self.opt.reset()
-            
-        #buffer state directly
-        self.x_0 = self.x
-
-        #add to buffers
-        self.B.insert(0, self.x)
-        self.T.insert(0, dt)
-
-        #truncate buffers if too long
-        if len(self.B) > self.n:
-            self.B.pop()
-            self.T.pop()
+    
+        #add to histories (solution and timestep)            
+        self.history.appendleft(self.x)
+        self.history_dt.appendleft(dt)
 
         #precompute coefficients here, where buffers are available
         self.F, self.K = {}, {}
-        for n in range(1, len(self.T)+1):
-            self.F[n], self.K[n] = compute_bdf_coefficients(n, self.T)
+        for n in range(len(self.history_dt)):
+            self.F[n+1], self.K[n+1] = compute_bdf_coefficients(n+1, np.array(self.history_dt))
 
 
     # methods for adaptive timestep solvers --------------------------------------------
@@ -170,12 +161,11 @@ class GEAR(ImplicitSolver):
         timestep.
         """
         
-        #reset internal state to previous state
-        self.x = self.x_0
+        #reset internal state to previous state from history
+        self.x = self.history.popleft() 
 
-        #remove most recent buffer entry
-        self.B.pop(0)
-        self.T.pop(0)
+        #also remove latest timestep from timestep history
+        self.history_dt.popleft()
 
 
     def error_controller(self, tr):
@@ -242,18 +232,18 @@ class GEAR(ImplicitSolver):
         """
 
         #order of scheme for current step
-        n = min(self.n, len(self.B))
+        n = min(self.n, len(self.history))
         
         #fixed-point function update (faster then sum comprehension)
-        g = self.F[n]*dt*f
-        for b, k in zip(self.B, self.K[n]):
-            g = g + b*k
+        g = self.F[n] * dt * f
+        for b, k in zip(self.history, self.K[n]):
+            g = g + b * k
 
         #use the jacobian
         if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, self.F[n]*dt*J)
+            self.x, err = self.opt.step(self.x, g, self.F[n] * dt * J)
 
         else:
             #optimizer step (pure)
@@ -286,13 +276,13 @@ class GEAR(ImplicitSolver):
         """
 
         #early exit if buffer not long enough for two solutions
-        if len(self.B) < self.n:
+        if len(self.history) < self.n:
             return True, 0.0, 1.0
 
         #estimate truncation error from lower order solution
-        tr = self.x - self.F[self.m]*dt*f
-        for b, k in zip(self.B, self.K[self.m]):
-            tr = tr - b*k
+        tr = self.x - self.F[self.m] * dt * f
+        for b, k in zip(self.history, self.K[self.m]):
+            tr = tr - b * k
 
         #error control
         return self.error_controller(tr)
@@ -321,6 +311,10 @@ class GEAR21(GEAR):
         self.n = 2
         self.m = 1
 
+        #gear buffers, here 2
+        self.history = deque([], maxlen=2)
+        self.history_dt = deque([], maxlen=2)
+
 
 class GEAR32(GEAR):
     """Adaptive-step GEAR integrator using 3rd order BDF for timestepping
@@ -342,6 +336,10 @@ class GEAR32(GEAR):
         #integration order and order of secondary method
         self.n = 3
         self.m = 2
+
+        #gear buffers, here 3
+        self.history = deque([], maxlen=3)
+        self.history_dt = deque([], maxlen=3)
 
 
 class GEAR43(GEAR):
@@ -365,6 +363,10 @@ class GEAR43(GEAR):
         self.n = 4
         self.m = 3
 
+        #gear buffers, here 4
+        self.history = deque([], maxlen=4)
+        self.history_dt = deque([], maxlen=4)
+
 
 class GEAR54(GEAR):
     """Adaptive-step GEAR integrator using 5th order BDF for timestepping
@@ -387,6 +389,10 @@ class GEAR54(GEAR):
         #integration order and order of secondary method
         self.n = 5
         self.m = 4
+
+        #gear, here 5
+        self.history = deque([], maxlen=5)
+        self.history_dt = deque([], maxlen=5)
 
 
 class GEAR52A(GEAR):
@@ -417,38 +423,9 @@ class GEAR52A(GEAR):
         #minimum and maximum BDF order to select
         self.n_min, self.n_max = 2, 5
 
-
-    def buffer(self, dt):
-        """
-        Buffer the state and timestep. Dynamically precompute the variable 
-        timestep BDF coefficients on the fly for the current timestep.
-
-        Parameters
-        ----------
-        dt : float
-            evaluation time
-
-        """
-            
-        #reset optimizer
-        self.opt.reset()
-
-        #buffer state directly
-        self.x_0 = self.x
-
-        #add to buffers
-        self.B.insert(0, self.x)
-        self.T.insert(0, dt)
-
-        #truncate buffers if too long
-        if len(self.B) > self.n_max + 1:
-            self.B.pop()
-            self.T.pop()
-
-        #precompute coefficients here, where buffers are available
-        self.F, self.K = {}, {}
-        for n in range(1, len(self.T)+1):
-            self.F[n], self.K[n] = compute_bdf_coefficients(n, self.T)
+        #gear, here 5+1
+        self.history = deque([], maxlen=6)
+        self.history_dt = deque([], maxlen=6)
 
 
     def error_controller(self, tr_m, tr_p):
@@ -536,20 +513,20 @@ class GEAR52A(GEAR):
         """
 
         #early exit if buffer not long enough for two solutions
-        if len(self.B) < self.n + 1:
+        if len(self.history) < self.n + 1:
             return True, 0.0, 1.0
 
         #lower and higher order
-        n_m, n_p = self.n-1, self.n+1 
+        n_m, n_p = self.n - 1, self.n + 1 
 
         #estimate truncation error from lower order solution
-        tr_m = self.x - self.F[n_m]*dt*f
-        for b, k in zip(self.B, self.K[n_m]):
-            tr_m = tr_m - b*k
+        tr_m = self.x - self.F[n_m] * dt * f
+        for b, k in zip(self.history, self.K[n_m]):
+            tr_m = tr_m - b * k
 
         #estimate truncation error from higher order solution
-        tr_p = self.x - self.F[n_p]*dt*f
-        for b, k in zip(self.B, self.K[n_p]):
-            tr_p = tr_p - b*k
+        tr_p = self.x - self.F[n_p] * dt * f
+        for b, k in zip(self.history, self.K[n_p]):
+            tr_p = tr_p - b * k
 
         return self.error_controller(tr_m, tr_p)
