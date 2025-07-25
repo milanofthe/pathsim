@@ -3,8 +3,6 @@
 ##                      EXPLICIT and IMPLICIT EULER INTEGRATORS
 ##                                (solvers/euler.py)
 ##
-##                                 Milan Rother 2024
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
@@ -124,13 +122,13 @@ class EUB(ImplicitSolver):
         x_0 = self.history[0]
 
         #update the fixed point equation
-        g = x_0 + dt*f
+        g = x_0 + dt * f
 
         #use the numerical jacobian
         if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, dt*J)
+            self.x, err = self.opt.step(self.x, g, dt * J)
 
         else:
             #optimizer step (pure)

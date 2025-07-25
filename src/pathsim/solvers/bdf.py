@@ -3,8 +3,6 @@
 ##                         BACKWARD DIFFERENTIATION FORMULAS
 ##                                 (solvers/bdf.py)
 ##
-##                                 Milan Rother 2024
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
@@ -12,7 +10,7 @@
 from collections import deque
 
 from ._solver import ImplicitSolver
-
+from .dirk3 import DIRK3
 
 # BASE BDF SOLVER ======================================================================
 
@@ -25,8 +23,6 @@ class BDF(ImplicitSolver):
 
     Attributes
     ----------
-    x_0 : numeric, array[numeric]
-        internal 'working' initial value
     x : numeric, array[numeric]
         internal 'working' state
     n : int
@@ -43,8 +39,11 @@ class BDF(ImplicitSolver):
         bdf coefficients for the state buffer for each order
     F : dict[int: float]
         bdf coefficients for the function 'func' for each order
-    B : list[numeric], list[array[numeric]]
-        buffer for previous states
+    history : deque[numeric]
+        internal history of past results
+    startup : Solver
+        internal solver instance for startup (building history) 
+        of multistep methods (using 'DIRK3' for 'BDF' methods)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -62,6 +61,30 @@ class BDF(ImplicitSolver):
                   6:[ 360/147, -450/147, 400/147, -225/147, 72/147, -10/147]}
         self.F = {1:1.0, 2:2/3, 3:6/11, 4:12/25, 5:60/137, 6:60/147}
 
+        #initialize startup solver from 'self'
+        self.startup = DIRK3.cast(self)
+
+
+    def stages(self, t, dt):
+        """Generator that yields the intermediate evaluation 
+        time during the timestep 't + ratio * dt'.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time
+        dt : float
+            integration timestep
+        """
+
+        #not enough history for full order -> stages of startup method
+        if len(self.history) < self.n:
+            for _t in self.startup.stages(t, dt):
+                yield _t
+        else:
+            for ratio in self.eval_stages:
+                yield t + ratio * dt
+
 
     def reset(self):
         """"Resets integration engine to initial state."""
@@ -71,6 +94,9 @@ class BDF(ImplicitSolver):
 
         #overwrite state with initial value
         self.x = self.initial_value
+
+        #reset startup solver
+        self.startup.reset()
 
 
     def buffer(self, dt):
@@ -87,6 +113,10 @@ class BDF(ImplicitSolver):
 
         #add current solution to history
         self.history.appendleft(self.x)
+
+        #not enough history for full order -> buffer with startup method
+        if len(self.history) < self.n:
+            self.startup.buffer(dt)
 
 
     def solve(self, f, J, dt):
@@ -107,19 +137,22 @@ class BDF(ImplicitSolver):
             residual error of the fixed point update equation
         """
 
-        #buffer length for BDF order selection
-        n = min(len(self.history), self.n)
+        #not enough history for full order -> solve with startup method
+        if len(self.history) < self.n:
+            err = self.startup.solve(f, J, dt)
+            self.x = self.startup.get()
+            return err
 
         #fixed-point function update
-        g = self.F[n] * dt * f
-        for b, k in zip(self.history, self.K[n]):
+        g = self.F[self.n] * dt * f
+        for b, k in zip(self.history, self.K[self.n]):
             g = g + b * k
 
         #use the jacobian
         if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, self.F[n] * dt * J)
+            self.x, err = self.opt.step(self.x, g, self.F[self.n] * dt * J)
 
         else:
             #optimizer step (pure)
@@ -127,6 +160,39 @@ class BDF(ImplicitSolver):
 
         #return the fixed-point residual
         return err
+
+
+    def step(self, f, dt):
+        """Performs the explicit timestep for (t+dt) based 
+        on the state and input at (t).
+
+        Note
+        ----
+        This is only required for the startup solver.
+
+        Parameters
+        ----------
+        f : numeric, array[numeric]
+            evaluation of rhs function
+        dt : float 
+            integration timestep
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
+        """
+
+        #not enough histors -> step the startup solver
+        if len(self.history) < self.n:
+            self.startup.step(f, dt)
+            self.x = self.startup.get()
+            
+        return True, 0.0, 1.0
 
 
 # SOLVERS ==============================================================================

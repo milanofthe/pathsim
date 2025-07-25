@@ -39,7 +39,7 @@ blocks = [VDP, Sco]
 #the connections between the blocks
 connections = [
     Connection(VDP, Sco),
-    # Connection(VDP[1], Sco[1])
+    Connection(VDP[1], Sco[1])
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
@@ -57,7 +57,7 @@ Sim = Simulation(
 
 if __name__ == "__main__":
 
-    Sim.run(3*mu)
+    Sim.run(1*mu)
 
     #plotting
     Sco.plot(".-")

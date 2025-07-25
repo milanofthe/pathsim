@@ -3,8 +3,6 @@
 ##                       BASE CLASS FOR RUNGE-KUTTA INTEGRATORS
 ##                              (solvers/_rungekutta.py)
 ##
-##                                 Milan Rother 2024
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
@@ -40,6 +38,8 @@ class ExplicitRungeKutta(ExplicitSolver):
         order of embedded integration scheme for error control
     s : int
         numer of RK stages
+    history : deque[numeric]
+        internal history of past results
     beta : float
         safety factor for error control
     Ks : dict
@@ -48,7 +48,6 @@ class ExplicitRungeKutta(ExplicitSolver):
         butcher table
     TR : list[float]
         coefficients for truncation error estimate
-    
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
