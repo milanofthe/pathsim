@@ -211,8 +211,6 @@ class ScheduleList(Schedule):
         
         #schedule times
         self.times_evt = times_evt
-        self.t_period = t_period        
-        self.t_end = t_end
 
 
     def _next(self):
