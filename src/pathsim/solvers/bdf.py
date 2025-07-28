@@ -61,7 +61,8 @@ class BDF(ImplicitSolver):
                   6:[ 360/147, -450/147, 400/147, -225/147, 72/147, -10/147]}
         self.F = {1:1.0, 2:2/3, 3:6/11, 4:12/25, 5:60/137, 6:60/147}
 
-        #initialize startup solver from 'self'
+        #initialize startup solver from 'self' and flag
+        self._needs_startup = True
         self.startup = DIRK3.cast(self)
 
 
@@ -78,7 +79,7 @@ class BDF(ImplicitSolver):
         """
 
         #not enough history for full order -> stages of startup method
-        if len(self.history) < self.n:
+        if self._needs_startup:
             for _t in self.startup.stages(t, dt):
                 yield _t
         else:
@@ -114,8 +115,11 @@ class BDF(ImplicitSolver):
         #add current solution to history
         self.history.appendleft(self.x)
 
-        #not enough history for full order -> buffer with startup method
-        if len(self.history) < self.n:
+        #flag for startup method, not enough history
+        self._needs_startup = len(self.history) < self.n
+
+        #buffer with startup method
+        if self._needs_startup:
             self.startup.buffer(dt)
 
 
@@ -138,7 +142,7 @@ class BDF(ImplicitSolver):
         """
 
         #not enough history for full order -> solve with startup method
-        if len(self.history) < self.n:
+        if self._needs_startup:
             err = self.startup.solve(f, J, dt)
             self.x = self.startup.get()
             return err
@@ -188,7 +192,7 @@ class BDF(ImplicitSolver):
         """
 
         #not enough histors -> step the startup solver
-        if len(self.history) < self.n:
+        if self._needs_startup:
             self.startup.step(f, dt)
             self.x = self.startup.get()
             

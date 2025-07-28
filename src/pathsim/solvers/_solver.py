@@ -216,7 +216,6 @@ class Solver:
         if not isinstance(other, Solver):
             raise ValueError("'other' must be instance of 'Solver' or child")
 
-
         #create new solver instance
         engine = cls(
             initial_value=other.initial_value, 
@@ -225,7 +224,7 @@ class Solver:
             )
         
         #set internal state of new engine from other
-        engine.set(other.get())
+        engine.set(other.x)
 
         return engine
 

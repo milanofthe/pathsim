@@ -1087,6 +1087,10 @@ class Simulation:
         when local truncation error is too large and timestep has to be 
         retaken with smaller timestep. 
         """
+
+        #revert dummy engine (for history)
+        self.engine.revert()
+
         #revert block states
         for block in self._blocks_dyn:
             if block: block.revert()
@@ -1520,8 +1524,9 @@ class Simulation:
 
             #if solver did not converge -> quit early (adaptive only)
             if not success:
-                error_norm, scale = 0.0, 0.5
-                break    
+                self._revert()
+                self._update(self.time) 
+                return False, 0.0, 0.5, total_evals+1, total_solver_its  
 
             #timestep for dynamical blocks (with internal states)
             success, error_norm, scale = self._step(time_stage, dt)
@@ -1530,8 +1535,7 @@ class Simulation:
         if not success:
             self._revert()
             self._update(self.time) 
-            total_evals += 1
-            return False, error_norm, scale, total_evals, total_solver_its
+            return False, error_norm, scale, total_evals+1, total_solver_its
 
         #system time after timestep
         time_dt = self.time + dt

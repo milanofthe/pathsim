@@ -139,6 +139,7 @@ class GEAR(ImplicitSolver):
         self.is_adaptive = True
 
         #initialize startup solver from 'self'
+        self._needs_startup = True
         self.startup = ESDIRK32.cast(self)
 
 
@@ -155,7 +156,7 @@ class GEAR(ImplicitSolver):
         """
 
         #not enough history for full order -> stages of startup method
-        if len(self.history) <= self.n:
+        if self._needs_startup:
             for _t in self.startup.stages(t, dt):
                 yield _t
         else:
@@ -174,8 +175,7 @@ class GEAR(ImplicitSolver):
         self.x = self.initial_value
 
         #reset startup solver
-        if len(self.history) <= self.n:
-            self.startup.reset()
+        self.startup.reset()
 
 
     def buffer(self, dt):
@@ -196,15 +196,17 @@ class GEAR(ImplicitSolver):
         self.history.appendleft(self.x)
         self.history_dt.appendleft(dt)
 
+        #flag for startup method
+        self._needs_startup = len(self.history) < self.n
+
         #buffer with startup method
-        if len(self.history) <= self.n:
+        if self._needs_startup:
             self.startup.buffer(dt)
-            return
 
         #precompute coefficients here, where buffers are available
         self.F, self.K = {}, {}
-        for n in range(len(self.history_dt)):
-            self.F[n+1], self.K[n+1] = compute_bdf_coefficients(n+1, np.array(self.history_dt))
+        for n, _ in enumerate(self.history_dt, 1):
+            self.F[n], self.K[n] = compute_bdf_coefficients(n, np.array(self.history_dt))
 
 
     # methods for adaptive timestep solvers --------------------------------------------
@@ -216,15 +218,15 @@ class GEAR(ImplicitSolver):
         timestep.
         """
         
-        #revert startup method
-        if len(self.history) <= self.n:
-            self.startup.revert()
-        
         #reset internal state to previous state from history
         self.x = self.history.popleft() 
 
         #also remove latest timestep from timestep history
-        self.history_dt.popleft()
+        _ = self.history_dt.popleft()
+
+        #revert startup method
+        if self._needs_startup:
+            self.startup.revert()
 
 
     def error_controller(self, tr):
@@ -291,7 +293,7 @@ class GEAR(ImplicitSolver):
         """
 
         #not enough history for full order -> solve with startup method
-        if len(self.history) <= self.n:
+        if self._needs_startup:
             err = self.startup.solve(f, J, dt)
             self.x = self.startup.get()
             return err
@@ -338,10 +340,10 @@ class GEAR(ImplicitSolver):
         """
 
         #not enough history for full order -> step with startup method
-        if len(self.history) <= self.n:
-            info = self.startup.step(f, dt)
+        if self._needs_startup:
+            suc, err, scl = self.startup.step(f, dt)
             self.x = self.startup.get()
-            return info
+            return suc, err, scl
 
         #estimate truncation error from lower order solution
         tr = self.x - self.F[self.m] * dt * f
@@ -454,7 +456,7 @@ class GEAR54(GEAR):
         self.n = 5
         self.m = 4
 
-        #gear, here 5
+        #gear, here 5+1
         self.history = deque([], maxlen=5)
         self.history_dt = deque([], maxlen=5)
 
@@ -487,7 +489,7 @@ class GEAR52A(GEAR):
         #minimum and maximum BDF order to select
         self.n_min, self.n_max = 2, 5
 
-        #gear, here 5+1
+        #gear, here 6
         self.history = deque([], maxlen=6)
         self.history_dt = deque([], maxlen=6)
 
@@ -510,56 +512,58 @@ class GEAR52A(GEAR):
         self.history.appendleft(self.x)
         self.history_dt.appendleft(dt)
 
+        #flag for startup method
+        self._needs_startup = len(self.history) < 6
+
         #buffer with startup method
-        if len(self.history) <= 6:
+        if self._needs_startup:
             self.startup.buffer(dt)
-            return 
 
         #precompute coefficients here, where buffers are available
         self.F, self.K = {}, {}
-        for n in range(len(self.history_dt)):
-            self.F[n+1], self.K[n+1] = compute_bdf_coefficients(n+1, np.array(self.history_dt))
+        for n, _ in enumerate(self.history_dt, 1):
+            self.F[n], self.K[n] = compute_bdf_coefficients(n, np.array(self.history_dt))
 
 
-    def stages(self, t, dt):
-        """Generator that yields the intermediate evaluation 
-        time during the timestep 't + ratio * dt'.
+    # def stages(self, t, dt):
+    #     """Generator that yields the intermediate evaluation 
+    #     time during the timestep 't + ratio * dt'.
 
-        Parameters
-        ----------
-        t : float 
-            evaluation time
-        dt : float
-            integration timestep
-        """
+    #     Parameters
+    #     ----------
+    #     t : float 
+    #         evaluation time
+    #     dt : float
+    #         integration timestep
+    #     """
 
-        #not enough history for full order -> stages of startup method
-        if len(self.history) <= 6:
-            for _t in self.startup.stages(t, dt):
-                yield _t
-        else:
-            for ratio in self.eval_stages:
-                yield t + ratio * dt
+    #     #not enough history for full order -> stages of startup method
+    #     if self._needs_startup:
+    #         for _t in self.startup.stages(t, dt):
+    #             yield _t
+    #     else:
+    #         for ratio in self.eval_stages:
+    #             yield t + ratio * dt
 
 
     # methods for adaptive timestep solvers --------------------------------------------
 
-    def revert(self):
-        """Revert integration engine to previous timestep, this is only 
-        relevant for adaptive methods where the simulation timestep 'dt' 
-        is rescaled and the engine step is recomputed with the smaller 
-        timestep.
-        """
+    # def revert(self):
+    #     """Revert integration engine to previous timestep, this is only 
+    #     relevant for adaptive methods where the simulation timestep 'dt' 
+    #     is rescaled and the engine step is recomputed with the smaller 
+    #     timestep.
+    #     """
 
-        #revert startup method
-        if len(self.history) <= 6:
-            self.startup.revert()
+    #     #revert startup method
+    #     if self._needs_startup:
+    #         self.startup.revert()
 
-        #reset internal state to previous state from history
-        self.x = self.history.popleft() 
+    #     #reset internal state to previous state from history
+    #     self.x = self.history.popleft() 
 
-        #also remove latest timestep from timestep history
-        self.history_dt.popleft()
+    #     #also remove latest timestep from timestep history
+    #     self.history_dt.popleft()
 
 
     def error_controller(self, tr_m, tr_p):
@@ -642,7 +646,7 @@ class GEAR52A(GEAR):
         """
 
         #not enough history for full order -> solve with startup method
-        if len(self.history) <= 6:
+        if self._needs_startup:
             err = self.startup.solve(f, J, dt)
             self.x = self.startup.get()
             return err
@@ -691,10 +695,10 @@ class GEAR52A(GEAR):
         """
 
         #not enough history for full order -> step with startup method
-        if len(self.history) <= 6:
-            info = self.startup.step(f, dt)
+        if self._needs_startup:
+            suc, err, scl = self.startup.step(f, dt)
             self.x = self.startup.get()
-            return info
+            return suc, err, scl
 
         #lower and higher order
         n_m, n_p = self.n - 1, self.n + 1 
