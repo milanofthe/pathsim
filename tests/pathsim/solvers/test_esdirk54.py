@@ -62,6 +62,8 @@ class TestESDIRK54(unittest.TestCase):
 
         solver = ESDIRK54()
 
+        solver.buffer(1)
+
         for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works

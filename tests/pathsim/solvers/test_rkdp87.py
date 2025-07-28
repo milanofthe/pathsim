@@ -63,6 +63,8 @@ class TestRKDP87(unittest.TestCase):
     def test_step(self):
 
         solver = RKDP87()
+        
+        solver.buffer(1)
 
         for i, t in enumerate(solver.stages(0, 1)):
 

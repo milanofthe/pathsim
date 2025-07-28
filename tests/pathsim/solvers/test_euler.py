@@ -62,6 +62,8 @@ class TestEUF(unittest.TestCase):
 
         solver = EUF()
 
+        solver.buffer(1)
+
         for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works
@@ -156,6 +158,8 @@ class TestEUB(unittest.TestCase):
     def test_step(self):
 
         solver = EUB()
+        
+        solver.buffer(1)
 
         for i, t in enumerate(solver.stages(0, 1)):
 
