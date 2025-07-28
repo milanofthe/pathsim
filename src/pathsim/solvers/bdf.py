@@ -3,14 +3,14 @@
 ##                         BACKWARD DIFFERENTIATION FORMULAS
 ##                                 (solvers/bdf.py)
 ##
-##                                 Milan Rother 2024
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
 
-from ._solver import ImplicitSolver
+from collections import deque
 
+from ._solver import ImplicitSolver
+from .dirk3 import DIRK3
 
 # BASE BDF SOLVER ======================================================================
 
@@ -23,8 +23,6 @@ class BDF(ImplicitSolver):
 
     Attributes
     ----------
-    x_0 : numeric, array[numeric]
-        internal 'working' initial value
     x : numeric, array[numeric]
         internal 'working' state
     n : int
@@ -41,8 +39,11 @@ class BDF(ImplicitSolver):
         bdf coefficients for the state buffer for each order
     F : dict[int: float]
         bdf coefficients for the function 'func' for each order
-    B : list[numeric], list[array[numeric]]
-        buffer for previous states
+    history : deque[numeric]
+        internal history of past results
+    startup : Solver
+        internal solver instance for startup (building history) 
+        of multistep methods (using 'DIRK3' for 'BDF' methods)
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -53,25 +54,50 @@ class BDF(ImplicitSolver):
 
         #bdf coefficients for orders 1 to 6
         self.K = {1:[1.0], 
-                  2:[-1/3, 4/3], 
-                  3:[2/11, -9/11, 18/11], 
-                  4:[-3/25, 16/25, -36/25, 48/25],
-                  5:[12/137, -75/137, 200/137, -300/137, 300/137],
-                  6:[-10/147, 72/147, -225/147, 400/147, -450/147, 360/147]}
+                  2:[4/3, -1/3], 
+                  3:[18/11, -9/11, 2/11], 
+                  4:[48/25, -36/25, 16/25, -3/25],
+                  5:[300/137, -300/137, 200/137, -75/137, 12/137],
+                  6:[ 360/147, -450/147, 400/147, -225/147, 72/147, -10/147]}
         self.F = {1:1.0, 2:2/3, 3:6/11, 4:12/25, 5:60/137, 6:60/147}
 
-        #bdf solution buffer
-        self.B = []
+        #initialize startup solver from 'self' and flag
+        self._needs_startup = True
+        self.startup = DIRK3.cast(self)
+
+
+    def stages(self, t, dt):
+        """Generator that yields the intermediate evaluation 
+        time during the timestep 't + ratio * dt'.
+
+        Parameters
+        ----------
+        t : float 
+            evaluation time
+        dt : float
+            integration timestep
+        """
+
+        #not enough history for full order -> stages of startup method
+        if self._needs_startup:
+            for _t in self.startup.stages(t, dt):
+                yield _t
+        else:
+            for ratio in self.eval_stages:
+                yield t + ratio * dt
 
 
     def reset(self):
         """"Resets integration engine to initial state."""
 
-        #clear buffer
-        self.B = []
+        #clear history (BDF solution buffer)
+        self.history.clear()
 
         #overwrite state with initial value
-        self.x = self.x_0 = self.initial_value
+        self.x = self.initial_value
+
+        #reset startup solver
+        self.startup.reset()
 
 
     def buffer(self, dt):
@@ -81,21 +107,20 @@ class BDF(ImplicitSolver):
         ----------
         dt : float
             integration timestep
-
         """
             
         #reset optimizer
         self.opt.reset()
 
-        #buffer state directly
-        self.x_0 = self.x
+        #add current solution to history
+        self.history.appendleft(self.x)
 
-        #add to buffer
-        self.B.append(self.x)
+        #flag for startup method, not enough history
+        self._needs_startup = len(self.history) < self.n
 
-        #truncate buffer if too long
-        if len(self.B) > self.n:
-            self.B.pop(0)
+        #buffer with startup method
+        if self._needs_startup:
+            self.startup.buffer(dt)
 
 
     def solve(self, f, J, dt):
@@ -116,19 +141,22 @@ class BDF(ImplicitSolver):
             residual error of the fixed point update equation
         """
 
-        #buffer length for BDF order selection
-        n = min(len(self.B), self.n)
+        #not enough history for full order -> solve with startup method
+        if self._needs_startup:
+            err = self.startup.solve(f, J, dt)
+            self.x = self.startup.get()
+            return err
 
         #fixed-point function update
-        g = self.F[n]*dt*f
-        for b, k in zip(self.B, self.K[n]):
-            g = g + b*k
+        g = self.F[self.n] * dt * f
+        for b, k in zip(self.history, self.K[self.n]):
+            g = g + b * k
 
         #use the jacobian
         if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, self.F[n]*dt*J)
+            self.x, err = self.opt.step(self.x, g, self.F[self.n] * dt * J)
 
         else:
             #optimizer step (pure)
@@ -136,6 +164,39 @@ class BDF(ImplicitSolver):
 
         #return the fixed-point residual
         return err
+
+
+    def step(self, f, dt):
+        """Performs the explicit timestep for (t+dt) based 
+        on the state and input at (t).
+
+        Note
+        ----
+        This is only required for the startup solver.
+
+        Parameters
+        ----------
+        f : numeric, array[numeric]
+            evaluation of rhs function
+        dt : float 
+            integration timestep
+
+        Returns 
+        -------
+        success : bool
+            True if the timestep was successful
+        error : float
+            estimated error of the internal error controller
+        scale : float
+            estimated timestep rescale factor for error control
+        """
+
+        #not enough histors -> step the startup solver
+        if self._needs_startup:
+            self.startup.step(f, dt)
+            self.x = self.startup.get()
+            
+        return True, 0.0, 1.0
 
 
 # SOLVERS ==============================================================================
@@ -159,6 +220,9 @@ class BDF2(BDF):
         #integration order (local)
         self.n = 2
 
+        #longer history for BDF
+        self.history = deque([], maxlen=2)
+
 
 class BDF3(BDF):
     """Fixed-step 3rd order Backward Differentiation Formula (BDF).
@@ -178,6 +242,9 @@ class BDF3(BDF):
 
         #integration order (local)
         self.n = 3
+
+        #longer history for BDF
+        self.history = deque([], maxlen=3)
 
 
 class BDF4(BDF):
@@ -199,6 +266,9 @@ class BDF4(BDF):
         #integration order (local)
         self.n = 4
 
+        #longer history for BDF
+        self.history = deque([], maxlen=4)
+
 
 class BDF5(BDF):
     """Fixed-step 5th order Backward Differentiation Formula (BDF).
@@ -218,6 +288,9 @@ class BDF5(BDF):
 
         #integration order (local)
         self.n = 5
+
+        #longer history for BDF
+        self.history = deque([], maxlen=5)
 
 
 class BDF6(BDF):
@@ -240,3 +313,6 @@ class BDF6(BDF):
 
         #integration order (local)
         self.n = 6
+
+        #longer history for BDF
+        self.history = deque([], maxlen=6)

@@ -61,6 +61,8 @@ class TestRKBS32(unittest.TestCase):
     def test_step(self):
 
         solver = RKBS32()
+        
+        solver.buffer(1)
 
         for i, t in enumerate(solver.stages(0, 1)):
 

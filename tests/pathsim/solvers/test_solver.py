@@ -31,7 +31,6 @@ class TestBaseSolver(unittest.TestCase):
 
     def test_init(self):
         self.assertEqual(self.solver.x, 1.0)
-        self.assertEqual(self.solver.x_0, 1.0)
         self.assertEqual(self.solver.initial_value, 1.0)
         self.assertFalse(self.solver.is_adaptive)
 
@@ -54,7 +53,7 @@ class TestBaseSolver(unittest.TestCase):
     def test_buffer(self):
         self.solver.x = 2.0
         self.solver.buffer(0)
-        self.assertEqual(self.solver.x_0, 2.0)
+        self.assertEqual(self.solver.history[0], 2.0)
 
     def test_cast(self):
         new_solver = ExplicitSolver.cast(self.solver)

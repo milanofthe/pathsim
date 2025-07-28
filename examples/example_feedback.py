@@ -45,8 +45,7 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=0.01, 
-    log=True
+    dt=0.01
     )
 
 # Run Example ===========================================================================

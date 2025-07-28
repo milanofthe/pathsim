@@ -50,16 +50,6 @@ class TestBDF2(unittest.TestCase):
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
 
 
-    def test_stages(self):
-
-        solver = BDF2()
-
-        for i, t in enumerate(solver.stages(0, 1)):
-            
-            #test the stage iterator
-            self.assertEqual(t, solver.eval_stages[i])
-
-
     def test_buffer(self):
 
         solver = BDF2()
@@ -71,7 +61,7 @@ class TestBDF2(unittest.TestCase):
             solver.buffer(0)
 
             #test bdf buffer length
-            buffer_length = len(solver.B)
+            buffer_length = len(solver.history)
             self.assertEqual(buffer_length, k+1 if k < solver.n else solver.n)
             
             #make one step
@@ -84,9 +74,6 @@ class TestBDF2(unittest.TestCase):
         solver = BDF2()
 
         for i, t in enumerate(solver.stages(0, 1)):
-
-            #test if stage incrementation works
-            self.assertEqual(solver.stage, i)
 
             success, err, scale = solver.step(0.0, 1)
 
@@ -131,9 +118,9 @@ class TestBDF2(unittest.TestCase):
                     err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 2 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 1.5) # <- due to startup DIRK3
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -178,16 +165,6 @@ class TestBDF3(unittest.TestCase):
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
 
 
-    def test_stages(self):
-
-        solver = BDF3()
-
-        for i, t in enumerate(solver.stages(0, 1)):
-            
-            #test the stage iterator
-            self.assertEqual(t, solver.eval_stages[i])
-
-
     def test_buffer(self):
 
         solver = BDF3()
@@ -199,7 +176,7 @@ class TestBDF3(unittest.TestCase):
             solver.buffer(0)
 
             #test bdf buffer length
-            buffer_length = len(solver.B)
+            buffer_length = len(solver.history)
             self.assertEqual(buffer_length, k+1 if k < solver.n else solver.n)
             
             #make one step
@@ -212,9 +189,6 @@ class TestBDF3(unittest.TestCase):
         solver = BDF3()
 
         for i, t in enumerate(solver.stages(0, 1)):
-
-            #test if stage incrementation works
-            self.assertEqual(solver.stage, i)
 
             success, err, scale = solver.step(0.0, 1)
 
@@ -259,9 +233,9 @@ class TestBDF3(unittest.TestCase):
                     err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 2 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 2.5) # <- due to startup DIRK3
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -305,16 +279,6 @@ class TestBDF4(unittest.TestCase):
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
 
 
-    def test_stages(self):
-
-        solver = BDF4()
-
-        for i, t in enumerate(solver.stages(0, 1)):
-            
-            #test the stage iterator
-            self.assertEqual(t, solver.eval_stages[i])
-
-
     def test_buffer(self):
 
         solver = BDF4()
@@ -326,7 +290,7 @@ class TestBDF4(unittest.TestCase):
             solver.buffer(0)
 
             #test bdf buffer length
-            buffer_length = len(solver.B)
+            buffer_length = len(solver.history)
             self.assertEqual(buffer_length, k+1 if k < solver.n else solver.n)
             
             #make one step
@@ -339,9 +303,6 @@ class TestBDF4(unittest.TestCase):
         solver = BDF4()
 
         for i, t in enumerate(solver.stages(0, 1)):
-
-            #test if stage incrementation works
-            self.assertEqual(solver.stage, i)
 
             success, err, scale = solver.step(0.0, 1)
 
@@ -386,9 +347,9 @@ class TestBDF4(unittest.TestCase):
                     err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 3 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 3) # <- due to startup DIRK3
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -432,16 +393,6 @@ class TestBDF5(unittest.TestCase):
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
 
 
-    def test_stages(self):
-
-        solver = BDF5()
-
-        for i, t in enumerate(solver.stages(0, 1)):
-            
-            #test the stage iterator
-            self.assertEqual(t, solver.eval_stages[i])
-
-
     def test_buffer(self):
 
         solver = BDF5()
@@ -453,7 +404,7 @@ class TestBDF5(unittest.TestCase):
             solver.buffer(0)
 
             #test bdf buffer length
-            buffer_length = len(solver.B)
+            buffer_length = len(solver.history)
             self.assertEqual(buffer_length, k+1 if k < solver.n else solver.n)
             
             #make one step
@@ -466,9 +417,6 @@ class TestBDF5(unittest.TestCase):
         solver = BDF5()
 
         for i, t in enumerate(solver.stages(0, 1)):
-
-            #test if stage incrementation works
-            self.assertEqual(solver.stage, i)
 
             success, err, scale = solver.step(0.0, 1)
 
@@ -513,9 +461,9 @@ class TestBDF5(unittest.TestCase):
                     err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 3 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 3) # <- due to startup DIRK3
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -558,16 +506,6 @@ class TestBDF6(unittest.TestCase):
         self.assertEqual(solver.tolerance_lte_abs, 1e-6)
 
 
-    def test_stages(self):
-
-        solver = BDF6()
-
-        for i, t in enumerate(solver.stages(0, 1)):
-            
-            #test the stage iterator
-            self.assertEqual(t, solver.eval_stages[i])
-
-
     def test_buffer(self):
 
         solver = BDF6()
@@ -579,7 +517,7 @@ class TestBDF6(unittest.TestCase):
             solver.buffer(0)
 
             #test bdf buffer length
-            buffer_length = len(solver.B)
+            buffer_length = len(solver.history)
             self.assertEqual(buffer_length, k+1 if k < solver.n else solver.n)
             
             #make one step
@@ -592,9 +530,6 @@ class TestBDF6(unittest.TestCase):
         solver = BDF6()
 
         for i, t in enumerate(solver.stages(0, 1)):
-
-            #test if stage incrementation works
-            self.assertEqual(solver.stage, i)
 
             success, err, scale = solver.step(0.0, 1)
 
@@ -639,9 +574,9 @@ class TestBDF6(unittest.TestCase):
                     err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 3 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 3) # <- due to startup DIRK3
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}

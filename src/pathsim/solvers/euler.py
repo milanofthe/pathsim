@@ -3,8 +3,6 @@
 ##                      EXPLICIT and IMPLICIT EULER INTEGRATORS
 ##                                (solvers/euler.py)
 ##
-##                                 Milan Rother 2024
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
@@ -64,8 +62,11 @@ class EUF(ExplicitSolver):
             timestep rescale from error controller
         """
 
+        #get current state from history
+        x_0 = self.history[0]
+
         #update state with euler step
-        self.x = self.x_0 + dt * f
+        self.x = x_0 + dt * f
 
         #no error estimate available
         return True, 0.0, 1.0
@@ -117,14 +118,17 @@ class EUB(ImplicitSolver):
             residual error of the fixed point update equation
         """
 
+        #get current state from history
+        x_0 = self.history[0]
+
         #update the fixed point equation
-        g = self.x_0 + dt*f
+        g = x_0 + dt * f
 
         #use the numerical jacobian
         if J is not None:
 
             #optimizer step with block local jacobian
-            self.x, err = self.opt.step(self.x, g, dt*J)
+            self.x, err = self.opt.step(self.x, g, dt * J)
 
         else:
             #optimizer step (pure)

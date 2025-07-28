@@ -10,7 +10,6 @@ Blocks
 
 Solvers
 -------
-- multistep methods (:class:`.BDF`, :class:`.GEAR`) need startup methods to build history, to maintain consistency order globally
 - make solver term :math:`\dot{x}` accessible for solving index 1 DAEs, especially for stiffly accurate :class:`.DIRK` and :class:`.ESDIRK` methods, will be the basis for future `DAE` blocks
 - add interpolant within timestep to solvers for dense output and to improve interpolation for the event mechanism 
 

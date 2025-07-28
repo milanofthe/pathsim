@@ -3,13 +3,13 @@
 ##                            BASE NUMERICAL INTEGRATOR CLASSES
 ##                                  (solvers/_solver.py)
 ##
-##                                  Milan Rother 2023/24
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
 
 import numpy as np
+
+from collections import deque
 
 from .._constants import (
     TOLERANCE,
@@ -48,10 +48,10 @@ class Solver:
 
     Attributes
     ----------
-    x_0 : numeric, array[numeric]
-        internal 'working' initial value
     x : numeric, array[numeric]
         internal 'working' state
+    history : deque[numeric]
+        internal history of past results
     n : int
         order of integration scheme
     s : int
@@ -69,8 +69,8 @@ class Solver:
         tolerance_lte_rel=SOL_TOLERANCE_LTE_REL
         ):
 
-        #set buffer, state and initial condition    
-        self.x_0 = self.x = self.initial_value = initial_value
+        #set state and initial condition    
+        self.x = self.initial_value = initial_value
 
         #tolerances for local truncation error (for adaptive solvers)
         self.tolerance_lte_abs = tolerance_lte_abs  
@@ -78,6 +78,9 @@ class Solver:
 
         #flag to identify adaptive/fixed timestep solvers
         self.is_adaptive = False
+
+        #history of past solutions, default only one
+        self.history = deque([], maxlen=1)
 
         #order of the integration scheme
         self.n = 1
@@ -151,7 +154,7 @@ class Solver:
         """
 
         #overwrite internal state with value
-        self.x = self.x_0 = x
+        self.x = x
 
         #reset stage counter
         self.stage = 0
@@ -161,7 +164,8 @@ class Solver:
         """"Resets integration engine to initial value"""
 
         #overwrite state with initial value
-        self.x = self.x_0 = self.initial_value
+        self.x = self.initial_value
+        self.history.clear()
 
         #reset stage counter
         self.stage = 0
@@ -183,8 +187,8 @@ class Solver:
     
         """
 
-        #buffer internal state
-        self.x_0 = self.x
+        #buffer internal state to history
+        self.history.appendleft(self.x)
 
         #reset stage counter
         self.stage = 0
@@ -212,7 +216,6 @@ class Solver:
         if not isinstance(other, Solver):
             raise ValueError("'other' must be instance of 'Solver' or child")
 
-
         #create new solver instance
         engine = cls(
             initial_value=other.initial_value, 
@@ -221,7 +224,7 @@ class Solver:
             )
         
         #set internal state of new engine from other
-        engine.set(other.get())
+        engine.set(other.x)
 
         return engine
 
@@ -252,8 +255,8 @@ class Solver:
         the smaller timestep.
         """
         
-        #reset internal state to previous state
-        self.x = self.x_0
+        #reset internal state to previous state from history
+        self.x = self.history.popleft()
 
         #reset stage counter
         self.stage = 0   
@@ -524,8 +527,8 @@ class ImplicitSolver(Solver):
             integration timestep
         """
 
-        #buffer internal state
-        self.x_0 = self.x
+        #buffer internal state to history
+        self.history.appendleft(self.x)
 
         #reset stage counter
         self.stage = 0

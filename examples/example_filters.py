@@ -11,7 +11,7 @@ import numpy as np
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, SquareWaveSource, ButterworthLowpassFilter
-from pathsim.solvers import SSPRK33, RKCK54
+from pathsim.solvers import SSPRK33, RKCK54, BDF2, BDF3
 from pathsim.optim import Value
 
 
@@ -36,7 +36,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
+Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=BDF3)
 
 
 # Run Example ===========================================================================

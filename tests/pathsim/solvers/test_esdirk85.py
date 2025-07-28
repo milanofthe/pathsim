@@ -64,6 +64,8 @@ class TestESDIRK85(unittest.TestCase):
     def test_step(self):
 
         solver = ESDIRK85()
+        
+        solver.buffer(1)
 
         for i, t in enumerate(solver.stages(0, 1)):
 

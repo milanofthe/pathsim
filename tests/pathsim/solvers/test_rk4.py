@@ -59,6 +59,8 @@ class TestRK4(unittest.TestCase):
     def test_step(self):
 
         solver = RK4()
+        
+        solver.buffer(1)
 
         for i, t in enumerate(solver.stages(0, 1)):
 

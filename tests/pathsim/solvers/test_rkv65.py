@@ -64,6 +64,8 @@ class TestRKV65(unittest.TestCase):
 
         solver = RKV65()
 
+        solver.buffer(1)
+
         for i, t in enumerate(solver.stages(0, 1)):
 
             #test if stage incrementation works

@@ -151,13 +151,9 @@ class TestGEAR21(unittest.TestCase):
             solver.buffer(1)
 
             #test bdf buffer length
-            self.assertEqual(len(solver.B), k+1 if k < solver.n else solver.n)
-            self.assertEqual(len(solver.T), k+1 if k < solver.n else solver.n)
+            self.assertEqual(len(solver.history), k+1 if k < solver.n else solver.n)
+            self.assertEqual(len(solver.history_dt), k+1 if k < solver.n else solver.n)
             
-            #make one step
-            for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, 1)
-
 
     def test_integrate_fixed(self):
 
@@ -197,9 +193,9 @@ class TestGEAR21(unittest.TestCase):
                 #test if errors are monotonically decreasing
                 self.assertTrue(np.all(np.diff(errors)<0))
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 2 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 1.5) # <- due to startup
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -229,7 +225,6 @@ class TestGEAR21(unittest.TestCase):
                     problem.jac,
                     time_start=problem.t_span[0], 
                     time_end=problem.t_span[1], 
-                    dt=duration/1000,  # <- small initial timestep for start up
                     dt_max=duration,
                     adaptive=True,
                     tolerance_fpi=1e-8
@@ -240,10 +235,6 @@ class TestGEAR21(unittest.TestCase):
 
                 #test if error control was successful (same OOM for global error -> < 1e-5)
                 self.assertLess(err, solver.tolerance_lte_abs*10)
-
-
-
-
 
 
 
@@ -285,12 +276,8 @@ class TestGEAR32(unittest.TestCase):
             solver.buffer(1)
 
             #test bdf buffer length
-            self.assertEqual(len(solver.B), k+1 if k < solver.n else solver.n)
-            self.assertEqual(len(solver.T), k+1 if k < solver.n else solver.n)
-            
-            #make one step
-            for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, 1)
+            self.assertEqual(len(solver.history), k+1 if k < solver.n else solver.n)
+            self.assertEqual(len(solver.history_dt), k+1 if k < solver.n else solver.n)
 
 
     def test_integrate_fixed(self):
@@ -331,9 +318,10 @@ class TestGEAR32(unittest.TestCase):
                 #test if errors are monotonically decreasing
                 self.assertTrue(np.all(np.diff(errors)<0))
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 2 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 2) 
+
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -363,7 +351,6 @@ class TestGEAR32(unittest.TestCase):
                     problem.jac,
                     time_start=problem.t_span[0], 
                     time_end=problem.t_span[1], 
-                    dt=duration/1000,  # <- small initial timestep for start up
                     dt_max=duration,
                     adaptive=True,
                     tolerance_fpi=1e-8
@@ -416,13 +403,9 @@ class TestGEAR43(unittest.TestCase):
             solver.buffer(1)
 
             #test bdf buffer length
-            self.assertEqual(len(solver.B), k+1 if k < solver.n else solver.n)
-            self.assertEqual(len(solver.T), k+1 if k < solver.n else solver.n)
+            self.assertEqual(len(solver.history), k+1 if k < solver.n else solver.n)
+            self.assertEqual(len(solver.history_dt), k+1 if k < solver.n else solver.n)
             
-            #make one step
-            for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, 1)
-
 
     def test_integrate_fixed(self):
 
@@ -462,9 +445,9 @@ class TestGEAR43(unittest.TestCase):
                 #test if errors are monotonically decreasing
                 self.assertTrue(np.all(np.diff(errors)<0))
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 3 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 3) 
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -494,7 +477,6 @@ class TestGEAR43(unittest.TestCase):
                     problem.jac,
                     time_start=problem.t_span[0], 
                     time_end=problem.t_span[1], 
-                    dt=duration/1000,  # <- small initial timestep for start up
                     dt_max=duration,
                     adaptive=True,
                     tolerance_fpi=1e-8
@@ -546,13 +528,9 @@ class TestGEAR54(unittest.TestCase):
             solver.buffer(1)
 
             #test bdf buffer length
-            self.assertEqual(len(solver.B), k+1 if k < solver.n else solver.n)
-            self.assertEqual(len(solver.T), k+1 if k < solver.n else solver.n)
+            self.assertEqual(len(solver.history), k+1 if k < solver.n else solver.n)
+            self.assertEqual(len(solver.history_dt), k+1 if k < solver.n else solver.n)
             
-            #make one step
-            for i, t in enumerate(solver.stages(0, 1)):
-                success, err, scale = solver.step(0.0, 1)
-
 
     def test_integrate_fixed(self):
 
@@ -592,9 +570,9 @@ class TestGEAR54(unittest.TestCase):
                 #test if errors are monotonically decreasing
                 self.assertTrue(np.all(np.diff(errors)<0))
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected 3 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 3) # <- due to startup ESDIRK32
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -624,7 +602,6 @@ class TestGEAR54(unittest.TestCase):
                     problem.jac,
                     time_start=problem.t_span[0], 
                     time_end=problem.t_span[1], 
-                    dt=duration/1000,  # <- small initial timestep for start up
                     dt_max=duration,
                     adaptive=True,
                     tolerance_fpi=1e-8
@@ -701,9 +678,9 @@ class TestGEAR52A(unittest.TestCase):
                     err = np.mean(abs(numerical_solution - analytical_solution))
                     errors.append(err)
 
-                #test convergence order, expected n-1 (global)
+                #test convergence order, expected >2 (global)
                 p, _ = np.polyfit(np.log10(timesteps), np.log10(errors), deg=1)
-                self.assertGreater(p, 1) # <- due to startup
+                self.assertGreater(p, 2) 
 
             #log stats
             stats[problem.name] = {"n":p, "err":errors, "dt":timesteps}
@@ -733,7 +710,6 @@ class TestGEAR52A(unittest.TestCase):
                     problem.jac,
                     time_start=problem.t_span[0], 
                     time_end=problem.t_span[1], 
-                    dt=duration/1000,  # <- small initial timestep for start up
                     dt_max=duration,
                     adaptive=True,
                     tolerance_fpi=1e-8
