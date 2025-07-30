@@ -298,6 +298,7 @@ class Graph:
         
         self._connections_dag = defaultdict(list)
         self._connections_loop_dag = defaultdict(list)
+        self._loop_closing_connections = []
 
         #construct mappings for connections between blocks
         self._upst_blk_blk_map = upstream_block_block_map(self.connections)
@@ -380,6 +381,7 @@ class Graph:
         
         # Process each strongly connected component separately
         for scc in sccs:
+            scc_set = set(scc)
             
             #find entry points for this SCC
             entry_points = []
@@ -393,18 +395,19 @@ class Graph:
                 if not scc_pred or len(pred) > len(scc_pred):
                     entry_points.append(blk)
             
-            #if no natural entry points, choose one block as artificial entry
+            # If no natural entry points, choose one block as artificial entry
             if not entry_points:
                 entry_points = [scc[0]]
             
-            #perform BFS from entry points for this SCC
+            # Perform BFS from entry points for this SCC
             visited = set()
             queue = deque([(entry_point, 0) for entry_point in entry_points])
             max_local_depth = 0
             
-            #map to store local depths within this SCC
+            # Map to store local depths within this SCC
             local_depths = defaultdict(float)
             
+            # First pass: assign depths using BFS
             while queue:
                 blk, local_depth = queue.popleft()
                 
@@ -415,17 +418,36 @@ class Graph:
                 local_depths[blk] = local_depth
                 max_local_depth = max(max_local_depth, local_depth)
                 
-                #enqueue downstream neighbors that are in this SCC
+                # Enqueue downstream neighbors that are in this SCC
                 for next_blk in self._dnst_blk_blk_map[blk]:
-                    if next_blk in scc and next_blk not in visited:
+                    if next_blk in scc_set and next_blk not in visited:
                         queue.append((next_blk, local_depth + 1))
-            
-            #assign blocks to global depths based on local depths
+
+            # Second pass: identify loop-closing connections
             for blk in scc:
+
+                # Assign blocks to global depths based on local depths
                 global_depth = current_depth + local_depths[blk]
                 self._blocks_loop_dag[global_depth].append(blk)
-                self._connections_loop_dag[global_depth].extend(self._outg_blk_con_map[blk])
-            
+
+                for con in self._outg_blk_con_map[blk]:
+
+                    # Check each target of the connection
+                    for target in con.targets:
+                        target_blk = target.block
+                        
+                        # If target is in the same SCC
+                        if target_blk in scc_set:
+                            # This is a loop-closing connection if:
+                            # It goes to a block at the same or earlier depth (back edge)
+                            if local_depths[target_blk] <= local_depths[blk]:
+                                self._loop_closing_connections.append(con)
+                                break
+
+                            else:
+                                # This is a forward edge in the loop DAG
+                                self._connections_loop_dag[global_depth].append(con)
+                        
             #update global depth counter for the next SCC
             current_depth += max_local_depth + 1
     
@@ -573,3 +595,14 @@ class Graph:
         """
         for d in range(self._loop_depth):
             yield (d, self._blocks_loop_dag[d], self._connections_loop_dag[d])
+
+
+    def loop_closing_connections(self):
+        """Returns the connections that close algebraic loops
+
+        Returns
+        -------
+        list[Connection]
+            Connections that close the algebraic loops from the broke loop DAG
+        """
+        return self._loop_closing_connections
