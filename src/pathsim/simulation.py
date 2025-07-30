@@ -925,7 +925,6 @@ class Simulation:
         for iteration in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
-            max_error = 0.0
             for depth, blocks_loop, connections_loop in self.graph.loop():
 
                 #update blocks at algebraic depth
@@ -934,27 +933,24 @@ class Simulation:
 
                 #step accelerated connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
-                    
-                    #skip inactive connections
-                    if not connection: 
-                        continue
+                    if connection: connection.update()
+                       
+            #step loop closing connections
+            max_error = 0.0
+            for connection in self.graph.loop_closing_connections():
 
-                    #connections at first depth
-                    if depth == 0:
+                #skip inactive connections
+                if not connection:
+                    continue
 
-                        #reset solver at first iteration
-                        if iteration == 1: 
-                            connection.reset()
+                #reset solver at first iteration
+                if iteration == 1: 
+                    connection.reset()
 
-                        #step fixed-point solver (for alg. loops)
-                        err = connection.step() 
-                        if err > max_error:
-                            max_error = err
-
-                    else:
-
-                        #connections at lower depths
-                        connection.update()
+                #step fixed-point solver (for alg. loops)
+                err = connection.step() 
+                if err > max_error:
+                    max_error = err
 
             #check convergence
             if max_error <= self.tolerance_fpi:
