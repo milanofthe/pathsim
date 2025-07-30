@@ -432,6 +432,8 @@ class Graph:
 
                 for con in self._outg_blk_con_map[blk]:
 
+                    is_loop_closing = False
+
                     # Check each target of the connection
                     for target in con.targets:
                         target_blk = target.block
@@ -442,11 +444,12 @@ class Graph:
                             # It goes to a block at the same or earlier depth (back edge)
                             if local_depths[target_blk] <= local_depths[blk]:
                                 self._loop_closing_connections.append(con)
+                                is_loop_closing = True
                                 break
 
-                            else:
-                                # This is a forward edge in the loop DAG
-                                self._connections_loop_dag[global_depth].append(con)
+                    if not is_loop_closing:
+                        # This is a forward edge in the loop DAG
+                        self._connections_loop_dag[global_depth].append(con)
                         
             #update global depth counter for the next SCC
             current_depth += max_local_depth + 1
