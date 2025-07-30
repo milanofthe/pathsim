@@ -535,6 +535,10 @@ class Subsystem(Block):
         t : float
             evaluation time for system function
         """
+
+        #reset / initialize loop accelerators
+        for connection in self.graph.loop_closing_connections():
+            connection.init_accelerator()
         
         #perform solver iterations on algebraic loops
         for iteration in range(1, self.iterations_max):
@@ -548,8 +552,6 @@ class Subsystem(Block):
 
                 #step accelerated connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
-                    
-                    #skip inactive connections
                     if connection: connection.update()
 
             #step loop closing connections
@@ -560,16 +562,12 @@ class Subsystem(Block):
                 if not connection:
                     continue
 
-                #reset solver at first iteration
-                if iteration == 1: 
-                    connection.reset()
-
                 #step fixed-point solver (for alg. loops)
-                err = connection.step() 
+                err = connection.step_accelerator() 
                 if err > max_error:
                     max_error = err
 
-            #check convergence
+            #check convergence after first iteration
             if max_error <= self.tolerance_fpi:
                 return
 

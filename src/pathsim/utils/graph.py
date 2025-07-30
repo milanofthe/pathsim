@@ -447,13 +447,13 @@ class Graph:
                                 is_loop_closing = True
                                 break
 
-                    if not is_loop_closing:
-                        # This is a forward edge in the loop DAG
-                        self._connections_loop_dag[global_depth].append(con)
+                if not is_loop_closing:
+                    # This is a forward edge in the loop DAG
+                    self._connections_loop_dag[global_depth].append(con)
                         
             #update global depth counter for the next SCC
             current_depth += max_local_depth + 1
-    
+        
         #compute depth of loop DAG
         self._loop_depth = max(self._blocks_loop_dag) + 1 if self._blocks_loop_dag else 0
 
@@ -609,3 +609,163 @@ class Graph:
             Connections that close the algebraic loops from the broke loop DAG
         """
         return self._loop_closing_connections
+
+
+
+    def to_graphviz(self, title="System Graph", show_loop_details=True):
+        """Generate GraphViz DOT format for the complete graph.
+        
+        Parameters
+        ----------
+        title : str
+            Title for the graph
+        show_loop_details : bool
+            Whether to highlight loop-closing connections
+            
+        Returns
+        -------
+        str
+            DOT format string for GraphViz
+        """
+        lines = [f'digraph "{title}" {{']
+        lines.append('  rankdir=TB;')  # Top to bottom
+        lines.append('  node [shape=box, style=filled, fixedsize=true, width=2, height=0.8];')
+        lines.append(f'  label="{title}";')
+        lines.append('  labelloc=t;')
+        lines.append('  ranksep=1.0;')  # Vertical spacing between levels
+        lines.append('  nodesep=0.5;')  # Horizontal spacing between nodes
+        
+        # Create set of loop blocks and loop-closing connections
+        loop_blocks = {b for d in range(self._loop_depth) for b in self._blocks_loop_dag[d]}
+        loop_closing_set = set(self._loop_closing_connections) if show_loop_details else set()
+        
+        # Determine maximum depth
+        max_depth = max(self._alg_depth, self._loop_depth)
+        
+        # Create clusters for DAG and loops
+        if self._alg_depth > 0:
+            lines.append('  subgraph cluster_dag {')
+            lines.append('    label="Acyclic Graph";')
+            lines.append('    style=filled;')
+            lines.append('    fillcolor=lightgray;')
+            
+            for depth in range(self._alg_depth):
+                lines.append(f'    subgraph cluster_dag_{depth} {{')
+                lines.append('      rank=same;')
+                lines.append(f'      label="depth {depth}";')
+                
+                for blk in self._blocks_dag[depth]:
+                    node_id = f'n{id(blk)}'
+                    label = blk.__class__.__name__
+                    
+                    # Color based on block type
+                    if len(blk) == 0:
+                        color = "lightcoral"  # Red for dynamic blocks
+                    else:
+                        color = "lightblue"   # Blue for algebraic blocks
+                    
+                    lines.append(f'      {node_id} [label="{label}", fillcolor={color}];')
+                
+                lines.append('    }')
+            lines.append('  }')
+        
+        if self._loop_depth > 0:
+            lines.append('  subgraph cluster_loops {')
+            lines.append('    label="Algebraic Loops";')
+            lines.append('    style=filled;')
+            lines.append('    fillcolor=lightgray;')
+            
+            for depth in range(self._loop_depth):
+                lines.append(f'    subgraph cluster_loop_{depth} {{')
+                lines.append('      rank=same;')
+                lines.append(f'      label="depth {depth}";')
+                
+                for blk in self._blocks_loop_dag[depth]:
+                    node_id = f'n{id(blk)}'
+                    label = blk.__class__.__name__
+                    
+                    # Color based on block type
+                    if len(blk) == 0:
+                        color = "lightcoral"  # Red for dynamic blocks
+                    else:
+                        color = "lightblue"   # Blue for algebraic blocks
+                    
+                    lines.append(f'      {node_id} [label="{label}", fillcolor={color}];')
+                
+                lines.append('    }')
+            lines.append('  }')
+        
+        # Add invisible edges to align depths across DAG and loop clusters
+        lines.append('  // Invisible edges to align depths')
+        for depth in range(max_depth):
+            dag_block = None
+            loop_block = None
+            
+            if depth < self._alg_depth and self._blocks_dag[depth]:
+                dag_block = self._blocks_dag[depth][0]
+            if depth < self._loop_depth and self._blocks_loop_dag[depth]:
+                loop_block = self._blocks_loop_dag[depth][0]
+            
+            if dag_block and loop_block:
+                lines.append(f'  n{id(dag_block)} -> n{id(loop_block)} [style=invis];')
+        
+        # Add invisible edges to maintain vertical ordering within each cluster
+        for depth in range(max_depth - 1):
+            # DAG vertical ordering
+            if depth < self._alg_depth - 1:
+                if self._blocks_dag[depth] and self._blocks_dag[depth + 1]:
+                    src_id = f'n{id(self._blocks_dag[depth][0])}'
+                    tgt_id = f'n{id(self._blocks_dag[depth + 1][0])}'
+                    lines.append(f'  {src_id} -> {tgt_id} [style=invis];')
+            
+            # Loop vertical ordering
+            if depth < self._loop_depth - 1:
+                if self._blocks_loop_dag[depth] and self._blocks_loop_dag[depth + 1]:
+                    src_id = f'n{id(self._blocks_loop_dag[depth][0])}'
+                    tgt_id = f'n{id(self._blocks_loop_dag[depth + 1][0])}'
+                    lines.append(f'  {src_id} -> {tgt_id} [style=invis];')
+        
+        # Add all visible edges
+        for con in self.connections:
+            src_id = f'n{id(con.source.block)}'
+            
+            # Determine edge style
+            if con in loop_closing_set:
+                style = 'color=red, penwidth=2'
+            else:
+                style = 'color=black'
+            
+            for target in con.targets:
+                tgt_id = f'n{id(target.block)}'
+                
+                # Only add edge if both nodes are in our graph
+                if (con.source.block in self.blocks and target.block in self.blocks):
+                    lines.append(f'  {src_id} -> {tgt_id} [{style}];')
+                
+        lines.append('}')
+        return '\n'.join(lines)
+
+
+    def save_graphviz(self, filename, **kwargs):
+        """Save graph visualization to a file.
+        
+        Parameters
+        ----------
+        filename : str
+            Output filename (without extension)
+        **kwargs
+            Additional arguments passed to to_graphviz()
+        """
+        dot_content = self.to_graphviz(**kwargs)
+        
+        # Save DOT file
+        with open(f'{filename}.dot', 'w') as f:
+            f.write(dot_content)
+        
+        # Try to generate image using graphviz if available
+        try:
+            import subprocess
+            subprocess.run(['dot', '-Tpng', f'{filename}.dot', '-o', f'{filename}.png'], check=True)
+            print(f"Saved visualizations to {filename}.dot, {filename}.png, and {filename}.svg")
+        except:
+            print(f"Saved DOT file to {filename}.dot (install graphviz to generate images)")
