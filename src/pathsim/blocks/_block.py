@@ -70,18 +70,22 @@ class Block(Serializable):
     events : list[Event]
         list of internal events, for mixed signal blocks
     _active : bool
-        flag that sets the block active or inactive   
+        flag that sets the block active or inactive
     op_alg : Operator | DynamicOperator | None
         internal callable operator for algebraic components of block
     op_dyn : DynamicOperator | None
         internal callable operator for dynamic (ODE) components of block
     """
 
+    #number of max input and output ports
+    _n_in_max = None
+    _n_out_max = None
+
     def __init__(self):
 
         #registers to hold input and output values
-        self.inputs  = Register()
-        self.outputs = Register()
+        self.inputs  = Register(1 if self._n_in_max is None else self._n_in_max)
+        self.outputs = Register(1 if self._n_out_max is None else self._n_out_max)
 
         #initialize integration engine as 'None' by default
         self.engine = None
@@ -191,6 +195,17 @@ class Block(Serializable):
         """
         nx = len(self.engine) if self.engine else 0
         return 1, nx
+
+
+    def shape(self):
+        """Get the number of input and output ports of the block
+
+        Returns
+        -------
+        shape : tuple[int]
+            number of input and output ports
+        """ 
+        return len(self.inputs), len(self.outputs)
 
 
     # methods for visualization ---------------------------------------------------------

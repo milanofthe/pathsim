@@ -99,6 +99,10 @@ class Spectrum(Block):
         labels for the inputs
     """
 
+    #max number of ports
+    _n_in_max = None
+    _n_out_max = 0
+
     def __init__(self, freq=[], t_wait=0.0, alpha=0.0, labels=[]):
         super().__init__()
         

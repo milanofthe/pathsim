@@ -39,9 +39,15 @@ class WhiteNoise(Block):
     n_samples : int
         internal sample counter 
     """
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
 
     def __init__(self, spectral_density=1, sampling_rate=None):
         super().__init__()
+
+        #clear all inputs because its a source block
+        self.inputs.clear()
 
         self.spectral_density = spectral_density
         self.sampling_rate = sampling_rate 
@@ -92,6 +98,7 @@ class WhiteNoise(Block):
         """
         self.outputs[0] = self.noise
 
+
 class PinkNoise(Block):
     """Pink noise (1/f) source using the Voss-McCartney algorithm.
 
@@ -119,8 +126,15 @@ class PinkNoise(Block):
         internal random numbers for octaves in the Voss-McCartney algorithm
     """
 
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(self, spectral_density=1, num_octaves=16, sampling_rate=None):
         super().__init__()
+        
+        #clear all inputs because its a source block
+        self.inputs.clear()
 
         self.spectral_density = spectral_density
         self.num_octaves = num_octaves

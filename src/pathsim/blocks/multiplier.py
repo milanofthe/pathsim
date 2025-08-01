@@ -40,6 +40,9 @@ class Multiplier(Block):
     op_alg : Operator
         internal algebraic operator that wraps 'prod'
     """
+    #max number of ports
+    _n_in_max = None
+    _n_out_max = 1
 
     def __init__(self):
         super().__init__()

@@ -36,6 +36,10 @@ class Counter(Block):
         internal zero crossing event
     """
 
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
+
     def __init__(self, start=0, threshold=0.0):
         super().__init__()
 
