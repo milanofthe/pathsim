@@ -35,7 +35,7 @@ class ButterworthLowpassFilter(StateSpace):
         filter order
     """
 
-    def __init__(self, Fc, n):
+    def __init__(self, Fc=100, n=2):
 
         #filter parameters
         self.Fc = Fc
@@ -66,7 +66,7 @@ class ButterworthHighpassFilter(StateSpace):
         filter order
     """
 
-    def __init__(self, Fc, n):
+    def __init__(self, Fc=100, n=2):
 
         #filter parameters
         self.Fc = Fc
@@ -91,13 +91,13 @@ class ButterworthBandpassFilter(StateSpace):
     
     Parameters
     ----------
-    Fc : float
-        corner frequency of the filter in [Hz]
+    Fc : list[float]
+        corner frequencies (left, right) of the filter in [Hz]
     n : int
         filter order
     """
 
-    def __init__(self, Fc, n):
+    def __init__(self, Fc=[50, 100], n=2):
 
         #filter parameters
         self.Fc = np.asarray(Fc)
@@ -129,7 +129,7 @@ class ButterworthBandstopFilter(StateSpace):
         filter order
     """
 
-    def __init__(self, Fc, n):
+    def __init__(self, Fc=[50, 100], n=2):
 
         #filter parameters
         self.Fc = np.asarray(Fc)
@@ -163,7 +163,7 @@ class AllpassFilter(StateSpace):
         number of cascades
     """
 
-    def __init__(self, fs, n=1):
+    def __init__(self, fs=100, n=1):
 
         #filter parameters
         self.fs = fs
