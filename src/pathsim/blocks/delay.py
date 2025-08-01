@@ -59,6 +59,10 @@ class Delay(Block):
         internal interpolatable adaptive rolling buffer
     """
 
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
+
     def __init__(self, tau=1e-3):
         super().__init__()
 

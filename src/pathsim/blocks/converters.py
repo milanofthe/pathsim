@@ -60,6 +60,11 @@ class ADC(Block):
     events : list[Schedule]
         Internal scheduled event responsible for periodic sampling and conversion.
     """
+
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = None
+
     def __init__(self, n_bits=4, span=[-1, 1], T=1, tau=0):
         super().__init__()
 
@@ -147,6 +152,11 @@ class DAC(Block):
     events : list[Schedule]
         Internal scheduled event responsible for periodic updates.
     """
+
+    #max number of ports
+    _n_in_max = None
+    _n_out_max = 1
+
     def __init__(self, n_bits=4, span=[-1, 1], T=1, tau=0):
         super().__init__()
 

@@ -62,6 +62,10 @@ class Differentiator(Block):
 
     """
 
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
+
     def __init__(self, f_max=1e2):
         super().__init__()
 

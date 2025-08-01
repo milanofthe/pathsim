@@ -29,6 +29,10 @@ class Constant(Block):
         constant defining block output
     """
 
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(self, value=1):
         super().__init__()
         self.value = value
@@ -125,6 +129,10 @@ class Source(Block):
         function defining time dependent block output
     """
 
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(self, func=lambda t: 1):
         super().__init__()
 
@@ -170,6 +178,10 @@ class TriangleWaveSource(Block):
     phase : float
         phase of the triangle wave
     """
+
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
 
     def __init__(self, frequency=1, amplitude=1, phase=0):
         super().__init__()
@@ -219,6 +231,10 @@ class SinusoidalSource(Block):
         phase of the sinusoid
     """
 
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(self, frequency=1, amplitude=1, phase=0):
         super().__init__()
 
@@ -248,6 +264,10 @@ class GaussianPulseSource(Block):
     tau : float
         time delay of the gaussian pulse 
     """
+
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
 
     def __init__(self, amplitude=1, f_max=1e3, tau=0.0):
         super().__init__()
@@ -315,6 +335,10 @@ class SinusoidalPhaseNoiseSource(Block):
     t_max : float
         most recent sampling time, to ensure timing for sampling bins
     """
+
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
 
     def __init__(
         self, 
@@ -463,6 +487,10 @@ class ChirpPhaseNoiseSource(Block):
     sampling_rate : float
         number of samples per unit time for the internal random number generators
     """
+
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
 
     def __init__(
         self, 
@@ -629,6 +657,11 @@ class PulseSource(Block):
     _phase_start_time : float
         Simulation time when the current phase began.
     """
+
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(
         self, 
         amplitude=1.0, 
@@ -789,6 +822,10 @@ class ClockSource(Block):
         internal scheduled event list 
     """
 
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(self, T=1, tau=0):
         super().__init__()
 
@@ -851,6 +888,10 @@ class SquareWaveSource(Block):
         internal scheduled events 
     """
 
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(self, amplitude=1, frequency=1, phase=0):
         super().__init__()
 
@@ -901,6 +942,10 @@ class StepSource(Block):
     events : list[Schedule]
         internal scheduled event 
     """
+
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
 
     def __init__(self, amplitude=1, tau=0.0):
         super().__init__()

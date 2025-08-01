@@ -75,6 +75,10 @@ class Adder(Block):
         internal algebraic operator
     """
 
+    #max number of ports
+    _n_in_max = None
+    _n_out_max = 1
+
     def __init__(self, operations=None):
         super().__init__()
 

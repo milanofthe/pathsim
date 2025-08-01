@@ -50,6 +50,10 @@ class Scope(Block):
     recording : dict
         recording, where key is time, and value the recorded values
     """
+    
+    #max number of ports
+    _n_in_max = None
+    _n_out_max = 0
 
     def __init__(self, sampling_rate=None, t_wait=0.0, labels=[]):
         super().__init__()

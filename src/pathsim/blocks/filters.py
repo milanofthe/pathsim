@@ -35,6 +35,10 @@ class ButterworthLowpassFilter(StateSpace):
         filter order
     """
 
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
+
     def __init__(self, Fc=100, n=2):
 
         #filter parameters
@@ -65,6 +69,10 @@ class ButterworthHighpassFilter(StateSpace):
     n : int
         filter order
     """
+
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
 
     def __init__(self, Fc=100, n=2):
 
@@ -97,6 +105,10 @@ class ButterworthBandpassFilter(StateSpace):
         filter order
     """
 
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
+
     def __init__(self, Fc=[50, 100], n=2):
 
         #filter parameters
@@ -128,6 +140,10 @@ class ButterworthBandstopFilter(StateSpace):
     n : int
         filter order
     """
+
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
 
     def __init__(self, Fc=[50, 100], n=2):
 
@@ -162,6 +178,10 @@ class AllpassFilter(StateSpace):
     n : int
         number of cascades
     """
+    
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
 
     def __init__(self, fs=100, n=1):
 

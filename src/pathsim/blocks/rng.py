@@ -36,6 +36,10 @@ class RNG(Block):
         internal random number state
     """
 
+    #max number of ports
+    _n_in_max = 0
+    _n_out_max = 1
+
     def __init__(self, sampling_rate=None):
         super().__init__()
 

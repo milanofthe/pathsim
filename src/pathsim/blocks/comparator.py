@@ -44,6 +44,10 @@ class Comparator(Block):
         internal zero crossing event
     """
 
+    #max number of ports
+    _n_in_max = 1
+    _n_out_max = 1
+
     def __init__(self, threshold=0, tolerance=1e-4, span=[-1, 1]):
         super().__init__()
 
