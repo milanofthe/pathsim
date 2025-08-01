@@ -70,7 +70,7 @@ class Block(Serializable):
     events : list[Event]
         list of internal events, for mixed signal blocks
     _active : bool
-        flag that sets the block active or inactive   
+        flag that sets the block active or inactive
     op_alg : Operator | DynamicOperator | None
         internal callable operator for algebraic components of block
     op_dyn : DynamicOperator | None
@@ -191,6 +191,17 @@ class Block(Serializable):
         """
         nx = len(self.engine) if self.engine else 0
         return 1, nx
+        
+
+    def shape(self):
+        """Get the number of input and output ports of the block
+
+        Returns
+        -------
+        shape : tuple[int]
+            number of input and output ports
+        """
+        return len(self.inputs), len(self.outputs)
 
 
     # methods for visualization ---------------------------------------------------------

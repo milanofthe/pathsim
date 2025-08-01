@@ -61,6 +61,12 @@ class Register:
             self._values[k] = 0.0
 
 
+    def clear(self):
+        """Fully clear the register of all values to length is zero."""
+        self._values.clear()
+        self._sorted_keys.clear()
+        
+
     def to_array(self):
         """Convert the register to a numpy array with entries 
         sorted by ports.
