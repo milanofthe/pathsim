@@ -55,7 +55,7 @@ class Scope(Block):
     _n_in_max = None
     _n_out_max = 0
 
-    def __init__(self, sampling_rate=None, t_wait=0.0, labels=[]):
+    def __init__(self, sampling_rate=None, t_wait=0.0, labels=None):
         super().__init__()
         
         #time delay until start recording
@@ -65,7 +65,7 @@ class Scope(Block):
         self.sampling_rate = sampling_rate
 
         #labels for plotting and saving data
-        self.labels = labels
+        self.labels = labels if labels is not None else []
 
         #set recording data and time
         self.recording = {}
