@@ -173,7 +173,7 @@ class AllpassFilter(StateSpace):
     
     Parameters
     ----------
-    f_s : float
+    fs : float
         frequency for 90 deg phase shift of 1st order allpass
     n : int
         number of cascades
