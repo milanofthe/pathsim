@@ -39,6 +39,14 @@ class TestScope(unittest.TestCase):
         self.assertEqual(S.t_wait, 1.0)
         self.assertEqual(S.labels, ["1", "2"])
 
+    def test_inputs_default(self):
+        """Catches bug in #60"""
+
+        S1 = Scope()
+        S2 = Scope()
+
+        S1.labels.append('A')
+        assert S2.labels == []
 
     def test_len(self):
         
