@@ -17,8 +17,6 @@ import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mpl_toolkits.mplot3d import Axes3D
-
 from ._block import Block
 from ..utils.realtimeplotter import RealtimePlotter
 
@@ -55,7 +53,7 @@ class Scope(Block):
     _n_in_max = None
     _n_out_max = 0
 
-    def __init__(self, sampling_rate=None, t_wait=0.0, labels=[]):
+    def __init__(self, sampling_rate=None, t_wait=0.0, labels=None):
         super().__init__()
         
         #time delay until start recording
@@ -65,7 +63,7 @@ class Scope(Block):
         self.sampling_rate = sampling_rate
 
         #labels for plotting and saving data
-        self.labels = labels
+        self.labels = labels if labels is not None else []
 
         #set recording data and time
         self.recording = {}
