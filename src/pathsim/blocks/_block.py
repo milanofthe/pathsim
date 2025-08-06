@@ -214,9 +214,6 @@ class Block(Serializable):
         return len(self.inputs), len(self.outputs)
 
 
-    def info(self):
-
-
     # methods for visualization ---------------------------------------------------------
 
     def plot(self, *args, **kwargs):
