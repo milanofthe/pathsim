@@ -33,21 +33,24 @@ class PortReference:
 
     def __init__(self, block=None, ports=None):
 
+        #default port is '0'
+        _ports = [0] if ports is None else ports 
+
         #type validation for ports
-        if not (isinstance(ports, list) and all(isinstance(p, (int, str)) for p in ports)):            
-            raise ValueError(f"'ports' must be 'list[int, str]' but is '{type(ports)}'!")
+        if not (isinstance(_ports, list) and all(isinstance(p, (int, str)) for p in _ports)):            
+            raise ValueError(f"'ports' must be 'list[int, str]' but is '{type(_ports)}'!")
 
         #key existance validation for string ports
-        for p in ports:
+        for p in _ports:
             if not (p in block.inputs or p in block.outputs):        
                 raise ValueError(f"Port '{p}' not defined for Block {block}!")
 
         #port uniqueness validation
-        if len(ports) != len(set(ports)):
+        if len(_ports) != len(set(_ports)):
             raise ValueError("'ports' must be unique!")
 
         self.block = block
-        self.ports = [0] if ports is None else ports 
+        self.ports = _ports
 
 
     def __len__(self):
