@@ -44,6 +44,9 @@ class Multiplier(Block):
     _n_in_max = None
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+
     def __init__(self):
         super().__init__()
 

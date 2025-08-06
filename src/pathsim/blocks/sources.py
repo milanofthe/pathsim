@@ -33,6 +33,9 @@ class Constant(Block):
     _n_in_max = 0
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+
     def __init__(self, value=1):
         super().__init__()
         self.value = value
@@ -133,6 +136,9 @@ class Source(Block):
     _n_in_max = 0
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+
     def __init__(self, func=lambda t: 1):
         super().__init__()
 
@@ -182,6 +188,9 @@ class TriangleWaveSource(Block):
     #max number of ports
     _n_in_max = 0
     _n_out_max = 1
+
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
 
     def __init__(self, frequency=1, amplitude=1, phase=0):
         super().__init__()
@@ -235,6 +244,9 @@ class SinusoidalSource(Block):
     _n_in_max = 0
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+
     def __init__(self, frequency=1, amplitude=1, phase=0):
         super().__init__()
 
@@ -268,6 +280,9 @@ class GaussianPulseSource(Block):
     #max number of ports
     _n_in_max = 0
     _n_out_max = 1
+
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
 
     def __init__(self, amplitude=1, f_max=1e3, tau=0.0):
         super().__init__()
@@ -339,6 +354,9 @@ class SinusoidalPhaseNoiseSource(Block):
     #max number of ports
     _n_in_max = 0
     _n_out_max = 1
+
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
 
     def __init__(
         self, 
@@ -491,6 +509,9 @@ class ChirpPhaseNoiseSource(Block):
     #max number of ports
     _n_in_max = 0
     _n_out_max = 1
+
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
 
     def __init__(
         self, 
@@ -662,6 +683,9 @@ class PulseSource(Block):
     _n_in_max = 0
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+
     def __init__(
         self, 
         amplitude=1.0, 
@@ -826,6 +850,9 @@ class ClockSource(Block):
     _n_in_max = 0
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+
     def __init__(self, T=1, tau=0):
         super().__init__()
 
@@ -892,6 +919,9 @@ class SquareWaveSource(Block):
     _n_in_max = 0
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+
     def __init__(self, amplitude=1, frequency=1, phase=0):
         super().__init__()
 
@@ -947,6 +977,9 @@ class StepSource(Block):
     _n_in_max = 0
     _n_out_max = 1
 
+    #maps for input and output port labels
+    _port_map_out = {"out": 0}
+    
     def __init__(self, amplitude=1, tau=0.0):
         super().__init__()
 
