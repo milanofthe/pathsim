@@ -37,11 +37,20 @@ class PortReference:
         _ports = [0] if ports is None else ports 
 
         #type validation for ports
-        if not (isinstance(_ports, list) and all(isinstance(p, (int, str)) for p in _ports)):            
-            raise ValueError(f"'ports' must be 'list[int, str]' but is '{type(_ports)}'!")
-
-        #key existance validation for string ports
+        if not isinstance(_ports, list):            
+            raise ValueError(f"'ports' must be list[int, str] but is '{type(_ports)}'!")
+        
         for p in _ports:
+
+            #type validation for individual ports
+            if not isinstance(p, (int, str)):
+                raise ValueError(f"Port '{p}' must be (int, str) but is '{type(p)}'!")
+
+            #validation for positive interger
+            if isinstance(p, int) and p < 0:
+                raise ValueError(f"Port '{p}' is int but must be positive!")
+            
+            #key existance validation for string ports
             if not (p in block.inputs or p in block.outputs):        
                 raise ValueError(f"Port '{p}' not defined for Block {block}!")
 
