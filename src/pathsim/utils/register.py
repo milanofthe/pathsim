@@ -3,8 +3,6 @@
 ##                                   Register Class
 ##                            (pathsim/utils/register.py)
 ##
-##                                 Milan Rother 2025
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -35,6 +33,8 @@ class Register:
         internal dict that stores the values of the register
     _sorted_keys : list[int]
         internal sorted list of port keys for fast ordered iterations of `_values`
+    _mapping : dict[str: int]
+        internal mapping for port aliases from string to int (index)
     """
 
     __slots__ = ["_values", "_sorted_keys", "_mapping"]
@@ -125,6 +125,22 @@ class Register:
             if k not in self._values:
                 insort(self._sorted_keys, k)
             self._values[k] = a
+
+
+    def __contains__(self, key):
+        """Check if a port key is in mapping or is integer 
+
+        Parameters
+        ----------
+        key : int, str
+            port key to check
+
+        Returns
+        -------
+        in : bool
+            key exists in register
+        """
+        return key in self._mapping or isinstance(key, int)
             
 
     def __setitem__(self, key, val):

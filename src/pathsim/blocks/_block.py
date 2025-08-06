@@ -5,9 +5,6 @@
 ##
 ##            This module defines the base 'Block' class that is the parent 
 ##         to all other blocks and can serve as a base for new or custom blocks
-##                                
-##
-##                                  Milan Rother 2024
 ##
 #########################################################################################
 
@@ -81,21 +78,19 @@ class Block(Serializable):
     _n_in_max = None
     _n_out_max = None
 
-    #maps for port labels to indices
+    #maps for input and output port labels to indices
     _port_map_in = None
     _port_map_out = None
 
     def __init__(self):
 
+        #default register sizes
+        _n_in = 1 if self._n_in_max is None else self._n_in_max
+        _n_out = 1 if self._n_out_max is None else self._n_out_max
+
         #registers to hold input and output values
-        self.inputs = Register(
-            size=1 if self._n_in_max is None else self._n_in_max, 
-            mapping=self._port_map_in
-            )
-        self.outputs = Register(
-            size=1 if self._n_out_max is None else self._n_out_max,
-            mapping=self._port_map_out
-            )
+        self.inputs = Register(size=_n_in, mapping=self._port_map_in)
+        self.outputs = Register(size=_n_out, mapping=self._port_map_out)
 
         #initialize integration engine as 'None' by default
         self.engine = None
@@ -137,8 +132,8 @@ class Block(Serializable):
 
         Parameters
         ----------
-        key : int, slice, list, tuple
-            port indices
+        key : int, str, slice, tuple[int, str], list[int, str]
+            port indices or port names, or list / tuple of them
 
         Returns
         -------
@@ -167,11 +162,6 @@ class Block(Serializable):
                 #port type validation
                 if not isinstance(k, (int, str)):
                     raise ValueError(f"Port '{k}' must be (int, str) but is '{type(k)}'!")
-
-                #mapping validation
-                if isinstance(k, str):
-                    if not (k in self._port_map_in or k in self._port_map_out):
-                        raise ValueError(f"Port '{k}' has no integer mapping!")
             
             #duplicate validation
             if len(set(key)) < len(key):
@@ -180,11 +170,6 @@ class Block(Serializable):
             return PortReference(self, list(key))
 
         elif isinstance(key, (int, str)):
-
-            #mapping validation
-            if isinstance(key, str):
-                if not (key in self._port_map_in or key in self._port_map_out):
-                    raise ValueError(f"Port '{key}' has no integer mapping!")
 
             #standard key
             return PortReference(self, [key])
@@ -227,6 +212,9 @@ class Block(Serializable):
             number of input and output ports
         """ 
         return len(self.inputs), len(self.outputs)
+
+
+    def info(self):
 
 
     # methods for visualization ---------------------------------------------------------

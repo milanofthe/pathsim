@@ -3,8 +3,6 @@
 ##                                PORT REFERENCE CLASS 
 ##                              (utils/portreference.py)
 ##                              
-##                                  Milan Rother 2025
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -26,8 +24,8 @@ class PortReference:
     ----------
     block : Block
         internal block reference
-    ports : list[int]
-        list of port indices
+    ports : list[int, str]
+        list of port indices or names
     """
 
     __slots__ = ["block", "ports"]
@@ -39,7 +37,12 @@ class PortReference:
         if not (isinstance(ports, list) and all(isinstance(p, (int, str)) for p in ports)):            
             raise ValueError(f"'ports' must be 'list[int, str]' but is '{type(ports)}'!")
 
-        #unique ports
+        #key existance validation for string ports
+        for p in ports:
+            if not (p in block.inputs or p in block.outputs):        
+                raise ValueError(f"Port '{p}' not defined for Block {block}!")
+
+        #port uniqueness validation
         if len(ports) != len(set(ports)):
             raise ValueError("'ports' must be unique!")
 
