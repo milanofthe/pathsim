@@ -33,22 +33,18 @@ class PortReference:
     __slots__ = ["block", "ports"]
 
 
-    def __init__(self, block=None, ports=[0]):
+    def __init__(self, block=None, ports=None):
 
         #type validation for ports
-        if not isinstance(ports, list):            
-            raise ValueError(f"'ports' must be 'list[int]' but is '{type(ports)}'!")
-
-        #ports are positive integers
-        if not all(isinstance(p, int) and p >= 0 for p in ports):
-            raise ValueError("'ports' must be positive integers!")   
+        if not (isinstance(ports, list) and all(isinstance(p, (int, str)) for p in ports)):            
+            raise ValueError(f"'ports' must be 'list[int, str]' but is '{type(ports)}'!")
 
         #unique ports
         if len(ports) != len(set(ports)):
             raise ValueError("'ports' must be unique!")
 
         self.block = block
-        self.ports = ports 
+        self.ports = [0] if ports is None else ports 
 
 
     def __len__(self):

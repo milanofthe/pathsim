@@ -81,11 +81,21 @@ class Block(Serializable):
     _n_in_max = None
     _n_out_max = None
 
+    #maps for port labels to indices
+    _port_map_in = None
+    _port_map_out = None
+
     def __init__(self):
 
         #registers to hold input and output values
-        self.inputs  = Register(1 if self._n_in_max is None else self._n_in_max)
-        self.outputs = Register(1 if self._n_out_max is None else self._n_out_max)
+        self.inputs = Register(
+            size=1 if self._n_in_max is None else self._n_in_max, 
+            mapping=self._port_map_in
+            )
+        self.outputs = Register(
+            size=1 if self._n_out_max is None else self._n_out_max,
+            mapping=self._port_map_out
+            )
 
         #initialize integration engine as 'None' by default
         self.engine = None
@@ -151,11 +161,17 @@ class Block(Serializable):
             return PortReference(self, ports)
 
         elif isinstance(key, (tuple, list)):
-
-            #port type validation
+            
             for k in key:
-                if not isinstance(k, int):
-                    raise ValueError(f"Port must be 'int' but is '{type(k)}'!")
+
+                #port type validation
+                if not isinstance(k, (int, str)):
+                    raise ValueError(f"Port '{k}' must be (int, str) but is '{type(k)}'!")
+
+                #mapping validation
+                if isinstance(k, str):
+                    if not (k in self._port_map_in or k in self._port_map_out):
+                        raise ValueError(f"Port '{k}' has no integer mapping!")
             
             #duplicate validation
             if len(set(key)) < len(key):
@@ -163,13 +179,18 @@ class Block(Serializable):
 
             return PortReference(self, list(key))
 
-        elif isinstance(key, int):
+        elif isinstance(key, (int, str)):
 
-            #standard integer key
+            #mapping validation
+            if isinstance(key, str):
+                if not (key in self._port_map_in or key in self._port_map_out):
+                    raise ValueError(f"Port '{key}' has no integer mapping!")
+
+            #standard key
             return PortReference(self, [key])
 
         else:
-            raise ValueError(f"Port has to be 'int', 'tuple', 'list' or 'slice' but is '{type(key)}'!")
+            raise ValueError(f"Port must be type (int, str, slice, tuple[int, str], list[int, str]) but is '{type(key)}'!")
 
 
     def __call__(self):

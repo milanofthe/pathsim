@@ -37,13 +37,13 @@ class Register:
         internal sorted list of port keys for fast ordered iterations of `_values`
     """
 
-    __slots__ = ["_values", "_sorted_keys"]
+    __slots__ = ["_values", "_sorted_keys", "_mapping"]
 
 
-    def __init__(self, size=1):
+    def __init__(self, size=1, mapping=None):
         self._values = {k:0.0 for k in range(size)}
         self._sorted_keys = list(range(size))
-
+        self._mapping = {} if mapping is None else mapping
 
     def __len__(self):
         """Returns the number of register entries / ports."""
@@ -53,6 +53,22 @@ class Register:
     def __iter__(self):
         for k in self._sorted_keys:
             yield self._values[k]
+
+
+    def _map(self, key):
+        """Map string keys to integers defined in '_mapping'
+
+        Parameters
+        ----------
+        key : int, str
+            port key, to map to index
+
+        Returns
+        -------
+        _key : int
+            port index 
+        """
+        return self._mapping.get(key, key)
 
 
     def reset(self):
@@ -117,14 +133,15 @@ class Register:
 
         Parameters
         ----------
-        key : int
+        key : int, str
             port key, where to set value
         val : float, obj
             value to set at port
         """
-        if key not in self._values:
-            insort(self._sorted_keys, key) 
-        self._values[key] = val
+        _key = self._map(key)
+        if _key not in self._values:
+            insort(self._sorted_keys, _key) 
+        self._values[_key] = val
 
 
     def __getitem__(self, key):
@@ -133,7 +150,7 @@ class Register:
         
         Parameters
         ----------
-        key : int
+        key : int, str
             port key, where to get value from
 
         Returns
@@ -141,4 +158,5 @@ class Register:
         out : float, obj
             value from port at `key` position
         """
-        return self._values.get(key, 0.0)
+        _key = self._map(key)
+        return self._values.get(_key, 0.0)
