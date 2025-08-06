@@ -71,16 +71,16 @@ class ADC(Block):
     def __init__(self, n_bits=4, span=[-1, 1], T=1, tau=0):
         super().__init__()
 
+        self.n_bits = n_bits
+        self.span = span
+        self.T = T
+        self.tau = tau
+
         #port alias map
         self._port_map_out = {f"b{self.n_bits-n}":n for n in range(self.n_bits)}
         
         #initialize outputs to have 'n_bits' ports
         self.outputs = Register(size=self.n_bits, mapping=self._port_map_out)
-
-        self.n_bits = n_bits
-        self.span = span
-        self.T = T
-        self.tau = tau
 
         def _sample(t):
 
@@ -169,16 +169,16 @@ class DAC(Block):
     def __init__(self, n_bits=4, span=[-1, 1], T=1, tau=0):
         super().__init__()
 
+        self.n_bits = n_bits
+        self.span = span
+        self.T = T
+        self.tau = tau
+
         #port alias map
         self._port_map_in = {f"b{self.n_bits-n}":n for n in range(self.n_bits)}
 
         #initialize inputs to expect 'n_bits' entries
         self.inputs = Register(self.n_bits, mapping=self._port_map_in)
-
-        self.n_bits = n_bits
-        self.span = span
-        self.T = T
-        self.tau = tau
 
         def _sample(t):
             
