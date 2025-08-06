@@ -72,6 +72,16 @@ class Block(Serializable):
         internal callable operator for algebraic components of block
     op_dyn : DynamicOperator | None
         internal callable operator for dynamic (ODE) components of block
+    _n_in_max : int | None
+        maximum number of allowed input ports, None -> infinite
+    _n_out_max : int | None
+        maximum number of allowed output ports, None -> infinite
+    _port_map_in : dict[str: int] | None
+        string aliases for input port numbers to be referenced in 
+        connections or for internal use
+    _port_map_out : dict[str: int] | None
+        string aliases for output port numbers to be referenced in 
+        connections or for internal use
     """
 
     #number of max input and output ports
