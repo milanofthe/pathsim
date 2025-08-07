@@ -52,7 +52,7 @@ class PortReference:
             
             #key existance validation for string ports
             if not (p in block.inputs or p in block.outputs):        
-                raise ValueError(f"Port '{p}' not defined for Block {block}!")
+                raise ValueError(f"Port alias '{p}' not defined for Block {block}!")
 
         #port uniqueness validation
         if len(_ports) != len(set(_ports)):
@@ -65,6 +65,24 @@ class PortReference:
     def __len__(self):
         """The number of ports managed by 'PortReference'"""
         return len(self.ports)
+
+
+    def _validate_input_ports(self):
+        """Check the existance of the input ports, specifically string port 
+        aliases for the block inputs. Raises a ValueError if not existent.
+        """
+        for p in self.ports:
+            if not p in self.block.inputs:
+                raise ValueError(f"Input port '{p}' not defined for Block {self.block}!")
+
+
+    def _validate_output_ports(self):
+        """Check the existance of the output ports, specifically string port 
+        aliases for the block inputs. Raises a ValueError if not existent.
+        """
+        for p in self.ports:
+            if not p in self.block.outputs:
+                raise ValueError(f"Output port '{p}' not defined for Block {self.block}!")
 
 
     def to(self, other):
