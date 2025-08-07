@@ -72,6 +72,10 @@ class FIR(Block):
     #max number of ports
     _n_in_max = 1
     _n_out_max = 1
+
+    #maps for input and output port labels
+    _port_map_in = {"in": 0}
+    _port_map_out = {"out": 0}
     
     def __init__(self, coeffs=[1.0], T=1, tau=0):
         super().__init__()

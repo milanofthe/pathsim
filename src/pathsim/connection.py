@@ -116,6 +116,22 @@ class Connection:
         C = Connection(B1[prts_1], B2[prts_2])
 
 
+    Another way to define the ports is by using strings. Some blocks have internal 
+    aliases for the ports that can be used instead of the integer port indices to 
+    define the connections (or access the port data):
+    
+    .. code-block:: python
+
+        C = Connection(B1["out"], B2["in"])
+
+
+    Or mixed with integer port indices:
+
+    .. code-block:: python
+
+        C = Connection(B1["out"], B2["in"])
+
+
     Parameters
     ----------
     source : PortReference, Block
@@ -154,8 +170,11 @@ class Connection:
         #internal fixed-point accelerator
         self.accelerator = None
         
+        #validate port aliases
+        self._validate_ports()
+        
         #validate port dimensions at connection creation
-        self._validate_dimensions()        
+        self._validate_dimensions()
 
 
     def __str__(self):
@@ -195,6 +214,18 @@ class Connection:
         for trg in self.targets:
             if len(trg) != n_src:
                 raise ValueError(f"Source and target have different number of ports!")
+
+
+    def _validate_ports(self):
+        """Check the existance of the input and output ports of 
+        the defined source and target blocks. 
+
+        Utilizes the `PortReference._validate_output_ports` and 
+        `PortReference._validate_input_ports` methods.
+        """
+        self.source._validate_output_ports()
+        for trg in self.targets:
+            trg._validate_input_ports()
 
 
     def get_blocks(self):

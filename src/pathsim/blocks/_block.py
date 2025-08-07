@@ -5,9 +5,6 @@
 ##
 ##            This module defines the base 'Block' class that is the parent 
 ##         to all other blocks and can serve as a base for new or custom blocks
-##                                
-##
-##                                  Milan Rother 2024
 ##
 #########################################################################################
 
@@ -75,17 +72,35 @@ class Block(Serializable):
         internal callable operator for algebraic components of block
     op_dyn : DynamicOperator | None
         internal callable operator for dynamic (ODE) components of block
+    _n_in_max : int | None
+        maximum number of allowed input ports, None -> infinite
+    _n_out_max : int | None
+        maximum number of allowed output ports, None -> infinite
+    _port_map_in : dict[str: int] | None
+        string aliases for input port numbers to be referenced in 
+        connections or for internal use
+    _port_map_out : dict[str: int] | None
+        string aliases for output port numbers to be referenced in 
+        connections or for internal use
     """
 
     #number of max input and output ports
     _n_in_max = None
     _n_out_max = None
 
+    #maps for input and output port labels to indices
+    _port_map_in = None
+    _port_map_out = None
+
     def __init__(self):
 
+        #default register sizes
+        _n_in = 1 if self._n_in_max is None else self._n_in_max
+        _n_out = 1 if self._n_out_max is None else self._n_out_max
+
         #registers to hold input and output values
-        self.inputs  = Register(1 if self._n_in_max is None else self._n_in_max)
-        self.outputs = Register(1 if self._n_out_max is None else self._n_out_max)
+        self.inputs = Register(size=_n_in, mapping=self._port_map_in)
+        self.outputs = Register(size=_n_out, mapping=self._port_map_out)
 
         #initialize integration engine as 'None' by default
         self.engine = None
@@ -127,8 +142,8 @@ class Block(Serializable):
 
         Parameters
         ----------
-        key : int, slice, list, tuple
-            port indices
+        key : int, str, slice, tuple[int, str], list[int, str]
+            port indices or port names, or list / tuple of them
 
         Returns
         -------
@@ -151,11 +166,12 @@ class Block(Serializable):
             return PortReference(self, ports)
 
         elif isinstance(key, (tuple, list)):
-
-            #port type validation
+            
             for k in key:
-                if not isinstance(k, int):
-                    raise ValueError(f"Port must be 'int' but is '{type(k)}'!")
+
+                #port type validation
+                if not isinstance(k, (int, str)):
+                    raise ValueError(f"Port '{k}' must be (int, str) but is '{type(k)}'!")
             
             #duplicate validation
             if len(set(key)) < len(key):
@@ -163,13 +179,13 @@ class Block(Serializable):
 
             return PortReference(self, list(key))
 
-        elif isinstance(key, int):
+        elif isinstance(key, (int, str)):
 
-            #standard integer key
+            #standard key
             return PortReference(self, [key])
 
         else:
-            raise ValueError(f"Port has to be 'int', 'tuple', 'list' or 'slice' but is '{type(key)}'!")
+            raise ValueError(f"Port must be type (int, str, slice, tuple[int, str], list[int, str]) but is '{type(key)}'!")
 
 
     def __call__(self):

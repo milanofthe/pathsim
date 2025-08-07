@@ -47,7 +47,7 @@ class Wrapper(Block):
         sampling period for the event
     """
 
-    def __init__(self,func=None, T=1, tau=0):
+    def __init__(self, func=None, T=1, tau=0):
         super().__init__()
         self._T   = T
         self._tau = tau
@@ -81,8 +81,9 @@ class Wrapper(Block):
     
         Note
         ----
-        no direct passthrough, so the 'update' method 
-        is optimized for this case        
+        No direct passthrough, the `Wrapper` block doesnt 
+        implement the `update` method. The behavior is 
+        defined by the `func` arg.
 
         Parameters
         ----------

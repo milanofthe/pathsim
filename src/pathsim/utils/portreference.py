@@ -3,8 +3,6 @@
 ##                                PORT REFERENCE CLASS 
 ##                              (utils/portreference.py)
 ##                              
-##                                  Milan Rother 2025
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -26,34 +24,65 @@ class PortReference:
     ----------
     block : Block
         internal block reference
-    ports : list[int]
-        list of port indices
+    ports : list[int, str]
+        list of port indices or names
     """
 
     __slots__ = ["block", "ports"]
 
 
-    def __init__(self, block=None, ports=[0]):
+    def __init__(self, block=None, ports=None):
+
+        #default port is '0'
+        _ports = [0] if ports is None else ports 
 
         #type validation for ports
-        if not isinstance(ports, list):            
-            raise ValueError(f"'ports' must be 'list[int]' but is '{type(ports)}'!")
+        if not isinstance(_ports, list):            
+            raise ValueError(f"'ports' must be list[int, str] but is '{type(_ports)}'!")
+        
+        for p in _ports:
 
-        #ports are positive integers
-        if not all(isinstance(p, int) and p >= 0 for p in ports):
-            raise ValueError("'ports' must be positive integers!")   
+            #type validation for individual ports
+            if not isinstance(p, (int, str)):
+                raise ValueError(f"Port '{p}' must be (int, str) but is '{type(p)}'!")
 
-        #unique ports
-        if len(ports) != len(set(ports)):
+            #validation for positive interger
+            if isinstance(p, int) and p < 0:
+                raise ValueError(f"Port '{p}' is int but must be positive!")
+            
+            #key existance validation for string ports
+            if not (p in block.inputs or p in block.outputs):        
+                raise ValueError(f"Port alias '{p}' not defined for Block {block}!")
+
+        #port uniqueness validation
+        if len(_ports) != len(set(_ports)):
             raise ValueError("'ports' must be unique!")
 
         self.block = block
-        self.ports = ports 
+        self.ports = _ports
 
 
     def __len__(self):
         """The number of ports managed by 'PortReference'"""
         return len(self.ports)
+
+
+    def _validate_input_ports(self):
+        """Check the existance of the input ports, specifically string port 
+        aliases for the block inputs. Raises a ValueError if not existent.
+        """
+        for p in self.ports:
+            if not p in self.block.inputs:
+                raise ValueError(f"Input port '{p}' not defined for Block {self.block}!")
+
+
+    def _validate_output_ports(self):
+        """Check the existance of the output ports, specifically string port 
+        aliases for the block inputs. Raises a ValueError if not existent.
+        """
+        for p in self.ports:
+            if not p in self.block.outputs:
+                raise ValueError(f"Output port '{p}' not defined for Block {self.block}!")
 
 
     def to(self, other):
