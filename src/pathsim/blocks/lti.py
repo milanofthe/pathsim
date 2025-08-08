@@ -231,6 +231,14 @@ class TransferFunctionPRC(StateSpace):
         constant term of transfer function
     """
 
+    #number of max input and output ports
+    _n_in_max = 1
+    _n_out_max = 1
+
+    #maps for input and output port labels to indices
+    _port_map_in = {"in": 0}
+    _port_map_out = {"out": 0}
+
     def __init__(self, Poles=[], Residues=[], Const=0.0):
 
         #parameters of transfer function in pole-residue-const form
@@ -300,7 +308,7 @@ class TransferFunctionZPG(StateSpace):
         gain term of transfer function 
     """
 
-    def __init__(self, Zeros=[], Poles=[], Gain=1.0):
+    def __init__(self, Zeros=[], Poles=[-1], Gain=1.0):
 
         #parameters of transfer function in zeros-poles-gain form
         self.Zeros, self.Poles, self.Gain = Zeros, Poles, Gain
@@ -348,7 +356,15 @@ class TransferFunctionNumDen(StateSpace):
         denominator polynomial coefficients
     """
 
-    def __init__(self, Num=[], Den=[]):
+    #number of max input and output ports
+    _n_in_max = 1
+    _n_out_max = 1
+
+    #maps for input and output port labels to indices
+    _port_map_in = {"in": 0}
+    _port_map_out = {"out": 0}
+
+    def __init__(self, Num=[1], Den=[1, 1]):
 
         #parameters of transfer function in numerator-denominator
         self.Num, self.Den = Num, Den
