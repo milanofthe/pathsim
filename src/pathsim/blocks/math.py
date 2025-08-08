@@ -472,5 +472,5 @@ class Clip(Math):
 
         self.op_alg = Operator(
             func=lambda x: np.clip(x, self.min_val, self.max_val), 
-            jac=clip_jac
+            jac=_clip_jac
             )

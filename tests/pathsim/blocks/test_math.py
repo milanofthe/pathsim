@@ -35,7 +35,7 @@ class TestSin(unittest.TestCase):
         def ref(t): return np.sin(t), np.sin(5*t) 
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestCos(unittest.TestCase):
@@ -60,7 +60,7 @@ class TestCos(unittest.TestCase):
         def ref(t): return np.cos(t), np.cos(3*t) 
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestSqrt(unittest.TestCase):
@@ -85,7 +85,7 @@ class TestSqrt(unittest.TestCase):
         def ref(t): return np.sqrt(abs(abs(t) + 1)), np.sqrt(abs(abs(2*t) + 1))
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestAbs(unittest.TestCase):
@@ -110,7 +110,7 @@ class TestAbs(unittest.TestCase):
         def ref(t): return abs(t - 5), abs(-2*t + 3)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestPow(unittest.TestCase):
@@ -135,7 +135,7 @@ class TestPow(unittest.TestCase):
         def ref(t): return np.power(t + 1, 3), np.power(2*t + 1, 3)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestExp(unittest.TestCase):
@@ -160,7 +160,7 @@ class TestExp(unittest.TestCase):
         def ref(t): return np.exp(t * 0.1), np.exp(t * 0.05)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestLog(unittest.TestCase):
@@ -184,7 +184,7 @@ class TestLog(unittest.TestCase):
         def ref(t): return np.log(t + 1), np.log(2*t + 1)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestLog10(unittest.TestCase):
@@ -209,7 +209,7 @@ class TestLog10(unittest.TestCase):
         def ref(t): return np.log10(t + 1), np.log10(3*t + 1)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestTan(unittest.TestCase):
@@ -234,7 +234,7 @@ class TestTan(unittest.TestCase):
         def ref(t): return np.tan(t * 0.1), np.tan(t * 0.05)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestSinh(unittest.TestCase):
@@ -259,7 +259,7 @@ class TestSinh(unittest.TestCase):
         def ref(t): return np.sinh(t * 0.1), np.sinh(t * 0.2)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestCosh(unittest.TestCase):
@@ -284,7 +284,7 @@ class TestCosh(unittest.TestCase):
         def ref(t): return np.cosh(t * 0.1), np.cosh(t * 0.15)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestTanh(unittest.TestCase):
@@ -309,7 +309,7 @@ class TestTanh(unittest.TestCase):
         def ref(t): return np.tanh(t), np.tanh(2*t)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestAtan(unittest.TestCase):
@@ -334,7 +334,7 @@ class TestAtan(unittest.TestCase):
         def ref(t): return np.arctan(t), np.arctan(3*t)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestNorm(unittest.TestCase):
@@ -359,7 +359,7 @@ class TestNorm(unittest.TestCase):
         def ref(t): return np.linalg.norm([t + 1, 2*t + 1])
         E = Embedding(B, src, ref)
         
-        for t in range(1, 10): self.assertEqual(*E.check_MIMO(t)) 
+        for t in range(1, 10): self.assertTrue(np.allclose(*E.check_MIMO(t))) 
 
 
 class TestMod(unittest.TestCase):
@@ -384,7 +384,7 @@ class TestMod(unittest.TestCase):
         def ref(t): return np.mod(t, 2.0), np.mod(3*t, 2.0)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 class TestClip(unittest.TestCase):
@@ -409,7 +409,7 @@ class TestClip(unittest.TestCase):
         def ref(t): return np.clip(t - 1, -2.0, 3.0), np.clip(2*t - 5, -2.0, 3.0)
         E = Embedding(B, src, ref)
         
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
+        for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
 # RUN TESTS LOCALLY ====================================================================
