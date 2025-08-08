@@ -158,11 +158,15 @@ class TestScheduleList(unittest.TestCase):
         self.assertFalse(c)
         self.assertEqual(r, 0.5)
 
+    def test_func_act_is_not_none(self):
+        def func_act(_):
+            pass
 
+        event = ScheduleList(
+            times_evt=[1, 2, 3], func_act=func_act
+        )
 
-
-
-
+        assert event.func_act is not None
 
         
 
