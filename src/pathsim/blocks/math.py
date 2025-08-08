@@ -19,7 +19,15 @@ from ..optim.operator import Operator
 # BASE MATH BLOCK =======================================================================
 
 class Math(Block):
+    """Base math block.
 
+    Note
+    ----
+    This block doesnt implement any functionality itself. 
+    Its intended to be used as a base for the elementary math blocks. 
+    Its **not** intended to be used directly!
+
+    """
 
     def __len__(self):
         """Purely algebraic block"""
