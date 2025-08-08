@@ -42,8 +42,15 @@ class Math(Block):
 # BLOCKS ================================================================================
 
 class Sin(Math):
-    """Sine operator block
+    """Sine operator block.
+
+    This block supports vector inputs. This is the operation it does:
         
+    .. math::
+        
+        \\vec{y} = \\sin(\\vec{u}) 
+
+
     Attributes
     ----------
     op_alg : Operator
@@ -61,7 +68,13 @@ class Sin(Math):
 
 
 class Cos(Math):
-    """Cosine operator block
+    """Cosine operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\cos(\\vec{u}) 
         
     Attributes
     ----------
@@ -80,7 +93,13 @@ class Cos(Math):
 
 
 class Sqrt(Math):
-    """Square root operator block
+    """Square root operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\sqrt{|\\vec{u}|} 
         
     Attributes
     ----------
@@ -99,7 +118,13 @@ class Sqrt(Math):
 
 
 class Abs(Math):
-    """Absolute value operator block
+    """Absolute value operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\vert| \\vec{u} \\vert| 
         
     Attributes
     ----------
@@ -118,7 +143,13 @@ class Abs(Math):
 
 
 class Pow(Math):
-    """Raise to power operator block
+    """Raise to power operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\vec{u}^{p} 
 
     Parameters
     ----------
@@ -140,4 +171,306 @@ class Pow(Math):
         self.op_alg = Operator(
             func=lambda x: np.power(x, self.exponent), 
             jac=lambda x: np.diag(self.exponent * np.power(x, self.exponent - 1))
+            )
+
+
+class Exp(Math):
+    """Exponential operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = e^{\\vec{u}} 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.exp, 
+            jac=lambda x: np.diag(np.exp(x))
+            )
+
+
+class Log(Math):
+    """Natural logarithm operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\ln(\\vec{u}) 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.log, 
+            jac=lambda x: np.diag(1/x)
+            )
+
+
+class Log10(Math):
+    """Base-10 logarithm operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\log_{10}(\\vec{u}) 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.log10, 
+            jac=lambda x: np.diag(1/(x * np.log(10)))
+            )
+
+
+class Tan(Math):
+    """Tangent operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\tan(\\vec{u}) 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.tan, 
+            jac=lambda x: np.diag(1/np.cos(x)**2)
+            )
+
+
+class Sinh(Math):
+    """Hyperbolic sine operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\sinh(\\vec{u}) 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.sinh, 
+            jac=lambda x: np.diag(np.cosh(x))
+            )
+
+
+class Cosh(Math):
+    """Hyperbolic cosine operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\cosh(\\vec{u}) 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.cosh, 
+            jac=lambda x: np.diag(np.sinh(x))
+            )
+
+
+class Tanh(Math):
+    """Hyperbolic tangent operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\tanh(\\vec{u}) 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.tanh, 
+            jac=lambda x: np.diag(1 - np.tanh(x)**2)
+            )
+
+
+class Atan(Math):
+    """Arctangent operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\arctan(\\vec{u}) 
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.arctan, 
+            jac=lambda x: np.diag(1/(1 + x**2))
+            )
+
+
+class Norm(Math):
+    """Vector norm operator block.
+
+    This block computes the Euclidean norm of the input vector:
+        
+    .. math::
+        
+        y = \\|\\vec{u}\\|_2 = \\sqrt{\\sum_i u_i^2}
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=np.linalg.norm, 
+            jac=lambda x: x/np.linalg.norm(x)
+            )
+
+
+class Mod(Math):
+    """Modulo operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\vec{u} \\bmod m
+
+
+    Note
+    ----
+    modulo is not differentiable at discontinuities
+
+    Parameters
+    ----------
+    modulus : float
+        modulus value
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self, modulus=1.0):
+        super().__init__()
+
+        self.modulus = modulus
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=lambda x: np.mod(x, self.modulus), 
+            jac=lambda x: np.diag(np.ones_like(x)) 
+            )
+
+
+class Clip(Math):
+    """Clipping/saturation operator block.
+
+    This block supports vector inputs. This is the operation it does:
+        
+    .. math::
+        
+        \\vec{y} = \\text{clip}(\\vec{u}, u_{min}, u_{max}) 
+
+    Parameters
+    ----------
+    min_val : float, array_like
+        minimum clipping value
+    max_val : float, array_like
+        maximum clipping value
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self, min_val=-1.0, max_val=1.0):
+        super().__init__()
+
+        self.min_val = min_val
+        self.max_val = max_val
+
+        #create internal algebraic operator
+        def _clip_jac(x):
+            """Jacobian is 1 where not clipped, 0 where clipped"""
+            mask = (x >= self.min_val) & (x <= self.max_val)
+            return np.diag(mask.astype(float))
+
+        self.op_alg = Operator(
+            func=lambda x: np.clip(x, self.min_val, self.max_val), 
+            jac=clip_jac
             )
