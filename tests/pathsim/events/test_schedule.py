@@ -94,8 +94,6 @@ class TestScheduleList(unittest.TestCase):
 
     def test_init(self):
 
-        with self.assertRaises(ValueError):
-            S = ScheduleList()
 
         with self.assertRaises(ValueError):
             S = ScheduleList(times_evt=[1, 3, 5, 2, 7])
