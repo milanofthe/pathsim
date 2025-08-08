@@ -6,13 +6,14 @@ pathsim.blocks
 
    pathsim.blocks._block
    pathsim.blocks.adder
+   pathsim.blocks.multiplier
+   pathsim.blocks.math
    pathsim.blocks.amplifier
    pathsim.blocks.delay
    pathsim.blocks.differentiator
    pathsim.blocks.function
    pathsim.blocks.integrator
    pathsim.blocks.lti
-   pathsim.blocks.multiplier
    pathsim.blocks.ode
    pathsim.blocks.rng
    pathsim.blocks.scope
