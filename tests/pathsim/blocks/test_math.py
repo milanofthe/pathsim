@@ -138,6 +138,45 @@ class TestPow(unittest.TestCase):
         for t in range(10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
 
 
+class TestPowProd(unittest.TestCase):
+    """
+    Test the implementation of the 'PowProd' block class
+    """
+
+    def test_embedding(self):
+        """test algebraic components via embedding"""
+        
+        # Test with default exponent (2) - computes u1^2 * u2^2 * ...
+        B = PowProd()
+        def src(t): return t + 1, t + 2  # Ensure positive inputs
+        def ref(t): 
+            u1, u2 = t + 1, t + 2
+            return np.prod([u1**2, u2**2])
+        E = Embedding(B, src, ref)
+        
+        for t in range(1, 10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
+        
+        # Test with custom exponents - different power for each input
+        B = PowProd(exponents=[2, 3, 1])
+        def src(t): return t + 1, t + 2, t + 3
+        def ref(t): 
+            u1, u2, u3 = t + 1, t + 2, t + 3
+            return np.prod([u1**2, u2**3, u3**1])
+        E = Embedding(B, src, ref)
+        
+        for t in range(1, 10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
+        
+        # Test with scalar exponent applied to multiple inputs
+        B = PowProd(exponents=3)
+        def src(t): return t + 1, t + 2
+        def ref(t): 
+            u1, u2 = t + 1, t + 2
+            return np.prod([u1**3, u2**3])
+        E = Embedding(B, src, ref)
+        
+        for t in range(1, 10): self.assertTrue(np.allclose(*E.check_MIMO(t)))
+
+
 class TestExp(unittest.TestCase):
     """
     Test the implementation of the 'Exp' block class

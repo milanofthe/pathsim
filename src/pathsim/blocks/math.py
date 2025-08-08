@@ -174,6 +174,57 @@ class Pow(Math):
             )
 
 
+class PowProd(Math):
+    """Power-Product operator block.
+
+    This block raises each input to a power and then multiplies all results together:
+        
+    .. math::
+        
+        y = \\prod_i u_i^{p_i}
+
+    Parameters
+    ----------
+    exponents : float, array_like
+        exponent(s) to raise the inputs to the power of. If scalar, 
+        applies same exponent to all inputs.
+        
+    Attributes
+    ----------
+    op_alg : Operator
+        internal algebraic operator
+    """
+
+    def __init__(self, exponents=2):
+        super().__init__()
+
+        self.exponents = exponents    
+        
+        def _jac(x):
+            if np.isscalar(self.exponents):
+                exps = np.full_like(x, self.exponents)
+            else:
+                exps = np.array(self.exponents)
+            
+            product = np.prod(np.power(x, exps))
+            
+            # Jacobian is a row vector since output is scalar
+            jac = np.zeros((1, len(x)))
+            for j in range(len(x)):
+                if x[j] != 0:
+                    jac[0, j] = product * exps[j] / x[j]
+                else:
+                    jac[0, j] = 0
+            
+            return jac
+
+        #create internal algebraic operator
+        self.op_alg = Operator(
+            func=lambda x: np.prod(np.power(x, self.exponents)), 
+            jac=_jac
+            )
+
+
 class Exp(Math):
     """Exponential operator block.
 
