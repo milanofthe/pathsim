@@ -16,6 +16,7 @@ from .adder import *
 from .scope import *
 from .delay import *
 from .noise import *
+from .math import *
 from .ctrl import *
 from .lti import *
 from .ode import *
