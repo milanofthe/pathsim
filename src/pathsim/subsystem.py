@@ -49,11 +49,26 @@ class Interface(Block):
     """
     def __len__(self):
         return 0
-    
+
+
+    def register_port_map(self, port_map_in, port_map_out):
+        """Update the input and output registers of the interface block with port mappings
+
+        Parameters
+        ----------
+        port_map_in : dict[str: int]
+            port alias mapping for block inputs
+        port_map_out : dict[str: int]
+            port alias mapping for block outputs
+        """
+        self._port_map_in = port_map_in
+        self._port_map_out = port_map_out
+
+        #reinitialize to build registers with mappings
+        self.__init__()
 
 
 # MAIN SUBSYSTEM CLASS ==================================================================
-
 
 class Subsystem(Block):
     """Subsystem class that holds its own blocks and connecions and 
@@ -179,6 +194,9 @@ class Subsystem(Block):
         #check if interface is defined
         if self.interface is None:
             raise ValueError("Subsystem 'blocks' list needs to contain 'Interface' block!")
+
+        #update port mappings of interface (reverse)
+        self.interface.register_port_map(self._port_map_out, self._port_map_in)
 
         #validate the internal connections upon initialization
         self._check_connections()
