@@ -1,0 +1,51 @@
+digraph "System Graph" {
+  rankdir=TB;
+  node [shape=box, style=filled, fixedsize=true, width=2, height=0.8];
+  label="System Graph";
+  labelloc=t;
+  ranksep=1.0;
+  nodesep=0.5;
+  subgraph cluster_dag {
+    label="Acyclic Graph";
+    style=filled;
+    fillcolor=lightgray;
+    subgraph cluster_dag_0 {
+      rank=same;
+      label="depth 0";
+      n1445602170864 [label="Source", fillcolor=lightcoral];
+      n1446446739008 [label="Scope", fillcolor=lightcoral];
+      n1446447190800 [label="Scope", fillcolor=lightcoral];
+    }
+  }
+  subgraph cluster_loops {
+    label="Algebraic Loops";
+    style=filled;
+    fillcolor=lightgray;
+    subgraph cluster_loop_0 {
+      rank=same;
+      label="depth 0";
+      n1446446738672 [label="Adder", fillcolor=lightblue];
+    }
+    subgraph cluster_loop_1 {
+      rank=same;
+      label="depth 1";
+      n1446446736992 [label="Function", fillcolor=lightblue];
+    }
+    subgraph cluster_loop_2 {
+      rank=same;
+      label="depth 2";
+      n1446446738336 [label="Amplifier", fillcolor=lightblue];
+    }
+  }
+  // Invisible edges to align depths
+  n1445602170864 -> n1446446738672 [style=invis];
+  n1446446738672 -> n1446446736992 [style=invis];
+  n1446446736992 -> n1446446738336 [style=invis];
+  n1445602170864 -> n1446446738672 [color=black];
+  n1445602170864 -> n1446446739008 [color=black];
+  n1446446738672 -> n1446446736992 [color=black];
+  n1446446738672 -> n1446446739008 [color=black];
+  n1446446736992 -> n1446446738336 [color=black];
+  n1446446736992 -> n1446447190800 [color=black];
+  n1446446738336 -> n1446446738672 [color=red, penwidth=2];
+}

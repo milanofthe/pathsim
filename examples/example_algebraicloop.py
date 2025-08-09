@@ -54,8 +54,14 @@ Sim = Simulation(blocks, connections, dt=dt, log=True)
 if __name__ == "__main__":
 
     #run the simulation for some time
-    Sim.run(5)
+    # Sim.run(5)
     # Sim.steadystate()
+    Sim.graph.save_graphviz("example")
+
+    for d, b, c in Sim.graph.loop():
+        print(d, b, c)
+
+    print(Sim.graph.loop_closing_connections())
 
     Sco.plot(".-")
 

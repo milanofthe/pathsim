@@ -304,7 +304,21 @@ class Connection:
             self.source.to(trg)
 
 
-    def step(self):
+    def init_accelerator(self):
+        """Initialize the internal fixed point accelerator of the connection 
+        and save the current input values"""
+        
+        #get source values 
+        self.values = self.source.get_outputs()
+
+        #initialize fixed point accelerator if not already available
+        if not self.accelerator:
+            self.accelerator = Anderson()
+        else:
+            self.accelerator.reset()
+
+
+    def step_accelerator(self):
         """Step the internal fixed-point accelerator forward by one iteration.
 
         If no previous values are available (prev_values is None), falls back to 
@@ -317,35 +331,17 @@ class Connection:
             fixed point residual for convergence control
         """
 
-        #get source values and previous values
-        self.values, prev_values = self.source.get_outputs(), self.values
-
-        #initialize fixed point accelerator if not already available
-        if not self.accelerator:
-            self.accelerator = Anderson()
-
-        #no previous value -> fallback to update method
-        if prev_values is None:
-            self.update()
-            return 1.0
-
         #update fixed-point accelerator
-        self.values, res = self.accelerator.step(prev_values, self.values)
+        _values, res = self.accelerator.step(self.values, self.source.get_outputs())
 
         #transmit new values to all targets
         for trg in self.targets:
-            trg.set_inputs(self.values)
+            trg.set_inputs(_values)
+
+        self.values = _values
 
         #return the fixed-point residual
         return res
-
-
-    def reset(self):
-        """Reset the internal fixed point accelerator which is used 
-        to resolve algebraic loops and the internal values"""
-        self.values = None
-        if self.accelerator: 
-            self.accelerator.reset()
 
 
 class Duplex(Connection):
