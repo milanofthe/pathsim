@@ -15,7 +15,7 @@ jobs:
           pip install -e .[test]
       - name: Test with pytest and generate coverage
         run: |
-          pytest --cov=./ --cov-report=xml
+          pytest --cov=./src/pathsim --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:

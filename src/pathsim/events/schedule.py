@@ -197,15 +197,13 @@ class ScheduleList(Schedule):
 
     def __init__(
         self, 
-        times_evt=[], 
+        times_evt, 
         func_act=None,      
         tolerance=TOLERANCE
         ):
-        super().__init__(None, func_act, tolerance)
+        super().__init__(t_start=None, func_act=func_act, tolerance=tolerance)
 
         #input validation for times
-        if not times_evt:
-            raise ValueError("'times_evt' are empty!")
         if len(times_evt) > 1 and np.any(np.diff(times_evt) <= 0.0):
             raise ValueError("'times_evt' need to be in ascending order!")
         

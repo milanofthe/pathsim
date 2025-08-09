@@ -94,8 +94,6 @@ class TestScheduleList(unittest.TestCase):
 
     def test_init(self):
 
-        with self.assertRaises(ValueError):
-            S = ScheduleList()
 
         with self.assertRaises(ValueError):
             S = ScheduleList(times_evt=[1, 3, 5, 2, 7])
@@ -158,11 +156,15 @@ class TestScheduleList(unittest.TestCase):
         self.assertFalse(c)
         self.assertEqual(r, 0.5)
 
+    def test_func_act_is_not_none(self):
+        def func_act(_):
+            pass
 
+        event = ScheduleList(
+            times_evt=[1, 2, 3], func_act=func_act
+        )
 
-
-
-
+        assert event.func_act is not None
 
         
 
