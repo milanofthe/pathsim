@@ -19,8 +19,8 @@ from .connection import Connection
 from .blocks._block import Block
 
 from .utils.graph import Graph
-from .utils.bundle import Bundle
 from .utils.register import Register
+from .utils.booster import ConnectionBooster
 from .utils.portreference import PortReference
 
 from ._constants import (
@@ -175,8 +175,8 @@ class Subsystem(Block):
         #internal graph representation -> initialized later
         self.graph = None
 
-        #internal algebraic loop solver -> initialized later
-        self.bundles = None
+        #internal algebraic loop solvers -> initialized later
+        self.boosters = None
 
         #internal connecions
         self.connections = [] if connections is None else connections
@@ -295,12 +295,11 @@ class Subsystem(Block):
         """
         self.graph = Graph(self.blocks, self.connections)
 
-        #bundle together loop closing connections
+        #create boosters for loop closing connections
         if self.graph.has_loops:
-            self.bundles = [
-                Bundle([conn]) for conn in self.graph.loop_closing_connections()
+            self.boosters = [
+                ConnectionBooster(conn) for conn in self.graph.loop_closing_connections()
             ]
-
 
 
     # methods for access to metadata --------------------------------------------------------
@@ -549,9 +548,9 @@ class Subsystem(Block):
             evaluation time for system function
         """
 
-        #reset accelerator of bundled loop closing connections
-        for bundle in self.bundles:
-            bundle.reset()
+        #reset accelerators of loop closing connections
+        for con_booster in self.boosters:
+            con_booster.reset()
 
         #perform solver iterations on algebraic loops
         for iteration in range(1, self.iterations_max):
@@ -566,17 +565,17 @@ class Subsystem(Block):
                 #step accelerated connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
                     if connection: connection.update()
-                       
-            #step bundled loop closing connection solvers
+
+            #step boosters of loop closing connections
             max_err = 0.0
-            for bundle in self.bundles:
-                err = bundle.update()
+            for con_booster in self.boosters:
+                err = con_booster.update()
                 if err > max_err:
                     max_err = err
                        
             #check convergence after first iteration
             if max_err <= self.tolerance_fpi:
-                return 
+                return
 
         #not converged -> error
         raise RuntimeError(

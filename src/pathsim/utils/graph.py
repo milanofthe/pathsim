@@ -13,9 +13,6 @@ from typing import Iterable, Optional, Dict, Set, List, Tuple, Any
 
 # HELPER METHODS =======================================================================
 
-def _stable_key(obj: Any) -> str:
-    return id(obj)
-
 
 def outgoing_block_connection_map(connections: Iterable):
     """Construct a mapping from blocks to their outgoing connections.
@@ -39,9 +36,9 @@ def outgoing_block_connection_map(connections: Iterable):
 
     # Sort connections per source deterministically by (src_key, targets_keys...)
     def _conn_key(c):
-        src_k = _stable_key(c.source.block)
+        src_k = id(c.source.block)
         # produce stable list of target keys
-        tgt_keys = tuple(sorted((_stable_key(t.block) for t in c.targets)))
+        tgt_keys = tuple(sorted((id(t.block) for t in c.targets)))
         return (src_k, tgt_keys)
 
     for src in list(block_connection_map.keys()):
@@ -179,7 +176,7 @@ def algebraic_depth_dfs(graph_map: Dict[Any, Set[Any]],
         # Recurse to neighbours. To be deterministic, iterate neighbours in sorted order.
         neighbors = graph_map.get(cur, ())
         # neighbors may be a set, convert to list sorted by stable key
-        nbrs_sorted = sorted(neighbors, key=_stable_key)
+        nbrs_sorted = sorted(neighbors, key=id)
 
         best = 0
         next_stk = stk + (cur,)
@@ -259,7 +256,7 @@ def has_algebraic_path(connection_map: Dict[Any, Set[Any]],
 
     # Iterative DFS stack: list of (node, iterator over sorted neighbors, depth_from_start)
     # depth_from_start helps detect trivial self-loop (path must traverse at least one other node)
-    stack = [(start_block, iter(sorted(connection_map.get(start_block, ()), key=_stable_key)), 0)]
+    stack = [(start_block, iter(sorted(connection_map.get(start_block, ()), key=id)), 0)]
 
     while stack:
         node, nbr_iter, depth = stack[-1]
@@ -301,9 +298,26 @@ def has_algebraic_path(connection_map: Dict[Any, Set[Any]],
 
         # If not visited, push onto stack with its neighbor iterator
         if nbr not in visited:
-            stack.append((nbr, iter(sorted(connection_map.get(nbr, ()), key=_stable_key)), depth + 1))
+            stack.append((nbr, iter(sorted(connection_map.get(nbr, ()), key=id)), depth + 1))
 
     return False
+
+
+
+
+
+# DAG CLASS ============================================================================
+
+class DAG:
+
+    def __init__(self, blocks, connections):
+        self.blocks = blocks
+        self.connections = connections
+
+    def __iter__(self):
+        for d in range(len(self.blocks)):
+            yield d, self.blocks[d], self.connections[d]
+
 
 
 # GRAPH CLASS ==========================================================================
@@ -420,7 +434,7 @@ class Graph:
 
         # iterate blocks to calculate their algebraic depths deterministically:
         # sort blocks by stable key before iterating to avoid input-order dependence
-        sorted_blocks = sorted(self.blocks, key=_stable_key)
+        sorted_blocks = sorted(self.blocks, key=id)
 
         for blk in sorted_blocks:
             depth = algebraic_depth_dfs(self._upst_blk_blk_map, blk, None, True)
@@ -444,7 +458,7 @@ class Graph:
             return
 
         # find strongly connected components among blocks in loops
-        sccs = self._find_strongly_connected_components(sorted(list(blocks_loop), key=_stable_key))
+        sccs = self._find_strongly_connected_components(sorted(list(blocks_loop), key=id))
 
         # track global depth counter for all loop blocks
         current_depth = 0
@@ -455,7 +469,7 @@ class Graph:
 
             # find entry points for this SCC deterministically
             entry_points = []
-            for blk in sorted(scc, key=_stable_key):
+            for blk in sorted(scc, key=id):
                 pred = self._upst_blk_blk_map.get(blk, set())
                 scc_pred = pred.intersection(scc_set)
 
@@ -467,11 +481,11 @@ class Graph:
 
             # If no natural entry points, choose first block as artificial entry
             if not entry_points:
-                entry_points = [sorted(scc, key=_stable_key)[0]]
+                entry_points = [sorted(scc, key=id)[0]]
 
             # BFS from entry points for this SCC with deterministic neighbor ordering
             visited: Set[Any] = set()
-            queue = deque([(ep, 0) for ep in sorted(entry_points, key=_stable_key)])
+            queue = deque([(ep, 0) for ep in sorted(entry_points, key=id)])
             max_local_depth = 0
             local_depths: Dict[Any, int] = {}
 
@@ -489,12 +503,12 @@ class Graph:
                 max_local_depth = max(max_local_depth, local_depth)
 
                 # Enqueue downstream neighbors that are in this SCC in deterministic order
-                for next_blk in sorted(self._dnst_blk_blk_map.get(blk, ()), key=_stable_key):
+                for next_blk in sorted(self._dnst_blk_blk_map.get(blk, ()), key=id):
                     if next_blk in scc_set and next_blk not in visited:
                         queue.append((next_blk, local_depth + 1))
 
             # Second pass: assign global depths and classify connections
-            for blk in sorted(scc, key=_stable_key):
+            for blk in sorted(scc, key=id):
                 global_depth = current_depth + local_depths.get(blk, 0)
                 self._blocks_loop_dag[global_depth].append(blk)
 
@@ -519,16 +533,6 @@ class Graph:
         # compute depth of loop DAG
         self._loop_depth = (max(self._blocks_loop_dag) + 1) if self._blocks_loop_dag else 0
 
-        # Deduplicate loop closing connections preserving order
-        seen = set()
-        unique_closers = []
-        for con in self._loop_closing_connections:
-            # use stable key for connection
-            key = ( _stable_key(con.source.block), tuple(sorted((_stable_key(t.block) for t in con.targets))) )
-            if key not in seen:
-                seen.add(key)
-                unique_closers.append(con)
-        self._loop_closing_connections = unique_closers
 
     def _find_strongly_connected_components(self, blocks):
         """Finds strongly connected components (SCCs) in the subgraph
@@ -556,7 +560,7 @@ class Graph:
 
         # deterministic neighbor ordering helper
         def _successors(node):
-            return sorted((n for n in self._dnst_blk_blk_map.get(node, ()) if n in block_set), key=_stable_key)
+            return sorted((n for n in self._dnst_blk_blk_map.get(node, ()) if n in block_set), key=id)
 
         def strongconnect(node):
             index[node] = index_counter[0]
@@ -584,10 +588,10 @@ class Graph:
                 # Only keep SCCs that are actual cycles: size>1 or self-loop
                 if len(scc) > 1 or any(node in self._dnst_blk_blk_map.get(node, ()) for node in scc):
                     # sort scc deterministically before appending
-                    result.append(sorted(scc, key=_stable_key))
+                    result.append(sorted(scc, key=id))
 
         # Process nodes in deterministic order
-        for node in sorted(blocks, key=_stable_key):
+        for node in sorted(blocks, key=id):
             if node not in index:
                 strongconnect(node)
 
@@ -607,7 +611,7 @@ class Graph:
         list[Connections]
             connections from the graph that have 'block' as their source
         """
-        return list(self._outg_blk_con_map.get(block, ()))
+        return self._outg_blk_con_map[block]
 
     def is_algebraic_path(self, start_block, end_block):
         """Check if two blocks are connected through a
@@ -644,7 +648,6 @@ class Graph:
             together with the depth 'd'
         """
         for d in range(self._alg_depth):
-            # provide deterministic copies
             yield (d, self._blocks_dag[d], self._connections_dag[d])
 
     def loop(self):
@@ -670,4 +673,4 @@ class Graph:
         list[Connection]
             Connections that close the algebraic loops from the broke loop DAG
         """
-        return list(self._loop_closing_connections)
+        return self._loop_closing_connections
