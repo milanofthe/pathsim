@@ -144,13 +144,9 @@ class Connection:
     ----------
     _active : bool
         flag to set 'Connection' as active or inactive
-    values : array
-        values to transmit, relevant for fixed-point accelerator
-    accelerator : None, Anderson
-        internal fixed-point accelerator for algebraic loops
     """
 
-    __slots__ = ["source", "targets", "_active", "values", "accelerator"]
+    __slots__ = ["source", "targets", "_active"]
 
 
     def __init__(self, source, *targets):
@@ -163,12 +159,6 @@ class Connection:
 
         #flag to set connection active
         self._active = True
-
-        #values to transmit as history
-        self.values = None
-
-        #internal fixed-point accelerator
-        self.accelerator = None
         
         #validate port aliases
         self._validate_ports()
@@ -182,6 +172,11 @@ class Connection:
         'to_dict' method with readable json formatting
         """
         return json.dumps(self.to_dict(), indent=2, sort_keys=False)
+
+
+    def __len__(self):
+        """Returns the number of ports that are defined in the connection"""
+        return len(self.source)
 
 
     def __bool__(self):
@@ -304,46 +299,6 @@ class Connection:
             self.source.to(trg)
 
 
-    def init_accelerator(self):
-        """Initialize the internal fixed point accelerator of the connection 
-        and save the current input values"""
-        
-        #get source values 
-        self.values = self.source.get_outputs()
-
-        #initialize fixed point accelerator if not already available
-        if not self.accelerator:
-            self.accelerator = Anderson()
-        else:
-            self.accelerator.reset()
-
-
-    def step_accelerator(self):
-        """Step the internal fixed-point accelerator forward by one iteration.
-
-        If no previous values are available (prev_values is None), falls back to 
-        the 'update' method, which is essentially equivalent to a standard 
-        fixed-point update. 
-    
-        Returns
-        -------
-        res : float
-            fixed point residual for convergence control
-        """
-
-        #update fixed-point accelerator
-        _values, res = self.accelerator.step(self.values, self.source.get_outputs())
-
-        #transmit new values to all targets
-        for trg in self.targets:
-            trg.set_inputs(_values)
-
-        self.values = _values
-
-        #return the fixed-point residual
-        return res
-
-
 class Duplex(Connection):
     """Extension of the 'Connection' class, that defines bidirectional 
     connections between two blocks by grouping together the inputs and 
@@ -363,6 +318,9 @@ class Duplex(Connection):
 
         #flag to set connection active
         self._active = True
+
+        import warnings
+        warnings.warn("'Duplex' will be deprecated in next release!")
         
 
     def to_dict(self):
