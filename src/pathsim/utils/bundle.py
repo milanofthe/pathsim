@@ -21,18 +21,16 @@ from ..connection import Connection
 class Bundle:
 
     def __init__(self, connections):
-        
         self.connections = connections
-        self.splits = np.cumsum([
-            len(con) for con in self.connections
-            ])
 
-        self.accelerator = Anderson()
-        self.history = self.get()
+        if connections:
+            self.splits = np.cumsum([len(con) for con in connections])
+            self.accelerator = Anderson()
+            self.history = self.get()
 
 
     def __bool__(self):
-        return True
+        return len(self.connections) > 0
 
 
     def get(self):
@@ -48,17 +46,13 @@ class Bundle:
 
 
     def reset(self):
-        
         self.accelerator.reset()
         self.history = self.get()
 
 
     def update(self):
-
-        #step fixed point accelerator
         _vals, res = self.accelerator.step(self.history, self.get())
         self.set(_vals)
-
         self.history = _vals
         return res
 

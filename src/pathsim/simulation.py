@@ -194,7 +194,7 @@ class Simulation:
         self.graph = None
 
         #internal algebraic loop solver -> initialized later
-        self.bundle = None
+        self.bundles = None
 
         #error tolerance for fixed point loop and implicit solver
         self.tolerance_fpi = tolerance_fpi
@@ -623,7 +623,10 @@ class Simulation:
             self.graph = Graph(self.blocks, self.connections)
 
         #bundle together loop closing connections
-        self.bundle = Bundle(self.graph.loop_closing_connections())
+        if self.graph.has_loops:
+            self.bundles = [
+                Bundle([conn]) for conn in self.graph.loop_closing_connections()
+            ]
 
         self._logger_info(
             "GRAPH (size: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
@@ -930,7 +933,8 @@ class Simulation:
         """
 
         #reset accelerator of bundled loop closing connections
-        self.bundle.reset()
+        for bundle in self.bundles:
+            bundle.reset()
 
         #perform solver iterations on algebraic loops
         for iteration in range(1, self.iterations_max):
@@ -945,19 +949,22 @@ class Simulation:
                 #step accelerated connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
                     if connection: connection.update()
-                       
-            #step bundled loop closing connections solver
-            max_error = self.bundle.update()       
 
+            #step bundled loop closing connection solvers
+            max_err = 0.0
+            for bundle in self.bundles:
+                err = bundle.update()
+                if err > max_err:
+                    max_err = err
+                       
             #check convergence after first iteration
-            if max_error <= self.tolerance_fpi:
-                print(f"iterations:{iteration}, error:{max_error}")
+            if max_err <= self.tolerance_fpi:
                 return
 
         #not converged -> error
         self._logger_error(
             "algebraic loop not converged (iters: {}, err: {})".format(
-                self.iterations_max, max_error), 
+                self.iterations_max, max_err), 
             RuntimeError
             )
 

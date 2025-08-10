@@ -55,10 +55,6 @@ if __name__ == "__main__":
 
     #run the simulation for some time
     Sim.run(5)
-    print(Sim.graph.loop_closing_connections())
-
-    for d, b, c in Sim.graph.loop():
-        print(d, b, c)
 
     Sco.plot(".-")
 

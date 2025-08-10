@@ -12,9 +12,9 @@ digraph "System Graph" {
     subgraph cluster_dag_0 {
       rank=same;
       label="depth 0";
-      n2038916749296 [label="Source", fillcolor=lightcoral];
-      n2039761235856 [label="Scope", fillcolor=lightcoral];
-      n2039761721040 [label="Scope", fillcolor=lightcoral];
+      n2339689912304 [label="Source", fillcolor=lightcoral];
+      n2340534857616 [label="Scope", fillcolor=lightcoral];
+      n2340535326416 [label="Scope", fillcolor=lightcoral];
     }
   }
   subgraph cluster_loops {
@@ -24,28 +24,29 @@ digraph "System Graph" {
     subgraph cluster_loop_0 {
       rank=same;
       label="depth 0";
-      n2039761235520 [label="Adder", fillcolor=lightblue];
+      n2340534857280 [label="Adder", fillcolor=lightblue];
     }
     subgraph cluster_loop_1 {
       rank=same;
       label="depth 1";
-      n2038918092112 [label="Function", fillcolor=lightblue];
+      n2339691238736 [label="Function", fillcolor=lightblue];
     }
     subgraph cluster_loop_2 {
       rank=same;
       label="depth 2";
-      n2039761235184 [label="Amplifier", fillcolor=lightblue];
+      n2340534856944 [label="Amplifier", fillcolor=lightblue];
     }
   }
   // Invisible edges to align depths
-  n2038916749296 -> n2039761235520 [style=invis];
-  n2039761235520 -> n2038918092112 [style=invis];
-  n2038918092112 -> n2039761235184 [style=invis];
-  n2038916749296 -> n2039761235520 [color=black];
-  n2038916749296 -> n2039761235856 [color=black];
-  n2039761235520 -> n2038918092112 [color=black];
-  n2039761235520 -> n2039761235856 [color=black];
-  n2038918092112 -> n2039761235184 [color=black];
-  n2038918092112 -> n2039761721040 [color=black];
-  n2039761235184 -> n2039761235520 [color=red, penwidth=2];
+  n2339689912304 -> n2340534857280 [style=invis];
+  n2340534857280 -> n2339691238736 [style=invis];
+  n2339691238736 -> n2340534856944 [style=invis];
+  n2339689912304 -> n2340534857280 [color=black];
+  n2339689912304 -> n2340534857616 [color=black];
+  n2340534857280 -> n2339691238736 [color=black];
+  n2340534857280 -> n2340534857616 [color=black];
+  n2339691238736 -> n2340535326416 [color=black];
+  n2339691238736 -> n2340534856944 [color=black];
+  n2340534856944 -> n2340535326416 [color=black];
+  n2340534856944 -> n2340534857280 [color=red, penwidth=2];
 }
