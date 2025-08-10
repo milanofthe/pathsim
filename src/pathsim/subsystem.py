@@ -6,8 +6,6 @@
 ##              This module contains the 'Subsystem' and 'Interface' classes 
 ##         that manage subsystems that can be embedded within a larger simulation
 ##
-##                                  Milan Rother 2024
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -21,6 +19,7 @@ from .connection import Connection
 from .blocks._block import Block
 
 from .utils.graph import Graph
+from .utils.bundle import Bundle
 from .utils.register import Register
 from .utils.portreference import PortReference
 
@@ -141,6 +140,13 @@ class Subsystem(Block):
     ----------
     interface : Interface
         internal interface block for data transfer to the outside
+    graph : Graph
+        internal graph representation for fast system funcion 
+        evluations using DAG with algebraic depths
+    bundle : None | Bundle
+        bundle of algebraic loop closing connections assembled from the 
+        system graphthat manages a fixed point accelerator for resolving 
+        algebraic loops
     """
 
     def __init__(self, 
@@ -150,7 +156,7 @@ class Subsystem(Block):
         iterations_max=SIM_ITERATIONS_MAX
         ):
 
-        #internal integration engine as 'None'
+        #internal integration engine -> initialized later
         self.engine = None
 
         #flag to set block (subsystem) active
@@ -162,15 +168,15 @@ class Subsystem(Block):
         #max iterations for internal alg. loop solver
         self.iterations_max = iterations_max
 
-        #internal discrete events (for mixed signal blocks)
-        self.events = []
-
         #operators for algebraic and dynamic components (not here)
         self.op_alg = None
         self.op_dyn = None
 
-        #internal graph representation
+        #internal graph representation -> initialized later
         self.graph = None
+
+        #internal algebraic loop solver -> initialized later
+        self.bundle = None
 
         #internal connecions
         self.connections = [] if connections is None else connections
@@ -288,6 +294,9 @@ class Subsystem(Block):
         algebraic evaluation during simulation.
         """
         self.graph = Graph(self.blocks, self.connections)
+
+        #bundle together loop closing connections
+        self.bundle = Bundle(self.graph.loop_closing_connections())
 
 
     # methods for access to metadata --------------------------------------------------------
@@ -527,7 +536,7 @@ class Subsystem(Block):
 
 
     def _loops(self, t):
-        """Perform the algebraic loop solve of the system using accelerated 
+        """Perform the algebraic loop solve of the subsystem using accelerated 
         fixed-point iterations on the broken loop directed graph.
         
         Parameters
@@ -536,39 +545,29 @@ class Subsystem(Block):
             evaluation time for system function
         """
 
-        #reset / initialize loop accelerators
-        for connection in self.graph.loop_closing_connections():
-            connection.init_accelerator()
-        
+        #reset accelerator of bundled loop closing connections
+        self.bundle.reset()
+
         #perform solver iterations on algebraic loops
         for iteration in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
             for depth, blocks_loop, connections_loop in self.graph.loop():
 
-                #update blocks at algebraic depth (with error control)
+                #update blocks at algebraic depth
                 for block in blocks_loop:
-                    if block: block.update(t)                
+                    if block: block.update(t)
 
                 #step accelerated connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
                     if connection: connection.update()
-
-            #step loop closing connections
-            max_error = 0.0
-            for connection in self.graph.loop_closing_connections():
-                
-                #skip inactive connections
-                if not connection:
-                    continue
-
-                #step fixed-point solver (for alg. loops)
-                err = connection.step_accelerator() 
-                if err > max_error:
-                    max_error = err
+                       
+            #step bundled loop closing connections solver
+            max_error = self.bundle.update()       
 
             #check convergence after first iteration
             if max_error <= self.tolerance_fpi:
+                print(f"iterations:{iteration}, error:{max_error}")
                 return
 
         #not converged -> error

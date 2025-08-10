@@ -6,8 +6,6 @@
 ##                This module contains the simulation class that manages
 ##            the blocks, connections, events and specific simulation methods.
 ##
-##                                   Milan Rother 2024
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -32,6 +30,7 @@ from ._constants import (
     )
 
 from .utils.graph import Graph
+from .utils.bundle import Bundle
 from .utils.analysis import Timer
 from .utils.portreference import PortReference
 from .utils.progresstracker import ProgressTracker
@@ -145,6 +144,10 @@ class Simulation:
     graph : Graph
         internal graph representation for fast system funcion 
         evluations using DAG with algebraic depths
+    bundle : None | Bundle
+        bundle of algebraic loop closing connections assembled from the 
+        system graphthat manages a fixed point accelerator for resolving 
+        algebraic loops
     engine : Solver
         global integrator (ODE solver) instance serving as a dummy to 
         get attributes and access to intermediate evaluation stages
@@ -189,6 +192,9 @@ class Simulation:
 
         #internal system graph -> initialized later
         self.graph = None
+
+        #internal algebraic loop solver -> initialized later
+        self.bundle = None
 
         #error tolerance for fixed point loop and implicit solver
         self.tolerance_fpi = tolerance_fpi
@@ -616,6 +622,9 @@ class Simulation:
         with Timer(verbose=False) as T:
             self.graph = Graph(self.blocks, self.connections)
 
+        #bundle together loop closing connections
+        self.bundle = Bundle(self.graph.loop_closing_connections())
+
         self._logger_info(
             "GRAPH (size: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
                 len(self.graph), *self.graph.depth(), T
@@ -850,7 +859,6 @@ class Simulation:
 
     # solving system equations ----------------------------------------------------
 
-
     def _update(self, t):        
         """Distribute information within the system by evaluating the directed acyclic graph 
         (DAG) formed by the algebraic passthroughs of the blocks and resolving algebraic loops 
@@ -921,9 +929,8 @@ class Simulation:
             evaluation time for system function
         """
 
-        #reset / initialize loop accelerators
-        for connection in self.graph.loop_closing_connections():
-            connection.init_accelerator()
+        #reset accelerator of bundled loop closing connections
+        self.bundle.reset()
 
         #perform solver iterations on algebraic loops
         for iteration in range(1, self.iterations_max):
@@ -939,18 +946,8 @@ class Simulation:
                 for connection in connections_loop:
                     if connection: connection.update()
                        
-            #step loop closing connections
-            max_error = 0.0
-            for connection in self.graph.loop_closing_connections():
-
-                #skip inactive connections
-                if not connection:
-                    continue
-
-                #step fixed-point solver (for alg. loops)
-                err = connection.step_accelerator() 
-                if err > max_error:
-                    max_error = err        
+            #step bundled loop closing connections solver
+            max_error = self.bundle.update()       
 
             #check convergence after first iteration
             if max_error <= self.tolerance_fpi:
@@ -959,7 +956,7 @@ class Simulation:
 
         #not converged -> error
         self._logger_error(
-            "fixed-point loop in '_update' not converged (iters: {}, err: {})".format(
+            "algebraic loop not converged (iters: {}, err: {})".format(
                 self.iterations_max, max_error), 
             RuntimeError
             )
