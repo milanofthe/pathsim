@@ -90,7 +90,6 @@ class Subsystem(Block):
 
     Example
     -------
-    
     This is how we can wrap up multiple blocks within a subsystem. 
     In this case vanderpol system built from discrete components 
     instead of using an ODE block (in practice you should use 
@@ -133,8 +132,8 @@ class Subsystem(Block):
         absolute tolerance for convergence of algebraic loops
         default see ´SIM_TOLERANCE_FPI´ in ´_constants.py´
     iterations_max : int
-        maximum allowed number of iterations for algebraic loop solver, 
-        default see ´SIM_ITERATIONS_MAX´ in ´_constants.py´
+        maximum allowed number of iterations for algebraic loop 
+        solver, default see ´SIM_ITERATIONS_MAX´ in ´_constants.py´
 
     Attributes
     ----------
@@ -143,10 +142,10 @@ class Subsystem(Block):
     graph : Graph
         internal graph representation for fast system funcion 
         evluations using DAG with algebraic depths
-    bundle : None | Bundle
-        bundle of algebraic loop closing connections assembled from the 
-        system graphthat manages a fixed point accelerator for resolving 
-        algebraic loops
+    boosters : None | list[ConnectionBooster]
+        list of boosters (fixed point accelerators) that wrap 
+        algebraic loop closing connections assembled from the 
+        system graph
     """
 
     def __init__(self, 

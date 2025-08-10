@@ -142,12 +142,11 @@ class Simulation:
     time : float
         global simulation time, starting at ´0.0´
     graph : Graph
-        internal graph representation for fast system funcion 
-        evluations using DAG with algebraic depths
-    bundle : None | Bundle
-        bundle of algebraic loop closing connections assembled from the 
-        system graphthat manages a fixed point accelerator for resolving 
-        algebraic loops
+        internal graph representation for fast system funcion evluations 
+        using DAG with algebraic depths
+    boosters : None | list[ConnectionBooster]
+        list of boosters (fixed point accelerators) that wrap algebraic 
+        loop closing connections assembled from the system graph
     engine : Solver
         global integrator (ODE solver) instance serving as a dummy to 
         get attributes and access to intermediate evaluation stages

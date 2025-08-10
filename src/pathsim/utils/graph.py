@@ -9,12 +9,11 @@
 
 from collections import defaultdict, deque, namedtuple
 from functools import lru_cache
-from typing import Iterable, Optional, Dict, Set, List, Tuple, Any
+
 
 # HELPER METHODS =======================================================================
 
-
-def outgoing_block_connection_map(connections: Iterable):
+def outgoing_block_connection_map(connections):
     """Construct a mapping from blocks to their outgoing connections.
 
     Parameters
@@ -27,7 +26,7 @@ def outgoing_block_connection_map(connections: Iterable):
     block_connection_map : defaultdict[Block, list[Connection]]
         outgoing connections of block (deterministic order)
     """
-    block_connection_map: Dict[Any, List] = defaultdict(list)
+    block_connection_map = defaultdict(list)
 
     # Build map grouping connections by source block.
     for con in connections:
@@ -47,7 +46,7 @@ def outgoing_block_connection_map(connections: Iterable):
     return defaultdict(list, block_connection_map)
 
 
-def downstream_block_block_map(connections: Iterable):
+def downstream_block_block_map(connections):
     """Construct a connection map (directed graph) from the list of
     connections in downstream (source -> targets) orientation.
 
@@ -61,7 +60,7 @@ def downstream_block_block_map(connections: Iterable):
     connection_map : defaultdict[Block, set[Block]]
         directed downstream graph of connections (source -> targets)
     """
-    connection_map: Dict[Any, Set[Any]] = defaultdict(set)
+    connection_map = defaultdict(set)
     for con in connections:
         src_blk = con.source.block
         for trg in con.targets:
@@ -71,7 +70,7 @@ def downstream_block_block_map(connections: Iterable):
     return defaultdict(set, {k: set(v) for k, v in connection_map.items()})
 
 
-def upstream_block_block_map(connections: Iterable):
+def upstream_block_block_map(connections):
     """Construct a connection map (directed graph) from the list of
     connections in upstream (targets -> source) orientation.
 
@@ -85,7 +84,7 @@ def upstream_block_block_map(connections: Iterable):
     connection_map : defaultdict[Block, set[Block]]
         directed upstream graph of connections (target -> source)
     """
-    connection_map: Dict[Any, Set[Any]] = defaultdict(set)
+    connection_map = defaultdict(set)
     for con in connections:
         src_blk = con.source.block
         for trg in con.targets:
@@ -94,11 +93,13 @@ def upstream_block_block_map(connections: Iterable):
     return defaultdict(set, {k: set(v) for k, v in connection_map.items()})
 
 
-def algebraic_depth_dfs(graph_map: Dict[Any, Set[Any]],
-                        node: Any,
-                        node_set: Optional[Set[Any]] = None,
-                        propagate_inf: bool = True,
-                        stack: Optional[Tuple[Any, ...]] = None):
+def algebraic_depth_dfs(
+    graph_map,
+    node,
+    node_set=None,
+    propagate_inf=True,
+    stack=None
+    ):
     """Computes the longest algebraic path length using depth-first search.
 
     This function determines the longest algebraic path length from a given node,
@@ -207,10 +208,12 @@ def algebraic_depth_dfs(graph_map: Dict[Any, Set[Any]],
     return _dfs(node, stack)
 
 
-def has_algebraic_path(connection_map: Dict[Any, Set[Any]],
-                       start_block: Any,
-                       end_block: Any,
-                       node_set: Optional[Set[Any]] = None) -> bool:
+def has_algebraic_path(
+    connection_map,
+    start_block,
+    end_block,
+    node_set=None
+    ):
     """Determines if an algebraic path exists between two blocks.
 
     An algebraic path exists if there is a directed path from start_block to
@@ -252,7 +255,7 @@ def has_algebraic_path(connection_map: Dict[Any, Set[Any]],
         if start_block is not end_block:
             return False
 
-    visited: Set[Any] = set()
+    visited = set()
 
     # Iterative DFS stack: list of (node, iterator over sorted neighbors, depth_from_start)
     # depth_from_start helps detect trivial self-loop (path must traverse at least one other node)
@@ -303,25 +306,7 @@ def has_algebraic_path(connection_map: Dict[Any, Set[Any]],
     return False
 
 
-
-
-
-# DAG CLASS ============================================================================
-
-class DAG:
-
-    def __init__(self, blocks, connections):
-        self.blocks = blocks
-        self.connections = connections
-
-    def __iter__(self):
-        for d in range(len(self.blocks)):
-            yield d, self.blocks[d], self.connections[d]
-
-
-
 # GRAPH CLASS ==========================================================================
-
 
 class Graph:
     """Representation of a directed graph, defined by blocks (nodes)
@@ -375,12 +360,12 @@ class Graph:
         self._loop_depth = 0
 
         # initialize graph orderings
-        self._blocks_dag: Dict[int, List[Any]] = defaultdict(list)
-        self._blocks_loop_dag: Dict[int, List[Any]] = defaultdict(list)
+        self._blocks_dag = defaultdict(list)
+        self._blocks_loop_dag = defaultdict(list)
 
-        self._connections_dag: Dict[int, List[Any]] = defaultdict(list)
-        self._connections_loop_dag: Dict[int, List[Any]] = defaultdict(list)
-        self._loop_closing_connections: List[Any] = []
+        self._connections_dag = defaultdict(list)
+        self._connections_loop_dag = defaultdict(list)
+        self._loop_closing_connections = []
 
         # construct mappings for connections between blocks (internally sets)
         self._upst_blk_blk_map = upstream_block_block_map(self.connections)
@@ -430,7 +415,7 @@ class Graph:
         self.has_loops = False
 
         # collect blocks involved in algebraic loops
-        blocks_loop: Set[Any] = set()
+        blocks_loop = set()
 
         # iterate blocks to calculate their algebraic depths deterministically:
         # sort blocks by stable key before iterating to avoid input-order dependence
@@ -484,7 +469,7 @@ class Graph:
                 entry_points = [sorted(scc, key=id)[0]]
 
             # BFS from entry points for this SCC with deterministic neighbor ordering
-            visited: Set[Any] = set()
+            visited = set()
             queue = deque([(ep, 0) for ep in sorted(entry_points, key=id)])
             max_local_depth = 0
             local_depths: Dict[Any, int] = {}
@@ -556,7 +541,7 @@ class Graph:
         lowlink = {}
         onstack = set()
         stack = []
-        result: List[List[Any]] = []
+        result = []
 
         # deterministic neighbor ordering helper
         def _successors(node):
