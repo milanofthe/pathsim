@@ -10,6 +10,8 @@
 
 # IMPORTS ==============================================================================
 
+import numpy as np
+
 from ..optim.anderson import Anderson
 from ..connection import Connection
 
@@ -56,6 +58,7 @@ class Bundle:
         #step fixed point accelerator
         _vals, res = self.accelerator.step(self.history, self.get())
         self.set(_vals)
+
         self.history = _vals
         return res
 
