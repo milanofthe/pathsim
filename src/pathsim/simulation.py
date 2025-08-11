@@ -6,8 +6,6 @@
 ##                This module contains the simulation class that manages
 ##            the blocks, connections, events and specific simulation methods.
 ##
-##                                   Milan Rother 2024
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -30,6 +28,8 @@ from ._constants import (
     SIM_ITERATIONS_MAX,
     LOG_ENABLE
     )
+
+from .optim.booster import ConnectionBooster
 
 from .utils.graph import Graph
 from .utils.analysis import Timer
@@ -143,8 +143,11 @@ class Simulation:
     time : float
         global simulation time, starting at ´0.0´
     graph : Graph
-        internal graph representation for fast system funcion 
-        evluations using DAG with algebraic depths
+        internal graph representation for fast system funcion evluations 
+        using DAG with algebraic depths
+    boosters : None | list[ConnectionBooster]
+        list of boosters (fixed point accelerators) that wrap algebraic 
+        loop closing connections assembled from the system graph
     engine : Solver
         global integrator (ODE solver) instance serving as a dummy to 
         get attributes and access to intermediate evaluation stages
@@ -189,6 +192,9 @@ class Simulation:
 
         #internal system graph -> initialized later
         self.graph = None
+
+        #internal algebraic loop solvers -> initialized later
+        self.boosters = None
 
         #error tolerance for fixed point loop and implicit solver
         self.tolerance_fpi = tolerance_fpi
@@ -616,6 +622,12 @@ class Simulation:
         with Timer(verbose=False) as T:
             self.graph = Graph(self.blocks, self.connections)
 
+        #create boosters for loop closing connections
+        if self.graph.has_loops:
+            self.boosters = [
+                ConnectionBooster(conn) for conn in self.graph.loop_closing_connections()
+            ]
+
         self._logger_info(
             "GRAPH (size: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
                 len(self.graph), *self.graph.depth(), T
@@ -850,7 +862,6 @@ class Simulation:
 
     # solving system equations ----------------------------------------------------
 
-
     def _update(self, t):        
         """Distribute information within the system by evaluating the directed acyclic graph 
         (DAG) formed by the algebraic passthroughs of the blocks and resolving algebraic loops 
@@ -921,11 +932,14 @@ class Simulation:
             evaluation time for system function
         """
 
+        #reset accelerators of loop closing connections
+        for con_booster in self.boosters:
+            con_booster.reset()
+
         #perform solver iterations on algebraic loops
         for iteration in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
-            max_error = 0.0
             for depth, blocks_loop, connections_loop in self.graph.loop():
 
                 #update blocks at algebraic depth
@@ -934,36 +948,23 @@ class Simulation:
 
                 #step accelerated connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
-                    
-                    #skip inactive connections
-                    if not connection: 
-                        continue
+                    if connection: connection.update()
 
-                    #connections at first depth
-                    if depth == 0:
-
-                        #reset solver at first iteration
-                        if iteration == 1: 
-                            connection.reset()
-
-                        #step fixed-point solver (for alg. loops)
-                        err = connection.step() 
-                        if err > max_error:
-                            max_error = err
-
-                    else:
-
-                        #connections at lower depths
-                        connection.update()
-
-            #check convergence
-            if max_error <= self.tolerance_fpi:
+            #step boosters of loop closing connections
+            max_err = 0.0
+            for con_booster in self.boosters:
+                err = con_booster.update()
+                if err > max_err:
+                    max_err = err
+                       
+            #check convergence after first iteration
+            if max_err <= self.tolerance_fpi:
                 return
 
         #not converged -> error
         self._logger_error(
-            "fixed-point loop in '_update' not converged (iters: {}, err: {})".format(
-                self.iterations_max, max_error), 
+            "algebraic loop not converged (iters: {}, err: {})".format(
+                self.iterations_max, max_err), 
             RuntimeError
             )
 

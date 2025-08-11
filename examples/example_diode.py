@@ -33,7 +33,7 @@ V_T = 0.026         # Thermal voltage at room temperature (V)
 # Define diode current function: i = I_s * (exp(v_diode/(n*V_T)) - 1)
 def diode_current(v_diode):
     """Diode current as function of diode voltage"""
-    clipped = np.clip(v_diode/V_T, -25, 25)
+    clipped = np.clip(v_diode/V_T, None, 25)
     return I_s * (np.exp(clipped) - 1)
 
 # Define voltage source function
@@ -55,7 +55,7 @@ connections = [
     Connection(Src, Add[0], Sc1[0]),            # Source to adder and scope
     Connection(Add, DiodeFn, Sc1[1]),           # Diode voltage to function and scope
     Connection(DiodeFn, ResAmp, Sc2),           # Diode current to resistor and scope
-    Connection(ResAmp, Add[1])                  # Voltage drop back to adder (algebraic loop)
+    Connection(ResAmp, Add[1]),                  # Voltage drop back to adder (algebraic loop)
 ]
 
 # Simulation instance
@@ -64,7 +64,7 @@ Sim = Simulation(
     connections, 
     dt=0.001, 
     Solver=RKBS32,
-    tolerance_fpi=1e-6
+    tolerance_fpi=1e-12
     )
 
 
@@ -74,7 +74,9 @@ if __name__ == "__main__":
     
     # Run the simulation for 2 seconds
     Sim.run(duration=2.0)
-    
+
+    # Sim.graph.save_graphviz("example")
+        
     # Plot the results
     Sim.plot()
         

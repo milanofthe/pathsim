@@ -58,6 +58,10 @@ class Anderson:
         return True
 
 
+    def __len__(self):
+        return len(self.dx_buffer[0]) if self.dx_buffer else 0
+
+
     def solve(self, func, x0, iterations_max=100, tolerance=1e-6):
         """Solve the function 'func' with initial 
         value 'x0' up to a certain tolerance.

@@ -6,8 +6,6 @@
 ##              This module contains the 'Subsystem' and 'Interface' classes 
 ##         that manage subsystems that can be embedded within a larger simulation
 ##
-##                                  Milan Rother 2024
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -19,6 +17,8 @@ from collections import defaultdict
 from .connection import Connection
 
 from .blocks._block import Block
+
+from .optim.booster import ConnectionBooster
 
 from .utils.graph import Graph
 from .utils.register import Register
@@ -91,7 +91,6 @@ class Subsystem(Block):
 
     Example
     -------
-    
     This is how we can wrap up multiple blocks within a subsystem. 
     In this case vanderpol system built from discrete components 
     instead of using an ODE block (in practice you should use 
@@ -134,13 +133,20 @@ class Subsystem(Block):
         absolute tolerance for convergence of algebraic loops
         default see ´SIM_TOLERANCE_FPI´ in ´_constants.py´
     iterations_max : int
-        maximum allowed number of iterations for algebraic loop solver, 
-        default see ´SIM_ITERATIONS_MAX´ in ´_constants.py´
+        maximum allowed number of iterations for algebraic loop 
+        solver, default see ´SIM_ITERATIONS_MAX´ in ´_constants.py´
 
     Attributes
     ----------
     interface : Interface
         internal interface block for data transfer to the outside
+    graph : Graph
+        internal graph representation for fast system funcion 
+        evluations using DAG with algebraic depths
+    boosters : None | list[ConnectionBooster]
+        list of boosters (fixed point accelerators) that wrap 
+        algebraic loop closing connections assembled from the 
+        system graph
     """
 
     def __init__(self, 
@@ -150,7 +156,7 @@ class Subsystem(Block):
         iterations_max=SIM_ITERATIONS_MAX
         ):
 
-        #internal integration engine as 'None'
+        #internal integration engine -> initialized later
         self.engine = None
 
         #flag to set block (subsystem) active
@@ -162,15 +168,15 @@ class Subsystem(Block):
         #max iterations for internal alg. loop solver
         self.iterations_max = iterations_max
 
-        #internal discrete events (for mixed signal blocks)
-        self.events = []
-
         #operators for algebraic and dynamic components (not here)
         self.op_alg = None
         self.op_dyn = None
 
-        #internal graph representation
+        #internal graph representation -> initialized later
         self.graph = None
+
+        #internal algebraic loop solvers -> initialized later
+        self.boosters = None
 
         #internal connecions
         self.connections = [] if connections is None else connections
@@ -288,6 +294,12 @@ class Subsystem(Block):
         algebraic evaluation during simulation.
         """
         self.graph = Graph(self.blocks, self.connections)
+
+        #create boosters for loop closing connections
+        if self.graph.has_loops:
+            self.boosters = [
+                ConnectionBooster(conn) for conn in self.graph.loop_closing_connections()
+            ]
 
 
     # methods for access to metadata --------------------------------------------------------
@@ -527,7 +539,7 @@ class Subsystem(Block):
 
 
     def _loops(self, t):
-        """Perform the algebraic loop solve of the system using accelerated 
+        """Perform the algebraic loop solve of the subsystem using accelerated 
         fixed-point iterations on the broken loop directed graph.
         
         Parameters
@@ -535,50 +547,40 @@ class Subsystem(Block):
         t : float
             evaluation time for system function
         """
-        
+
+        #reset accelerators of loop closing connections
+        for con_booster in self.boosters:
+            con_booster.reset()
+
         #perform solver iterations on algebraic loops
         for iteration in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
-            max_error = 0.0
             for depth, blocks_loop, connections_loop in self.graph.loop():
 
-                #update blocks at algebraic depth (with error control)
+                #update blocks at algebraic depth
                 for block in blocks_loop:
-                    if block: block.update(t)                
+                    if block: block.update(t)
 
                 #step accelerated connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
-                    
-                    #skip inactive connections
-                    if not connection: 
-                        continue
+                    if connection: connection.update()
 
-                    #connections at first depth
-                    if loop_depth == 0:
-
-                        #reset solver at first iteration
-                        if iteration == 1: 
-                            connection.reset()
-
-                        #step fixed-point solver (for alg. loops)
-                        err = connection.step() 
-                        if err > max_error:
-                            max_error = err
-
-                    else:
-
-                        #connections at lower depths
-                        connection.update()
-
-            #check convergence
-            if max_error <= self.tolerance_fpi:
+            #step boosters of loop closing connections
+            max_err = 0.0
+            for con_booster in self.boosters:
+                err = con_booster.update()
+                if err > max_err:
+                    max_err = err
+                       
+            #check convergence after first iteration
+            if max_err <= self.tolerance_fpi:
                 return
 
         #not converged -> error
         raise RuntimeError(
             "algebraic loop in 'Subsystem' not converged (iters: {}, err: {})".format(
-                self.iterations_max, max_error)
+                self.iterations_max, max_err)
             )
         
 

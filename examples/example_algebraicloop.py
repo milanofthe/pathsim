@@ -55,7 +55,6 @@ if __name__ == "__main__":
 
     #run the simulation for some time
     Sim.run(5)
-    # Sim.steadystate()
 
     Sco.plot(".-")
 

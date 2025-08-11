@@ -144,13 +144,9 @@ class Connection:
     ----------
     _active : bool
         flag to set 'Connection' as active or inactive
-    values : array
-        values to transmit, relevant for fixed-point accelerator
-    accelerator : None, Anderson
-        internal fixed-point accelerator for algebraic loops
     """
 
-    __slots__ = ["source", "targets", "_active", "values", "accelerator"]
+    __slots__ = ["source", "targets", "_active"]
 
 
     def __init__(self, source, *targets):
@@ -163,12 +159,6 @@ class Connection:
 
         #flag to set connection active
         self._active = True
-
-        #values to transmit as history
-        self.values = None
-
-        #internal fixed-point accelerator
-        self.accelerator = None
         
         #validate port aliases
         self._validate_ports()
@@ -182,6 +172,11 @@ class Connection:
         'to_dict' method with readable json formatting
         """
         return json.dumps(self.to_dict(), indent=2, sort_keys=False)
+
+
+    def __len__(self):
+        """Returns the number of ports that are defined in the connection"""
+        return len(self.source)
 
 
     def __bool__(self):
@@ -304,50 +299,6 @@ class Connection:
             self.source.to(trg)
 
 
-    def step(self):
-        """Step the internal fixed-point accelerator forward by one iteration.
-
-        If no previous values are available (prev_values is None), falls back to 
-        the 'update' method, which is essentially equivalent to a standard 
-        fixed-point update. 
-    
-        Returns
-        -------
-        res : float
-            fixed point residual for convergence control
-        """
-
-        #get source values and previous values
-        self.values, prev_values = self.source.get_outputs(), self.values
-
-        #initialize fixed point accelerator if not already available
-        if not self.accelerator:
-            self.accelerator = Anderson()
-
-        #no previous value -> fallback to update method
-        if prev_values is None:
-            self.update()
-            return 1.0
-
-        #update fixed-point accelerator
-        self.values, res = self.accelerator.step(prev_values, self.values)
-
-        #transmit new values to all targets
-        for trg in self.targets:
-            trg.set_inputs(self.values)
-
-        #return the fixed-point residual
-        return res
-
-
-    def reset(self):
-        """Reset the internal fixed point accelerator which is used 
-        to resolve algebraic loops and the internal values"""
-        self.values = None
-        if self.accelerator: 
-            self.accelerator.reset()
-
-
 class Duplex(Connection):
     """Extension of the 'Connection' class, that defines bidirectional 
     connections between two blocks by grouping together the inputs and 
@@ -367,6 +318,9 @@ class Duplex(Connection):
 
         #flag to set connection active
         self._active = True
+
+        import warnings
+        warnings.warn("'Duplex' will be deprecated in next release!")
         
 
     def to_dict(self):
