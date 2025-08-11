@@ -29,9 +29,10 @@ from ._constants import (
     LOG_ENABLE
     )
 
+from .optim.booster import ConnectionBooster
+
 from .utils.graph import Graph
 from .utils.analysis import Timer
-from .utils.booster import ConnectionBooster
 from .utils.portreference import PortReference
 from .utils.progresstracker import ProgressTracker
 

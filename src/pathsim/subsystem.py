@@ -18,9 +18,10 @@ from .connection import Connection
 
 from .blocks._block import Block
 
+from .optim.booster import ConnectionBooster
+
 from .utils.graph import Graph
 from .utils.register import Register
-from .utils.booster import ConnectionBooster
 from .utils.portreference import PortReference
 
 from ._constants import (
