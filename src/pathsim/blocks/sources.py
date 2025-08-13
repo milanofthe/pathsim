@@ -789,6 +789,24 @@ class PulseSource(Block):
         self._phase = 'low'
         self._phase_start_time = self.tau
 
+    def re_initialize(self, t: float):
+        """Restarts the pulse cycle at time t, adjusting all event timings accordingly."""
+        self._phase_start_time = t
+
+        # event timings relative to start of cycle (tau)
+        new_t_start_rise = t
+        new_t_start_high = new_t_start_rise + self.t_rise
+        t_plateau = self.T * self.duty
+        new_t_start_fall = new_t_start_high + t_plateau
+        new_t_start_low = new_t_start_fall + self.t_fall
+
+        self.events[0].t_start = max(0.0, new_t_start_rise)
+        self.events[1].t_start = max(0.0, new_t_start_high)
+        self.events[2].t_start = max(0.0, new_t_start_fall)
+        self.events[3].t_start = max(0.0, new_t_start_low)
+
+        for e in self.events:
+            e.reset()
 
     def update(self, t):
         """Calculate the pulse output value based on the current phase.
