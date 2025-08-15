@@ -791,8 +791,10 @@ class PulseSource(Block):
         to reset the block's state to the specified time.
         This is done by changing the phase of the pulse + resetting all the internal events.
 
-        Args:
-            t: Time to reset the block state at. If None, resets to initial state.
+        Parameters
+        ----------
+            t: float, optional
+                Time to reset the block state at. If None, resets to initial state.
 
         """
         if t:
