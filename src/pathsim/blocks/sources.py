@@ -783,30 +783,39 @@ class PulseSource(Block):
         self.events = [_E_rising, _E_high, _E_falling, _E_low]
 
 
-    def reset(self):
-        """Resets the block state."""
-        super().reset()
-        self._phase = 'low'
-        self._phase_start_time = self.tau
+    def reset(self, t: float=None):
+        """
+        Resets the block state.
+        
+        This block has a special implementation of reset where ``t`` can be provided
+        to reset the block's state to the specified time.
+        This is done by changing the phase of the pulse + resetting all the internal events.
 
-    def re_initialize(self, t: float):
-        """Restarts the pulse cycle at time t, adjusting all event timings accordingly."""
-        self._phase_start_time = t
+        Args:
+            t: Time to reset the block state at. If None, resets to initial state.
 
-        # event timings relative to start of cycle (tau)
-        new_t_start_rise = t
-        new_t_start_high = new_t_start_rise + self.t_rise
-        t_plateau = self.T * self.duty
-        new_t_start_fall = new_t_start_high + t_plateau
-        new_t_start_low = new_t_start_fall + self.t_fall
+        """
+        if t:
+            self._phase_start_time = t
 
-        self.events[0].t_start = max(0.0, new_t_start_rise)
-        self.events[1].t_start = max(0.0, new_t_start_high)
-        self.events[2].t_start = max(0.0, new_t_start_fall)
-        self.events[3].t_start = max(0.0, new_t_start_low)
+            # event timings relative to start of cycle (tau)
+            new_t_start_rise = t
+            new_t_start_high = new_t_start_rise + self.t_rise
+            t_plateau = self.T * self.duty
+            new_t_start_fall = new_t_start_high + t_plateau
+            new_t_start_low = new_t_start_fall + self.t_fall
 
-        for e in self.events:
-            e.reset()
+            self.events[0].t_start = max(0.0, new_t_start_rise)
+            self.events[1].t_start = max(0.0, new_t_start_high)
+            self.events[2].t_start = max(0.0, new_t_start_fall)
+            self.events[3].t_start = max(0.0, new_t_start_low)
+
+            for e in self.events:
+                e.reset()
+        else:
+            super().reset()
+            self._phase = 'low'
+            self._phase_start_time = self.tau
 
     def update(self, t):
         """Calculate the pulse output value based on the current phase.
