@@ -69,7 +69,11 @@ class LUT1D(Function):
         represents scalar values at each point. If 2-D with shape (n, m), 
         each column represents a different output dimension, allowing the
         lookup table to return m-dimensional vectors.
-        
+    fill_value : float or str, optional
+        The value to use for points outside the interpolation range. If "extrapolate",
+        the interpolator will use linear extrapolation. Default is "extrapolate".
+        See https://docs.scipy.org/doc/scipy-1.16.1/reference/generated/scipy.interpolate.interp1d.html for more details
+
     Attributes
     ----------
     points : ndarray
@@ -81,19 +85,19 @@ class LUT1D(Function):
         extrapolation enabled beyond the data range.
     """
 
-    def __init__(self, points, values):
+    def __init__(self, points, values, fill_value="extrapolate"):
         self.points = np.asarray(points).flatten()
         self.values = np.asarray(values)
         
         # Handle both 1D and 2D values
         if self.values.ndim == 1:
             # Single output dimension
-            self.inter = interp1d(self.points, self.values, fill_value="extrapolate")
+            self.inter = interp1d(self.points, self.values, fill_value=fill_value)
             def func(*x):
                 return self.inter(x[0])
         else:
             # Multiple output dimensions - interpolate each column separately
-            self.inter = interp1d(self.points, self.values, axis=0, fill_value="extrapolate")
+            self.inter = interp1d(self.points, self.values, axis=0, fill_value=fill_value)
             def func(*x):
                 return self.inter(x[0])
 
