@@ -4,15 +4,37 @@ import numpy as np
 
 class LUT(Function):
     """
-    Build internal n-d interpolant and treats it as a function. 
-    Inherits from the `Function` block
+    N-dimensional lookup table with linear interpolation functionality.
+
+    This class implements a multi-dimensional lookup table that uses scipy's
+    LinearNDInterpolator for piecewise linear interpolation in N-dimensional space.
+    The interpolation is based on Delaunay triangulation of the input points, 
+    providing smooth linear interpolation between data points. For points outside 
+    the convex hull of the input data, the interpolator returns NaN values.
+    
+    For more details see: https://docs.scipy.org/doc/scipy-1.16.1/reference/generated/scipy.interpolate.LinearNDInterpolator.html
+
+    The LUT acts as a Function block.
 
     Parameters
     ----------
-    points : ndarray of floats
-        2-D array of data point coordinates, or a precomputed Delaunay triangulation 
-    values : ndarray of float 
-        N-D array of data values at points. 
+    points : array_like of shape (n, ndim)
+        2-D array of data point coordinates where n is the number of points
+        and ndim is the dimensionality of the space. Each row represents a
+        single data point in ndim-dimensional space.
+    values : array_like of shape (n,) or (n, m)
+        N-D array of data values at the corresponding points. If 1-D, represents
+        scalar values at each point. If 2-D, each column represents a different
+        output dimension (m output values per input point).
+        
+    Attributes
+    ----------
+    points : ndarray
+        Stored array of input point coordinates.
+    values : ndarray  
+        Stored array of output values at each point.
+    inter : scipy.interpolate.LinearNDInterpolator
+        The scipy linear interpolator object used for interpolation.
     """
 
     def __init__(self, points, values):
@@ -25,16 +47,38 @@ class LUT(Function):
 
 class LUT1D(Function):
     """
-    Build internal 1-D interpolant and treats it as a function. 
-    Inherits from the `Function` block
+    One-dimensional lookup table with linear interpolation functionality.
+    
+    This class implements a 1-dimensional lookup table that uses scipy's interp1d
+    for piecewise linear interpolation along a single axis. The interpolation
+    provides linear interpolation between adjacent data points and supports
+    extrapolation beyond the input data range using the 'extrapolate' fill mode.
+
+    For more details see: https://docs.scipy.org/doc/scipy-1.16.1/reference/generated/scipy.interpolate.interp1d.html
+    
+    The LUT1D acts as a Function block.
 
     Parameters
     ----------
-    points : ndarray of floats
-        1-D array of data point coordinates
-    values : ndarray of float
-        1-D or 2-D array of data values at points. If 2-D, each column represents
-        a different output dimension.
+    points : array_like of shape (n,)
+        1-D array of monotonically increasing data point coordinates where n 
+        is the number of points. These represent the independent variable values
+        at which the dependent values are known.
+    values : array_like of shape (n,) or (n, m)
+        1-D or 2-D array of data values at the corresponding points. If 1-D,
+        represents scalar values at each point. If 2-D with shape (n, m), 
+        each column represents a different output dimension, allowing the
+        lookup table to return m-dimensional vectors.
+        
+    Attributes
+    ----------
+    points : ndarray
+        Flattened array of input point coordinates, stored as 1-D array.
+    values : ndarray
+        Stored array of output values at each point, preserving original shape.
+    inter : scipy.interpolate.interp1d
+        The scipy 1D interpolator object used for linear interpolation with
+        extrapolation enabled beyond the data range.
     """
 
     def __init__(self, points, values):
