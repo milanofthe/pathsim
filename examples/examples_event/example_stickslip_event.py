@@ -64,7 +64,7 @@ A2 = Amplifier(-k)
 A3 = Amplifier(1/m)
 Fc = Function(f_coulomb) # coulomb friction (kinetic)
 P1 = Adder()
-Sw = Switch(1)           # selecting port '1' initially
+Sw = Switch(0)           # selecting port '0' initially
 
 #blocks for visualization
 Sc1 = Scope(
@@ -83,15 +83,12 @@ Sc2 = Scope(
 
 blocks = [Sr, I1, I2, A1, A2, A3, Fc, P1, Sw, Sc1, Sc2]
 
-
 #connections between the blocks
 connections = [
-    Connection(I1, Sw[0]), 
-    Connection(Sr, Sw[1], Sc1[0]), 
+    Connection(I1, Sw[1], Fc[0]), 
+    Connection(Sr, Sw[0], Fc[1], Sc1[0]), 
     Connection(Sw, I2, A1, Sc1[1]), 
     Connection(I2, A2, Sc1[2]), 
-    Connection(Sw, Fc[0]), 
-    Connection(Sr, Fc[1]),
     Connection(A1, P1[0]), 
     Connection(A2, P1[1]), 
     Connection(Fc, P1[2], Sc2[1]),
@@ -112,7 +109,7 @@ def slip_to_stick_evt(t):
 def slip_to_stick_act(t):
 
     #change switch state
-    Sw.select(1)
+    Sw.select(0)
 
     I1.off()
     Fc.off()
@@ -134,7 +131,7 @@ def stick_to_slip_evt(t):
 def stick_to_slip_act(t):
 
     #change switch state
-    Sw.select(0)
+    Sw.select(1)
 
     I1.on()
     Fc.on()
