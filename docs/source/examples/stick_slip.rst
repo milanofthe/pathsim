@@ -161,12 +161,10 @@ Afterwards, the connections between the blocks can be defined. The first argumen
 
     #connections between the blocks
     connections = [
-        Connection(I1, Sw[0]), 
-        Connection(Sr, Sw[1], Sc1[0]), 
+        Connection(I1, Sw[1], Fc[0]), 
+        Connection(Sr, Sw[0], Fc[1], Sc1[0]), 
         Connection(Sw, I2, A1, Sc1[1]), 
         Connection(I2, A2, Sc1[2]), 
-        Connection(Sw, Fc[0]), 
-        Connection(Sr, Fc[1]),
         Connection(A1, P1[0]), 
         Connection(A2, P1[1]), 
         Connection(Fc, P1[2], Sc2[1]),
@@ -192,7 +190,7 @@ Next we need to define the two event managers for the state transitions of the s
     def slip_to_stick_act(t):
 
         #change switch state
-        Sw.state = 1
+        Sw.select(0)
 
         I1.off()
         Fc.off()
@@ -216,7 +214,7 @@ Next we need to define the two event managers for the state transitions of the s
     def stick_to_slip_act(t):
 
         #change switch state
-        Sw.state = 0
+        Sw.select(1)
 
         I1.on()
         Fc.on()
