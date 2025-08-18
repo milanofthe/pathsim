@@ -404,13 +404,18 @@ class TestPulseSource(unittest.TestCase):
         self.assertEqual(len(P), 0)
     
     def test_reset_with_time(self):
+        """Test the special reset with time functionality"""
         P = PulseSource()
-        print(P._phase)
+
+        # set the phase to high and check that the output
+        # corresponds to the plateau value
         P._phase = 'high'
         P.update(t=0.1)
         self.assertEqual(P.outputs[0], 1.0)
 
-
+        # reset the pulse to t=0.7
+        # if not resetted correctly, this should output zero (low phase)
+        # but here we reset with the `t` argument
         P.reset(t=0.7)
         P.update(t=0.7)
         self.assertEqual(P.outputs[0], 1.0)
