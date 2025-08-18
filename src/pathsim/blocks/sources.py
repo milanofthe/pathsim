@@ -787,9 +787,11 @@ class PulseSource(Block):
         """
         Resets the block state.
         
-        This block has a special implementation of reset where ``t`` can be provided
-        to reset the block's state to the specified time.
-        This is done by changing the phase of the pulse + resetting all the internal events.
+        Note
+        ----
+            This block has a special implementation of reset where ``t`` can be provided
+            to reset the block's state to the specified time.
+            This is done by changing the phase of the pulse + resetting all the internal events.
 
         Parameters
         ----------
