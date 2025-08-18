@@ -402,6 +402,19 @@ class TestPulseSource(unittest.TestCase):
     def test_len(self):
         P = PulseSource()
         self.assertEqual(len(P), 0)
+    
+    def test_reset_with_time(self):
+        P = PulseSource()
+        print(P._phase)
+        P._phase = 'high'
+        P.update(t=0.1)
+        self.assertEqual(P.outputs[0], 1.0)
+
+
+        P.reset(t=0.7)
+        P.update(t=0.7)
+        self.assertEqual(P.outputs[0], 1.0)
+
 
 
 class TestPulse(unittest.TestCase):
