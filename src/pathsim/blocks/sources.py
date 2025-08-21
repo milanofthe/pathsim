@@ -1024,8 +1024,8 @@ class StepSource(Block):
         if not isinstance(tau, (int, float, list, np.ndarray)):
             raise ValueError(f"'tau' has to be float, or array of floarts, but is {type(tau)}!") 
 
-        self.amplitude = [amplitude] if isinstance(amplitude, (int, float)) else amplitude
-        self.tau = [tau] if isinstance(tau, (int, float)) else tau
+        self.amplitude = np.asarray(amplitude)
+        self.tau = np.asarray(tau)
 
         #input shape validation
         if len(self.amplitude) != len(self.tau):
