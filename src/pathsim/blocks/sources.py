@@ -986,22 +986,28 @@ class SquareWaveSource(Block):
 
 
 class StepSource(Block):
-    """Discrete time unit step block.
+    """Discrete time unit step source block.
     
-    Utilizes a scheduled event to set 
-    the block output at the defined delay.
+    Utilizes a scheduled event to set the block output 
+    to the specified output levels at the defined event times.
+
+    The arguments can be vectorial and in that case, the output is set to the 
+    amplitude that corresponds to the defined delay.
 
     Parameters
     ----------
-    amplitude : float
-        amplitude of the step signal
-    tau : float
-        delay of the step
+    amplitude : float | list[float]
+        amplitude of the step signal, or amplitudes / output 
+        levels of the multiple steps
+    tau : float | list[float]
+        delay of the step, or delays of the different steps
 
     Attributes
     ----------
-    events : list[Schedule]
-        internal scheduled event 
+    Evt : ScheduleList
+        internal scheduled event directly accessible
+    events : list[ScheduleList]
+        list of interna events
     """
 
     #max number of ports
@@ -1014,21 +1020,29 @@ class StepSource(Block):
     def __init__(self, amplitude=1, tau=0.0):
         super().__init__()
 
-        self.amplitude = amplitude
-        self.tau = tau
+        #input type validation
+        if not isinstance(amplitude, (int, float, list, np.ndarray)):
+            raise ValueError(f"'amplitude' has to be float, or array of floarts, but is {type(amplitude)}")
+        if not isinstance(tau, (int, float, list, np.ndarray)):
+            raise ValueError(f"'tau' has to be float, or array of floarts, but is {type(tau)}!") 
 
-        def stp_up(t):
-            self.outputs[0] = self.amplitude
+        self.amplitude = list(amplitude)
+        self.tau = list(tau)
 
-        #internal scheduled event
-        self.events = [
-            Schedule(
-                t_start=tau,
-                t_period=tau,
-                t_end=3*tau/2,
-                func_act=stp_up
-                )
-            ]
+        #input shape validation
+        if len(self.amplitude) != len(self.tau):
+            raise ValueError("'amplitude' abd 'tau' must have same dimensions!")
+
+        #internal scheduled list event
+        def stp_set(t):
+            idx = len(self.Evt)
+            self.outputs[0] = self.amplitude[idx]
+
+        self.Evt = ScheduleList(
+            times_evt=self.tau,
+            func_act=stp_set
+            )
+        self.events = [self.Evt]
 
     def __len__(self):
         #no algebraic passthrough
