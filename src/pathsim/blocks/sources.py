@@ -1057,7 +1057,7 @@ class StepSource(Block):
 
         #internal scheduled list event
         def stp_set(t):
-            idx = len(self.Evt)
+            idx = len(self.Evt) - 1
             self.outputs[0] = self.amplitude[idx]
 
         self.Evt = ScheduleList(

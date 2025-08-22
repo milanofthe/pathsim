@@ -58,7 +58,7 @@ if __name__ == "__main__":
     #run the simulation for some time
     Sim.run(100)
 
-    sco.plot(lw=2)
+    sco.plot(".-", lw=2)
 
     #plot sensitivities
     time, [sp, ot, er] = sco.read()
