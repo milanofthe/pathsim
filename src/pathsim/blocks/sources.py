@@ -5,8 +5,6 @@
 ##           This module defines blocks that serve purely as inputs / sources 
 ##                for the simulation such as the generic 'Source' block
 ##
-##                                 Milan Rother 2024
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================
@@ -14,7 +12,7 @@
 import numpy as np
 
 from ._block import Block
-from ..events.schedule import Schedule
+from ..events.schedule import Schedule, ScheduleList
 from .._constants import TOLERANCE
 
 
@@ -986,22 +984,52 @@ class SquareWaveSource(Block):
 
 
 class StepSource(Block):
-    """Discrete time unit step block.
+    """Discrete time unit step source block.
     
-    Utilizes a scheduled event to set 
-    the block output at the defined delay.
+    Utilizes a scheduled event to set the block output 
+    to the specified output levels at the defined event times.
+
+    The arguments can be vectorial and in that case, the output is set to the 
+    amplitude that corresponds to the defined delay.
+
+
+    Examples
+    --------
+
+    This is how to use the source as a unit step source:
+
+    .. code-block:: python
+
+        from pathsim.blocks import StepSource
+        
+        #default, starts at 0, jumps to 1
+        stp = StepSource()
+
+
+    And this is how to configure it with multiple consecutive steps:
+
+    .. code-block:: python
+
+        from pathsim.blocks import StepSource
+        
+        #starts at 0, jumps to 1 at 1, jumps to -1 at 2 and jumps back to 0 at 3
+        stp = StepSource(amplitude=[1, -1, 0], tau=[1, 2, 3])
+
 
     Parameters
     ----------
-    amplitude : float
-        amplitude of the step signal
-    tau : float
-        delay of the step
+    amplitude : float | list[float]
+        amplitude of the step signal, or amplitudes / output 
+        levels of the multiple steps
+    tau : float | list[float]
+        delay of the step, or delays of the different steps
 
     Attributes
     ----------
-    events : list[Schedule]
-        internal scheduled event 
+    Evt : ScheduleList
+        internal scheduled event directly accessible
+    events : list[ScheduleList]
+        list of interna events
     """
 
     #max number of ports
@@ -1014,21 +1042,29 @@ class StepSource(Block):
     def __init__(self, amplitude=1, tau=0.0):
         super().__init__()
 
-        self.amplitude = amplitude
-        self.tau = tau
+        #input type validation
+        if not isinstance(amplitude, (int, float, list, np.ndarray)):
+            raise ValueError(f"'amplitude' has to be float, or array of floarts, but is {type(amplitude)}")
+        if not isinstance(tau, (int, float, list, np.ndarray)):
+            raise ValueError(f"'tau' has to be float, or array of floarts, but is {type(tau)}!") 
 
-        def stp_up(t):
-            self.outputs[0] = self.amplitude
+        self.amplitude = amplitude if isinstance(amplitude, (list, np.ndarray)) else [amplitude]
+        self.tau = tau if isinstance(tau, (list, np.ndarray)) else [tau]
 
-        #internal scheduled event
-        self.events = [
-            Schedule(
-                t_start=tau,
-                t_period=tau,
-                t_end=3*tau/2,
-                func_act=stp_up
-                )
-            ]
+        #input shape validation
+        if len(self.amplitude) != len(self.tau):
+            raise ValueError("'amplitude' and 'tau' must have same dimensions!")
+
+        #internal scheduled list event
+        def stp_set(t):
+            idx = len(self.Evt) - 1
+            self.outputs[0] = self.amplitude[idx]
+
+        self.Evt = ScheduleList(
+            times_evt=self.tau,
+            func_act=stp_set
+            )
+        self.events = [self.Evt]
 
     def __len__(self):
         #no algebraic passthrough
