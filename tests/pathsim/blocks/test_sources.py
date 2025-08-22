@@ -16,7 +16,7 @@ from pathsim.blocks.sources import (
     SinusoidalPhaseNoiseSource, ChirpPhaseNoiseSource, ChirpSource,
     PulseSource, Pulse, ClockSource, Clock, SquareWaveSource, StepSource, Step
 )
-from pathsim.events.schedule import Schedule
+from pathsim.events.schedule import Schedule, ScheduleList
 
 
 # TESTS ================================================================================
@@ -512,25 +512,41 @@ class TestStepSource(unittest.TestCase):
     def test_init(self):
         # Default
         S = StepSource()
-        self.assertEqual(S.amplitude, 1)
-        self.assertEqual(S.tau, 0.0)
+        self.assertEqual(S.amplitude, [1])
+        self.assertEqual(S.tau, [0.0])
         
         # Specific
         S = StepSource(amplitude=10, tau=5.0)
-        self.assertEqual(S.amplitude, 10)
-        self.assertEqual(S.tau, 5.0)
+        self.assertEqual(S.amplitude, [10])
+        self.assertEqual(S.tau, [5.0])
+
+        #specific vectorial
+        S = StepSource(amplitude=[1, 2, -1, 0], tau=[1, 10, 200, 220])
+        self.assertEqual(S.amplitude, [1, 2, -1, 0])
+        self.assertEqual(S.tau, [1, 10, 200, 220])
+
+        #input validation, dimension mismatch
+        with self.assertRaises(ValueError):
+            S = StepSource(amplitude=[1, 2, -1, 0], tau=[1, 10, 200])
+
+        #input validation, wrong type
+        with self.assertRaises(ValueError):
+            S = StepSource(amplitude="3", tau=2)
+        with self.assertRaises(ValueError):
+            S = StepSource(amplitude=3, tau="2")
+
+        #validation wrong order of delays (indirectly through `ScheduleList`)
+        with self.assertRaises(ValueError):
+            S = StepSource(amplitude=[1, 2, 0], tau=[1, 20, 10])
+
 
     def test_event(self):
         S = StepSource(amplitude=5, tau=2.0)
         
         # Should have 1 scheduled event
         self.assertEqual(len(S.events), 1)
+        self.assertIsInstance(S.Evt, ScheduleList)
         
-        # Check event timing
-        event = S.events[0]
-        self.assertEqual(event.t_start, 2.0)
-        self.assertEqual(event.t_period, 2.0)
-        self.assertEqual(event.t_end, 3.0)  # 3*tau/2
 
     def test_len(self):
         S = StepSource()

@@ -12,7 +12,7 @@
 import numpy as np
 
 from ._block import Block
-from ..events.schedule import Schedule
+from ..events.schedule import Schedule, ScheduleList
 from .._constants import TOLERANCE
 
 
@@ -1024,12 +1024,12 @@ class StepSource(Block):
         if not isinstance(tau, (int, float, list, np.ndarray)):
             raise ValueError(f"'tau' has to be float, or array of floarts, but is {type(tau)}!") 
 
-        self.amplitude = np.asarray(amplitude)
-        self.tau = np.asarray(tau)
+        self.amplitude = amplitude if isinstance(amplitude, (list, np.ndarray)) else [amplitude]
+        self.tau = tau if isinstance(tau, (list, np.ndarray)) else [tau]
 
         #input shape validation
         if len(self.amplitude) != len(self.tau):
-            raise ValueError("'amplitude' abd 'tau' must have same dimensions!")
+            raise ValueError("'amplitude' and 'tau' must have same dimensions!")
 
         #internal scheduled list event
         def stp_set(t):
