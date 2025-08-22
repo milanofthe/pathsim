@@ -992,6 +992,30 @@ class StepSource(Block):
     The arguments can be vectorial and in that case, the output is set to the 
     amplitude that corresponds to the defined delay.
 
+
+    Examples
+    --------
+
+    This is how to use the source as a unit step source:
+
+    .. code-block:: python
+
+        from pathsim.blocks import StepSource
+        
+        #default, starts at 0, jumps to 1
+        stp = StepSource()
+
+
+    And this is how to configure it with multiple consecutive steps:
+
+    .. code-block:: python
+
+        from pathsim.blocks import StepSource
+        
+        #starts at 0, jumps to 1 at 1, jumps to -1 at 2 and jumps back to 0 at 3
+        stp = StepSource(amplitude=[1, -1, 0], tau=[1, 2, 3])
+
+
     Parameters
     ----------
     amplitude : float | list[float]
