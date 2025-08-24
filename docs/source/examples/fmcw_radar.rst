@@ -3,7 +3,7 @@ FMCW Radar
 
 In this example we simulate a simple frequency modulated continuous wave (FMCW) radar system. 
 
-You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/examples_rf/example_radar.py>`_.
+You can also find this example as a single file in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples/example_radar.py>`_.
 
 Below we have a very simplistic image of a radar system, it consists of a signal generator, transmitter/reciever chain and directed antennas. The fundamental working principle of a FMCW radar is that if we multiply a chirp signal (linearly frequency modulated sinusoid) with a delayed version of itself, we get a signal that has at each time two frequency components (sum and diffrerence). The low frequency component then is directly proportional to the phase shift between the two signals and this the time delay. This can be used to reconstruct the target distance from the frequency domain spectrum. 
 
