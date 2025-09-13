@@ -25,7 +25,8 @@ class Splitter(Function):
     
     Parameters
     ----------
-        fractions : np.ndarray | list
+    fractions : np.ndarray | list
+        fractions to split the input signal into
     """
 
     #max number of ports
