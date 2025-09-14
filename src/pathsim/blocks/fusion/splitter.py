@@ -1,8 +1,7 @@
 #########################################################################################
 ##
-##                       GENERIC MIMO FUNCTION BLOCK (blocks/function.py)
-##
-##                                Milan Rother 2024
+##                                 Flow Splitter Block 
+##                             (blocks/fusion/splitter.py)
 ##
 #########################################################################################
 
@@ -26,7 +25,8 @@ class Splitter(Function):
     Parameters
     ----------
     fractions : np.ndarray | list
-        fractions to split the input signal into
+        fractions to split the input signal into, 
+        must sum up to one
     """
 
     #max number of ports
