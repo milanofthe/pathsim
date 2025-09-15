@@ -245,18 +245,26 @@ class Solver:
         Returns
         -------
         engine : Solver
-            new solver instance        
+            new solver instance cast from `other`      
         """
 
         if not isinstance(other, Solver):
             raise ValueError("'other' must be instance of 'Solver' or child")
 
+        #assemble additional solver kwargs (default)
+        _solver_kwargs = {
+            "tolerance_lte_rel": other.tolerance_lte_rel,
+            "tolerance_lte_abs": other.tolerance_lte_abs
+        }
+
+        #update from casting
+        _solver_kwargs.update(solver_kwargs)
+
         #create new solver instance
         engine = cls(
             initial_value=other.initial_value, 
-            tolerance_lte_rel=solver_kwargs.get("tolerance_lte_rel", other.tolerance_lte_rel),
-            tolerance_lte_abs=solver_kwargs.get("tolerance_lte_abs", other.tolerance_lte_abs),
-            parent=parent
+            parent=parent,
+            **_solver_kwargs
             )
         
         #set internal state of new engine from other

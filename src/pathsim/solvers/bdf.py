@@ -70,7 +70,22 @@ class BDF(ImplicitSolver):
 
     @classmethod
     def cast(cls, other, parent, **solver_kwargs):
-        """cast to this solver needs special handling of startup method"""
+        """cast to this solver needs special handling of startup method
+
+        Parameters
+        ----------
+        other : Solver
+            solver instance to cast new instance of this class from
+        parent : None | Solver
+            solver instance to use as parent
+        solver_kwargs : dict
+            other args for the solver
+
+        Returns
+        -------
+        engine : BDF
+            instance of `BDF` solver with params and state from `other`
+        """
         engine = super().cast(other, parent, **solver_kwargs)
         engine.startup = DIRK3.cast(engine, parent)
 
