@@ -75,14 +75,14 @@ class TestODE(unittest.TestCase):
         #test that no solver is initialized
         self.assertEqual(D.engine, None)
 
-        D.set_solver(Solver, tolerance_lte_rel=1e-4, tolerance_lte_abs=1e-6)
+        D.set_solver(Solver, None, tolerance_lte_rel=1e-4, tolerance_lte_abs=1e-6)
 
         #test that solver is now available
         self.assertTrue(isinstance(D.engine, Solver))
         self.assertEqual(D.engine.tolerance_lte_rel, 1e-4)
         self.assertEqual(D.engine.tolerance_lte_abs, 1e-6)
 
-        D.set_solver(Solver, tolerance_lte_rel=1e-3, tolerance_lte_abs=1e-4)
+        D.set_solver(Solver, None, tolerance_lte_rel=1e-3, tolerance_lte_abs=1e-4)
 
         #test that solver tolerance is changed
         self.assertEqual(D.engine.tolerance_lte_rel, 1e-3)
@@ -114,7 +114,7 @@ class TestODE(unittest.TestCase):
     def test_update(self):
 
         D = ODE()
-        D.set_solver(Solver)
+        D.set_solver(Solver, None)
 
         D.update(0)
 

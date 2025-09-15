@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, ODE
-from pathsim.solvers import ESDIRK32, ESDIRK43, ESDIRK54, GEAR21, GEAR32, GEAR43, GEAR52A
+from pathsim.solvers import ESDIRK32, ESDIRK43, ESDIRK54, ESDIRK85, GEAR21, GEAR32, GEAR43, GEAR52A
 
 
 # VAN DER POL OSCILLATOR INITIAL VALUE PROBLEM ==========================================
@@ -60,7 +60,7 @@ Sim = Simulation(
 if __name__ == "__main__":
 
     #change solver and continue
-    for SOL in [ESDIRK32, ESDIRK43, ESDIRK54, GEAR21, GEAR32, GEAR43, GEAR52A]:
+    for SOL in [ESDIRK32, ESDIRK43, ESDIRK54, ESDIRK85, GEAR21, GEAR32, GEAR43, GEAR52A]:
         Sim._set_solver(Solver=SOL)
         Sim.run(3*mu)
 

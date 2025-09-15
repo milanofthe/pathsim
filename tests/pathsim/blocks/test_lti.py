@@ -96,7 +96,7 @@ class TestStateSpace(unittest.TestCase):
         #test that no solver is initialized
         self.assertEqual(S.engine, None)
 
-        S.set_solver(Solver, tolerance_lte_rel=1e-4, tolerance_lte_abs=1e-6)
+        S.set_solver(Solver, None, tolerance_lte_rel=1e-4, tolerance_lte_abs=1e-6)
 
         #test that solver is now available
         self.assertTrue(isinstance(S.engine, Solver))
@@ -106,7 +106,7 @@ class TestStateSpace(unittest.TestCase):
         self.assertEqual(S.engine.tolerance_lte_abs, 1e-6)
         self.assertEqual(S.engine.initial_value, 1.0)
 
-        S.set_solver(Solver, tolerance_lte_rel=1e-2, tolerance_lte_abs=1e-3)
+        S.set_solver(Solver, None, tolerance_lte_rel=1e-2, tolerance_lte_abs=1e-3)
 
         #test that solver tolerance is changed
         self.assertEqual(S.engine.tolerance_lte_rel, 1e-2)
@@ -116,7 +116,7 @@ class TestStateSpace(unittest.TestCase):
     def test_update(self):
 
         S = StateSpace(initial_value=1.1)
-        S.set_solver(Solver)
+        S.set_solver(Solver, None)
 
         #test if output is zero 
         self.assertEqual(S.outputs[0], 0.0)
@@ -137,7 +137,7 @@ class TestStateSpace(unittest.TestCase):
             D=0.5, 
             initial_value=None
             )    
-        S.set_solver(Solver)
+        S.set_solver(Solver, None)
         
         def src(t): return np.sin(t)
         def ref(t): return 0.5*np.sin(t)
@@ -155,7 +155,7 @@ class TestStateSpace(unittest.TestCase):
             D=np.ones((2, 2)), 
             initial_value=None
             )    
-        S.set_solver(Solver)
+        S.set_solver(Solver, None)
         
         def src(t): return [np.sin(t), np.cos(t)]
         def ref(t): return np.array([np.sin(t) + np.cos(t), np.sin(t) + np.cos(t)])
@@ -188,9 +188,11 @@ class TestTransferFunctionPRC(unittest.TestCase):
         self.assertEqual(T.D, 5.5)
 
         #test specific initialization (mimo)
-        T = TransferFunctionPRC(Poles=np.array([1, 2]), 
-                             Residues=2*np.ones((2, 2)), 
-                             Const=np.ones(2))
+        T = TransferFunctionPRC(
+            Poles=np.array([1, 2]), 
+            Residues=2*np.ones((2, 2)), 
+            Const=np.ones(2)
+            )
         self.assertTrue(np.all(T.A == np.diag(np.array([1, 2]))))
         self.assertTrue(np.all(T.B == np.ones(2)))
         self.assertTrue(np.all(T.C == 2*np.ones(2)))

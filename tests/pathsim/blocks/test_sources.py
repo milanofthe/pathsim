@@ -216,7 +216,7 @@ class TestSinusoidalPhaseNoiseSource(unittest.TestCase):
         
         # Mock solver
         MockSolver = Mock(return_value=Mock())
-        S.set_solver(MockSolver)
+        S.set_solver(MockSolver, None)
         
         self.assertIsNotNone(S.engine)
         MockSolver.assert_called_once_with(0.0)
@@ -282,7 +282,7 @@ class TestChirpPhaseNoiseSource(unittest.TestCase):
         
         # Mock solver
         MockSolver = Mock(return_value=Mock())
-        C.set_solver(MockSolver)
+        C.set_solver(MockSolver, None)
         
         self.assertIsNotNone(C.engine)
         MockSolver.assert_called_once_with(C.f0)
