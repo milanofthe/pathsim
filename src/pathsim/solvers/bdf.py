@@ -65,7 +65,16 @@ class BDF(ImplicitSolver):
 
         #initialize startup solver from 'self' and flag
         self._needs_startup = True
-        self.startup = DIRK3.cast(self, self.parent.startup if self.parent is not None else None)
+        self.startup = DIRK3.cast(self, self.parent)
+
+
+    @classmethod
+    def cast(cls, other, parent, **solver_kwargs):
+        """cast to this solver needs special handling of startup method"""
+        engine = super().cast(other, parent, **solver_kwargs)
+        engine.startup = DIRK3.cast(engine, parent)
+
+        return engine
 
 
     def stages(self, t, dt):
@@ -82,7 +91,7 @@ class BDF(ImplicitSolver):
 
         #not enough history for full order -> stages of startup method
         if self._needs_startup:
-            for _t in self.startup.stages(t, dt):
+            for self.stage, _t in enumerate(self.startup.stages(t, dt)):
                 yield _t
         else:
             for self.stage, ratio in enumerate(self.eval_stages):

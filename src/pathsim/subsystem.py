@@ -685,13 +685,13 @@ class Subsystem(Block):
             args to initialize solver with 
         """
 
-        #set internal dummy engine
+        #set internal dummy engine -> marks block as dynamic
         self.engine = Solver(parent=parent, **solver_args)
 
         #set integration engines and assemble list of dynamic blocks
         self._blocks_dyn = []
         for block in self.blocks:
-            block.set_solver(Solver, self.engine, **solver_args)
+            block.set_solver(Solver, parent, **solver_args)
             if block.engine:
                 self._blocks_dyn.append(block)
 

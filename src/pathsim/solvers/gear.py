@@ -140,7 +140,16 @@ class GEAR(ImplicitSolver):
 
         #initialize startup solver from 'self'
         self._needs_startup = True
-        self.startup = ESDIRK32.cast(self, self.parent.startup if self.parent is not None else None)
+        self.startup = ESDIRK32.cast(self, self.parent)
+
+
+    @classmethod
+    def cast(cls, other, parent, **solver_kwargs):
+        """cast to this solver needs special handling of startup method"""
+        engine = super().cast(other, parent, **solver_kwargs)
+        engine.startup = ESDIRK32.cast(engine, parent)
+
+        return engine
 
 
     def stages(self, t, dt):
@@ -157,7 +166,7 @@ class GEAR(ImplicitSolver):
 
         #not enough history for full order -> stages of startup method
         if self._needs_startup:
-            for _t in self.startup.stages(t, dt):
+            for self.stage, _t in enumerate(self.startup.stages(t, dt)):
                 yield _t
         else:
             for self.stage, ratio in enumerate(self.eval_stages):
