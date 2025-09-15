@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 from pathsim import Simulation, Connection, Interface, Subsystem
 from pathsim.blocks import Integrator, Scope, Function, Multiplier, Adder, Amplifier, Constant
-from pathsim.solvers import GEAR52A, ESDIRK43
+from pathsim.solvers import GEAR52A, ESDIRK43, ESDIRK32
 
 
 # VAN DER POL OSCILLATOR INITIAL VALUE PROBLEM ==========================================
@@ -91,7 +91,7 @@ Sim = Simulation(
     connections, 
     dt=dt, 
     log=True, 
-    Solver=GEAR52A, 
+    Solver=ESDIRK43, 
     tolerance_lte_abs=1e-6, 
     tolerance_lte_rel=1e-3,
     tolerance_fpi=1e-7

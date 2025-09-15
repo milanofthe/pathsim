@@ -147,6 +147,14 @@ class Solver:
         self._stage = val
 
 
+    def is_first_stage(self):
+        return self.stage == 0
+
+
+    def is_last_stage(self):
+        return self.stage == self.s - 1
+
+
     def stages(self, t, dt):
         """Generator that yields the intermediate evaluation 
         time during the timestep 't + ratio * dt' and also updates 
