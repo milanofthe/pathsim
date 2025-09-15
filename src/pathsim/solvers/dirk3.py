@@ -44,7 +44,9 @@ class DIRK3(DiagonallyImplicitRungeKutta):
         self.eval_stages = [1/2, 2/3, 1/2, 1.0]
 
         #butcher table
-        self.BT = {0:[1/2],
-                   1:[1/6, 1/2], 
-                   2:[-1/2, 1/2, 1/2], 
-                   3:[3/2, -3/2, 1/2, 1/2]}
+        self.BT = {
+            0: [1/2],
+            1: [1/6, 1/2], 
+            2: [-1/2, 1/2, 1/2], 
+            3: [3/2, -3/2, 1/2, 1/2]
+            }

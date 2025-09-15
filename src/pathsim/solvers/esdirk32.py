@@ -50,10 +50,12 @@ class ESDIRK32(DiagonallyImplicitRungeKutta):
         self.eval_stages = [0.0, 1.0, 3/2, 1.0]
 
         #butcher table
-        self.BT = {0:None, #explicit first stage
-                   1:[1/2, 1/2],
-                   2:[5/8, 3/8, 1/2],
-                   3:[7/18, 1/3, -2/9, 1/2]}
+        self.BT = {
+            0: None,      #explicit first stage
+            1: [1/2, 1/2],
+            2: [5/8, 3/8, 1/2],
+            3: [7/18, 1/3, -2/9, 1/2]
+            }
 
         #coefficients for truncation error estimate
         self.TR = [-1/9, -1/6, -2/9, 1/2]

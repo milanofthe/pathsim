@@ -65,24 +65,26 @@ class Integrator(Block):
         return 0
 
 
-    def set_solver(self, Solver, **solver_args):
+    def set_solver(self, Solver, parent, **solver_args):
         """set the internal numerical integrator
 
         Parameters
         ----------
         Solver : Solver
             numerical integration solver class
+        parent : None | Solver
+            solver instance to use as parent
         solver_args : dict
             parameters for solver initialization
         """
 
         if self.engine is None:
             #initialize the integration engine
-            self.engine = Solver(self.initial_value, **solver_args)
+            self.engine = Solver(self.initial_value, parent, **solver_args)
 
         else:
             #change solver if already initialized
-            self.engine = Solver.cast(self.engine, **solver_args)
+            self.engine = Solver.cast(self.engine, parent, **solver_args)
 
 
     def update(self, t):

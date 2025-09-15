@@ -90,21 +90,23 @@ class Differentiator(Block):
         return 1 if self._active else 0
 
 
-    def set_solver(self, Solver, **solver_args):
+    def set_solver(self, Solver, parent, **solver_args):
         """set the internal numerical integrator
 
         Parameters
         ----------
         Solver : Solver
             numerical integration solver class
+        parent : None | Solver
+            solver instance to use as parent
         solver_args : dict
             parameters for solver initialization
         """
 
         #initialize the numerical integration engine with kernel
-        if self.engine is None: self.engine = Solver(0.0, **solver_args)
+        if self.engine is None: self.engine = Solver(0.0, parent, **solver_args)
         #change solver if already initialized
-        else: self.engine = Solver.cast(self.engine, **solver_args)
+        else: self.engine = Solver.cast(self.engine, parent, **solver_args)
 
 
     def update(self, t):

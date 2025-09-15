@@ -12,6 +12,7 @@ from collections import deque
 from ._solver import ImplicitSolver
 from .dirk3 import DIRK3
 
+
 # BASE BDF SOLVER ======================================================================
 
 class BDF(ImplicitSolver):
@@ -53,17 +54,43 @@ class BDF(ImplicitSolver):
         self.n = None
 
         #bdf coefficients for orders 1 to 6
-        self.K = {1:[1.0], 
-                  2:[4/3, -1/3], 
-                  3:[18/11, -9/11, 2/11], 
-                  4:[48/25, -36/25, 16/25, -3/25],
-                  5:[300/137, -300/137, 200/137, -75/137, 12/137],
-                  6:[ 360/147, -450/147, 400/147, -225/147, 72/147, -10/147]}
+        self.K = {
+            1:[1.0], 
+            2:[4/3, -1/3], 
+            3:[18/11, -9/11, 2/11], 
+            4:[48/25, -36/25, 16/25, -3/25],
+            5:[300/137, -300/137, 200/137, -75/137, 12/137],
+            6:[360/147, -450/147, 400/147, -225/147, 72/147, -10/147]
+            }
         self.F = {1:1.0, 2:2/3, 3:6/11, 4:12/25, 5:60/137, 6:60/147}
 
         #initialize startup solver from 'self' and flag
         self._needs_startup = True
-        self.startup = DIRK3.cast(self)
+        self.startup = DIRK3.cast(self, self.parent)
+
+
+    @classmethod
+    def cast(cls, other, parent, **solver_kwargs):
+        """cast to this solver needs special handling of startup method
+
+        Parameters
+        ----------
+        other : Solver
+            solver instance to cast new instance of this class from
+        parent : None | Solver
+            solver instance to use as parent
+        solver_kwargs : dict
+            other args for the solver
+
+        Returns
+        -------
+        engine : BDF
+            instance of `BDF` solver with params and state from `other`
+        """
+        engine = super().cast(other, parent, **solver_kwargs)
+        engine.startup = DIRK3.cast(engine, parent)
+
+        return engine
 
 
     def stages(self, t, dt):
@@ -80,11 +107,11 @@ class BDF(ImplicitSolver):
 
         #not enough history for full order -> stages of startup method
         if self._needs_startup:
-            for _t in self.startup.stages(t, dt):
+            for self.stage, _t in enumerate(self.startup.stages(t, dt)):
                 yield _t
         else:
-            for ratio in self.eval_stages:
-                yield t + ratio * dt
+            for _t in super().stages(t, dt):
+                yield _t
 
 
     def reset(self):

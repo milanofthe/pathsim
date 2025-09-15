@@ -94,10 +94,6 @@ class ExplicitRungeKutta(ExplicitSolver):
             timestep rescale from error controller
         """
 
-        #no error estimate or not last stage -> early exit
-        if self.TR is None or self.stage < self.s: 
-            return True, 0.0, 1.0
-
         #local truncation error slope (this is faster then 'sum' comprehension)
         slope = 0.0
         for i, b in enumerate(self.TR):
@@ -157,8 +153,9 @@ class ExplicitRungeKutta(ExplicitSolver):
             slope = slope + self.Ks[i] * b
         self.x = x_0 + dt * slope
 
-        #increment stage counter
-        self.stage += 1
+        #no error estimate or not last stage -> early exit
+        if self.TR is None or not self.is_last_stage(): 
+            return True, 0.0, 1.0
 
         #compute truncation error estimate
         return self.error_controller(dt)
@@ -246,10 +243,6 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
             timestep rescale from error controller
         """
 
-        #no error estimate or not last stage -> early exit
-        if self.TR is None or self.stage < self.s: 
-            return True, 0.0, 1.0
-
         #local truncation error slope (this is faster then 'sum' comprehension)
         slope = 0.0
         for i, b in enumerate(self.TR):
@@ -295,7 +288,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         """
 
         #first stage is explicit -> ESDIRK -> early exit
-        if self.stage == 0 and self.BT[self.stage] is None:
+        if self.is_first_stage() and self.BT[0] is None:
             return 0.0
             
         #update timestep weighted slope 
@@ -348,23 +341,30 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         """
 
         #first stage is explicit -> ESDIRK
-        if self.stage == 0 and self.BT[self.stage] is None:
+        if self.is_first_stage() and self.BT[0] is None:
             self.Ks[self.stage] = f
 
-        #increment stage counter
-        self.stage += 1
+        #last stage, stiffly accurate and error control
+        if self.is_last_stage():
 
-        #compute final output if not stiffly accurate
-        if self.A is not None and self.stage == self.s:
+            #compute final output if not stiffly accurate
+            if self.A is not None:
 
-            #get past state from history
-            x_0 = self.history[0]
+                #get past state from history
+                x_0 = self.history[0]
 
-            #compute slope (this is faster then 'sum' comprehension)
-            slope = 0.0
-            for i, a in enumerate(self.A):
-                slope = slope + self.Ks[i] * a
-            self.x = x_0 + dt * slope    
+                #compute slope (this is faster then 'sum' comprehension)
+                slope = 0.0
+                for i, a in enumerate(self.A):
+                    slope = slope + self.Ks[i] * a
+                self.x = x_0 + dt * slope    
 
-        #compute truncation error estimate in final stage
-        return self.error_controller(dt)
+            #no error estimate -> early exit
+            if self.TR is None: 
+                return True, 0.0, 1.0
+
+            #compute truncation error estimate
+            return self.error_controller(dt)
+
+        #no error estimate otherwise
+        return True, 0.0, 1.0

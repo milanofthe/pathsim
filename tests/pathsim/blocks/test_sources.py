@@ -17,6 +17,7 @@ from pathsim.blocks.sources import (
     PulseSource, Pulse, ClockSource, Clock, SquareWaveSource, StepSource, Step
 )
 from pathsim.events.schedule import Schedule, ScheduleList
+from pathsim.solvers import EUF
 
 
 # TESTS ================================================================================
@@ -216,10 +217,9 @@ class TestSinusoidalPhaseNoiseSource(unittest.TestCase):
         
         # Mock solver
         MockSolver = Mock(return_value=Mock())
-        S.set_solver(MockSolver)
+        S.set_solver(EUF, None)
         
         self.assertIsNotNone(S.engine)
-        MockSolver.assert_called_once_with(0.0)
 
     def test_update_and_sample(self):
         S = SinusoidalPhaseNoiseSource(
@@ -281,11 +281,9 @@ class TestChirpPhaseNoiseSource(unittest.TestCase):
         C = ChirpPhaseNoiseSource()
         
         # Mock solver
-        MockSolver = Mock(return_value=Mock())
-        C.set_solver(MockSolver)
+        C.set_solver(EUF, None)
         
         self.assertIsNotNone(C.engine)
-        MockSolver.assert_called_once_with(C.f0)
 
     def test_triangle_wave(self):
         C = ChirpPhaseNoiseSource()

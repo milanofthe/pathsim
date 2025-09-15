@@ -541,8 +541,8 @@ class Simulation:
             _msg = f"block {block} already part of simulation"
             self._logger_error(_msg, ValueError)
 
-        #initialize numerical integrator of block
-        block.set_solver(self.Solver, **self.solver_kwargs)
+        #initialize numerical integrator of block with parent
+        block.set_solver(self.Solver, self.engine, **self.solver_kwargs)
 
         #add to dynamic list if solver was initialized
         if block.engine and block not in self._blocks_dyn:
@@ -688,7 +688,7 @@ class Simulation:
         #iterate all blocks and set integration engines with tolerances
         self._blocks_dyn = []
         for block in self.blocks:
-            block.set_solver(self.Solver, **self.solver_kwargs)
+            block.set_solver(self.Solver, self.engine, **self.solver_kwargs)
             
             #add dynamic blocks to list
             if block.engine:
@@ -730,6 +730,9 @@ class Simulation:
 
         #reset simulation time
         self.time = time
+
+        #reset integration engine
+        self.engine.reset()
 
         #reset all blocks to initial state
         for block in self.blocks:

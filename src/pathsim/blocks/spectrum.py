@@ -109,6 +109,9 @@ class Spectrum(Block):
         #time delay until start recording
         self.t_wait = t_wait
 
+        #last valid timestep sample for waiting
+        self.t_sample = 0.0
+
         #local integration time
         self.time = 0.0
 
@@ -135,7 +138,7 @@ class Spectrum(Block):
         return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
 
 
-    def set_solver(self, Solver, **solver_kwargs):
+    def set_solver(self, Solver, parent, **solver_kwargs):
         """set the internal numerical integrator for the RFT
 
         Parameters
@@ -145,8 +148,8 @@ class Spectrum(Block):
         solver_kwargs : dict
             parameters for solver initialization
         """
-        if self.engine is None: self.engine = Solver(0.0, **solver_kwargs)
-        else: self.engine = Solver.cast(self.engine, **solver_kwargs)
+        if self.engine is None: self.engine = Solver(0.0, parent, **solver_kwargs)
+        else: self.engine = Solver.cast(self.engine, parent, **solver_kwargs)
 
         
     def reset(self):
@@ -154,7 +157,6 @@ class Spectrum(Block):
 
         #local integration time
         self.time = 0.0
-
 
 
     def read(self):
@@ -228,16 +230,13 @@ class Spectrum(Block):
         error : float
             solver residual norm
         """
+        if self.t_sample >= self.t_wait:
 
-        #effective time for integration
-        _t = t - self.t_wait
-        if _t > dt:
+            #effective time for integration
+            self.time = t - self.t_wait
 
-            #update local integtration time
-            self.time = _t
-            
             #advance solution of implicit update equation (no jacobian)
-            f = self._kernel(self.engine.get(), self.inputs.to_array(), _t)
+            f = self._kernel(self.engine.get(), self.inputs.to_array(), self.time)
             return self.engine.solve(f, None, dt)
 
         #no error 
@@ -263,20 +262,29 @@ class Spectrum(Block):
         scale : float
             timestep rescale from adaptive integrators
         """
+        if self.t_sample >= self.t_wait:
 
-        #effective time for integration
-        _t = t - self.t_wait
-        if _t > dt:
-
-            #update local integtration time
-            self.time = _t
+            #effective time for integration
+            self.time = t - self.t_wait
             
             #compute update step with integration engine
-            f = self._kernel(self.engine.get(), self.inputs.to_array(), _t)
+            f = self._kernel(self.engine.get(), self.inputs.to_array(), self.time)
             return self.engine.step(f, dt)
 
         #no error estimate
         return True, 0.0, 1.0
+
+
+    def sample(self, t):
+        """sample time of successfull timestep for waiting period
+    
+        Parameters
+        ----------
+        t : float
+            sampling time
+        """
+        self.t_sample = t
+
 
 
     def plot(self, *args, **kwargs):
