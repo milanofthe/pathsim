@@ -178,7 +178,7 @@ class TestSubsystem(unittest.TestCase):
         self.assertEqual(nx, 0) # <- no internal engine yet
 
         from pathsim.solvers import EUF
-        S.set_solver(EUF)
+        S.set_solver(EUF, None)
 
         n, nx = S.size()
         self.assertEqual(nx, 1)
@@ -240,9 +240,6 @@ class TestSubsystem(unittest.TestCase):
 
         self.assertTrue(S._active)
         self.assertTrue(B1._active)
-
-
-
 
 
     def test_graph(self): pass
