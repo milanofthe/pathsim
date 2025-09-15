@@ -48,10 +48,12 @@ class RKBS32(ExplicitRungeKutta):
         self.eval_stages = [0.0, 1/2, 3/4, 1.0]
         
         #extended butcher table
-        self.BT = {0:[1/2],
-                   1:[0.0 , 3/4],
-                   2:[2/9 , 1/3, 4/9],
-                   3:[2/9 , 1/3, 4/9]}
+        self.BT = {
+            0: [1/2],
+            1: [0.0 , 3/4],
+            2: [2/9 , 1/3, 4/9],
+            3: [2/9 , 1/3, 4/9]
+            }
 
         #coefficients for truncation error estimate
         self.TR = [-5/72, 1/12, 1/9, -1/8]

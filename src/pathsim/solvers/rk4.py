@@ -41,10 +41,12 @@ class RK4(ExplicitRungeKutta):
         self.eval_stages = [0.0, 0.5, 0.5, 1.0]
 
         #butcher table
-        self.BT = {0:[1/2],
-                   1:[0.0, 1/2],
-                   2:[0.0, 0.0, 1.0], 
-                   3:[1/6, 2/6, 2/6, 1/6]}
+        self.BT = {
+            0: [1/2],
+            1: [0.0, 1/2],
+            2: [0.0, 0.0, 1.0], 
+            3: [1/6, 2/6, 2/6, 1/6]
+            }
 
 
     def interpolate(self, r, dt):

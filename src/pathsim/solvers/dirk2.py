@@ -47,8 +47,10 @@ class DIRK2(DiagonallyImplicitRungeKutta):
         self.eval_stages = [1/4, 3/4]
 
         #butcher table
-        self.BT = {0:[1/4],
-                   1:[1/2, 1/4]}
+        self.BT = {
+            0: [1/4],
+            1: [1/2, 1/4]
+            }
 
         #final evaluation
         self.A = [1/2, 1/2]
