@@ -95,7 +95,7 @@ class ExplicitRungeKutta(ExplicitSolver):
         """
 
         #no error estimate or not last stage -> early exit
-        if self.TR is None or self.stage < self.s: 
+        if self.TR is None or self.stage < self.s - 1: 
             return True, 0.0, 1.0
 
         #local truncation error slope (this is faster then 'sum' comprehension)
@@ -156,9 +156,6 @@ class ExplicitRungeKutta(ExplicitSolver):
         for i, b in enumerate(self.BT[self.stage]):
             slope = slope + self.Ks[i] * b
         self.x = x_0 + dt * slope
-
-        #increment stage counter
-        self.stage += 1
 
         #compute truncation error estimate
         return self.error_controller(dt)
@@ -247,7 +244,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         """
 
         #no error estimate or not last stage -> early exit
-        if self.TR is None or self.stage < self.s: 
+        if self.TR is None or self.stage < self.s - 1: 
             return True, 0.0, 1.0
 
         #local truncation error slope (this is faster then 'sum' comprehension)
@@ -351,11 +348,8 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         if self.stage == 0 and self.BT[self.stage] is None:
             self.Ks[self.stage] = f
 
-        #increment stage counter
-        self.stage += 1
-
         #compute final output if not stiffly accurate
-        if self.A is not None and self.stage == self.s:
+        if self.A is not None and self.stage == self.s - 1:
 
             #get past state from history
             x_0 = self.history[0]

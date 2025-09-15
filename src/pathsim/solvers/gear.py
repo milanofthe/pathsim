@@ -140,7 +140,7 @@ class GEAR(ImplicitSolver):
 
         #initialize startup solver from 'self'
         self._needs_startup = True
-        self.startup = ESDIRK32.cast(self)
+        self.startup = ESDIRK32.cast(self, self.parent.startup if self.parent is not None else None)
 
 
     def stages(self, t, dt):
@@ -160,7 +160,7 @@ class GEAR(ImplicitSolver):
             for _t in self.startup.stages(t, dt):
                 yield _t
         else:
-            for ratio in self.eval_stages:
+            for self.stage, ratio in enumerate(self.eval_stages):
                 yield t + ratio * dt
 
 
@@ -525,46 +525,7 @@ class GEAR52A(GEAR):
             self.F[n], self.K[n] = compute_bdf_coefficients(n, np.array(self.history_dt))
 
 
-    # def stages(self, t, dt):
-    #     """Generator that yields the intermediate evaluation 
-    #     time during the timestep 't + ratio * dt'.
-
-    #     Parameters
-    #     ----------
-    #     t : float 
-    #         evaluation time
-    #     dt : float
-    #         integration timestep
-    #     """
-
-    #     #not enough history for full order -> stages of startup method
-    #     if self._needs_startup:
-    #         for _t in self.startup.stages(t, dt):
-    #             yield _t
-    #     else:
-    #         for ratio in self.eval_stages:
-    #             yield t + ratio * dt
-
-
     # methods for adaptive timestep solvers --------------------------------------------
-
-    # def revert(self):
-    #     """Revert integration engine to previous timestep, this is only 
-    #     relevant for adaptive methods where the simulation timestep 'dt' 
-    #     is rescaled and the engine step is recomputed with the smaller 
-    #     timestep.
-    #     """
-
-    #     #revert startup method
-    #     if self._needs_startup:
-    #         self.startup.revert()
-
-    #     #reset internal state to previous state from history
-    #     self.x = self.history.popleft() 
-
-    #     #also remove latest timestep from timestep history
-    #     self.history_dt.popleft()
-
 
     def error_controller(self, tr_m, tr_p):
         """Compute scaling factor for adaptive timestep based on absolute and 

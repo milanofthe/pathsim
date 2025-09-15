@@ -123,20 +123,22 @@ class PID(Block):
         return 1 if self._active and (self.Kp or self.Kd) else 0
 
 
-    def set_solver(self, Solver, **solver_args):
+    def set_solver(self, Solver, parent, **solver_args):
         """set the internal numerical integrator
 
         Parameters
         ----------
         Solver : Solver
             numerical integration solver class
+        parent : None | Solver
+            numerical solver instance
         solver_args : dict
             parameters for solver initialization
         """
         #initialize the numerical integration engine with kernel
-        if not self.engine: self.engine = Solver(np.zeros(2), **solver_args)
-        #change solver if already initialized    
-        else: self.engine = Solver.cast(self.engine, **solver_args)
+        if not self.engine: self.engine = Solver(np.zeros(2), parent, **solver_args)
+        #change solver if already initialized
+        else: self.engine = Solver.cast(self.engine, parent, **solver_args)
 
 
     def update(self, t):

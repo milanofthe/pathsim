@@ -392,11 +392,11 @@ class SinusoidalPhaseNoiseSource(Block):
         return 0
 
 
-    def set_solver(self, Solver, **solver_kwargs):
+    def set_solver(self, Solver, parent, **solver_kwargs):
         #initialize the numerical integration engine 
-        if self.engine is None: self.engine = Solver(0.0, **solver_kwargs)
+        if self.engine is None: self.engine = Solver(0.0, parent, **solver_kwargs)
         #change solver if already initialized
-        else: self.engine = Solver.cast(self.engine, **solver_kwargs)
+        else: self.engine = Solver.cast(self.engine, parent, **solver_kwargs)
 
 
     def reset(self):
@@ -575,13 +575,13 @@ class ChirpPhaseNoiseSource(Block):
         self.t_max = 0
 
 
-    def set_solver(self, Solver, **solver_kwargs):
+    def set_solver(self, Solver, parent, **solver_kwargs):
         if self.engine is None:
             #initialize the numerical integration engine
-            self.engine = Solver(self.f0, **solver_kwargs)
+            self.engine = Solver(self.f0, parent, **solver_kwargs)
         else:
             #change solver if already initialized
-            self.engine = Solver.cast(self.engine, **solver_kwargs)
+            self.engine = Solver.cast(self.engine, parent, **solver_kwargs)
 
 
     def sample(self, t):
