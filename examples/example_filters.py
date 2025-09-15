@@ -47,6 +47,6 @@ if __name__ == "__main__":
     Sim.run(10)
 
     #plot the results from the scope directly
-    Sco.plot(".-")
+    Sco.plot()
 
     plt.show()
