@@ -36,7 +36,7 @@ connections = [
     ]
 
 #initialize simulation with the blocks, connections, timestep and logging enabled
-Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=BDF3)
+Sim = Simulation(blocks, connections, dt=dt, log=True, Solver=SSPRK33)
 
 
 # Run Example ===========================================================================
@@ -47,6 +47,6 @@ if __name__ == "__main__":
     Sim.run(10)
 
     #plot the results from the scope directly
-    Sco.plot()
+    Sco.plot(".-")
 
     plt.show()

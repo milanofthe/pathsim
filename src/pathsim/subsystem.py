@@ -668,7 +668,7 @@ class Subsystem(Block):
         return success, max_error_norm, min(relevant_scales)
 
 
-    def set_solver(self, Solver, **solver_args):
+    def set_solver(self, Solver, parent, **solver_args):
         """Initialize all blocks with solver for numerical integration
         and additional args for the solver such as tolerances, etc.
 
@@ -679,17 +679,19 @@ class Subsystem(Block):
         ----------
         Solver : Solver
             numerical solver definition
+        parent : Solver
+            numerical solver instance as parent
         solver_args : dict
             args to initialize solver with 
         """
 
         #set internal dummy engine
-        self.engine = Solver()
+        self.engine = Solver(parent=parent, **solver_args)
 
         #set integration engines and assemble list of dynamic blocks
         self._blocks_dyn = []
         for block in self.blocks:
-            block.set_solver(Solver, **solver_args)
+            block.set_solver(Solver, self.engine, **solver_args)
             if block.engine:
                 self._blocks_dyn.append(block)
 

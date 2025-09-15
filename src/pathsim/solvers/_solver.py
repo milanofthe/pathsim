@@ -45,6 +45,8 @@ class Solver:
         absolute tolerance for local truncation error (for solvers with error estimate)
     tolerance_lte_rel : float
         relative tolerance for local truncation error (for solvers with error estimate)
+    parent : None | Solver
+        parent solver instance that manages the intermediate stages, stage counter, etc.
 
     Attributes
     ----------
@@ -56,7 +58,7 @@ class Solver:
         order of integration scheme
     s : int
         number of internal intermediate stages
-    stage : int
+    _stage : int
         counter for current intermediate stage
     eval_stages : list[float]
         rations for evaluation times of intermediate stages
@@ -64,7 +66,8 @@ class Solver:
 
     def __init__(
         self, 
-        initial_value=0, 
+        initial_value=0,
+        parent=None, 
         tolerance_lte_abs=SOL_TOLERANCE_LTE_ABS, 
         tolerance_lte_rel=SOL_TOLERANCE_LTE_REL
         ):
@@ -75,6 +78,9 @@ class Solver:
         #tolerances for local truncation error (for adaptive solvers)
         self.tolerance_lte_abs = tolerance_lte_abs  
         self.tolerance_lte_rel = tolerance_lte_rel  
+
+        #parent solver instance
+        self.parent = parent
 
         #flag to identify adaptive/fixed timestep solvers
         self.is_adaptive = False
@@ -89,7 +95,7 @@ class Solver:
         self.s = 1
 
         #current evaluation stage for multistage solvers
-        self.stage = 0
+        self._stage = 0
 
         #intermediate evaluation times as ratios between [t, t+dt]
         self.eval_stages = [0.0]
@@ -114,9 +120,37 @@ class Solver:
         return True
 
 
+    @property
+    def stage(self):
+        """stage property management to interface with parent solver
+
+        Returns
+        -------
+        stage : int
+            current intermediate evaluation stage of solver
+        """
+        if self.parent is None:
+            return self._stage
+        return self.parent.stage
+
+
+    @stage.setter
+    def stage(self, val):
+        """stage property management to interface with parent solver,
+        setter method for property
+
+        Parameters
+        ----------
+        val : int
+            set intermediate evaluation stage of solver
+        """
+        self._stage = val
+
+
     def stages(self, t, dt):
         """Generator that yields the intermediate evaluation 
-        time during the timestep 't + ratio * dt'.
+        time during the timestep 't + ratio * dt' and also updates 
+        the current stage number for internal use.
 
         Parameters
         ----------
@@ -125,7 +159,7 @@ class Solver:
         dt : float
             integration timestep
         """
-        for ratio in self.eval_stages:
+        for self.stage, ratio in enumerate(self.eval_stages):
             yield t + ratio * dt
 
 
@@ -156,9 +190,6 @@ class Solver:
         #overwrite internal state with value
         self.x = x
 
-        #reset stage counter
-        self.stage = 0
-
 
     def reset(self):
         """"Resets integration engine to initial value"""
@@ -166,9 +197,6 @@ class Solver:
         #overwrite state with initial value
         self.x = self.initial_value
         self.history.clear()
-
-        #reset stage counter
-        self.stage = 0
 
 
     def buffer(self, dt):
@@ -190,12 +218,9 @@ class Solver:
         #buffer internal state to history
         self.history.appendleft(self.x)
 
-        #reset stage counter
-        self.stage = 0
-
 
     @classmethod
-    def cast(cls, other, **solver_kwargs):
+    def cast(cls, other, parent, **solver_kwargs):
         """Cast the integration engine to the new type and initialize 
         with previous solver arguments so it can continue from where 
         the 'old' solver stopped.
@@ -204,6 +229,8 @@ class Solver:
         ----------
         other : Solver
             solver instance to cast to new solver type
+        parent : None | Solver
+            solver instance to use as parent
         solver_kwargs : dict
             additional args for the new solver
 
@@ -220,11 +247,12 @@ class Solver:
         engine = cls(
             initial_value=other.initial_value, 
             tolerance_lte_rel=solver_kwargs.get("tolerance_lte_rel", other.tolerance_lte_rel),
-            tolerance_lte_abs=solver_kwargs.get("tolerance_lte_abs", other.tolerance_lte_abs)
+            tolerance_lte_abs=solver_kwargs.get("tolerance_lte_abs", other.tolerance_lte_abs),
+            parent=parent
             )
         
         #set internal state of new engine from other
-        engine.set(other.x)
+        engine.set(other.get())
 
         return engine
 
@@ -256,10 +284,7 @@ class Solver:
         """
         
         #reset internal state to previous state from history
-        self.x = self.history.popleft()
-
-        #reset stage counter
-        self.stage = 0   
+        self.x = self.history.popleft() 
 
 
     # methods for timestepping ---------------------------------------------------------

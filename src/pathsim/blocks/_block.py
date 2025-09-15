@@ -335,7 +335,7 @@ class Block(Serializable):
 
     # methods for blocks with integration engines ---------------------------------------
 
-    def set_solver(self, Solver, **solver_args):
+    def set_solver(self, Solver, parent, **solver_args):
         """Initialize the numerical integration engine with local truncation error 
         tolerance if required.
 
@@ -346,6 +346,8 @@ class Block(Serializable):
         ----------
         Solver : Solver
             numerical integrator
+        parent : None | Solver
+            numerical integrator instance
         solver_args : dict
             additional args for the solver
         """

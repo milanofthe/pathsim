@@ -135,7 +135,7 @@ class Spectrum(Block):
         return np.kron(u, np.exp(-1j * self.omega * t)) - self.alpha * x
 
 
-    def set_solver(self, Solver, **solver_kwargs):
+    def set_solver(self, Solver, parent, **solver_kwargs):
         """set the internal numerical integrator for the RFT
 
         Parameters
@@ -145,8 +145,8 @@ class Spectrum(Block):
         solver_kwargs : dict
             parameters for solver initialization
         """
-        if self.engine is None: self.engine = Solver(0.0, **solver_kwargs)
-        else: self.engine = Solver.cast(self.engine, **solver_kwargs)
+        if self.engine is None: self.engine = Solver(0.0, parent, **solver_kwargs)
+        else: self.engine = Solver.cast(self.engine, parent, **solver_kwargs)
 
         
     def reset(self):
