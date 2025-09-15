@@ -44,9 +44,11 @@ class RKF21(ExplicitRungeKutta):
         self.eval_stages = [0.0, 1/2, 1]
 
         #extended butcher table 
-        self.BT = {0:[  1/2],
-                   1:[1/256, 255/256],
-                   2:[1/512, 255/256, 1/512]}
+        self.BT = {
+            0: [  1/2],
+            1: [1/256, 255/256],
+            2: [1/512, 255/256, 1/512]
+            }
 
         #coefficients for local truncation error estimate
         self.TR = [1/512, 0, -1/512]

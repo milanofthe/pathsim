@@ -42,8 +42,10 @@ class SSPRK22(ExplicitRungeKutta):
         self.eval_stages = [0.0, 1.0]
 
         #butcher table
-        self.BT = {0:[1.0],
-                   1:[1/2, 1/2]}
+        self.BT = {
+            0: [1.0],
+            1: [1/2, 1/2]
+            }
 
 
     def interpolate(self, r, dt):
