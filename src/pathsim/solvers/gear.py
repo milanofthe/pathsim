@@ -184,8 +184,8 @@ class GEAR(ImplicitSolver):
             for self.stage, _t in enumerate(self.startup.stages(t, dt)):
                 yield _t
         else:
-            for self.stage, ratio in enumerate(self.eval_stages):
-                yield t + ratio * dt
+            for _t in super().stages(t, dt):
+                yield _t
 
 
     def reset(self):

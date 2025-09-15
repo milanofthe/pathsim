@@ -12,6 +12,7 @@ from collections import deque
 from ._solver import ImplicitSolver
 from .dirk3 import DIRK3
 
+
 # BASE BDF SOLVER ======================================================================
 
 class BDF(ImplicitSolver):
@@ -109,8 +110,8 @@ class BDF(ImplicitSolver):
             for self.stage, _t in enumerate(self.startup.stages(t, dt)):
                 yield _t
         else:
-            for self.stage, ratio in enumerate(self.eval_stages):
-                yield t + ratio * dt
+            for _t in super().stages(t, dt):
+                yield _t
 
 
     def reset(self):
