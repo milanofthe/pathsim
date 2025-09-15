@@ -99,8 +99,7 @@ class TestVanDerPolSystem(unittest.TestCase):
                     self.Sim._set_solver(
                         SOL, 
                         tolerance_lte_rel=0.0, 
-                        tolerance_lte_abs=tol,
-                        tolerance_fpi=1e-12
+                        tolerance_lte_abs=tol
                         )
 
                     self.Sim.run(self.mu)
