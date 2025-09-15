@@ -288,7 +288,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         """
 
         #first stage is explicit -> ESDIRK -> early exit
-        if self.is_first_stage() and self.BT[self.stage] is None:
+        if self.is_first_stage() and self.BT[0] is None:
             return 0.0
             
         #update timestep weighted slope 
@@ -341,7 +341,7 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
         """
 
         #first stage is explicit -> ESDIRK
-        if self.is_first_stage() and self.BT[self.stage] is None:
+        if self.is_first_stage() and self.BT[0] is None:
             self.Ks[self.stage] = f
 
         #last stage, stiffly accurate and error control
@@ -359,11 +359,11 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
                     slope = slope + self.Ks[i] * a
                 self.x = x_0 + dt * slope    
 
-            #no error estimate or not last stage -> early exit
+            #no error estimate -> early exit
             if self.TR is None: 
                 return True, 0.0, 1.0
 
-            #compute truncation error estimate in final stage
+            #compute truncation error estimate
             return self.error_controller(dt)
 
         #no error estimate otherwise
