@@ -7,6 +7,8 @@
 
 # IMPORTS ===============================================================================
 
+import numpy as np
+
 from ..ode import ODE
 
 
@@ -72,7 +74,7 @@ class ResidenceTime(ODE):
 
 
     def update(self, t):
-    	"""update global system equation
+        """update global system equation
 
         Parameters
         ----------
