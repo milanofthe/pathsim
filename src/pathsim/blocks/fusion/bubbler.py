@@ -93,7 +93,7 @@ class Bubbler(ODE):
         ve = self.vial_efficiency
         ce = self.conversion_efficiency
 
-        sol, ins = self.inputs.to_array()
+        sol, ins = self.inputs[0], self.inputs[1]
         sample_out = (1 - ce) * ins + (1 - ve)**2 * (ce * ins + (1 - ve)**2 * sol)
         x = self.engine.get()
 
