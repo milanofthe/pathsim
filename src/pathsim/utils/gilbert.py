@@ -70,25 +70,6 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
     if len(Poles) != len(Residues):
         raise ValueError("Same number of 'Poles' and 'Residues' have to be given!")
 
-    #check shape of residues for MIMO, etc
-    if Residues.ndim == 1:
-        N, m, n = Residues.size, 1, 1
-        Residues = np.reshape(Residues, (N, m, n))
-    elif Residues.ndim == 2:
-        N, m, n = *Residues.shape, 1
-        Residues = np.reshape(Residues, (N, m, n))
-    elif Residues.ndim == 3:
-        N, m, n = Residues.shape
-    else:
-        raise ValueError(f"shape mismatch of 'Residues': Residues.shape={Residues.shape}")
-
-    #initialize companion matrix
-    a = np.zeros((N, N))
-    b = np.zeros(N)
-        
-    #residues
-    C = np.ones((m, n*N))
-    
     #go through poles and handle conjugate pairs
     _Poles, _Residues = [], []
     for p, R in zip(Poles, Residues):
@@ -102,6 +83,28 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
         elif np.imag(p) > 0.0:
             _Poles.extend([p, np.conj(p)])
             _Residues.extend([R, np.conj(R)])
+
+    _Poles = np.asarray(_Poles)
+    _Residues = np.asarray(_Residues)
+
+    #check shape of residues for MIMO, etc
+    if _Residues.ndim == 1:
+        N, m, n = _Residues.size, 1, 1
+        _Residues = np.reshape(_Residues, (N, m, n))
+    elif _Residues.ndim == 2:
+        N, m, n = *_Residues.shape, 1
+        _Residues = np.reshape(_Residues, (N, m, n))
+    elif _Residues.ndim == 3:
+        N, m, n = _Residues.shape
+    else:
+        raise ValueError(f"shape mismatch of 'Residues': Residues.shape={_Residues.shape}")
+
+    #initialize companion matrix
+    a = np.zeros((N, N))
+    b = np.zeros(N)
+        
+    #residues
+    C = np.ones((m, n*N))
 
     #build real companion matrix from the poles
     p_old = 0.0
