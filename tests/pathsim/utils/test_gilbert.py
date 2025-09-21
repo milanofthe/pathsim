@@ -65,6 +65,21 @@ class TestGilbertRealization(unittest.TestCase):
             pr_eval = evaluate_poleresidue(s, Poles, Residues, Const)
             self.assertArrayAlmostEqual(ss_eval, pr_eval, places=12)
 
+    def test_siso_complex_poles_with_missing_conjugate(self):
+        "Complex poles passed but not their associated conjugate values."
+        Poles = [-1+1j, -1-2j, -2]
+        Residues = [1-0.5j, 1+1j, 2]
+        Const = 0.1
+        A, B, C, D = gilbert_realization(Poles, Residues, Const)
+
+        Poles_with_conj = [-1+1j, -1-1j,-1-2.j,-1+2.j, -2]
+        Residues_with_conj = [1-0.5j, 1+0.5j, 1+1j, 1- 1j, 2]
+
+        for s in [0, 1j, 10j, 100j]:
+            ss_eval = evaluate_statespace(s, A, B, C, D)
+            pr_eval = evaluate_poleresidue(s, Poles_with_conj, Residues_with_conj, Const)
+            self.assertArrayAlmostEqual(ss_eval, pr_eval, places=12)
+
     def test_mimo_2x2(self):
         Poles = [-1, -2, -3]
         Residues = [np.array([[1, 2], [3, 4]]), 

@@ -16,7 +16,7 @@ import numpy as np
 
 def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9): 
     """Build real valued statespace model from transfer function 
-    in pole residue form by Gilberts method and an additional 
+    in pole residue form by Gilbert's method and an additional
     similarity transformation to get fully real valued matrices.
 
     pole residue form:
@@ -57,6 +57,12 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
         state to output projection matrix
     D : array, float
         direct passthrough
+
+    Note
+    ----
+    If some poles are complex-valued, their conjugate-values are automatically
+    added if missing, to enforce the model realness and stability.
+
     """
 
     #make arrays
@@ -70,20 +76,22 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
     if len(Poles) != len(Residues):
         raise ValueError("Same number of 'Poles' and 'Residues' have to be given!")
 
-    #go through poles and handle conjugate pairs
+    #go through poles and handle missing conjugate pairs if any
     _Poles, _Residues = [], []
     for p, R in zip(Poles, Residues):
-
-        #real pole
+        # real pole
         if np.isreal(p) or abs(np.imag(p) / np.real(p)) < tolerance:
             _Poles.append(p.real)
             _Residues.append(R.real)
-
-        #complex conjugate pair
-        elif np.imag(p) > 0.0:
-            _Poles.extend([p, np.conj(p)])
-            _Residues.extend([R, np.conj(R)])
-
+        # complex pole
+        else:
+            if not p in _Poles:
+                _Poles.append(p)
+                _Residues.append(R)
+            # add eventual missing conjugate pair
+            if not np.conj(p) in _Poles:
+                _Poles.append(np.conj(p))
+                _Residues.append(np.conj(R))
     _Poles = np.asarray(_Poles)
     _Residues = np.asarray(_Residues)
 
