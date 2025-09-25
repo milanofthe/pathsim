@@ -50,7 +50,7 @@ class Bubbler(ODE):
         conversion_efficiency=0.9,
         vial_efficiency=0.9,
         replacement_times=None,
-    ):
+        ):
 
         #bubbler parameters
         self.replacement_times = replacement_times
@@ -76,8 +76,8 @@ class Bubbler(ODE):
 
         super().__init__(func=_fn, initial_value=np.zeros(4))
 
-        #create vial reset events
-        self.events = self.create_reset_events()
+        #create internal vial reset events
+        self._create_reset_events()
 
 
     def update(self, t):
@@ -103,10 +103,16 @@ class Bubbler(ODE):
 
 
     def _create_reset_event_vial(self, i, reset_times):
+        """Define event action function and return a `ScheduleList` event 
+        per vial `i` that triggers at predefined `reset_times`. 
+        """
 
         def reset_vial_i(_):
+            #get the full engine state
             x = self.engine.get()
+            #set index 'i' to zero
             x[i] = 0.0
+            #set the full engine state 
             self.engine.set(x)
 
         return ScheduleList(
@@ -115,7 +121,7 @@ class Bubbler(ODE):
             )
 
 
-    def create_reset_events(self):
+    def _create_reset_events(self):
         """Create reset events for all vials based on the replacement times.
 
         Raises
@@ -129,11 +135,11 @@ class Bubbler(ODE):
         """
 
         replacement_times = self.replacement_times
-        events = []
+        self.events = []
 
         # if reset_times is a single list use it for all vials
         if replacement_times is None:
-            return events
+            return 
 
         if isinstance(replacement_times, (int, float)):
             replacement_times = [replacement_times]
@@ -152,7 +158,7 @@ class Bubbler(ODE):
                 "replacement_times must be a single value or a list with the same length as the number of vials"
             )
 
-        for i, ts in enumerate(replacement_times):
-            events.append(self._create_reset_event_vial(i, ts))
-
-        return events
+        #create the internal events
+        self.events = [
+            self._create_reset_event_vial(i, ts) for i, ts in enumerate(replacement_times)
+            ]
