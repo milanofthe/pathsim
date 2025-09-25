@@ -43,8 +43,8 @@ class Splitter(Function):
         if not np.isclose(sum(self.fractions), 1):
             raise ValueError(f"'fractions' must sum to one and not {sum(self.fractions)}")
 
-        #dynamically define output port map based on fractions
-        _port_map_out = {f"out {fr}": i for i, fr in enumerate(self.fractions)}
-
         #initialize like `Function` block
         super().__init__(func=lambda u: self.fractions*u)
+
+        #dynamically define output port map based on fractions
+        self._port_map_out = {f"out {fr}": i for i, fr in enumerate(self.fractions)}
