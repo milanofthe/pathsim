@@ -28,3 +28,5 @@ pathsim.blocks
    pathsim.blocks.converters
    pathsim.blocks.samplehold
    pathsim.blocks.comparator
+
+   pathsim.blocks.tritium
