@@ -29,4 +29,4 @@ pathsim.blocks
    pathsim.blocks.samplehold
    pathsim.blocks.comparator
 
-   pathsim.blocks.fusion
+   pathsim.blocks.tritium

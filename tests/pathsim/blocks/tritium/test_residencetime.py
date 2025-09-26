@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                                  TESTS FOR 
-##                       'blocks.fusion.residencetime.py'
+##                       'blocks.tritium.residencetime.py'
 ##
 ########################################################################################
 
@@ -10,7 +10,7 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.fusion import ResidenceTime, Process
+from pathsim.blocks.tritium import ResidenceTime, Process
 
 from pathsim.solvers import EUF
 

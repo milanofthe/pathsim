@@ -15,4 +15,4 @@ from pathsim.blockd.amplifier import Amplifier
 
 ---
 
-The goal is to keep the available blocks that can be imported direcly general purpose and have separate submodules / toolboxes for special purpose blocks. For example for different domains such as nuclear fusion, radio-frequency engineering, or robotics.
+The goal is to keep the available blocks that can be imported direcly general purpose and have separate submodules / toolboxes for special purpose blocks. For example for different domains such as chemical, tritium sciences, radio-frequency engineering, or robotics.

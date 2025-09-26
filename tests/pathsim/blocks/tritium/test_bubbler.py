@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                                  TESTS FOR 
-##                         'blocks.fusion.bubbler.py'
+##                         'blocks.tritium.bubbler.py'
 ##
 ########################################################################################
 
@@ -10,7 +10,7 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.fusion import Bubbler4
+from pathsim.blocks.tritium import Bubbler4
 
 from pathsim.solvers import EUF
 from pathsim.events.schedule import ScheduleList

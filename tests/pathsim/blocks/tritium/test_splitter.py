@@ -1,7 +1,7 @@
 ########################################################################################
 ##
 ##                                  TESTS FOR 
-##                         'blocks.fusion.splitter.py'
+##                         'blocks.tritium.splitter.py'
 ##
 ########################################################################################
 
@@ -10,7 +10,7 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.fusion import Splitter
+from pathsim.blocks.tritium import Splitter
 
 from tests.pathsim.blocks._embedding import Embedding
 
