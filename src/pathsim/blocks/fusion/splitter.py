@@ -16,7 +16,7 @@ from ..function import Function
 
 class Splitter(Function):
     """Splitter block that splits the input signal into multiple 
-    outputs based on specified fractions.
+    outputs weighted with the specified fractions.
 
     Note
     ----
