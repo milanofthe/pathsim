@@ -319,20 +319,6 @@ class Block(Serializable):
         if self.op_dyn: self.op_dyn.reset()
 
 
-    # methods for blocks with discrete events -------------------------------------------
-
-    def get_events(self):
-        """Return internal events of the block, for discrete time blocks 
-        such as triggers / comparators, clocks, etc.
-
-        Returns
-        -------
-        events : list[Event]
-            internal events of the block
-        """
-        return self.events
-
-
     # methods for blocks with integration engines ---------------------------------------
 
     def set_solver(self, Solver, parent, **solver_args):
