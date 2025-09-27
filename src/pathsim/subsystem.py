@@ -454,14 +454,15 @@ class Subsystem(Block):
 
     # methods for discrete event management -------------------------------------------------
 
-    def get_events(self):
+    @property
+    def events(self):
         """Recursively collect and return events spawned by the 
         internal blocks of the subsystem, for discrete time 
         blocks such as triggers / comparators, clocks, etc.
         """
         _events = []
         for block in self.blocks:
-            _events.extend(block.get_events())
+            _events.extend(block.events)
         return _events
 
 
