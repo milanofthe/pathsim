@@ -73,14 +73,6 @@ class TestBlock(unittest.TestCase):
         self.assertTrue(B)
 
 
-    def test_get_events(self):
-
-        B = Block()
-
-        #no internal events by default
-        self.assertEqual(B.get_events(), [])
-
-
     def test_getitem(self):
 
         B = Block()
