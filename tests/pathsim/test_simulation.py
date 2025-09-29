@@ -283,6 +283,28 @@ class TestSimulation(unittest.TestCase):
             self.assertAlmostEqual(Sim.time, 0.1*i, 10)
 
 
+    def test_stop(self):
+        """Test that stop() method sets _active flag to False"""
+        B1, B2, B3 = Block(), Block(), Block()
+        C1 = Connection(B1, B2)
+        Sim = Simulation(
+            blocks=[B1, B2, B3], 
+            connections=[C1],
+            log=False
+        )
+        
+        # Initially active
+        self.assertTrue(Sim._active)
+        self.assertTrue(bool(Sim))  # __bool__ should return _active
+        
+        # Stop the simulation
+        Sim.stop()
+        
+        # Should be inactive
+        self.assertFalse(Sim._active)
+        self.assertFalse(bool(Sim))
+
+
     def test_run(self): 
 
         B1, B2, B3 = Block(), Block(), Block()
