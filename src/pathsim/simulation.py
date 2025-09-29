@@ -552,7 +552,7 @@ class Simulation:
         self.blocks.append(block)
 
         #add events of block to global event list
-        for event in block.get_events():
+        for event in block.events:
             self.add_event(event)
 
         #if graph already exists, it needs to be rebuilt
