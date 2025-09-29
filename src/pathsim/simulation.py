@@ -1645,7 +1645,8 @@ class Simulation:
 
     def stop(self):
         """Set the flag for active simulation to 'False', intended to be 
-        called from the outside to interrupt the timestepping loop in 'run'
+        called from the outside (for example by events) to interrupt the 
+        timestepping loop in 'run'.
         """
         self._active = False
 
@@ -1676,6 +1677,9 @@ class Simulation:
         stats : dict
             stats of simulation run tracked by the ´ProgressTracker´ 
         """
+
+        #set simulation active
+        self._active = True
 
         #reset the simulation before running it
         if reset:
@@ -1723,9 +1727,8 @@ class Simulation:
 
                 #check for interrupts and exit
                 if not self._active:
-                    tracker.close()
-                    self._logger_info("interrupt")
-                    return tracker.stats
+                    tracker.interrupt()
+                    break
 
                 #advance the simulation by one (effective) timestep '_dt'
                 success, error_norm, scale, *_ = self.timestep(
