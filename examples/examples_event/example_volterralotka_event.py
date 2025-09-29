@@ -63,6 +63,7 @@ E1 = ZeroCrossingUp(
 
 E2 = ZeroCrossingUp(
     func_evt=func_evt_2,
+    func_act=lambda _: Sim.stop(),
     tolerance=1e-4
     )
 

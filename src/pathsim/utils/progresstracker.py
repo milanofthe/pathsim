@@ -102,6 +102,9 @@ class ProgressTracker:
         self.update_log_every = update_log_every
         self.log = log
 
+        #flag for interrupts
+        self._interrupted = False
+
         #setup logger
         self.logger = logger or logging.getLogger(f"ProgressTracker_{self.description[:10]}")
 
@@ -250,6 +253,12 @@ class ProgressTracker:
 
     # core methods ---------------------------------------------------------------------
 
+    def interrupt(self):
+        """Interrupts the progress tracking and marks for special logging.
+        """
+        self._interrupted = True
+
+
     def start(self):
         """Starts the progress timer and logs the initial message."""
 
@@ -313,30 +322,34 @@ class ProgressTracker:
 
 
     def close(self):
-        """Logs the final status, calculates final runtime, and marks tracker as closed.
-        """
-
+        """Modified to distinguish between normal finish and interrupt"""
+        
         if not self._closed:
-
+            
             if self.start_time is not None:
-
-                #calculate final runtime
+                
+                # Calculate final runtime
                 runtime = time.perf_counter() - self.start_time
                 self.stats["runtime_ms"] = runtime * 1000
-
-                #ensure final progress is logged at 100%
-                self.current_progress = 1.0
-                self._log_progress(is_final=True) 
-
-                #log summary statistics
+                
+                # Log final progress
+                self._log_progress(is_final=True)
+                
+                # Choose log message based on interrupt state
                 if self.logger and self.log:
                     final_stats_str = (
                         f"total steps: {self.stats['total_steps']}, "
                         f"successful: {self.stats['successful_steps']}, "
                         f"runtime: {self.stats['runtime_ms']:.2f} ms"
-                        )
-                    self.logger.log(self.log_level, f"FINISHED -> {self.description} ({final_stats_str})")
-
+                    )
+                    
+                    if self._interrupted:
+                        log_msg = f"INTERRUPTED -> {self.description} ({final_stats_str})"
+                    else:
+                        log_msg = f"FINISHED -> {self.description} ({final_stats_str})"
+                    
+                    self.logger.log(self.log_level, log_msg)
+            
             self._closed = True
 
 
