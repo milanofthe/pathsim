@@ -636,7 +636,7 @@ class ChirpSource(ChirpPhaseNoiseSource):
         super().__init__(amplitude, f0, BW, T, phase, sig_cum, sig_white, sampling_rate)
 
         import warnings
-        warnings.warn("'ChirpSource' block will be deprecated and is currently an alias, use 'ChirpPhaseNoiseSource' instead")
+        warnings.warn("'ChirpSource' block will be deprecated with release version 1.0.0, use 'ChirpPhaseNoiseSource' instead")
 
 
 
@@ -853,7 +853,7 @@ class Pulse(PulseSource):
         super().__init__(amplitude, T, t_rise, t_fall, tau, duty)
 
         import warnings
-        warnings.warn("'Pulse' block will be deprecated and is currently an alias, use 'PulseSource' instead")
+        warnings.warn("'Pulse' block will be deprecated with release version 1.0.0, use 'PulseSource' instead")
 
 
 class ClockSource(Block):
@@ -919,7 +919,7 @@ class Clock(ClockSource):
         super().__init__(T, tau)
 
         import warnings
-        warnings.warn("'Clock' block will be deprecated and is currently an alias, use 'ClockSource' instead")
+        warnings.warn("'Clock' block will be deprecated with release version 1.0.0, use 'ClockSource' instead")
 
 
 
@@ -1077,4 +1077,4 @@ class Step(StepSource):
         super().__init__(amplitude, tau)
 
         import warnings
-        warnings.warn("'Step' block will be deprecated and is currently an alias, use 'StepSource' instead")
+        warnings.warn("'Step' block will be deprecated with release version 1.0.0, use 'StepSource' instead")

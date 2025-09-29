@@ -1617,7 +1617,7 @@ class Simulation:
     def step(self, dt=None, adaptive=True):
         """Wraps 'Simulation.timestep' for backward compatibility"""
         self._logger_warning(
-            "'Simulation.step' method will be deprecated in next release, use 'Simulation.timestep' instead!"
+            "'Simulation.step' method will be deprecated with release version 1.0.0, use 'Simulation.timestep' instead!"
             )
         return self.timestep(dt, adaptive)
 
