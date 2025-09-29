@@ -23,3 +23,4 @@ from .ode import *
 from .rng import *
 from .fir import *
 from .table import *
+from .rf import *
