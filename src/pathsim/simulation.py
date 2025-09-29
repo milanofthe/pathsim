@@ -157,6 +157,8 @@ class Simulation:
         flag for buffering system state
     _blocks_dyn : list[Block]
         list of blocks with internal ´Solver´ instances (stateful) 
+    _active : bool
+        flag for setting the simulation as active, used for interrupts
     """
 
     def __init__(
@@ -217,6 +219,9 @@ class Simulation:
         #collection of blocks with internal ODE solvers
         self._blocks_dyn = []
 
+        #flag for setting the simulation active
+        self._active = True
+
         #initialize logging for logging mode
         self._initialize_logger()
 
@@ -267,6 +272,17 @@ class Simulation:
             other in self.connections or 
             other in self.events
             )
+
+
+    def __bool__(self):
+        """Boolean evaluation of Simulation instances
+
+        Returns
+        -------
+        active : bool
+            is the simulation active
+        """
+        return self._active
 
 
     # methods for access to metadata ----------------------------------------------
@@ -727,6 +743,9 @@ class Simulation:
         """
 
         self._logger_info(f"RESET (time: {time})")
+
+        #set active again
+        self._active = True
 
         #reset simulation time
         self.time = time
@@ -1624,6 +1643,13 @@ class Simulation:
 
     # simulation execution --------------------------------------------------------
 
+    def stop(self):
+        """Set the flag for active simulation to 'False', intended to be 
+        called from the outside to interrupt the timestepping loop in 'run'
+        """
+        self._active = False
+
+
     def run(self, duration=10, reset=False, adaptive=True):
         """Perform multiple simulation timesteps for a given 'duration'.
         
@@ -1694,6 +1720,12 @@ class Simulation:
 
             #iterate progress tracker generator until 'progress >= 1.0' is reached
             for _ in tracker:
+
+                #check for interrupts and exit
+                if not self._active:
+                    tracker.close()
+                    self._logger_info("interrupt")
+                    return tracker.stats
 
                 #advance the simulation by one (effective) timestep '_dt'
                 success, error_norm, scale, *_ = self.timestep(

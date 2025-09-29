@@ -325,7 +325,6 @@ class ProgressTracker:
                 self.stats["runtime_ms"] = runtime * 1000
 
                 #ensure final progress is logged at 100%
-                self.current_progress = 1.0
                 self._log_progress(is_final=True) 
 
                 #log summary statistics
