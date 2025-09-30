@@ -80,9 +80,20 @@ class DynamicalSystem(Block):
         
 
     def __len__(self):
-        """Potential passthrough due to `func_alg` being dependent on `u`
+        """Potential passthrough due to `func_alg` being dependent on `u`.
+
+        This is checked by evaluating the jacobian of the algebraic output 
+        equation with respect to `u`. If there are any non-zero entries, an 
+        algebraic passthrouh exists.
+        
+        Returns
+        -------
+        alg_length : int
+            length of algebraic path
         """
-        return 1
+        x, u = self.engine.get(), self.inputs.to_array()
+        has_passthrough = np.any(self.op_alg.jac_u(x, u, 0.0))
+        return int(has_passthrough)
 
 
     def set_solver(self, Solver, parent, **solver_args):
