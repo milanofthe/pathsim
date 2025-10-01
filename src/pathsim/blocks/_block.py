@@ -76,10 +76,10 @@ class Block(Serializable):
         maximum number of allowed input ports, None -> infinite
     _n_out_max : int | None
         maximum number of allowed output ports, None -> infinite
-    _port_map_in : dict[str: int] | None
+    _port_map_in : dict[str: int]
         string aliases for input port numbers to be referenced in 
         connections or for internal use
-    _port_map_out : dict[str: int] | None
+    _port_map_out : dict[str: int]
         string aliases for output port numbers to be referenced in 
         connections or for internal use
     """
@@ -89,14 +89,14 @@ class Block(Serializable):
     _n_out_max = None
 
     #maps for input and output port labels to indices
-    _port_map_in = None
-    _port_map_out = None
+    _port_map_in = {}
+    _port_map_out = {}
 
     def __init__(self):
 
         #default register sizes
-        _n_in = 1 if self._n_in_max is None else self._n_in_max
-        _n_out = 1 if self._n_out_max is None else self._n_out_max
+        _n_in = max(len(self._port_map_in), 1)
+        _n_out = max(len(self._port_map_out), 1)
 
         #registers to hold input and output values
         self.inputs = Register(size=_n_in, mapping=self._port_map_in)
