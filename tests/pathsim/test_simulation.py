@@ -216,7 +216,7 @@ class TestSimulation(unittest.TestCase):
             log=False
             )  
 
-        n, nx = Sim.size()
+        n, nx = Sim.size
         self.assertEqual(n, 3)
         self.assertEqual(nx, 0)
 
@@ -229,7 +229,7 @@ class TestSimulation(unittest.TestCase):
             log=False
             )  
 
-        n, nx = Sim.size()
+        n, nx = Sim.size
         self.assertEqual(n, 2)
         self.assertEqual(nx, 1)
 
