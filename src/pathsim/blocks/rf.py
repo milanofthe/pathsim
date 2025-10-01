@@ -42,5 +42,10 @@ class RFNetwork(TransferFunctionPRC):
         # Apply vector fitting
         vf = rf.VectorFitting(ntwk)
         getattr(vf, vf_fun_name)(**vf_kwargs)
+        # keep a copy of the network and VF
+        self.network = ntwk
+        self.vf = vf
 
-        super().__init__(Poles=vf.poles.real, Residues=vf.residues.T, Const=vf.constant_coeff)
+        super().__init__(Poles=vf.poles.real,
+                         Residues=vf.residues.reshape(len(vf.poles), ntwk.nports, ntwk.nports),
+                         Const=vf.constant_coeff.reshape(ntwk.nports, ntwk.nports))
