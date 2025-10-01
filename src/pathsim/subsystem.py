@@ -304,6 +304,7 @@ class Subsystem(Block):
 
     # methods for access to metadata --------------------------------------------------------
 
+    @property
     def size(self):
         """Get size information from subsystem, recursively assembled 
         from internal blocks, including nested subsystems.
@@ -311,12 +312,12 @@ class Subsystem(Block):
         Returns
         -------
         sizes : tuple[int]
-            size of block (default 1) and number 
-            of internal states (from internal engine)
+            size of block (number of all internal blocks) 
+            and number of internal states (from internal engines)
         """
         total_n, total_nx = 0, 0
         for block in self.blocks:
-            n, nx = block.size()
+            n, nx = block.size
             total_n += n
             total_nx += nx
         return total_n, total_nx

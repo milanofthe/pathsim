@@ -287,6 +287,7 @@ class Simulation:
 
     # methods for access to metadata ----------------------------------------------
 
+    @property
     def size(self):
         """Get size information of the simulation, such as total number 
         of blocks and dynamic states, with recursive retrieval from subsystems
@@ -294,12 +295,12 @@ class Simulation:
         Returns
         -------
         sizes : tuple[int]
-            size of block (default 1) and number 
-            of internal states (from internal engine)
+            size of simulation (number of blocks) and number 
+            of internal states (from internal engines)
         """
         total_n, total_nx = 0, 0
         for block in self.blocks:
-            n, nx = block.size()
+            n, nx = block.size
             total_n += n
             total_nx += nx
         return total_n, total_nx
