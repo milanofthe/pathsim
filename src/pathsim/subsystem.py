@@ -304,6 +304,7 @@ class Subsystem(Block):
 
     # methods for access to metadata --------------------------------------------------------
 
+    @property
     def size(self):
         """Get size information from subsystem, recursively assembled 
         from internal blocks, including nested subsystems.
