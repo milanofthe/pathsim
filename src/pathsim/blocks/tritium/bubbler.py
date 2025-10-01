@@ -9,13 +9,13 @@
 
 import numpy as np
 
-from ..ode import ODE
+from ..dynsys import DynamicalSystem
 from ...events.schedule import ScheduleList
 
 
 # BLOCK DEFIINITIONS ====================================================================
 
-class Bubbler4(ODE):
+class Bubbler4(DynamicalSystem):
     """
     Tritium bubbling system with sequential vial collection stages.
 
@@ -117,7 +117,8 @@ class Bubbler4(ODE):
         self.vial_efficiency = vial_efficiency
         self.conversion_efficiency = conversion_efficiency
 
-        def _fn(x, u, t):
+        #dynamical component, ode rhs
+        def _fn_d(x, u, t):
 
             #short
             ve = self.vial_efficiency
@@ -134,32 +135,25 @@ class Bubbler4(ODE):
 
             return np.array([dv1, dv2, dv3, dv4])
 
-        super().__init__(func=_fn, initial_value=np.zeros(4))
+        #algebraic output component
+        def _fn_a(x, u, t):
+
+            #short
+            ve = self.vial_efficiency
+            ce = self.conversion_efficiency
+
+            #unpack inputs
+            sol, ins = u
+
+            sample_out = (1 - ce) * ins + (1 - ve)**2 * (ce * ins + (1 - ve)**2 * sol)
+
+            return np.hstack([x, sample_out])
+
+        #initialization just like `DynamicalSystem` block
+        super().__init__(func_dyn=_fn_d, func_alg=_fn_a, initial_value=np.zeros(4))
 
         #create internal vial reset events
         self._create_reset_events()
-
-
-    def update(self, t):
-        """update global system equation
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-        """
-
-        #short
-        ve = self.vial_efficiency
-        ce = self.conversion_efficiency
-
-        sol, ins = self.inputs[0], self.inputs[1]
-        sample_out = (1 - ce) * ins + (1 - ve)**2 * (ce * ins + (1 - ve)**2 * sol)
-        x = self.engine.get()
-
-        y = np.hstack([x, sample_out])
-
-        self.outputs.update_from_array(y)
 
 
     def _create_reset_event_vial(self, i, reset_times):

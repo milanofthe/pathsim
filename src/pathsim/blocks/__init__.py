@@ -12,10 +12,12 @@ from .wrapper import *
 from .counter import *
 from .filters import *
 from .switch import *
+from .dynsys import *
 from .adder import *
 from .scope import *
 from .delay import *
 from .noise import *
+from .table import *
 from .math import *
 from .ctrl import *
 from .lti import *
@@ -23,4 +25,3 @@ from .ode import *
 from .rng import *
 from .fir import *
 from .table import *
-from .rf import *

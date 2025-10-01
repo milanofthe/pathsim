@@ -179,6 +179,101 @@ class TestProgressTracker(unittest.TestCase):
         self.assertAlmostEqual(tracker.current_progress, 1.0)
 
 
+    def test_interrupt_early(self):
+        """Test interrupting the tracker before completion."""
+        n = 100
+        interrupt_at = 50
+        test_logger = self._get_test_logger("TestInterruptEarly")
+        tracker = ProgressTracker(
+            total_duration=1.0,
+            update_log_every=0.10,
+            description="Test Interrupt Early",
+            logger=test_logger,
+            min_log_interval=0.001
+        )
+
+        i = 0
+        with tracker:
+            for _ in tracker:
+                i += 1
+                progress = i / n
+                tracker.update(progress=progress, success=True)
+
+                # Trigger interrupt at 50%
+                if i == interrupt_at:
+                    tracker.interrupt()
+                    break
+
+        # Check that interrupt was registered
+        self.assertTrue(tracker._interrupted)
+        
+        # Check stats reflect partial completion
+        self.assertEqual(tracker.stats["total_steps"], interrupt_at)
+        self.assertEqual(tracker.stats["successful_steps"], interrupt_at)
+        
+        # Tracker should be closed
+        self.assertTrue(tracker._closed)
+        
+
+    def test_normal_completion_not_interrupted(self):
+        """Test that normal completion doesn't set interrupt flag."""
+        n = 100
+        test_logger = self._get_test_logger("TestNoInterrupt")
+        tracker = ProgressTracker(
+            total_duration=1.0,
+            update_log_every=0.10,
+            description="Test No Interrupt",
+            logger=test_logger,
+            min_log_interval=0.001
+        )
+
+        i = 0
+        with tracker:
+            for _ in tracker:
+                i += 1
+                progress = i / n
+                tracker.update(progress=progress, success=True)
+                if i >= n:
+                    break
+
+        # Should NOT be interrupted
+        self.assertFalse(tracker._interrupted)
+        self.assertEqual(tracker.stats["total_steps"], n)
+        self.assertTrue(tracker._closed)
+
+
+    def test_interrupt_with_mixed_success(self):
+        """Test interrupt with some failed steps before interruption."""
+        n = 100
+        interrupt_at = 60
+        fail_before = 30
+        test_logger = self._get_test_logger("TestInterruptMixed")
+        tracker = ProgressTracker(
+            total_duration=1.0,
+            update_log_every=0.10,
+            description="Test Interrupt Mixed",
+            logger=test_logger,
+            min_log_interval=0.001
+        )
+
+        i = 0
+        with tracker:
+            for _ in tracker:
+                i += 1
+                progress = i / n
+                is_successful = (i > fail_before)
+                tracker.update(progress=progress, success=is_successful)
+
+                if i == interrupt_at:
+                    tracker.interrupt()
+                    break
+
+        self.assertTrue(tracker._interrupted)
+        self.assertEqual(tracker.stats["total_steps"], interrupt_at)
+        self.assertEqual(tracker.stats["successful_steps"], interrupt_at - fail_before)
+        self.assertTrue(tracker._closed)
+
+
 # RUN TESTS LOCALLY ====================================================================
 
 if __name__ == '__main__':

@@ -53,7 +53,7 @@ class TestAlgebraicSystem(unittest.TestCase):
 
     def test_graph(self):
 
-        na, nd = self.Sim.size()
+        na, nd = self.Sim.size
         self.assertEqual(na, 6) # 6 alg. blocks
         self.assertEqual(nd, 0) # 0 dyn. blocks
 

@@ -76,10 +76,10 @@ class Block(Serializable):
         maximum number of allowed input ports, None -> infinite
     _n_out_max : int | None
         maximum number of allowed output ports, None -> infinite
-    _port_map_in : dict[str: int] | None
+    _port_map_in : dict[str: int]
         string aliases for input port numbers to be referenced in 
         connections or for internal use
-    _port_map_out : dict[str: int] | None
+    _port_map_out : dict[str: int]
         string aliases for output port numbers to be referenced in 
         connections or for internal use
     """
@@ -89,14 +89,14 @@ class Block(Serializable):
     _n_out_max = None
 
     #maps for input and output port labels to indices
-    _port_map_in = None
-    _port_map_out = None
+    _port_map_in = {}
+    _port_map_out = {}
 
     def __init__(self):
 
         #default register sizes
-        _n_in = 1 if self._n_in_max is None else self._n_in_max
-        _n_out = 1 if self._n_out_max is None else self._n_out_max
+        _n_in = max(len(self._port_map_in), 1)
+        _n_out = max(len(self._port_map_out), 1)
 
         #registers to hold input and output values
         self.inputs = Register(size=_n_in, mapping=self._port_map_in)
@@ -199,6 +199,7 @@ class Block(Serializable):
 
     # methods for access to metadata ----------------------------------------------------
 
+    @property
     def size(self):
         """Get size information from block, such as 
         number of internal states, etc.
@@ -212,7 +213,7 @@ class Block(Serializable):
         nx = len(self.engine) if self.engine else 0
         return 1, nx
 
-
+    @property
     def shape(self):
         """Get the number of input and output ports of the block
 
@@ -317,20 +318,6 @@ class Block(Serializable):
         #reset algebraic and dynamic operators
         if self.op_alg: self.op_alg.reset()
         if self.op_dyn: self.op_dyn.reset()
-
-
-    # methods for blocks with discrete events -------------------------------------------
-
-    def get_events(self):
-        """Return internal events of the block, for discrete time blocks 
-        such as triggers / comparators, clocks, etc.
-
-        Returns
-        -------
-        events : list[Event]
-            internal events of the block
-        """
-        return self.events
 
 
     # methods for blocks with integration engines ---------------------------------------

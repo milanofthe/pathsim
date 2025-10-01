@@ -63,6 +63,7 @@ E1 = ZeroCrossingUp(
 
 E2 = ZeroCrossingUp(
     func_evt=func_evt_2,
+    func_act=lambda _: Sim.stop(),
     tolerance=1e-4
     )
 
@@ -94,7 +95,7 @@ Sim = Simulation(
 if __name__ == "__main__":
 
     #run the simulation
-    Sim.run(20)
+    Sim.run(10)
 
     fig, ax = Sc.plot(".-")
 
@@ -103,6 +104,7 @@ if __name__ == "__main__":
     for e in E2: ax.axvline(e, ls=":", c="k")
     for e in E3: ax.axvline(e, ls="--", c="k")
     for e in E4: ax.axvline(e, ls=":", c="k")
+
 
     plt.show()
 

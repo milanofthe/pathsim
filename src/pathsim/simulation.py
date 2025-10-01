@@ -157,6 +157,8 @@ class Simulation:
         flag for buffering system state
     _blocks_dyn : list[Block]
         list of blocks with internal ´Solver´ instances (stateful) 
+    _active : bool
+        flag for setting the simulation as active, used for interrupts
     """
 
     def __init__(
@@ -217,6 +219,9 @@ class Simulation:
         #collection of blocks with internal ODE solvers
         self._blocks_dyn = []
 
+        #flag for setting the simulation active
+        self._active = True
+
         #initialize logging for logging mode
         self._initialize_logger()
 
@@ -269,8 +274,20 @@ class Simulation:
             )
 
 
+    def __bool__(self):
+        """Boolean evaluation of Simulation instances
+
+        Returns
+        -------
+        active : bool
+            is the simulation active
+        """
+        return self._active
+
+
     # methods for access to metadata ----------------------------------------------
 
+    @property
     def size(self):
         """Get size information of the simulation, such as total number 
         of blocks and dynamic states, with recursive retrieval from subsystems
@@ -278,12 +295,12 @@ class Simulation:
         Returns
         -------
         sizes : tuple[int]
-            size of block (default 1) and number 
-            of internal states (from internal engine)
+            size of simulation (number of blocks) and number 
+            of internal states (from internal engines)
         """
         total_n, total_nx = 0, 0
         for block in self.blocks:
-            n, nx = block.size()
+            n, nx = block.size
             total_n += n
             total_nx += nx
         return total_n, total_nx
@@ -552,7 +569,7 @@ class Simulation:
         self.blocks.append(block)
 
         #add events of block to global event list
-        for event in block.get_events():
+        for event in block.events:
             self.add_event(event)
 
         #if graph already exists, it needs to be rebuilt
@@ -727,6 +744,9 @@ class Simulation:
         """
 
         self._logger_info(f"RESET (time: {time})")
+
+        #set active again
+        self._active = True
 
         #reset simulation time
         self.time = time
@@ -1617,12 +1637,20 @@ class Simulation:
     def step(self, dt=None, adaptive=True):
         """Wraps 'Simulation.timestep' for backward compatibility"""
         self._logger_warning(
-            "'Simulation.step' method will be deprecated in next release, use 'Simulation.timestep' instead!"
+            "'Simulation.step' method will be deprecated with release version 1.0.0, use 'Simulation.timestep' instead!"
             )
         return self.timestep(dt, adaptive)
 
 
     # simulation execution --------------------------------------------------------
+
+    def stop(self):
+        """Set the flag for active simulation to 'False', intended to be 
+        called from the outside (for example by events) to interrupt the 
+        timestepping loop in 'run'.
+        """
+        self._active = False
+
 
     def run(self, duration=10, reset=False, adaptive=True):
         """Perform multiple simulation timesteps for a given 'duration'.
@@ -1650,6 +1678,9 @@ class Simulation:
         stats : dict
             stats of simulation run tracked by the ´ProgressTracker´ 
         """
+
+        #set simulation active
+        self._active = True
 
         #reset the simulation before running it
         if reset:
@@ -1694,6 +1725,11 @@ class Simulation:
 
             #iterate progress tracker generator until 'progress >= 1.0' is reached
             for _ in tracker:
+
+                #check for interrupts and exit
+                if not self._active:
+                    tracker.interrupt()
+                    break
 
                 #advance the simulation by one (effective) timestep '_dt'
                 success, error_norm, scale, *_ = self.timestep(

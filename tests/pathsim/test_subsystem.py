@@ -158,7 +158,7 @@ class TestSubsystem(unittest.TestCase):
             connections=[C1, C2, C3]
             )  
 
-        n, nx = S.size()
+        n, nx = S.size
         self.assertEqual(n, 3)
         self.assertEqual(nx, 0)
 
@@ -173,14 +173,14 @@ class TestSubsystem(unittest.TestCase):
             connections=[C1]
             )  
 
-        n, nx = S.size()
+        n, nx = S.size
         self.assertEqual(n, 2)
         self.assertEqual(nx, 0) # <- no internal engine yet
 
         from pathsim.solvers import EUF
         S.set_solver(EUF, None)
 
-        n, nx = S.size()
+        n, nx = S.size
         self.assertEqual(nx, 1)
 
 
