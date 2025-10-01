@@ -9,12 +9,12 @@
 
 import numpy as np
 
-from ..ode import ODE
+from ..dynsys import DynamicalSystem
 
 
 # BLOCKS ================================================================================
 
-class ResidenceTime(ODE):
+class ResidenceTime(DynamicalSystem):
     """Chemical process block with residence time model.
 
     This block implements an internal 1st order linear ode with 
@@ -62,28 +62,19 @@ class ResidenceTime(ODE):
         self.source_term = source_term
 
         #rhs of residence time ode
-        def _fn(x, u, t):
+        def _fn_d(x, u, t):
             return -x/self.tau + self.source_term + sum(self.betas*u)
 
         #jacobian of rhs wrt x
-        def _jc(x, u, t):
+        def _jc_d(x, u, t):
             return -1/self.tau
 
-        #initialization just like ode block
-        super().__init__(func=_fn, jac=_jc, initial_value=initial_value)
+        #output function of residence time ode
+        def _fn_a(x, u, t):
+            return self.gammas * x
 
-
-    def update(self, t):
-        """update global system equation
-
-        Parameters
-        ----------
-        t : float
-            evaluation time
-        """
-        x = self.engine.get()
-        self.outputs.update_from_array(self.gammas * x)
-
+        #initialization just like `DynamicalSystem` block
+        super().__init__(func_dyn=_fn_d, jac_dyn=_jc_d, func_alg=_fn_a, initial_value=initial_value)
 
 
 class Process(ResidenceTime):
