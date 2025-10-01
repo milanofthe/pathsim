@@ -112,7 +112,7 @@ class TestFusionBubbler4(unittest.TestCase):
         # Get rates and sample_out
         u = np.array([sol_in, ins_in])
         x = np.zeros(4)
-        rates = B.func(x, u, 0.0)
+        rates = B.func_dyn(x, u, 0.0)
         
         B.update(0.0)
         sample_out = B.outputs[4]
