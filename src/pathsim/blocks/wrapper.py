@@ -24,8 +24,8 @@ class Wrapper(Block):
     not evaluated continuously but periodically at discrete times.
 
 
-    Examples
-    --------
+    Example
+    -------
     There are two ways to setup the `Wrapper`, first and standard way is to define 
     a function to be wrapped and pass it to the block initializer:
 
@@ -174,8 +174,8 @@ class Wrapper(Block):
     def dec(cls, T=1, tau=0):
         """decorator for direct instance construction from func
     
-        Examples
-        --------
+        Example
+        -------
         Decorate a function definition to directly make it 
         a `Wrapper` block instance:
 
