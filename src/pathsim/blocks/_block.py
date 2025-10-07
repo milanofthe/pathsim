@@ -76,10 +76,10 @@ class Block(Serializable):
         maximum number of allowed input ports, None -> infinite
     _n_out_max : int | None
         maximum number of allowed output ports, None -> infinite
-    _port_map_in : dict[str: int]
+    _port_map_in : dict[str: int] | None
         string aliases for input port numbers to be referenced in 
         connections or for internal use
-    _port_map_out : dict[str: int]
+    _port_map_out : dict[str: int] | None
         string aliases for output port numbers to be referenced in 
         connections or for internal use
     """
@@ -89,14 +89,14 @@ class Block(Serializable):
     _n_out_max = None
 
     #maps for input and output port labels to indices
-    _port_map_in = {}
-    _port_map_out = {}
+    _port_map_in = None
+    _port_map_out = None
 
     def __init__(self):
 
         #default register sizes
-        _n_in = max(len(self._port_map_in), 1)
-        _n_out = max(len(self._port_map_out), 1)
+        _n_in = 1 if self._n_in_max is None else self._n_in_max
+        _n_out = 1 if self._n_out_max is None else self._n_out_max
 
         #registers to hold input and output values
         self.inputs = Register(size=_n_in, mapping=self._port_map_in)
@@ -199,7 +199,6 @@ class Block(Serializable):
 
     # methods for access to metadata ----------------------------------------------------
 
-    @property
     def size(self):
         """Get size information from block, such as 
         number of internal states, etc.
@@ -213,7 +212,7 @@ class Block(Serializable):
         nx = len(self.engine) if self.engine else 0
         return 1, nx
 
-    @property
+
     def shape(self):
         """Get the number of input and output ports of the block
 
@@ -320,6 +319,20 @@ class Block(Serializable):
         if self.op_dyn: self.op_dyn.reset()
 
 
+    # methods for blocks with discrete events -------------------------------------------
+
+    def get_events(self):
+        """Return internal events of the block, for discrete time blocks 
+        such as triggers / comparators, clocks, etc.
+
+        Returns
+        -------
+        events : list[Event]
+            internal events of the block
+        """
+        return self.events
+
+
     # methods for blocks with integration engines ---------------------------------------
 
     def set_solver(self, Solver, parent, **solver_args):
@@ -411,7 +424,7 @@ class Block(Serializable):
 
     def update(self, t):
         """The 'update' method is called iteratively for all blocks to evaluate the 
-        algbebraic components of the global system ode from the DAG. 
+        algebraic components of the global system ode from the DAG.
 
         It is meant for instant time blocks (blocks that dont have a delay due to the 
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
@@ -448,7 +461,7 @@ class Block(Serializable):
 
 
     def solve(self, t, dt):
-        """The 'solve' method performes one iterative solution step that is required 
+        """The 'solve' method performs one iterative solution step that is required
         to solve the implicit update equation of the solver if an implicit solver 
         (numerical integrator) is used.
 
@@ -479,7 +492,7 @@ class Block(Serializable):
         (numeric integration timestep, recording data, etc.) based on the current 
         inputs and the current internal state. 
 
-        It performes one timestep for the internal states. For instant time blocks, 
+        It performs one timestep for the internal states. For instant time blocks,
         the 'step' method does not has to be implemented specifically. 
         
         The method handles timestepping for dynamic blocks with internal states

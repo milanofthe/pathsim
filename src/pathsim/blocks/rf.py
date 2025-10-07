@@ -46,6 +46,6 @@ class RFNetwork(TransferFunctionPRC):
         self.network = ntwk
         self.vf = vf
 
-        super().__init__(Poles=vf.poles.real,
+        super().__init__(Poles=vf.poles,
                          Residues=vf.residues.reshape(len(vf.poles), ntwk.nports, ntwk.nports),
                          Const=vf.constant_coeff.reshape(ntwk.nports, ntwk.nports))
