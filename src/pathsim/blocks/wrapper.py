@@ -69,10 +69,6 @@ class Wrapper(Block):
     ----------
     Evt : Schedule
         internal event. Used for periodic sampling the wrapped method
-    tau : float
-        delay time for the start time of the wrapper sampling
-    T : float
-        sampling period for calling the `wrapped` function
     """
 
     def __init__(self, func=None, T=1, tau=0):
@@ -152,10 +148,10 @@ class Wrapper(Block):
     def T(self):
         """Get the sampling period of the block
             
-            Returns
-            -------
-            T: float
-                sampling period for the Schedule event
+        Returns
+        -------
+        T: float
+            sampling period for the Schedule event
         """
         return self._T
 
@@ -163,10 +159,10 @@ class Wrapper(Block):
     @T.setter
     def T(self, value):
         """Set the sampling period of the block
-            Parameters
-            ----------
-            value : float
-                    sampling period
+        Parameters
+        ----------
+        value : float
+                sampling period
         """
         if value <= 0:
             raise ValueError("T must be positive")
@@ -176,7 +172,29 @@ class Wrapper(Block):
 
     @classmethod
     def dec(cls, T=1, tau=0):
-        """ decorator class for direct instance access from func"""
+        """decorator for direct instance construction from func
+    
+        Examples
+        --------
+        Decorate a function definition to directly make it 
+        a `Wrapper` block instance:
+
+        .. code-block:: python
+        
+        from pathsim.blocks import Wrapper
+        
+        @Wrapper.dec(T=0.1)
+        def wrp(a, b, c):
+            return a * (b + c)
+
+
+        Parameters
+        ----------
+        tau : float
+            delay time for the start time of the wrapper sampling
+        T : float
+            sampling period for calling the `wrapped` function
+        """
         def decorator(func):
             return cls(func, T, tau)
         return decorator
