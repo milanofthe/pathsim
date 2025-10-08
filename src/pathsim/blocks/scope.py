@@ -1,10 +1,9 @@
 #########################################################################################
 ##
-##                              SCOPE BLOCK (blocks/scope.py)
+##                                       SCOPE BLOCK 
+##                                (pathsim/blocks/scope.py)
 ##
 ##               This module defines blocks for recording time domain data
-##
-##                                  Milan Rother 2024
 ##
 #########################################################################################
 
@@ -18,6 +17,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from ._block import Block
+from ..events.schedule import Schedule 
 from ..utils.realtimeplotter import RealtimePlotter
 
 from .._constants import COLORS_ALL
@@ -27,13 +27,15 @@ from .._constants import COLORS_ALL
 # BLOCKS FOR DATA RECORDING =============================================================
 
 class Scope(Block):
-    """
-    Block for recording time domain data with variable sampling sampling rate.
+    """Block for recording time domain data with variable sampling rate.
     
-    A time threshold can be set by 'wait' to start recording data after the simulation 
-    time is larger then the specified waiting time, i.e. 't - t_wait > 0'. 
+    A time threshold can be set by `t_wait` to start recording data after the simulation 
+    time is larger then the specified waiting time, i.e. `t - t_wait > 0`. 
     This is useful for recording data only after all the transients have settled.
     
+    The block uses an interal `Schedule` event, when `sampling_rate` is provided, 
+    otherwise it just samples at every simulation timestep.
+
     Parameters
     ----------
     sampling_rate : int, None
@@ -47,6 +49,8 @@ class Scope(Block):
     ----------
     recording : dict
         recording, where key is time, and value the recorded values
+    events : list[Schedule]
+        internal scheduled event for periodic input sampling when `sampling_rate` is provided
     """
     
     #max number of ports
@@ -67,6 +71,21 @@ class Scope(Block):
 
         #set recording data and time
         self.recording = {}
+
+        #sampling produces discrete time behavior
+        if not (sampling_rate is None):
+            
+            #internal scheduled list event
+            def _sample(t):
+                self.recording[t] = self.inputs.to_array()
+
+            self.events = [
+                Schedule(
+                    t_start=t_wait,
+                    t_period=sampling_rate,
+                    func_act=_sample
+                    )
+            ]
 
 
     def __len__(self):
@@ -104,16 +123,17 @@ class Scope(Block):
     def sample(self, t):
         """Sample the data from all inputs, and overwrites existing timepoints, 
         since we use a dict for storing the recorded data.
+ 
+        If `sampling_rate` is provided, this does nothing, since the sampling 
+        is handled by the internal `Schedule` event.
 
         Parameters
         ----------
         t : float
             evaluation time for sampling
         """
-        if t >= self.t_wait: 
-            if (self.sampling_rate is None or 
-                t * self.sampling_rate > len(self.recording)):
-                self.recording[t] = self.inputs.to_array()
+        if self.sampling_rate is None and t >= self.t_wait: 
+            self.recording[t] = self.inputs.to_array()
 
 
     def plot(self, *args, **kwargs):
@@ -426,6 +446,8 @@ class RealtimeScope(Scope):
             x_label="time [s]", 
             y_label=""
             )
+
+        warnings.warn("'RealtimeScope' block will be deprecated with release version 1.0.0")
 
 
     def sample(self, t):

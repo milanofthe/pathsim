@@ -10,6 +10,8 @@
 
 import csv
 
+import warnings
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -456,6 +458,8 @@ class RealtimeSpectrum(Spectrum):
             x_label="freq [Hz]", 
             y_label="magnitude"
             )
+
+        warnings.warn("'RealtimeSpectrum' block will be deprecated with release version 1.0.0")
 
 
     def step(self, t, dt):

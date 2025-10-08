@@ -269,7 +269,7 @@ class TestSimulation(unittest.TestCase):
         self.assertTrue(suc)
         self.assertEqual(err, 0.0)
         self.assertEqual(scl, 1.0)
-        self.assertEqual(evl, 3)
+        self.assertEqual(evl, 1)
         self.assertEqual(its, 0)
         self.assertEqual(Sim.time, 0.1)
 
@@ -375,6 +375,28 @@ class TestSimulationIVP(unittest.TestCase):
         self.assertTrue(self.Amp.engine is None)
         self.assertTrue(self.Add.engine is None)
         self.assertTrue(self.Sco.engine is None)
+
+
+    def test_set_solver(self):
+
+        from pathsim.solvers import BDF2, SSPRK22
+
+        #reset first
+        self.Sim.reset()
+    
+        #set to implicit solver
+        self.Sim._set_solver(BDF2)
+        self.assertTrue(isinstance(self.Sim.engine, BDF2))
+
+        #run with implicit solver
+        self.test_run()
+
+        #set to explicit solver
+        self.Sim._set_solver(SSPRK22)
+        self.assertTrue(isinstance(self.Sim.engine, SSPRK22))
+
+        #run with explicit solver
+        self.test_run()
 
 
     def test_step(self):
