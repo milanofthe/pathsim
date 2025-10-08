@@ -1,8 +1,7 @@
 #########################################################################################
 ##
-##                       GENERIC MIMO FUNCTION BLOCK (blocks/function.py)
-##
-##                                Milan Rother 2024
+##                                  MIMO FUNCTION BLOCK 
+##                              (pathsim/blocks/function.py)
 ##
 #########################################################################################
 
@@ -182,9 +181,25 @@ class DynamicalFunction(Block):
 
         vco = DynamicalFunction(f_vco)        
     
+    
+    Using it as a decorator also works:
+
+    .. code-block:: python
+        
+        import numpy as np
+        from pathsim.blocks import DynamicalFunction
+        
+        f_0 = 100
+        
+        @DynamicalFunction
+        def vco(u, t):
+            return np.sin(2*np.pi*f_0*u*t)
+
+        #'vco' is now a PathSim block 
+
 
     Parameters
-    ---------- 
+    ----------
     func : callable
         function that defines algebraic block IO behaviour with time dependency, 
         signature `func(u, t)` where `u` is `numpy.ndarray` and `t` is `float`
