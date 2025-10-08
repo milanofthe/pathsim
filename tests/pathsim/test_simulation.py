@@ -269,7 +269,7 @@ class TestSimulation(unittest.TestCase):
         self.assertTrue(suc)
         self.assertEqual(err, 0.0)
         self.assertEqual(scl, 1.0)
-        self.assertEqual(evl, 3)
+        self.assertEqual(evl, 1)
         self.assertEqual(its, 0)
         self.assertEqual(Sim.time, 0.1)
 
