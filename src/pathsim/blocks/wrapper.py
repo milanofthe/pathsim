@@ -1,32 +1,60 @@
 #########################################################################################
 ##
-##                       WRAPPER BLOCK (wrapper.py)
-##
-##                                2025
+##                                    WRAPPER BLOCK 
+##                             (pathsim/blocks/wrapper.py)
 ##
 #########################################################################################
 
 # IMPORTS ===============================================================================
 
-
 from ._block import Block
 from ..events import Schedule
-from ..optim.operator import Operator
 
+
+# BLOCK DEFINITIONS =====================================================================
 
 class Wrapper(Block):
-    """
-    Wrapper block for discrete implementation and external code integration.
+    """Wrapper block for discrete implementation and external code integration.
 
-    The `Wrapper` class is designed to trigger the `wrapped` method at fixed intervals 
-    using an internal scheduled event. This makes it particularly useful for wrapping 
-    external code or implementing discrete-time systems within the simulation framework.
+    The `Wrapper` class is designed to call the internal `func` at fixed intervals 
+    using an internal `Schedule` event. This makes it particularly useful for wrapping 
+    external code or implementing discrete-time systems.
 
-    The block uses the `Schedule` class to periodically call the `_run_wrapper` method, 
-    which must be implemented by subclasses. The inputs and outputs of the block are 
-    handled through the `inputs` and `outputs` registers, enabling seamless integration 
-    with other blocks in the simulation. 
-    ...
+    Essentially this block does the same as `Function` with the difference that its 
+    not evaluated continuously but periodically at discrete times.
+
+
+    Example
+    -------
+    There are two ways to setup the `Wrapper`, first and standard way is to define 
+    a function to be wrapped and pass it to the block initializer:
+
+    .. code-block:: python
+        
+        from pathsim.blocks import Wrapper
+        
+        #function to be wrapped
+        def func(a, b, c):
+            return a * (b + c)
+
+        wrp = Wrapper(func, T=0.1)
+
+
+    Another option is to use the `dec` classmethod, which might be more convenient 
+    in some situations:
+
+    .. code-block:: python
+        
+        from pathsim.blocks import Wrapper
+        
+        @Wrapper.dec(T=0.1)
+        def wrp(a, b, c):
+            return a * (b + c)
+
+
+    This way the internal function of the block `wrp` will be evaluated with a period 
+    of `T=0.1` and its outputs updated accordingly.
+
 
     Parameters
     ----------
@@ -39,12 +67,8 @@ class Wrapper(Block):
         
     Attributes
     ----------
-    Evt : 
+    Evt : Schedule
         internal event. Used for periodic sampling the wrapped method
-    tau : float
-        delau time for the start time of the event
-    T : float
-        sampling period for the event
     """
 
     def __init__(self, func=None, T=1, tau=0):
@@ -54,7 +78,7 @@ class Wrapper(Block):
 
         #assign func to wrap (direct initialization)
         if callable(func):
-            self.wrapped = func
+            self.func = func
 
         def _sample(t):
 
@@ -62,7 +86,7 @@ class Wrapper(Block):
             u = self.inputs.to_array()
 
             #compute operator output
-            y = self.wrapped(*u)
+            y = self.func(*u)
 
             #update block outputs
             self.outputs.update_from_array(y)
@@ -104,6 +128,7 @@ class Wrapper(Block):
         """
         return self._tau
 
+
     @tau.setter
     def tau(self, value):
         """Setter for tau
@@ -118,33 +143,58 @@ class Wrapper(Block):
         self._tau = value
         self.Evt.t_start = value
 
+
     @property
     def T(self):
         """Get the sampling period of the block
             
-            Returns
-            -------
-            T: float
-                sampling period for the Schedule event
+        Returns
+        -------
+        T: float
+            sampling period for the Schedule event
         """
         return self._T
+
 
     @T.setter
     def T(self, value):
         """Set the sampling period of the block
-            Parameters
-            ----------
-            value : float
-                    sampling period
+        Parameters
+        ----------
+        value : float
+                sampling period
         """
         if value <= 0:
             raise ValueError("T must be positive")
         self._T = value
         self.Evt.t_period = value
     
+
     @classmethod
     def dec(cls, T=1, tau=0):
-        """ decorator class for direct instance access from func"""
+        """decorator for direct instance construction from func
+    
+        Example
+        -------
+        Decorate a function definition to directly make it 
+        a `Wrapper` block instance:
+
+        .. code-block:: python
+        
+        from pathsim.blocks import Wrapper
+        
+        @Wrapper.dec(T=0.1)
+        def wrp(a, b, c):
+            return a * (b + c)
+
+
+        Parameters
+        ----------
+        tau : float
+            delay time for the start time of the wrapper sampling
+        T : float
+            sampling period for calling the `wrapped` function
+        """
         def decorator(func):
             return cls(func, T, tau)
         return decorator

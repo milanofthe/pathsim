@@ -80,5 +80,8 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
+# Claude
+.claude
+
 
 *_version.py

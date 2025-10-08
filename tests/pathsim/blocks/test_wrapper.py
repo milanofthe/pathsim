@@ -29,7 +29,7 @@ class TestWrapper(unittest.TestCase):
             return a + 1, b + 2, c + 3
         self.assertEqual(func1.T,2)
         self.assertEqual(func1.tau,0.5)
-        self.assertEqual(func1.wrapped(1,2,3), (2, 4, 6))
+        self.assertEqual(func1.func(1,2,3), (2, 4, 6))
     
     def test_init_with_func(self):
         def func(a, b, c):
@@ -37,37 +37,37 @@ class TestWrapper(unittest.TestCase):
         func1 = Wrapper(func=func, T=2, tau=0.5)
         self.assertEqual(func1.T,2)
         self.assertEqual(func1.tau,0.5)
-        self.assertEqual(func1.wrapped(1,2,3), (2, 4, 6))
+        self.assertEqual(func1.func(1,2,3), (2, 4, 6))
     
     def test_init_with_func_as_class(self):
         class Func(Wrapper):
-            def wrapped(self, a, b, c):
+            def func(self, a, b, c):
                 return a + 1, b + 2, c + 3
         func1 = Func(T=2, tau=0.5)
         self.assertEqual(func1.T,2)
         self.assertEqual(func1.tau,0.5)
-        self.assertEqual(func1.wrapped(1,2,3), (2, 4, 6))
+        self.assertEqual(func1.func(1,2,3), (2, 4, 6))
 
     def test_raise_not_overcharged(self):
         W = Wrapper()
         with self.assertRaises(AttributeError):
-            W.wrapped()
+            W.func()
 
     def test_overcharge(self):
         class SinSample(Wrapper):
-            def wrapped(self, x):
+            def func(self, x):
               return np.sin(x)
         W = SinSample()
 
     def test_wrapped_func(self):
         class SinSample(Wrapper):
-            def wrapped(self, x):
+            def func(self, x):
                 return np.sin(x)
 
         W = SinSample()
 
         for t in range(10):
-            self.assertEqual(W.wrapped(t), np.sin(t))
+            self.assertEqual(W.func(t), np.sin(t))
 
     def test_trigger_event_error(self):
 
@@ -106,7 +106,7 @@ class TestWrapper(unittest.TestCase):
     def test_trigger_event(self):
 
         class SinSample(Wrapper):
-            def wrapped(self, x):
+            def func(self, x):
                 return np.sin(x)
 
         W = SinSample()

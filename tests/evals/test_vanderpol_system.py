@@ -74,7 +74,8 @@ class TestVanDerPolSystem(unittest.TestCase):
         #initialize simulation with the blocks, connections, timestep and logging enabled
         self.Sim = Simulation(
             blocks, 
-            connections
+            connections,
+            log=False,
             )
 
         #build reference solution with scipy integrator
