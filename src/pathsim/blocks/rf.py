@@ -5,14 +5,14 @@ import numpy as np
 import skrf as rf
 from inspect import signature
 
-from .lti import TransferFunctionPRC
+from .lti import StateSpace
 
 # TODO LIST
 # class RFAmplifier Model amplifier in RF systems
 # class Resistor/Capacitor/Inductor
 # class RFMixer for mixer in RF systems?
 
-class RFNetwork(TransferFunctionPRC):
+class RFNetwork(StateSpace):
     """
     N-port RF network linear time invariant (LTI) multi input multi output (MIMO) state-space model.
 
@@ -25,7 +25,6 @@ class RFNetwork(TransferFunctionPRC):
     ----------
     ntwk : :py:class:`~skrf.network.Network`
         scikit-rf [skrf]_ RF Network object
-
 
     References
     ----------
@@ -42,10 +41,25 @@ class RFNetwork(TransferFunctionPRC):
         # Apply vector fitting
         vf = rf.VectorFitting(ntwk)
         getattr(vf, vf_fun_name)(**vf_kwargs)
+        A, B, C, D, _ = vf._get_ABCDE()
         # keep a copy of the network and VF
         self.network = ntwk
         self.vf = vf
 
-        super().__init__(Poles=vf.poles,
-                         Residues=vf.residues.reshape(len(vf.poles), ntwk.nports, ntwk.nports),
-                         Const=vf.constant_coeff.reshape(ntwk.nports, ntwk.nports))
+        super().__init__(A, B, C, D)
+
+    def s(self, freqs: np.ndarray) -> np.ndarray:
+        """
+        S-matrix of the vector fitted N-port model calculated from its state-space representation.
+
+        Parameters
+        ----------
+        freqs : :py:class:`~numpy.ndarray`
+            Frequencies (in Hz) at which to calculate the S-matrices.
+
+        Returns
+        -------
+        s : :py:class:`~numpy.ndarray`
+            Complex-valued S-matrices (fxNxN) calculated at frequencies `freqs`.
+        """
+        return rf.VectorFitting._get_s_from_ABCDE(freqs, self.A, self.B, self.C, self.D, 0)

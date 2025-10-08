@@ -1,9 +1,17 @@
+# tests require scikit-rf package
+import pytest, sys
+
+try:
+    import skrf as rf
+except ImportError as e:
+    pass
+
+if "skrf" not in sys.modules:
+    pytest.skip(allow_module_level=True)
+
 import unittest
-import skrf as rf
-import matplotlib.pyplot as plt
 
 from numpy.testing import assert_allclose
-
 from pathsim.blocks.rf import RFNetwork
 
 class TestSkrf(unittest.TestCase):
@@ -47,7 +55,7 @@ class TestOnePort(unittest.TestCase):
         ntwk = rf.data.ring_slot_meas
         # Get S-parameter from pathsim ABCD parameters
         rfblock = RFNetwork(ntwk)
-        s = rf.VectorFitting._get_s_from_ABCDE(freqs=ntwk.f, A=rfblock.A, B=rfblock.B, C=rfblock.C, D=rfblock.D, E=0)
+        s = rfblock.s(ntwk.f)
         # check equality (with a large tolerance, since it's measurements vs VF model)
         assert_allclose(ntwk.s, s, atol=0.05)
 
@@ -55,3 +63,15 @@ class TestTwoPort(unittest.TestCase):
     def test_init(self):
         two_port = RFNetwork(rf.data.ring_slot)
         print(two_port)
+
+    def test_s_parameters(self):
+        "Test S-parameters deduced from ABCD parameters for two-port Network."
+        # original network
+        ntwk = rf.data.ring_slot
+        two_port = RFNetwork(ntwk)
+        # State-space model
+        rfblock = RFNetwork(ntwk)
+        # S-parameter from ABCD parameters
+        s = rfblock.s(ntwk.f)
+        # check equality between original s parameters and reconstructed from vector fitting/state-space
+        assert_allclose(ntwk.s, s, atol=1e-5)

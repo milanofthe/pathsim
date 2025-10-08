@@ -14,6 +14,7 @@ import skrf as rf  # requires the scikit-rf package
 from pathsim import Simulation, Connection
 from pathsim.blocks import Spectrum, GaussianPulseSource
 from pathsim.blocks.rf import RFNetwork
+from pathsim.solvers import RKBS32
 
 # RF Network block is created from a scikit-rf Network object
 # (here an example of a 1-port RF network included in scikit-rf)
@@ -39,6 +40,18 @@ sim = Simulation(
         Connection(rfntwk, spc[1])
     ],
     dt=1e-13,
+)
+
+# create the system connections and simulation setup
+sim = Simulation(
+    blocks=[src, rfntwk, spc],
+    connections=[
+        Connection(src, rfntwk, spc[0]),
+        Connection(rfntwk, spc[1])
+    ],
+    tolerance_lte_abs=1e-16, # this is due to the super tiny states
+    tolerance_lte_rel=1e-5,  # so error control is dominated by the relative truncation error
+    Solver=RKBS32,
 )
 
 sim.run(1e-9)
