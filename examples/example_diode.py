@@ -33,7 +33,7 @@ V_T = 0.026         # Thermal voltage at room temperature (V)
 # Define diode current function: i = I_s * (exp(v_diode/(n*V_T)) - 1)
 def diode_current(v_diode):
     """Diode current as function of diode voltage"""
-    clipped = np.clip(v_diode/V_T, None, 25)
+    clipped = np.clip(v_diode/V_T, None, 23)
     return I_s * (np.exp(clipped) - 1)
 
 # Define voltage source function
@@ -74,8 +74,6 @@ if __name__ == "__main__":
     
     # Run the simulation for 2 seconds
     Sim.run(duration=2.0)
-
-    # Sim.graph.save_graphviz("example")
         
     # Plot the results
     Sim.plot()

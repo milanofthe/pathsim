@@ -1455,11 +1455,11 @@ class Simulation:
         #if no dynamic blocks -> skip the solver step        
         if self._blocks_dyn:
 
+            #buffer internal states for solvers
+            self._buffer_blocks(dt)
+
             #iterate explicit solver stages with evaluation time (generator)
             for time_stage in self.engine.stages(self.time, dt):
-
-                #buffer internal states for solvers
-                self._buffer_blocks(dt)
 
                 #evaluate system equation by fixed-point iteration
                 self._update(time_stage) 
