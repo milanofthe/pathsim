@@ -55,7 +55,7 @@ class DiscretePID(Wrapper):
         self.integral = 0
         self.prev_error = 0
     
-    def wrapped(self, error):
+    def func(self, error):
 
         """
         Run the PID controller

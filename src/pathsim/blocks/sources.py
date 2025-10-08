@@ -990,7 +990,9 @@ class StepSource(Block):
     to the specified output levels at the defined event times.
 
     The arguments can be vectorial and in that case, the output is set to the 
-    amplitude that corresponds to the defined delay.
+    amplitude that corresponds to the defined delay like a zero-order-hold stage. 
+    This functionality enables adding external or time series measurement data 
+    into the system.
 
 
     Examples
@@ -1014,6 +1016,20 @@ class StepSource(Block):
         
         #starts at 0, jumps to 1 at 1, jumps to -1 at 2 and jumps back to 0 at 3
         stp = StepSource(amplitude=[1, -1, 0], tau=[1, 2, 3])
+
+
+    Similarly implementing measured time series data via zoh:
+
+    .. code-block:: python
+
+        import numpy as np
+        from pathsim.blocks import StepSource
+        
+        #some random time series arrays
+        times, data = np.linspace(0, 100, 1000), np.random.rand(1000)
+        
+        #pass them to the block
+        stp = StepSource(amplitude=data, tau=times)
 
 
     Parameters

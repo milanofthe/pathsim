@@ -153,8 +153,6 @@ class Simulation:
         get attributes and access to intermediate evaluation stages
     logger : logging.Logger
         global simulation logger
-    _needs_buffering : bool
-        flag for buffering system state
     _blocks_dyn : list[Block]
         list of blocks with internal ´Solver´ instances (stateful) 
     _active : bool
@@ -212,9 +210,6 @@ class Simulation:
 
         #initial simulation time
         self.time = 0.0
-
-        #flag for state buffering (transient)
-        self._needs_buffering = True
 
         #collection of blocks with internal ODE solvers
         self._blocks_dyn = []
@@ -527,8 +522,7 @@ class Simulation:
         params["Solver"] = getattr(solvers, solver_name)
 
         #update with additional kwargs
-        for name, val in kwargs.items():
-            params[name] = val
+        params.update(kwargs)
 
         #create simulation
         return cls(
@@ -567,6 +561,13 @@ class Simulation:
 
         #add block to global blocklist
         self.blocks.append(block)
+
+        #logging message
+        self._logger_info(
+            "BLOCK (type: {}, dynamic: {})".format(
+                block.__class__.__name__, bool(block.engine)
+                )
+            )
 
         #add events of block to global event list
         for event in block.events:
@@ -696,8 +697,7 @@ class Simulation:
             self.Solver = Solver
 
         #update solver parmeters
-        for k, v in solver_kwargs.items():
-            self.solver_kwargs[k] = v
+        self.solver_kwargs.update(solver_kwargs)
 
         #initialize dummy engine to get solver attributes
         self.engine = self.Solver()
@@ -963,13 +963,13 @@ class Simulation:
         for iteration in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
-            for depth, blocks_loop, connections_loop in self.graph.loop():
+            for _, blocks_loop, connections_loop in self.graph.loop():
 
                 #update blocks at algebraic depth
                 for block in blocks_loop:
                     if block: block.update(t)
 
-                #step accelerated connenctions at algebraic depth (data transfer)
+                #update connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
                     if connection: connection.update()
 
@@ -980,14 +980,15 @@ class Simulation:
                 if err > max_err:
                     max_err = err
                        
-            #check convergence after first iteration
+            #check convergence
             if max_err <= self.tolerance_fpi:
                 return
 
         #not converged -> error
         self._logger_error(
             "algebraic loop not converged (iters: {}, err: {})".format(
-                self.iterations_max, max_err), 
+                self.iterations_max, max_err
+                ), 
             RuntimeError
             )
 
@@ -1060,6 +1061,25 @@ class Simulation:
         the right hand side equation (including external inputs) of the 
         engines of dynamic blocks to zero.
 
+        Note
+        ----
+        This is really a sort of pseudo-steady-state solve. It does NOT compute 
+        the limit :math:`t\\rightarrow\\infty` but rather forces all time 
+        derivatives to zero at a given moment in time. 
+
+        This means, for a given `t` it computes the block states `x` such that:
+    
+        .. math:: 
+    
+            0 = f(x, t)
+
+        instead of the real steady state:
+
+        .. math:: 
+
+            \\lim_{t \\rightarrow \\infty} x(t)
+        
+            
         Parameters
         ----------
         reset : bool
@@ -1248,6 +1268,9 @@ class Simulation:
             total number of implicit solver iterations
         """
 
+        #initial solver stepping stats
+        total_evals, error_norm = 0, 0
+
         #default global timestep as local timestep
         if dt is None: 
             dt = self.dt
@@ -1255,21 +1278,21 @@ class Simulation:
         #buffer states for event system
         self._buffer_events(self.time)
 
-        #buffer internal states for solvers
-        self._buffer_blocks(dt)
+        #if no dynamic blocks -> skip the solver step        
+        if self._blocks_dyn:
 
-        #total function evaluations 
-        total_evals = 0
+            #buffer internal states for solvers
+            self._buffer_blocks(dt)
 
-        #iterate explicit solver stages with evaluation time (generator)
-        for time_stage in self.engine.stages(self.time, dt):
+            #iterate explicit solver stages with evaluation time (generator)
+            for time_stage in self.engine.stages(self.time, dt):
 
-            #evaluate system equation by fixed-point iteration
-            self._update(time_stage) 
-            total_evals += 1
+                #evaluate system equation by fixed-point iteration
+                self._update(time_stage) 
+                total_evals += 1
 
-            #timestep for dynamical blocks (with internal states)
-            _1, error_norm, _3 = self._step(time_stage, dt)
+                #timestep for dynamical blocks (with internal states)
+                _1, error_norm, _3 = self._step(time_stage, dt)
 
         #system time after timestep
         time_dt = self.time + dt
@@ -1324,8 +1347,8 @@ class Simulation:
             total number of implicit solver iterations
         """
 
-        #successful by default
-        success = True
+        #initial solver stepping stats
+        total_evals, total_solver_its, error_norm, success = 0, 0, 0, True
 
         #default global timestep as local timestep
         if dt is None: 
@@ -1334,30 +1357,30 @@ class Simulation:
         #buffer states for event system
         self._buffer_events(self.time)
 
-        #buffer internal states for solvers
-        self._buffer_blocks(dt)
+        #if no dynamic blocks -> skip the solver step        
+        if self._blocks_dyn:
 
-        #total function evaluations and implicit solver iterations
-        total_evals, total_solver_its = 0, 0
+            #buffer internal states for solvers
+            self._buffer_blocks(dt)
 
-        #iterate explicit solver stages with evaluation time (generator)
-        for time_stage in self.engine.stages(self.time, dt):
+            #iterate explicit solver stages with evaluation time (generator)
+            for time_stage in self.engine.stages(self.time, dt):
 
-            #solve implicit update equation and get iteration count
-            success, evals, solver_its = self._solve(time_stage, dt)
+                #solve implicit update equation and get iteration count
+                success, evals, solver_its = self._solve(time_stage, dt)
 
-            #warning if implicit solver didnt converge in timestep
-            if not success:
-                self._logger_warning(
-                    f"implicit solver not converged in {solver_its} iterations!"
-                    )
+                #warning if implicit solver didnt converge in timestep
+                if not success:
+                    self._logger_warning(
+                        f"implicit solver not converged in {solver_its} iterations!"
+                        )
 
-            #count solver iterations and function evaluations
-            total_solver_its += solver_its
-            total_evals += evals
+                #count solver iterations and function evaluations
+                total_solver_its += solver_its
+                total_evals += evals
 
-            #timestep for dynamical blocks (with internal states)
-            _1, error_norm, _3 = self._step(time_stage, dt)
+                #timestep for dynamical blocks (with internal states)
+                _1, error_norm, _3 = self._step(time_stage, dt)
 
         #system time after timestep
         time_dt = self.time + dt
@@ -1419,6 +1442,8 @@ class Simulation:
         total_solver_its : int
             total number of implicit solver iterations
         """
+        #initial solver stepping stats
+        total_evals, error_norm, scale, success = 0, 0, 1, True  
 
         #default global timestep as local timestep
         if dt is None: 
@@ -1427,28 +1452,28 @@ class Simulation:
         #buffer states for event system
         self._buffer_events(self.time)
 
-        #buffer internal states for solvers
-        self._buffer_blocks(dt)
+        #if no dynamic blocks -> skip the solver step        
+        if self._blocks_dyn:
 
-        #total function evaluations and implicit solver iterations
-        total_evals = 0
+            #buffer internal states for solvers
+            self._buffer_blocks(dt)
 
-        #iterate explicit solver stages with evaluation time (generator)
-        for time_stage in self.engine.stages(self.time, dt):
+            #iterate explicit solver stages with evaluation time (generator)
+            for time_stage in self.engine.stages(self.time, dt):
 
-            #evaluate system equation by fixed-point iteration
-            self._update(time_stage) 
-            total_evals += 1
+                #evaluate system equation by fixed-point iteration
+                self._update(time_stage) 
+                total_evals += 1
 
-            #timestep for dynamical blocks (with internal states)
-            success, error_norm, scale = self._step(time_stage, dt)
+                #timestep for dynamical blocks (with internal states)
+                success, error_norm, scale = self._step(time_stage, dt)
 
-        #if step not successful -> roll back timestep
-        if not success:
-            self._revert()
-            self._update(self.time) 
-            total_evals += 1
-            return False, error_norm, scale, total_evals, 0
+            #if step not successful -> roll back timestep
+            if not success:
+                self._revert()
+                self._update(self.time) 
+                total_evals += 1
+                return False, error_norm, scale, total_evals, 0
 
         #system time after timestep
         time_dt = self.time + dt
@@ -1522,6 +1547,8 @@ class Simulation:
         total_solver_its : int
             total number of implicit solver iterations
         """
+        #initial solver stepping stats
+        total_evals, total_solver_its, error_norm, scale, success = 0, 0, 0, 1, True
 
         #default global timestep as local timestep
         if dt is None: 
@@ -1530,36 +1557,36 @@ class Simulation:
         #buffer states for event system
         self._buffer_events(self.time)
 
-        #buffer internal states for solvers
-        self._buffer_blocks(dt)
+        #if no dynamic blocks -> skip the solver step        
+        if self._blocks_dyn:
 
-        #total function evaluations and implicit solver iterations
-        total_evals, total_solver_its = 0, 0
+            #buffer internal states for solvers
+            self._buffer_blocks(dt)
 
-        #iterate explicit solver stages with evaluation time (generator)
-        for time_stage in self.engine.stages(self.time, dt):
+            #iterate explicit solver stages with evaluation time (generator)
+            for time_stage in self.engine.stages(self.time, dt):
 
-            #solve implicit update equation and get iteration count
-            success, evals, solver_its = self._solve(time_stage, dt)
+                #solve implicit update equation and get iteration count
+                success, evals, solver_its = self._solve(time_stage, dt)
 
-            #count solver iterations and function evaluations
-            total_solver_its += solver_its
-            total_evals += evals
+                #count solver iterations and function evaluations
+                total_solver_its += solver_its
+                total_evals += evals
 
-            #if solver did not converge -> quit early (adaptive only)
+                #if solver did not converge -> quit early (adaptive only)
+                if not success:
+                    self._revert()
+                    self._update(self.time) 
+                    return False, 0.0, 0.5, total_evals+1, total_solver_its  
+
+                #timestep for dynamical blocks (with internal states)
+                success, error_norm, scale = self._step(time_stage, dt)
+
+            #if step not successful -> roll back timestep
             if not success:
                 self._revert()
                 self._update(self.time) 
-                return False, 0.0, 0.5, total_evals+1, total_solver_its  
-
-            #timestep for dynamical blocks (with internal states)
-            success, error_norm, scale = self._step(time_stage, dt)
-
-        #if step not successful -> roll back timestep
-        if not success:
-            self._revert()
-            self._update(self.time) 
-            return False, error_norm, scale, total_evals+1, total_solver_its
+                return False, error_norm, scale, total_evals+1, total_solver_its
 
         #system time after timestep
         time_dt = self.time + dt
