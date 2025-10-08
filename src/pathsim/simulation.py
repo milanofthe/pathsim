@@ -963,13 +963,13 @@ class Simulation:
         for iteration in range(1, self.iterations_max):
             
             #iterate DAG depths of broken loops
-            for depth, blocks_loop, connections_loop in self.graph.loop():
+            for _, blocks_loop, connections_loop in self.graph.loop():
 
                 #update blocks at algebraic depth
                 for block in blocks_loop:
                     if block: block.update(t)
 
-                #step accelerated connenctions at algebraic depth (data transfer)
+                #update connenctions at algebraic depth (data transfer)
                 for connection in connections_loop:
                     if connection: connection.update()
 
@@ -980,7 +980,7 @@ class Simulation:
                 if err > max_err:
                     max_err = err
                        
-            #check convergence after first iteration
+            #check convergence
             if max_err <= self.tolerance_fpi:
                 return
 
