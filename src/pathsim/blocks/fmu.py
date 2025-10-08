@@ -122,6 +122,8 @@ class CoSimulationFMU(Block):
         self.fmu.enterInitializationMode()
         self.fmu.exitInitializationMode()
 
+        self._history = None
+
         # Internal scheduled event function
         self.events = [
             Schedule(
@@ -138,30 +140,26 @@ class CoSimulationFMU(Block):
     def _step_fmu(self, t):
         """Perform one FMU co-simulation step"""
         self._update_fmu_from_inputs()    
-
         # Perform co-simulation step
         self.fmu.doStep(
             currentCommunicationPoint=t, 
             communicationStepSize=self.dt
             )  
-
         self._update_outputs_from_fmu()
 
 
     def _update_fmu_from_inputs(self):
         """Read block inputs and update FMU outputs."""
         if len(self._input_refs) > 0:
-            input_values = self.inputs.to_array()
             input_vrefs = list(self._input_refs.values())
-            self.fmu.setReal(input_vrefs, input_values.tolist())
+            self.fmu.setReal(input_vrefs, self.inputs.to_array())
 
 
     def _update_outputs_from_fmu(self):
         """Read outputs from FMU and update block outputs."""
         if len(self._output_refs) > 0:
             output_vrefs = list(self._output_refs.values())
-            output_values = self.fmu.getReal(output_vrefs)
-            self.outputs.update_from_array(np.array(output_values))
+            self.outputs.update_from_array(self.fmu.getReal(output_vrefs))
 
 
     def reset(self):
