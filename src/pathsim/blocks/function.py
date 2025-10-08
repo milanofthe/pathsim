@@ -12,7 +12,7 @@ import numpy as np
 
 from ._block import Block
 
-from ..optim.operator import Operator
+from ..optim.operator import Operator, DynamicOperator
 
 
 # MIMO BLOCKS ===========================================================================
@@ -43,7 +43,7 @@ class Function(Block):
     called in the global simulation loop.
     Therefore `func` must be purely algebraic and not introduce states, 
     delay, etc. For interfacing with external stateful APIs, use the 
-    API block.
+    `Wrapper` block.
 
 
     Note
@@ -105,13 +105,13 @@ class Function(Block):
     Parameters
     ---------- 
     func : callable
-        MIMO function that defines algebraic block IO behaviour
+        MIMO function that defines algebraic block IO behaviour, signature `func(*tuple)`
 
 
     Attributes
     ----------
     op_alg : Operator
-        internal algebraic operator that wraps 'func'
+        internal algebraic operator that wraps `func`
     
     """
 
@@ -131,8 +131,6 @@ class Function(Block):
         """Evaluate function block as part of algebraic component 
         of global system DAE. 
 
-        With convergence control for algebraic loop solver.
-
         Parameters
         ----------
         t : float
@@ -141,4 +139,86 @@ class Function(Block):
                 
         #apply operator to get output
         y = self.op_alg(self.inputs.to_array())
+        self.outputs.update_from_array(y)
+
+
+
+class DynamicalFunction(Block):
+    """Arbitrary MIMO function block, defined by a callable object, 
+    i.e. function or `lambda` expression.
+
+    The function signature needs two arguments `f(u, t)` where `u` is 
+    the (possibly vectorial) block input and `t` is a time dependency.
+
+    .. math::
+
+        \\vec{y} = \\mathrm{func}(\\vec{u}, t)
+
+    
+    Note
+    ----
+    This block does essentially the same as `Function` but with different 
+    requirements for the signature of the function to be wrapped. 
+    Block inputs are packed into an array `u` and this block additionally 
+    accepts time dependency in the function provided. 
+    Thats where the prefix `Dynamical..` comes from.
+
+
+    Example
+    -------
+    Lets say we want to implement a super simple model for a voltage controlled 
+    oscillator (VCO), where the block input controls the frequency of a sine wave 
+    at the output. 
+
+    .. code-block:: python
+        
+        import numpy as np
+        from pathsim.blocks import DynamicalFunction
+        
+        f_0 = 100
+
+        def f_vco(u, t):
+            return np.sin(2*np.pi*f_0*u*t)
+
+        vco = DynamicalFunction(f_vco)        
+    
+
+    Parameters
+    ---------- 
+    func : callable
+        function that defines algebraic block IO behaviour with time dependency, 
+        signature `func(u, t)` where `u` is `numpy.ndarray` and `t` is `float`
+
+
+    Attributes
+    ----------
+    op_alg : DynamicOperator
+        internal operator that wraps `func`
+
+    """
+    
+    def __init__(self, func=lambda u, t: u):
+        super().__init__()
+
+        #some checks to ensure that function works correctly
+        if not callable(func):  
+            raise ValueError(f"'{func}' is not callable")
+        
+        #function defining the block update
+        self.func = func
+        self.op_alg = DynamicOperator(lambda x, u, t: func(u, t))
+
+
+    def update(self, t):
+        """Evaluate function with time dependency as part of algebraic 
+        component of global system DAE. 
+
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        """
+                
+        #apply operator to get output
+        y = self.op_alg(None, self.inputs.to_array(), t)
         self.outputs.update_from_array(y)
