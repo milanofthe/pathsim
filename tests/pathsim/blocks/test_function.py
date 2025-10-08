@@ -3,8 +3,6 @@
 ##                                  TESTS FOR 
 ##                            'blocks.function.py'
 ##
-##                              Milan Rother 2024
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
@@ -12,7 +10,7 @@
 import unittest
 import numpy as np
 
-from pathsim.blocks.function import Function
+from pathsim.blocks.function import Function, DynamicalFunction
 
 from tests.pathsim.blocks._embedding import Embedding
 
@@ -238,6 +236,67 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(F.outputs[0], 7)
         self.assertEqual(F.outputs[1], 3)
 
+
+
+class TestDynamicalFunction(unittest.TestCase):
+    """
+    Test the implementation of the 'DynamicalFunction' block class
+    """
+
+    def test_init(self):
+
+        def f(a, t): 
+            return a**2 + t
+        
+        F = DynamicalFunction(func=f)
+
+        #test if the function works
+        self.assertEqual(F.op_alg(None, 1, 2), f(1, 2))
+        self.assertEqual(F.op_alg(None, 2, 3), f(2, 3))
+        self.assertEqual(F.op_alg(None, 3, 4), f(3, 4))
+
+        #test input validation
+        for v in [2, 0.3, 1j, np.ones(3)]:
+            with self.assertRaises(ValueError): 
+                F = Function(func=v)
+
+
+    def test_embedding_siso(self):
+
+        def f(a, t): 
+            return a**2 + t
+        
+        F = DynamicalFunction(func=f)
+        
+        def src(t): return np.sin(t)
+        def ref(t): return np.sin(t)**2 + t
+        
+        E = Embedding(F, src, ref)
+        
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+        def src(t): return np.tanh(t)
+        def ref(t): return np.tanh(t)**2 + t
+
+        E = Embedding(F, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_SISO(t))
+
+
+    def test_embedding_miso(self):
+
+        def f(u, t): 
+            a, b, c = u
+            return (a**2 + b - c) * t
+        
+        F = DynamicalFunction(func=f)
+
+        def src(t): return np.sin(t), np.cos(t), np.tanh(t)
+        def ref(t): return (np.sin(t)**2 + np.cos(t) - np.tanh(t))*t
+        
+        E = Embedding(F, src, ref)
+
+        for t in range(10): self.assertEqual(*E.check_MIMO(t))
 
 
 # RUN TESTS LOCALLY ====================================================================
