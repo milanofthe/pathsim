@@ -527,8 +527,7 @@ class Simulation:
         params["Solver"] = getattr(solvers, solver_name)
 
         #update with additional kwargs
-        for name, val in kwargs.items():
-            params[name] = val
+        params.update(kwargs)
 
         #create simulation
         return cls(
@@ -567,6 +566,13 @@ class Simulation:
 
         #add block to global blocklist
         self.blocks.append(block)
+
+        #logging message
+        self._logger_info(
+            "BLOCK (type: {}, shape: {}, dynamic: {})".format(
+                type(block), block.shape, bool(block.engine)
+                )
+            )
 
         #add events of block to global event list
         for event in block.events:
@@ -696,8 +702,7 @@ class Simulation:
             self.Solver = Solver
 
         #update solver parmeters
-        for k, v in solver_kwargs.items():
-            self.solver_kwargs[k] = v
+        self.solver_kwargs.update(solver_kwargs)
 
         #initialize dummy engine to get solver attributes
         self.engine = self.Solver()
@@ -987,7 +992,8 @@ class Simulation:
         #not converged -> error
         self._logger_error(
             "algebraic loop not converged (iters: {}, err: {})".format(
-                self.iterations_max, max_err), 
+                self.iterations_max, max_err
+                ), 
             RuntimeError
             )
 
