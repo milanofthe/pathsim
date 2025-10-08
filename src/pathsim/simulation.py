@@ -153,8 +153,6 @@ class Simulation:
         get attributes and access to intermediate evaluation stages
     logger : logging.Logger
         global simulation logger
-    _needs_buffering : bool
-        flag for buffering system state
     _blocks_dyn : list[Block]
         list of blocks with internal ´Solver´ instances (stateful) 
     _active : bool
@@ -212,9 +210,6 @@ class Simulation:
 
         #initial simulation time
         self.time = 0.0
-
-        #flag for state buffering (transient)
-        self._needs_buffering = True
 
         #collection of blocks with internal ODE solvers
         self._blocks_dyn = []
@@ -1066,6 +1061,25 @@ class Simulation:
         the right hand side equation (including external inputs) of the 
         engines of dynamic blocks to zero.
 
+        Note
+        ----
+        This is really a sort of pseudo-steady-state solve. It does NOT compute 
+        the limit :math:`t\\rightarrow\\infty` but rather forces all time 
+        derivatives to zero at a given moment in time. 
+
+        This means, for a given `t` it computes the block states `x` such that:
+    
+        .. math:: 
+    
+            0 = f(x, t)
+
+        instead of the real steady state:
+
+        .. math:: 
+
+            \\lim_{t \\rightarrow \\infty} x(t)
+        
+            
         Parameters
         ----------
         reset : bool
