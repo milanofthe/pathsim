@@ -564,8 +564,8 @@ class Simulation:
 
         #logging message
         self._logger_info(
-            "BLOCK (type: {}, dynamic: {})".format(
-                block.__class__.__name__, bool(block.engine)
+            "BLOCK (type: {}, dynamic: {}, events: {})".format(
+                block.__class__.__name__, bool(block.engine), len(block.events)
                 )
             )
 
