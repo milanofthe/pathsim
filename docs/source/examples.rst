@@ -12,7 +12,7 @@ There is an even more comprehensive collection of example dynamical system simul
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
 
    examples/linear_feedback.ipynb
    examples/harmonic_oscillator.ipynb
