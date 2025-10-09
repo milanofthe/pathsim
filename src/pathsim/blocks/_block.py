@@ -198,7 +198,7 @@ class Block(Serializable):
 
 
     # methods for access to metadata ----------------------------------------------------
-
+    @property
     def size(self):
         """Get size information from block, such as 
         number of internal states, etc.
@@ -212,7 +212,7 @@ class Block(Serializable):
         nx = len(self.engine) if self.engine else 0
         return 1, nx
 
-
+    @property
     def shape(self):
         """Get the number of input and output ports of the block
 
