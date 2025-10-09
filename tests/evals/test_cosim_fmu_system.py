@@ -9,6 +9,9 @@
 import unittest
 import numpy as np
 
+from pathlib import Path
+TEST_DIR = Path(__file__).parent
+
 from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Source, CoSimulationFMU
 
@@ -22,7 +25,7 @@ class TestCoSimFMUSystem(unittest.TestCase):
         """Set up the system with everything thats needed 
         for the evaluation exposed"""
 
-        fmu_path = r"CoupledClutches_CS.fmu"
+        fmu_path = TEST_DIR / r"CoupledClutches_CS.fmu"
 
         #blocks that define the system
         self.fmu = CoSimulationFMU(fmu_path, dt=0.01)
@@ -50,7 +53,7 @@ class TestCoSimFMUSystem(unittest.TestCase):
         #check number of fmu steps
         self.assertEqual(len(self.fmu.events[0]), 2001)
 
-        
+
 
 # RUN TESTS LOCALLY ====================================================================
 
