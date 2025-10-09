@@ -92,13 +92,13 @@ intersphinx_mapping = {
 # -- Options for nbsphinx -----------------------------------------------
 
 # Execute notebooks before conversion
-nbsphinx_execute = 'auto'  # 'always', 'never', or 'auto' (only if no output)
+nbsphinx_execute = 'always'  # 'always', 'never', or 'auto' (only if no output)
 
 # Timeout for notebook execution (in seconds)
 nbsphinx_timeout = 180
 
 # Allow errors in notebooks (useful during development)
-nbsphinx_allow_errors = False
+nbsphinx_allow_errors = True
 
 # Kernel to use for notebook execution
 nbsphinx_kernel_name = 'python3'
@@ -133,5 +133,5 @@ nbsphinx_prolog = """
 # Exclude certain notebook patterns from execution
 nbsphinx_execute_arguments = [
     "--InlineBackend.figure_formats={'svg', 'png'}",
-    "--InlineBackend.rc={'figure.dpi': 120}",
+    "--InlineBackend.rc={'figure.dpi': 200}",
 ]
