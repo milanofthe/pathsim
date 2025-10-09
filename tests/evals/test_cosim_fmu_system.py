@@ -8,6 +8,7 @@
 
 import unittest
 import numpy as np
+import os
 
 from pathlib import Path
 TEST_DIR = Path(__file__).parent
@@ -16,8 +17,10 @@ from pathsim import Simulation, Connection
 from pathsim.blocks import Scope, Source, CoSimulationFMU
 
 
+
 # TESTCASE =============================================================================
 
+@unittest.skipIf(os.getenv("CI") == "true", "FMU tests require platform-specific binaries")
 class TestCoSimFMUSystem(unittest.TestCase):
 
     def setUp(self):
