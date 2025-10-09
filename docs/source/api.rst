@@ -2,90 +2,138 @@
 API Reference
 =============
 
-The basic object hierarchy of PathSim is shown in the diagramm below. The :class:`.Simulation` manages the system components (derivatives of :class:`.Block` and :class:`.Event`, :class:`.Connection`). 
+----
 
-.. image:: figures/pathsim_object_hierarchy.png
-   :width: 700
-   :align: center
-   :alt: hierarchy of PathSim objects
+Core Components
+---------------
 
+The following modules form the core of PathSim's system definition and simulation capabilities.
 
-System Definition and Simulation
---------------------------------
+.. grid:: 2
+   :gutter: 3
 
-The following modules serve the system definition and simulation. In PathSim, systems are defined by instantiating blocks from the block library :mod:`.blocks` and connecting them using :class:`.Connection` objects. PathSim also supports hierarchical modling through subsystems with the :class:`.Subsystem` class, which holds internal blocks and connections and behaves just like a normal block from the outside.
+   .. grid-item-card:: 🎯 Simulation
+      :link: modules/pathsim.simulation
+      :link-type: doc
 
+      Main simulation engine that orchestrates system execution, manages blocks, connections, and events.
+
+   .. grid-item-card:: 🔌 Connection
+      :link: modules/pathsim.connection
+      :link-type: doc
+
+      Defines signal flow between blocks, enabling data transfer and system interconnection.
+
+   .. grid-item-card:: 📦 Subsystem
+      :link: modules/pathsim.subsystem
+      :link-type: doc
+
+      Enables hierarchical modeling by encapsulating blocks and connections into reusable components.
+
+   .. grid-item-card:: 🧱 Block Library
+      :link: modules/pathsim.blocks
+      :link-type: doc
+
+      Comprehensive library of pre-built blocks for sources, operations, controllers, and more.
 
 .. toctree::
+   :hidden:
    :maxdepth: 3
-   :caption: Simulation
 
    modules/pathsim.simulation
-   
-.. toctree::
-   :maxdepth: 3
-   :caption: Subsystem (hierarchical modeling)
-
    modules/pathsim.subsystem
-   
-.. toctree::
-   :maxdepth: 3
-   :caption: Connection 
-
    modules/pathsim.connection
-   
-.. toctree::
-   :maxdepth: 5
-   :caption: Block Library
-
    modules/pathsim.blocks
 
+----
+
+Event System
+------------
+
+PathSim's event handling mechanism enables discrete event detection and system state modifications.
+
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: ⚡ Event Library
+      :link: modules/pathsim.events
+      :link-type: doc
+
+      Zero-crossing detection, scheduled events, and condition-based triggers for hybrid system simulation.
+
 .. toctree::
+   :hidden:
    :maxdepth: 5
-   :caption: Event Library
 
    modules/pathsim.events
 
+----
 
+Numerical Solvers
+-----------------
 
-ODE Solvers
------------
+PathSim provides a wide range of ODE solvers with different characteristics and performance profiles.
 
-The numerical ODE solvers, available in PathSim are structured like this:
-
-.. image:: figures/pathsim_solver_hierarchy.png
+.. image:: figures/pathsim_solver_hierarchy_g.png
    :width: 700
    :align: center
    :alt: hierarchy of PathSim numerical integrators
 
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: 🔢 Solver Library
+      :link: modules/pathsim.solvers
+      :link-type: doc
+
+      Explicit and implicit Runge-Kutta methods, BDF, Gear, and adaptive solvers for stiff and non-stiff problems.
 
 .. toctree::
+   :hidden:
    :maxdepth: 4
-   :caption: Solvers
 
    modules/pathsim.solvers
 
+----
 
+Optimization & Differentiation
+------------------------------
 
-Optimizers and Automatic Differentiation
-----------------------------------------
+Advanced features for optimization, nonlinear solving, and automatic differentiation.
 
-The :mod:`.optim` module contains a range of nonlinear solvers / optimizers that are primarily used for the implicit update equation of implicit ODE solvers and for the steadystate solver. This module also includes the automatic differentiation framework.
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: 🎓 Optimization Module
+      :link: modules/pathsim.optim
+      :link-type: doc
+
+      Nonlinear solvers, optimizers, and automatic differentiation framework for fully differentiable simulations.
 
 .. toctree::
+   :hidden:
    :maxdepth: 4
-   :caption: Optim
 
    modules/pathsim.optim
 
+----
 
 Utilities
 ---------
 
-Utility functions and classes.
+Helper functions and utility classes for analysis, plotting, and system management.
+
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: 🛠️ Utility Functions
+      :link: modules/pathsim.utils
+      :link-type: doc
+
+      Analysis tools, real-time plotting, serialization, adaptive buffers, and more.
 
 .. toctree::
+   :hidden:
    :maxdepth: 4
-   :caption: Utils
 
    modules/pathsim.utils

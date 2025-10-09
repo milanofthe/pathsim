@@ -2,7 +2,12 @@ numpy
 matplotlib
 scipy
 sphinx
-sphinx-rtd-theme
+furo
 myst-parser
 sphinx-autoapi
 sphinx-copybutton
+sphinx-design
+nbsphinx
+jupyter
+ipykernel
+pandoc
