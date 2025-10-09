@@ -7,8 +7,9 @@ Here we show a range of examples utilizing `PathSim` to simulate different dynam
 
 There is an even more comprehensive collection of example dynamical system simulations availabe in the `GitHub repository <https://github.com/milanofthe/pathsim/blob/master/examples>`_.
 
+
 .. note::
-   Some examples are available as interactive Jupyter notebooks that can be downloaded and executed directly. These notebooks generate figures dynamically with transparent backgrounds that adapt to light and dark themes.
+   Examples are available as interactive Jupyter notebooks that can be downloaded and executed directly. 
 
 
 .. toctree::
@@ -22,3 +23,11 @@ There is an even more comprehensive collection of example dynamical system simul
    examples/fmcw_radar.ipynb
    examples/stick_slip.ipynb
    examples/vanderpol_subsystem.ipynb
+   examples/pid_controller.ipynb
+   examples/algebraic_loop.ipynb
+   examples/diode_circuit.ipynb
+   examples/delta_sigma_adc.ipynb
+   examples/sar_adc.ipynb
+   examples/lorenz_attractor.ipynb
+   examples/chemical_reactor.ipynb
+   examples/nested_subsystems.ipynb
