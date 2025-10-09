@@ -39,16 +39,6 @@ sim = Simulation(
         Connection(src, rfntwk, spc[0]),
         Connection(rfntwk, spc[1])
     ],
-    dt=1e-13,
-)
-
-# create the system connections and simulation setup
-sim = Simulation(
-    blocks=[src, rfntwk, spc],
-    connections=[
-        Connection(src, rfntwk, spc[0]),
-        Connection(rfntwk, spc[1])
-    ],
     tolerance_lte_abs=1e-16, # this is due to the super tiny states
     tolerance_lte_rel=1e-5,  # so error control is dominated by the relative truncation error
     Solver=RKBS32,
