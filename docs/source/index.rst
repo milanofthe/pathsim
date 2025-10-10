@@ -19,11 +19,14 @@ Minimal dependencies: only ``numpy``, ``scipy`` and ``matplotlib``!
 .. raw:: html
 
    <div style="text-align: center; margin: 2rem 0;">
-      <a href="https://pypi.org/project/pathsim/" style="display: inline-block; padding: 0.75rem 2rem; background: var(--color-brand-primary); color: white; text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem;">
+      <a href="https://pypi.org/project/pathsim/" style="display: inline-block; padding: 0.75rem 2rem; background: var(--color-background-secondary); color: var(--color-foreground-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; border: 2px solid var(--color-background-border);">
          Install via pip
       </a>
       <a href="https://github.com/milanofthe/pathsim" style="display: inline-block; padding: 0.75rem 2rem; background: var(--color-background-secondary); color: var(--color-foreground-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; border: 2px solid var(--color-background-border);">
          View on GitHub
+      </a>
+      <a href="https://github.com/sponsors/milanofthe" style="display: inline-block; padding: 0.75rem 2rem; background: var(--color-background-secondary); color: var(--color-foreground-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; border: 2px solid var(--color-background-border);">
+         ❤️ Sponsor
       </a>
    </div>
 
@@ -45,11 +48,11 @@ Key Features
 
    .. grid-item-card:: 🔢 Numerical Integrators
 
-      Wide range of solvers: implicit, explicit, high-order, and adaptive time-stepping.
+      Wide range of solvers: implicit, explicit, high-order, and adaptive time-stepping. (:ref:`Numerical Solvers <api:numerical solvers>`)
 
    .. grid-item-card:: 🏗️ Modular & Hierarchical
 
-      Build complex systems with **nested subsystems** (:class:`.Subsystem`, `example <examples/nested_subsystem.ipynb>`_).
+      Build complex systems with **nested subsystems** (:class:`.Subsystem`, `example <examples/nested_subsystems.ipynb>`_).
 
    .. grid-item-card:: ⚡ Event Handling
 
