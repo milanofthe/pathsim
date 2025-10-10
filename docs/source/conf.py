@@ -35,17 +35,29 @@ html_theme = 'furo'
 html_static_path = ['_static']
 html_logo = 'logos/pathsim_logo.png'
 html_title = "PathSim Documentation"
+html_css_files = ['custom.css']  # Add custom CSS for link previews and styling
 
 html_theme_options = {
     "light_css_variables": {
-        "color-brand-primary": "#2962ff",
-        "color-brand-content": "#2962ff",
+        # PathSim brand colors - using blue from the palette
+        "color-brand-primary": "#377eb8",  # PathSim blue
+        "color-brand-content": "#377eb8",  # PathSim blue for links
+
+        # Accent colors for various elements using PathSim palette
+        "color-api-keyword": "#377eb8",  # PathSim blue for keywords
+        "color-highlight-on-target": "#fff3cd",  # Soft yellow highlight
+
+        # Font stacks
         "font-stack": "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
         "font-stack--monospace": "SFMono-Regular, Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace",
     },
     "dark_css_variables": {
-        "color-brand-primary": "#448aff",
-        "color-brand-content": "#448aff",
+        # PathSim brand colors for dark mode - slightly lighter for better contrast
+        "color-brand-primary": "#377eb8",  # PathSim blue
+        "color-brand-content": "#377eb8",  # PathSim blue
+
+        # Accent colors for dark mode
+        "color-api-keyword": "#377eb8",  # PathSim blue
     },
     "sidebar_hide_name": True,  # Hide project name, show logo only
     "navigation_with_keys": True,  # Allow keyboard navigation
@@ -121,11 +133,12 @@ nbsphinx_prolog = """
             background-color: transparent !important;
         }
 
-        /* Better styling for stderr/logging output */
+        /* Better styling for stderr/logging output - adapts to light/dark mode */
         .nboutput .stderr {
-            background-color: #f5f5f5 !important;
-            color: #333333 !important;
-            border-left: 3px solid #2962ff;
+            background-color: transparent !important;
+            color: var(--color-foreground-secondary) !important;
+            border-left: 3px solid var(--color-brand-primary);
+            opacity: 0.85;
         }
     </style>
 """
