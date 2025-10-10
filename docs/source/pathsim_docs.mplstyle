@@ -14,19 +14,19 @@ savefig.pad_inches: 0.1
 
 # Axes
 axes.facecolor: none
-axes.edgecolor: #7F7F7F
+axes.edgecolor: "#7F7F7F"
 axes.linewidth: 1.8
 axes.grid: False
 axes.axisbelow: True
 axes.labelsize: 11
 axes.titlesize: 12
-axes.labelcolor: #7F7F7F
+axes.labelcolor: "#7F7F7F"
 axes.titleweight: bold
 axes.spines.top: False
 axes.spines.right: False
 
 # Grid
-grid.color: #7F7F7F
+grid.color: "#7F7F7F"
 grid.linestyle: --
 grid.linewidth: 0.8
 grid.alpha: 0.6
@@ -47,7 +47,7 @@ patch.antialiased: True
 font.family: sans-serif
 font.sans-serif: DejaVu Sans, Arial, Helvetica, sans-serif
 font.size: 10
-text.color: #7F7F7F
+text.color: "#7F7F7F"
 
 # Legend
 legend.frameon: False
@@ -61,8 +61,8 @@ legend.loc: best
 # Ticks
 xtick.labelsize: 10
 ytick.labelsize: 10
-xtick.color: #7F7F7F
-ytick.color: #7F7F7F
+xtick.color: "#7F7F7F"
+ytick.color: "#7F7F7F"
 xtick.direction: out
 ytick.direction: out
 xtick.major.width: 1.8
