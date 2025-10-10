@@ -1,0 +1,74 @@
+# PathSim documentation matplotlib style
+# Optimized for light/dark mode compatibility with transparent backgrounds
+
+# Figure
+figure.figsize: 8, 4
+figure.dpi: 300
+figure.facecolor: none
+figure.edgecolor: none
+savefig.facecolor: none
+savefig.edgecolor: none
+savefig.transparent: True
+savefig.bbox: tight
+savefig.pad_inches: 0.1
+
+# Axes
+axes.facecolor: none
+axes.edgecolor: "#7F7F7F"
+axes.linewidth: 1.8
+axes.grid: False
+axes.axisbelow: True
+axes.labelsize: 11
+axes.titlesize: 12
+axes.labelcolor: "#7F7F7F"
+axes.titleweight: bold
+axes.spines.top: False
+axes.spines.right: False
+
+# Grid
+grid.color: "#7F7F7F"
+grid.linestyle: --
+grid.linewidth: 0.8
+grid.alpha: 0.6
+
+# Lines
+lines.linewidth: 2.0
+lines.markersize: 8
+lines.markeredgewidth: 1.5
+lines.antialiased: True
+
+# Patches (for bars, etc.)
+patch.linewidth: 1.0
+patch.facecolor: 4C72B0
+patch.edgecolor: none
+patch.antialiased: True
+
+# Font
+font.family: sans-serif
+font.sans-serif: DejaVu Sans, Arial, Helvetica, sans-serif
+font.size: 10
+text.color: "#7F7F7F"
+
+# Legend
+legend.frameon: False
+legend.framealpha: 0.0
+legend.fancybox: False
+legend.facecolor: none
+legend.edgecolor: none
+legend.fontsize: 10
+legend.loc: best
+
+# Ticks
+xtick.labelsize: 10
+ytick.labelsize: 10
+xtick.color: "#7F7F7F"
+ytick.color: "#7F7F7F"
+xtick.direction: out
+ytick.direction: out
+xtick.major.width: 1.8
+ytick.major.width: 1.8
+xtick.minor.width: 1.2
+ytick.minor.width: 1.2
+
+# Color cycle - colors that work well with grey text
+axes.prop_cycle: cycler('color', ['2962ff', 'ff6f00', '00897b', 'd81b60', '8e24aa', '3949ab', '00acc1', '43a047'])

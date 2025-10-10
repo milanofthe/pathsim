@@ -17,15 +17,42 @@ from ._rungekutta import ExplicitRungeKutta
 class RK4(ExplicitRungeKutta):
     """Classical four-stage, 4th order explicit Runge-Kutta method.
 
-    The most well-known Runge-Kutta method. It provides a good balance 
-    between accuracy and computational cost for non-stiff problems. Not SSP.
+    The most well-known Runge-Kutta method. It provides a good balance
+    between accuracy and computational cost for non-stiff problems. This is
+    the standard textbook Runge-Kutta method, often simply called "RK4" or
+    "the Runge-Kutta method."
 
-    Characteristics:
-        * Order: 4
-        * Stages: 4
-        * Explicit
-        * Fixed timestep only
-        * Widely used, good general-purpose explicit solver.
+    Characteristics
+    ---------------
+    * Order: 4
+    * Stages: 4
+    * Explicit
+    * Fixed timestep only
+    * Not SSP
+    * Widely used, good general-purpose explicit solver
+
+    When to Use
+    -----------
+    * **General-purpose integration**: Excellent default choice for smooth, non-stiff problems
+    * **Fixed timestep applications**: When adaptive stepping is not required
+    * **Moderate accuracy needs**: Good balance of accuracy and computational cost
+    * **Educational/reference**: Standard method for comparison and teaching
+    
+    Note
+    ----
+    Not suitable for stiff problems. For adaptive timestepping, consider
+    RKDP54 or RKF45. For problems requiring TVD/SSP properties, use SSPRK methods.
+
+    References
+    ----------
+    .. [1] Kutta, W. (1901). "Beitrag zur näherungsweisen Integration totaler
+           Differentialgleichungen". Zeitschrift für Mathematik und Physik, 46, 435-453.
+    .. [2] Butcher, J. C. (2016). "Numerical Methods for Ordinary Differential Equations".
+           John Wiley & Sons, 3rd Edition.
+    .. [3] Hairer, E., Nørsett, S. P., & Wanner, G. (1993). "Solving Ordinary
+           Differential Equations I: Nonstiff Problems". Springer Series in Computational
+           Mathematics, Vol. 8.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

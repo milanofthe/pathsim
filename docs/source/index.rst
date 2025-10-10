@@ -1,110 +1,168 @@
-.. pathsim documentation master file, created by
-   sphinx-quickstart on Wed Feb 19 13:55:01 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. pathsim documentation master file
 
-PathSim - A System Simulation Framework
-=======================================
+========================================
+PathSim
+========================================
 
-**PathSim** is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism! It provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through Python scripting.
+.. raw:: html
 
-All of that with minimal dependencies, only `numpy`, `scipy` and `matplotlib`!
+   <div style="text-align: center; margin-bottom: 2rem;">
+      <p style="font-size: 1.3rem; color: var(--color-foreground-secondary); max-width: 800px; margin: 0 auto;">
+         A flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and event handling!
+      </p>
+   </div>
 
-Key Features:
+**PathSim** provides a variety of classes that enable modeling and simulating complex interconnected dynamical systems through intuitive Python scripting.
 
-- **Hot-swappable** blocks and solvers during simulation
-- Blocks are inherently **MIMO** (Multiple Input, Multiple Output) capable
-- Wide range of **numerical integrators** (implicit, explicit, high order, adaptive)
-- **Modular and hierarchical** modeling with (nested) subsystems (see :class:`.Subsystem` and :ref:`ref-vanderpol-subsystem`)
-- **Event handling** system to detect and resolve discrete events (zero-crossing detection, see :ref:`ref-bouncing-ball`)
-- Automatic differentiation for **fully differentiable** system simulations (see :ref:`ref-tutorials-ad`)
-- **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
+Minimal dependencies: only ``numpy``, ``scipy`` and ``matplotlib``!
 
-The source code can be found in the `GitHub repository <https://github.com/milanofthe/pathsim>`_ and is fully open source under MIT license. Consider starring PathSim to support its development.
+.. raw:: html
+
+   <div style="text-align: center; margin: 2rem 0;">
+      <a href="https://pypi.org/project/pathsim/" style="display: inline-block; padding: 0.75rem 2rem; background: var(--color-background-secondary); color: var(--color-foreground-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; border: 2px solid var(--color-background-border);">
+         Install via pip
+      </a>
+      <a href="https://github.com/milanofthe/pathsim" style="display: inline-block; padding: 0.75rem 2rem; background: var(--color-background-secondary); color: var(--color-foreground-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; border: 2px solid var(--color-background-border);">
+         View on GitHub
+      </a>
+      <a href="https://github.com/sponsors/milanofthe" style="display: inline-block; padding: 0.75rem 2rem; background: var(--color-background-secondary); color: var(--color-foreground-primary); text-decoration: none; border-radius: 0.5rem; font-weight: 600; margin: 0.5rem; border: 2px solid var(--color-background-border);">
+         ❤️ Sponsor
+      </a>
+   </div>
+
+----
+
+Key Features
+============
+
+.. grid:: 2
+   :gutter: 3
+
+   .. grid-item-card:: 🔄 Hot-Swappable
+
+      Switch blocks and solvers **during simulation** for flexible experimentation and analysis.
+
+   .. grid-item-card:: 🎯 MIMO Capable
+
+      Blocks are inherently **Multiple Input, Multiple Output** capable for complex systems.
+
+   .. grid-item-card:: 🔢 Numerical Integrators
+
+      Wide range of solvers: implicit, explicit, high-order, and adaptive time-stepping.
+
+   .. grid-item-card:: 🏗️ Modular & Hierarchical
+
+      Build complex systems with **nested subsystems** (:class:`.Subsystem`, `example <examples/nested_subsystems.ipynb>`_).
+
+   .. grid-item-card:: ⚡ Event Handling
+
+      Detect and resolve discrete events with **zero-crossing detection** (`example <examples/bouncing_ball.ipynb>`_).
+
+   .. grid-item-card:: 🎓 Auto Differentiation
+
+      Fully **differentiable** system simulations for optimization and analysis (`example <examples/automatic_differentiation.ipynb>`_).
+
+   .. grid-item-card:: 🔧 Extensible
+
+      Subclass the base ``Block`` class and implement just a handful of methods.
+
+   .. grid-item-card:: 📖 Open Source
+
+      MIT licensed on `GitHub <https://github.com/milanofthe/pathsim>`_ - star to support development!
 
 
 Quickstart
-----------
+==========
 
-1. **Install** PathSim with `pip <https://pypi.org/project/pathsim/>`_:
+Get started with PathSim in three simple steps:
 
-.. code-block:: bash
+.. grid:: 3
+   :gutter: 2
 
-    pip install pathsim
+   .. grid-item-card:: 1️⃣ Install
 
+      Install PathSim with pip:
 
-2. **Build** a dynamical system using blocks and connections. Here we just integrate a cosine:
+      .. code-block:: bash
 
+         pip install pathsim
 
-.. image:: figures/sin_cos_blockdiagram.png
-   :width: 700
-   :align: center
-   :alt: cos integration block diagram
+   .. grid-item-card:: 2️⃣ Build
 
+      Create a system using blocks and connections
 
-Which looks like this, translated to PathSim:
+   .. grid-item-card:: 3️⃣ Run
 
-.. code-block:: python
-    
-    import numpy as np
+      Execute the simulation and visualize results
 
-    from pathsim import Simulation, Connection
-    from pathsim.blocks import Source, Integrator, Scope
+----
 
-    #these are the blocks of our system
-    Sr = Source(np.cos)
-    In = Integrator()
-    Sc = Scope(labels=["cos", "sin"])
+Example: Integrating a Cosine
+------------------------------
 
-    #simulation instance with blocks and connections
-    Sim = Simulation(
-        blocks=[Sr, In, Sc], 
-        connections=[
-            Connection(Sr, In),
-            Connection(Sr, Sc[0]),
-            Connection(In, Sc[1]),
-            ], 
-        dt=0.01 
-        )
-        
+Here's a simple interactive example that demonstrates PathSim basics. Click to view the full notebook with live code execution:
 
-3. **Run** the simulation and look at the results:
+.. grid:: 1
 
-.. code-block:: python
-    
-    #run for 10 time units
-    Sim.run(10)
+   .. grid-item-card:: 🚀 Quickstart Example
+      :link: quickstart
+      :link-type: doc
+      :text-align: center
 
-    #plot the scope
-    Sc.plot()
+      Interactive notebook demonstrating basic PathSim usage - integrating a cosine function to produce a sine wave.
 
-
-.. image:: figures/sin_cos.png
-   :width: 700
-   :align: center
-   :alt: cos integration result
-
-
-
-Table of Contents
------------------
-
-This documentation is structured in the following way. There are a number of **examples** that almost have tutorial-charakter and of course the **API-reference**.
+      .. image:: figures/sin_cos_blockdiagram_g.png
+         :width: 400
+         :align: center
 
 .. toctree::
+   :hidden:
+
+   quickstart
+
+----
+
+Explore the Documentation
+=========================
+
+.. grid:: 2
+   :gutter: 3
+
+   .. grid-item-card:: 📚 Examples
+      :link: examples
+      :link-type: doc
+
+      Explore practical examples demonstrating PathSim's capabilities, from simple oscillators to complex hybrid systems with event handling and automatic differentiation.
+
+   .. grid-item-card:: 📖 API Reference
+      :link: api
+      :link-type: doc
+
+      Complete API documentation for all PathSim classes, methods, and modules.
+
+   .. grid-item-card:: 🛣️ Roadmap
+      :link: roadmap
+      :link-type: doc
+
+      See what's planned for future releases and contribute your ideas.
+
+   .. grid-item-card:: 🤝 Contributing
+      :link: contributing
+      :link-type: doc
+
+      Learn how to contribute to PathSim development and join the community.
+
+   .. grid-item-card:: 🔍 Index
+      :link: genindex
+      :link-type: ref
+
+      Alphabetical index of all functions, classes, and terms.
+
+.. toctree::
+   :hidden:
    :maxdepth: 2
 
    examples
-   tutorials
    roadmap
    contributing
    api
-   
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`

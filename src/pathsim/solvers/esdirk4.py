@@ -17,17 +17,36 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 class ESDIRK4(DiagonallyImplicitRungeKutta):
     """Six-stage, 4th order Singly Diagonally Implicit Runge-Kutta (ESDIRK) method.
 
-    Features an explicit first stage (making it ESDIRK). This specific tableau is often
-    designed for handling stiff problems and potentially Differential Algebraic Equations (DAEs)
-    of index up to two or three. Does not have an embedded method for error estimation in this
+    Features an explicit first stage (making it ESDIRK). This specific tableau is designed
+    for handling stiff problems and potentially Differential Algebraic Equations (DAEs) of
+    index up to two or three. Does not have an embedded method for error estimation in this
     implementation (fixed step only).
 
-    Characteristics:
-       * Order: 4
-       * Stages: 6 (1 Explicit, 5 Implicit)
-       * Implicit (ESDIRK)
-       * Fixed timestep only
-       * A-stable
+    Characteristics
+    ---------------
+    * Order: 4
+    * Stages: 6 (1 Explicit, 5 Implicit)
+    * Implicit (ESDIRK)
+    * Fixed timestep only
+    * A-stable
+
+    When to Use
+    -----------
+    * **Stiff problems with fixed timestep**: 4th order accuracy for stiff ODEs
+    * **Differential-algebraic equations**: Suitable for DAEs of index 2-3
+    * **Moderate-to-high accuracy on stiff problems**: Better than 3rd order methods
+    * **Known stable timestep**: When adaptive stepping is not needed
+
+    **Note**: For adaptive timestepping on stiff problems, use ESDIRK43 or ESDIRK54 instead.
+
+    References
+    ----------
+    .. [1] Kennedy, C. A., & Carpenter, M. H. (2016). "Diagonally implicit Runge-Kutta
+           methods for ordinary differential equations. A review". NASA Technical Report.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

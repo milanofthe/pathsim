@@ -15,20 +15,43 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKV65(ExplicitRungeKutta):
-    """9-stage 6-th order with embedded 5-th order Runge-Kutta method from Verner 
-    with 6-th order truncation error estimate.
+    """Nine-stage, 6th order explicit Runge-Kutta method by Verner.
 
-    This is the 'most robust' 9, 6(5) pair of Jim Verner's Refuge for Runge-Kutta Pairs
-    URL: https://www.sfu.ca/~jverner/
+    Features an embedded 5th order method for adaptive step size control. This is the
+    'most robust' 9-stage 6(5) pair from Jim Verner's collection, designed for efficient
+    high-accuracy integration of non-stiff problems. Offers better accuracy than 5th
+    order methods while being more efficient than 8th order methods.
 
-    Characteristics:
+    Characteristics
+    ---------------
     * Order: 6 (Propagating solution)
     * Embedded Order: 5
     * Stages: 9
     * Explicit
     * Adaptive timestep
-    * Efficient high-order method for non-stiff problems.
+    * Efficient high-order method for non-stiff problems
+
+    When to Use
+    -----------
+    * **High-accuracy requirements**: When 5th order is insufficient but 8th order is overkill
+    * **Smooth non-stiff problems**: Excellent for problems with smooth solutions
+    * **Stringent error tolerances**: When tight tolerances are needed efficiently
+    * **Scientific computing**: Common in astronomical and molecular dynamics simulations
     
+    Note
+    ----
+    More expensive per step than 5th order methods, but can take larger steps for the same 
+    accuracy. For very high accuracy, consider RKF78 or RKDP87.
+
+    References
+    ----------
+    .. [1] Verner, J. H. (2010). "Numerically optimal Runge-Kutta pairs with interpolants".
+           Numerical Algorithms, 53(2-3), 383-396.
+    .. [2] Verner's Refuge for Runge-Kutta Pairs: https://www.sfu.ca/~jverner/
+    .. [3] Hairer, E., Nørsett, S. P., & Wanner, G. (1993). "Solving Ordinary
+           Differential Equations I: Nonstiff Problems". Springer Series in Computational
+           Mathematics, Vol. 8.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

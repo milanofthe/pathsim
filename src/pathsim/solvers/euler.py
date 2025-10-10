@@ -22,22 +22,36 @@ class EUF(ExplicitSolver):
     Method:
 
     .. math::
-        
+
         x_{n+1} = x_n + dt \\cdot f(x_n, t_n)
 
-    Characteristics:
+    Characteristics
+    ---------------
+    * Order: 1
+    * Stages: 1
+    * Explicit
+    * Fixed timestep only
+    * Not A-stable
+    * Low accuracy and stability, but computationally very cheap.
 
-        * Order: 1
-        * Stages: 1
-        * Explicit
-        * Fixed timestep only
-        * Not A-stable
-        * Low accuracy and stability, but computationally very cheap.
-    
-    Note
-    ----
-    Use this only if the function to integrate is super smooth 
-    or multistep/multistage methods cant be used. 
+    When to Use
+    -----------
+    * **Educational purposes**: Ideal for teaching basic numerical integration concepts
+    * **Very smooth problems**: When the function is extremely smooth and well-behaved
+    * **Rapid prototyping**: Quick initial testing before applying more sophisticated methods
+    * **Resource-constrained scenarios**: When computational cost must be minimized
+
+    **Not recommended** for production use, stiff problems, or when accuracy is important.
+
+    References
+    ----------
+    .. [1] Euler, L. (1768). "Institutionum calculi integralis". Impensis Academiae
+           Imperialis Scientiarum, Vol. 1.
+    .. [2] Butcher, J. C. (2016). "Numerical Methods for Ordinary Differential Equations".
+           John Wiley & Sons, 3rd Edition.
+    .. [3] Hairer, E., Nørsett, S. P., & Wanner, G. (1993). "Solving Ordinary
+           Differential Equations I: Nonstiff Problems". Springer Series in Computational
+           Mathematics, Vol. 8.
 
     """
 
@@ -81,21 +95,41 @@ class EUB(ImplicitSolver):
     accuracy for non-stiff problems or when high precision is required.
 
     Method:
-    
+
     .. math::
 
         x_{n+1} = x_n + dt \\cdot f(x_{n+1}, t_{n+1})
-    
+
     This implicit equation is solved iteratively using the internal optimizer.
 
-    Characteristics:
+    Characteristics
+    ---------------
+    * Order: 1
+    * Stages: 1 (Implicit)
+    * Implicit
+    * Fixed timestep only
+    * A-stable, L-stable
+    * Very stable, suitable for stiff problems, but low accuracy.
 
-        * Order: 1
-        * Stages: 1 (Implicit)
-        * Implicit
-        * Fixed timestep only
-        * A-stable, L-stable
-        * Very stable, suitable for stiff problems, but low accuracy.
+    When to Use
+    -----------
+    * **Highly stiff problems**: Excellent stability for very stiff ODEs
+    * **Robustness over accuracy**: When stability is more critical than precision
+    * **Long-time integration**: For simulations over very long time periods where stability matters
+    * **Initial testing of stiff systems**: Simple method to verify problem setup
+
+    **Trade-off**: Sacrifices accuracy for exceptional stability. For higher accuracy on
+    stiff problems, consider BDF or ESDIRK methods.
+
+    References
+    ----------
+    .. [1] Curtiss, C. F., & Hirschfelder, J. O. (1952). "Integration of stiff equations".
+           Proceedings of the National Academy of Sciences, 38(3), 235-243.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+    .. [3] Butcher, J. C. (2016). "Numerical Methods for Ordinary Differential Equations".
+           John Wiley & Sons, 3rd Edition.
 
     """
 

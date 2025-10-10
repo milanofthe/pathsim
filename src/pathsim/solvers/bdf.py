@@ -231,14 +231,34 @@ class BDF(ImplicitSolver):
 class BDF2(BDF):
     """Fixed-step 2nd order Backward Differentiation Formula (BDF).
 
-    Implicit linear multistep method. Uses the previous two solution points.
-    A-stable, suitable for stiff problems. Uses BDF1 for the first step.
+    Implicit linear multistep method using the previous two solution points. A-stable,
+    making it excellent for stiff problems. Uses DIRK3 startup method for the first steps.
 
-    Characteristics:
-        * Order: 2
-        * Implicit Multistep
-        * Fixed timestep only
-        * A-stable
+    Characteristics
+    ---------------
+    * Order: 2
+    * Implicit Multistep
+    * Fixed timestep only
+    * A-stable
+
+    When to Use
+    -----------
+    * **Stiff problems with fixed timestep**: Classic choice for stiff ODEs
+    * **Long-time integration**: Very stable for extended simulations
+    * **Known timestep**: When timestep is predetermined
+    * **Efficient stiff solver**: Lower overhead than higher-order BDFs
+
+    **Recommended** for fixed-timestep stiff problems. For adaptive stepping, use GEAR21
+    or ESDIRK methods.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -254,14 +274,35 @@ class BDF2(BDF):
 class BDF3(BDF):
     """Fixed-step 3rd order Backward Differentiation Formula (BDF).
 
-    Implicit linear multistep method. Uses the previous three solution points.
-    A(alpha)-stable, suitable for stiff problems. Uses lower orders for startup.
+    Implicit linear multistep method using the previous three solution points. A(alpha)-stable
+    with :math:`\\alpha \\approx 86^\\circ`, providing excellent stability for stiff problems.
+    Uses DIRK3 startup method for initial steps.
 
-    Characteristics:
-        * Order: 3
-        * Implicit Multistep
-        * Fixed timestep only
-        * A(alpha)-stable (:math:`\\alpha \\approx 86^\\circ`)
+    Characteristics
+    ---------------
+    * Order: 3
+    * Implicit Multistep
+    * Fixed timestep only
+    * A(alpha)-stable (:math:`\\alpha \\approx 86^\\circ`)
+
+    When to Use
+    -----------
+    * **Stiff problems with higher accuracy**: 3rd order for better accuracy than BDF2
+    * **Fixed-timestep applications**: When timestep is predetermined
+    * **Good stability/accuracy balance**: Better accuracy with still-excellent stability
+    * **Chemical kinetics**: Common in reaction-diffusion problems
+
+    **Trade-off**: Slightly less stable than BDF2, but more accurate. For adaptive stepping,
+    use GEAR32 or ESDIRK43.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -277,14 +318,35 @@ class BDF3(BDF):
 class BDF4(BDF):
     """Fixed-step 4th order Backward Differentiation Formula (BDF).
 
-    Implicit linear multistep method. Uses the previous four solution points.
-    A(alpha)-stable, suitable for stiff problems. Uses lower orders for startup.
+    Implicit linear multistep method using the previous four solution points. A(alpha)-stable
+    with :math:`\\alpha \\approx 73^\\circ`. Good for stiff problems requiring moderate-to-high
+    accuracy. Uses DIRK3 startup method for initial steps.
 
-    Characteristics:
-        * Order: 4
-        * Implicit Multistep
-        * Fixed timestep only
-        * A(alpha)-stable (:math:`\\alpha \\approx 73^\\circ`)
+    Characteristics
+    ---------------
+    * Order: 4
+    * Implicit Multistep
+    * Fixed timestep only
+    * A(alpha)-stable (:math:`\\alpha \\approx 73^\\circ`)
+
+    When to Use
+    -----------
+    * **Moderate-to-high accuracy on stiff problems**: 4th order with good stability
+    * **Fixed timestep**: When timestep is predetermined
+    * **Accurate stiff solver**: Higher accuracy than BDF3
+    * **Scientific computing**: Common in engineering simulations
+
+    **Note**: Stability angle is smaller than BDF3. For very stiff problems, BDF2 or BDF3
+    may be more robust. For adaptive stepping, use GEAR43 or ESDIRK43.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -300,14 +362,35 @@ class BDF4(BDF):
 class BDF5(BDF):
     """Fixed-step 5th order Backward Differentiation Formula (BDF).
 
-    Implicit linear multistep method. Uses the previous five solution points.
-    A(alpha)-stable, suitable for stiff problems. Uses lower orders for startup.
+    Implicit linear multistep method using the previous five solution points. A(alpha)-stable
+    with :math:`\\alpha \\approx 51^\\circ`. Suitable for stiff problems requiring high accuracy,
+    but with reduced stability angle. Uses DIRK3 startup method for initial steps.
 
-    Characteristics:
-        * Order: 5
-        * Implicit Multistep
-        * Fixed timestep only
-        * A(alpha)-stable (:math:`\\alpha \\approx 51^\\circ`)
+    Characteristics
+    ---------------
+    * Order: 5
+    * Implicit Multistep
+    * Fixed timestep only
+    * A(alpha)-stable (:math:`\\alpha \\approx 51^\\circ`)
+
+    When to Use
+    -----------
+    * **High accuracy on mildly stiff problems**: 5th order when stability angle is sufficient
+    * **Fixed timestep applications**: When timestep is predetermined
+    * **Smooth stiff problems**: Problems without extreme stiffness
+    * **High-precision requirements**: Better accuracy than BDF4
+
+    **Warning**: Reduced stability compared to lower-order BDFs. For very stiff problems,
+    use BDF2 or BDF3. For adaptive stepping, use GEAR54 or ESDIRK54.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -323,16 +406,38 @@ class BDF5(BDF):
 class BDF6(BDF):
     """Fixed-step 6th order Backward Differentiation Formula (BDF).
 
-    Implicit linear multistep method. Uses the previous six solution points.
-    Not A-stable, stability region does not contain the entire left half-plane,
-    limiting its use for highly stiff problems compared to lower-order BDFs.
-    Uses lower orders for startup.
+    Implicit linear multistep method using the previous six solution points. Not A-stable;
+    stability region does not contain the entire left half-plane (stability angle only
+    :math:`\\approx 18^\\circ`), severely limiting its use for stiff problems. Uses DIRK3
+    startup method for initial steps.
 
-    Characteristics:
-        * Order: 6
-        * Implicit Multistep
-        * Fixed timestep only
-        * Not A-stable (stability angle approx :math:`18^\\circ`)
+    Characteristics
+    ---------------
+    * Order: 6
+    * Implicit Multistep
+    * Fixed timestep only
+    * Not A-stable (stability angle approx :math:`18^\\circ`)
+
+    When to Use
+    -----------
+    * **Very smooth, mildly stiff problems**: Only when stiffness is minimal
+    * **High accuracy priority**: When 6th order accuracy justifies poor stability
+    * **Specialized applications**: Rarely used in practice
+
+    **Warning**: Very limited stability. Generally not recommended for stiff problems.
+    For most applications requiring 6th order accuracy, use explicit methods like RKV65
+    on non-stiff problems, or lower-order BDFs with smaller timesteps on stiff problems.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+    .. [3] Curtiss, C. F., & Hirschfelder, J. O. (1952). "Integration of stiff equations".
+           Proceedings of the National Academy of Sciences, 38(3), 235-243.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
