@@ -49,7 +49,7 @@ Key Features
 
    .. grid-item-card:: 🏗️ Modular & Hierarchical
 
-      Build complex systems with **nested subsystems** (:class:`.Subsystem`, `example <examples/vanderpol_subsystem.ipynb>`_).
+      Build complex systems with **nested subsystems** (:class:`.Subsystem`, `example <examples/nested_subsystem.ipynb>`_).
 
    .. grid-item-card:: ⚡ Event Handling
 

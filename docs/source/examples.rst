@@ -22,7 +22,7 @@ There is an even more comprehensive collection of example dynamical system simul
    examples/thermostat.ipynb
    examples/fmcw_radar.ipynb
    examples/stick_slip.ipynb
-   examples/vanderpol_subsystem.ipynb
+   examples/vanderpol.ipynb
    examples/pid_controller.ipynb
    examples/algebraic_loop.ipynb
    examples/diode_circuit.ipynb
