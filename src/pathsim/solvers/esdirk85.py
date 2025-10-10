@@ -15,26 +15,44 @@ from ._rungekutta import DiagonallyImplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class ESDIRK85(DiagonallyImplicitRungeKutta):
-    """Sixteen-stage, 8th order, L-stable, stiffly accurate Embedded Singly Diagonally
-    Implicit Runge-Kutta (ESDIRK) method.
+    """Sixteen-stage, 8th order L-stable Embedded Singly Diagonally Implicit Runge-Kutta method.
 
     Features an embedded 5th order method for adaptive step size control. The first stage is
-    explicit. Designed for very stiff problems requiring very high accuracy, but computationally
-    expensive due to the large number of stages.
+    explicit. Designed for very stiff problems requiring very high accuracy. Computationally
+    expensive due to 16 stages, but can take very large timesteps with tight tolerances.
+    This is the ESDIRK(16,8)[2]SAL-[(16,5)] method.
 
-    FROM:
-        VERY HIGH-ORDER A-STABLE STIFFLY ACCURATE DIAGONALLY
-        IMPLICIT RUNGE-KUTTA METHODS WITH ERROR ESTIMATORS
-        YOUSEF ALAMRI AND DAVID I. KETCHESON
-        Method: ESDIRK(16,8)[2]SAL-[(16,5)]
+    Characteristics
+    ---------------
+    * Order: 8
+    * Embedded Order: 5
+    * Stages: 16 (1 Explicit, 15 Implicit)
+    * Implicit (ESDIRK)
+    * Adaptive timestep
+    * L-stable, Stiffly accurate
 
-    Characteristics:
-        * Order: 8
-        * Embedded Order: 5
-        * Stages: 16 (1 Explicit, 15 Implicit)
-        * Implicit (ESDIRK)
-        * Adaptive timestep
-        * L-stable, Stiffly Accurate
+    When to Use
+    -----------
+    * **Extremely high accuracy on stiff problems**: When very tight tolerances are essential
+    * **Expensive right-hand sides**: When large timesteps justify the 16 stages
+    * **Benchmark computations**: Reference solutions for stiff problems
+    * **Specialized applications**: Only when 8th order accuracy is truly needed
+
+    **Warning**: Very expensive (16 implicit stages). Only use when extremely high accuracy
+    is essential and large timesteps are possible. For most applications, ESDIRK54 is more
+    practical.
+
+    References
+    ----------
+    .. [1] Alamri, Y., & Ketcheson, D. I. (2019). "Very high-order A-stable stiffly accurate
+           diagonally implicit Runge-Kutta methods with error estimators". arXiv preprint
+           arXiv:1905.11370.
+    .. [2] Kennedy, C. A., & Carpenter, M. H. (2019). "Diagonally implicit Runge-Kutta
+           methods for stiff ODEs". Applied Numerical Mathematics, 146, 221-244.
+    .. [3] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

@@ -24,10 +24,11 @@ class SteadyState(ImplicitSolver):
     :math:`f(x, u, t_{steady}) = 0` by finding the fixed point of :math:`x = x + f(x, u, t_{steady})`.
     It uses the same internal optimizer (e.g., NewtonAnderson) as other implicit solvers.
 
-    Characteristics:
-        * Purpose: Find steady-state (:math:`dx/dt = 0`)
-        * Implicit (uses optimizer)
-        * Not a time-stepping method.
+    Characteristics
+    ---------------
+    * Purpose: Find steady-state (:math:`dx/dt = 0`)
+    * Implicit (uses optimizer)
+    * Not a time-stepping method.
     """
         
     def solve(self, f, J, dt):
