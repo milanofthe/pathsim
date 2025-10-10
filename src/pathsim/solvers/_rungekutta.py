@@ -26,8 +26,8 @@ class ExplicitRungeKutta(ExplicitSolver):
     the timestepping at intermediate stages and the error control if 
     the coefficients for the local truncation error estimate are defined.        
     
-    Notes
-    -----
+    Note
+    ----
     This class is not intended to be used directly!!!
 
     Attributes
@@ -171,8 +171,8 @@ class DiagonallyImplicitRungeKutta(ImplicitSolver):
     Extensions and checks to also handle explicit first stages (ESDIRK) 
     and additional final evaluation coefficients (not stiffly accurate)
     
-    Notes
-    -----
+    Note
+    ----
     This class is not intended to be used directly!!!
 
     Attributes

@@ -20,16 +20,37 @@ class ESDIRK43(DiagonallyImplicitRungeKutta):
     """Six-stage, 4th order Embedded Singly Diagonally Implicit Runge-Kutta (ESDIRK) method.
 
     Features an embedded 3rd order method for adaptive step size control. The first stage is
-    explicit. Suitable for stiff problems requiring moderate accuracy.
+    explicit. L-stable and stiffly accurate, making it excellent for stiff problems requiring
+    moderate-to-high accuracy with adaptive timestepping.
 
-    Characteristics:
-        * Order: 4
-        * Embedded Order: 3
-        * Stages: 6 (1 Explicit, 5 Implicit)
-        * Implicit (ESDIRK)
-        * Adaptive timestep
-        * L-stable
-        * Stiffy Accurate
+    Characteristics
+    ---------------
+    * Order: 4
+    * Embedded Order: 3
+    * Stages: 6 (1 Explicit, 5 Implicit)
+    * Implicit (ESDIRK)
+    * Adaptive timestep
+    * L-stable
+    * Stiffly accurate
+
+    When to Use
+    -----------
+    * **Stiff problems with adaptive stepping**: Excellent default for stiff ODEs
+    * **Moderate-to-high accuracy**: 4th order with good error control
+    * **Damping high frequencies**: L-stability damps spurious oscillations
+    * **General-purpose stiff solver**: Reliable choice for most stiff applications
+
+    **Recommended** as a default adaptive stiff solver. For very high accuracy, use ESDIRK54.
+    For non-stiff problems, RKDP54 is more efficient.
+
+    References
+    ----------
+    .. [1] Kennedy, C. A., & Carpenter, M. H. (2019). "Diagonally implicit Runge-Kutta
+           methods for stiff ODEs". Applied Numerical Mathematics, 146, 221-244.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

@@ -15,19 +15,43 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKF78(ExplicitRungeKutta):
-    """Thirteen-stage, 8th order explicit Runge-Kutta method by Fehlberg.
+    """Thirteen-stage, 7th order explicit Runge-Kutta-Fehlberg method.
 
-    Features an embedded 7th order method. The difference provides an 8th order error
-    estimate. The 7th order solution is typically propagated. Designed for high accuracy
-    requirements.
+    Features an embedded 8th order method for error estimation. The difference provides
+    an 8th order error estimate. The 7th order solution is typically propagated. Designed
+    for very high accuracy requirements and long-time integration where precision is critical.
 
-    Characteristics:
-        * Order: 7 (Propagating solution)
-        * Embedded Order: 8 (Error estimation)
-        * Stages: 13
-        * Explicit
-        * Adaptive timestep
-        * Suitable for high-precision computations, nearly symplectic.
+    Characteristics
+    ---------------
+    * Order: 7 (Propagating solution)
+    * Embedded Order: 8 (Error estimation)
+    * Stages: 13
+    * Explicit
+    * Adaptive timestep
+    * Very high accuracy, nearly symplectic properties
+
+    When to Use
+    -----------
+    * **Very high accuracy needs**: When stringent error tolerances are essential
+    * **Long-time integration**: Problems requiring stable, accurate integration over long periods
+    * **Smooth dynamics**: Highly smooth problems where high order is efficient
+    * **Scientific precision**: Astronomical calculations, molecular dynamics, precision engineering
+    
+    Note
+    ----
+    Expensive per step (13 stages), but can take very large steps with tight tolerances. 
+    Not suitable for non-smooth problems or when function evaluations are expensive.
+
+    References
+    ----------
+    .. [1] Fehlberg, E. (1968). "Classical fifth-, sixth-, seventh-, and eighth-order
+           Runge-Kutta formulas with stepsize control". NASA Technical Report TR R-287.
+    .. [2] Hairer, E., Nørsett, S. P., & Wanner, G. (1993). "Solving Ordinary
+           Differential Equations I: Nonstiff Problems". Springer Series in Computational
+           Mathematics, Vol. 8.
+    .. [3] Prince, P. J., & Dormand, J. R. (1981). "High order embedded Runge-Kutta
+           formulae". Journal of Computational and Applied Mathematics, 7(1), 67-75.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

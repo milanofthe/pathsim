@@ -15,20 +15,46 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKF45(ExplicitRungeKutta):
-    """Six-stage, 4th order explicit Runge-Kutta method by Fehlberg.
+    """Six-stage, 4th order explicit Runge-Kutta-Fehlberg method.
 
     Features an embedded 5th order method. The difference between the 5th and 4th order
     results provides a 5th order error estimate. Typically, the 4th order solution is
-    propagated. A classic adaptive step size method, though often superseded in efficiency
-    by Dormand-Prince methods.
+    propagated (local extrapolation available). A classic adaptive step size method,
+    though often superseded in efficiency by Dormand-Prince methods.
 
-    Characteristics:
-        * Order: 4 (Propagating solution)
-        * Embedded Order: 5 (Error estimation)
-        * Stages: 6
-        * Explicit
-        * Adaptive timestep
-        * Classic adaptive method, good for moderate accuracy.
+    Characteristics
+    ---------------
+    * Order: 4 (Propagating solution)
+    * Embedded Order: 5 (Error estimation)
+    * Stages: 6
+    * Explicit
+    * Adaptive timestep
+    * Classic adaptive method, good for moderate accuracy
+
+    When to Use
+    -----------
+    * **Moderate accuracy requirements**: Good balance for many engineering applications
+    * **Well-established benchmarks**: When comparing against historical results
+    * **Non-stiff smooth problems**: Standard choice for a wide range of ODEs
+
+    Note
+    ----
+    While this is a classic method, RKDP54 or RKCK54 generally offer better efficiency
+    for the same computational cost. Consider RKDP54 or RKCK54 for new applications unless 
+    specific properties of RKF45 are required.
+
+    References
+    ----------
+    .. [1] Fehlberg, E. (1969). "Low-order classical Runge-Kutta formulas with stepsize
+           control and their application to some heat transfer problems". NASA Technical
+           Report TR R-315.
+    .. [2] Fehlberg, E. (1970). "Klassische Runge-Kutta-Formeln vierter und niedrigerer
+           Ordnung mit Schrittweiten-Kontrolle und ihre Anwendung auf Wärmeleitungsprobleme".
+           Computing, 6(1-2), 61-71.
+    .. [3] Hairer, E., Nørsett, S. P., & Wanner, G. (1993). "Solving Ordinary
+           Differential Equations I: Nonstiff Problems". Springer Series in Computational
+           Mathematics, Vol. 8.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

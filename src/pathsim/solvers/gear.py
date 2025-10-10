@@ -381,17 +381,41 @@ class GEAR(ImplicitSolver):
 # SOLVERS ==============================================================================
 
 class GEAR21(GEAR):
-    """Adaptive-step GEAR integrator using 2nd order BDF for timestepping
-    and 1st order BDF (Backward Euler) for truncation error estimation.
+    """Adaptive-step GEAR integrator using 2nd order BDF with variable timesteps.
 
-    Suitable for moderately stiff problems where variable timestepping is beneficial.
+    Uses 2nd order BDF for timestepping and 1st order BDF (Backward Euler) for truncation
+    error estimation. Dynamically computes BDF coefficients for variable timesteps. Excellent
+    for moderately stiff problems where adaptive timestepping is beneficial. Uses ESDIRK32
+    for startup.
 
-    Characteristics:
-        * Stepping Order: 2 (max)
-        * Error Estimation Order: 1
-        * Implicit Variable-Step Multistep
-        * Adaptive timestep
-        * A-stable (based on BDF2)
+    Characteristics
+    ---------------
+    * Stepping Order: 2 (max)
+    * Error Estimation Order: 1
+    * Implicit Variable-Step Multistep
+    * Adaptive timestep
+    * A-stable (based on BDF2)
+
+    When to Use
+    -----------
+    * **Stiff problems with adaptive stepping**: Classic adaptive stiff solver
+    * **Variable dynamics**: When solution changes character over time
+    * **Efficient stiff integration**: Good balance of stability and accuracy
+    * **Long-time simulations**: Stable for extended integrations
+    
+    Note
+    ----
+    Good choice as a default adaptive stiff solver. For higher accuracy, use GEAR32 or
+    ESDIRK43. For fixed timestep, use BDF2.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -407,17 +431,40 @@ class GEAR21(GEAR):
 
 
 class GEAR32(GEAR):
-    """Adaptive-step GEAR integrator using 3rd order BDF for timestepping
-    and 2nd order BDF for truncation error estimation.
+    """Adaptive-step GEAR integrator using 3rd order BDF with variable timesteps.
 
-    Suitable for stiff problems requiring higher accuracy than GEAR21.
+    Uses 3rd order BDF for timestepping and 2nd order BDF for truncation error estimation.
+    Dynamically computes BDF coefficients for variable timesteps. Suitable for stiff problems
+    requiring higher accuracy than GEAR21. Uses ESDIRK32 for startup.
 
-    Characteristics:
-        * Stepping Order: 3 (max)
-        * Error Estimation Order: 2
-        * Implicit Variable-Step Multistep
-        * Adaptive timestep
-        * A(alpha)-stable (based on BDF3)
+    Characteristics
+    ---------------
+    * Stepping Order: 3 (max)
+    * Error Estimation Order: 2
+    * Implicit Variable-Step Multistep
+    * Adaptive timestep
+    * A(alpha)-stable (based on BDF3)
+
+    When to Use
+    -----------
+    * **Higher accuracy stiff problems**: 3rd order with adaptive stepping
+    * **Good stability/accuracy balance**: Better accuracy with excellent stability
+    * **Chemical reactions**: Common in kinetics problems
+    * **Engineering simulations**: Widely used in practice
+    
+    Note
+    ----
+    Slightly less stable than GEAR21, but more accurate. For very high accuracy,
+    use GEAR43 or ESDIRK54.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -433,17 +480,40 @@ class GEAR32(GEAR):
 
 
 class GEAR43(GEAR):
-    """Adaptive-step GEAR integrator using 4th order BDF for timestepping
-    and 3rd order BDF for truncation error estimation.
+    """Adaptive-step GEAR integrator using 4th order BDF with variable timesteps.
 
-    Suitable for stiff problems requiring good accuracy.
+    Uses 4th order BDF for timestepping and 3rd order BDF for truncation error estimation.
+    Dynamically computes BDF coefficients for variable timesteps. Suitable for stiff problems
+    requiring good accuracy. Uses ESDIRK32 for startup.
 
-    Characteristics:
-        * Stepping Order: 4 (max)
-        * Error Estimation Order: 3
-        * Implicit Variable-Step Multistep
-        * Adaptive timestep
-        * A(alpha)-stable (based on BDF4)
+    Characteristics
+    ---------------
+    * Stepping Order: 4 (max)
+    * Error Estimation Order: 3
+    * Implicit Variable-Step Multistep
+    * Adaptive timestep
+    * A(alpha)-stable (based on BDF4)
+
+    When to Use
+    -----------
+    * **High-accuracy stiff problems**: 4th order with adaptive stepping
+    * **Demanding applications**: When higher accuracy is needed
+    * **Smooth stiff dynamics**: Problems with smooth solutions
+    * **Scientific computing**: Common in research applications
+    
+    Note
+    ----
+    Smaller stability angle than GEAR32. For very stiff problems, GEAR21 or GEAR32
+    may be more robust. For very high accuracy, use GEAR54 or ESDIRK54.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -459,18 +529,41 @@ class GEAR43(GEAR):
 
 
 class GEAR54(GEAR):
-    """Adaptive-step GEAR integrator using 5th order BDF for timestepping
-    and 4th order BDF for truncation error estimation.
+    """Adaptive-step GEAR integrator using 5th order BDF with variable timesteps.
 
-    Suitable for stiff problems requiring high accuracy, but stability region
-    is smaller than lower-order GEAR methods.
+    Uses 5th order BDF for timestepping and 4th order BDF for truncation error estimation.
+    Dynamically computes BDF coefficients for variable timesteps. Suitable for stiff problems
+    requiring high accuracy, but stability region is smaller than lower-order GEAR methods.
+    Uses ESDIRK32 for startup.
 
-    Characteristics:
-        * Stepping Order: 5 (max)
-        * Error Estimation Order: 4
-        * Implicit Variable-Step Multistep
-        * Adaptive timestep
-        * A(alpha)-stable (based on BDF5)
+    Characteristics
+    ---------------
+    * Stepping Order: 5 (max)
+    * Error Estimation Order: 4
+    * Implicit Variable-Step Multistep
+    * Adaptive timestep
+    * A(alpha)-stable (based on BDF5)
+
+    When to Use
+    -----------
+    * **Very high accuracy on mildly stiff problems**: 5th order when stability angle sufficient
+    * **Smooth stiff problems**: Problems without extreme stiffness
+    * **High-precision requirements**: Better accuracy than GEAR43
+    * **Research applications**: Specialized high-accuracy needs
+    
+    Warn
+    ----
+    Reduced stability compared to lower-order GEAR methods. For very stiff problems,
+    use GEAR21 or GEAR32. Consider ESDIRK54 as an alternative high-accuracy stiff solver.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
@@ -488,20 +581,46 @@ class GEAR54(GEAR):
 class GEAR52A(GEAR):
     """Adaptive-order, adaptive-stepsize GEAR integrator (Variable-Step Variable-Order BDF).
 
-    This method dynamically adjusts the BDF order used for timestepping (between 2 and 5)
-    based on error estimates from lower and higher order predictors. It aims to optimize
-    step size by using higher orders for smooth regions and lower, more stable orders
-    for stiff or rapidly changing regions.
+    This method dynamically adjusts both timestep and BDF order (between 2 and 5) based on
+    error estimates from lower and higher order predictors. Optimizes step size by using
+    higher orders for smooth regions and lower, more stable orders for stiff or rapidly
+    changing regions. Dynamically computes BDF coefficients for variable timesteps and orders.
+    Uses ESDIRK32 for startup.
 
     Error estimation compares the current order solution with predictions from
-    order n-1 and n+1 formulas.
+    order n-1 and n+1 formulas to select the optimal order.
 
-    Characteristics:
-        * Stepping Order: Variable (2 to 5)
-        * Error Estimation Orders: n-1 and n+1 (relative to current n)
-        * Implicit Variable-Step, Variable-Order Multistep
-        * Adaptive timestep and order
-        * Stability varies with the currently selected order (A-stable or A(alpha)-stable)
+    Characteristics
+    ---------------
+    * Stepping Order: Variable (2 to 5)
+    * Error Estimation Orders: n-1 and n+1 (relative to current n)
+    * Implicit Variable-Step, Variable-Order Multistep
+    * Adaptive timestep and order
+    * Stability varies with the currently selected order (A-stable or A(alpha)-stable)
+
+    When to Use
+    -----------
+    * **Problems with varying character**: Automatically adapts to changing dynamics
+    * **Black-box applications**: Minimal tuning required
+    * **Efficiency priority**: Optimizes order for efficiency
+    * **General-purpose adaptive stiff solver**: Robust default choice
+
+    Note
+    ----
+    Recommended for problems where the optimal order is unknown. This is similar to
+    MATLAB's ode15s. Can be more efficient than fixed-order methods for problems with
+    varying smoothness.
+
+    References
+    ----------
+    .. [1] Gear, C. W. (1971). "Numerical Initial Value Problems in Ordinary
+           Differential Equations". Prentice-Hall.
+    .. [2] Shampine, L. F., & Reichelt, M. W. (1997). "The MATLAB ODE Suite".
+           SIAM Journal on Scientific Computing, 18(1), 1-22.
+    .. [3] Hairer, E., & Wanner, G. (1996). "Solving Ordinary Differential Equations II:
+           Stiff and Differential-Algebraic Problems". Springer Series in Computational
+           Mathematics, Vol. 14.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):

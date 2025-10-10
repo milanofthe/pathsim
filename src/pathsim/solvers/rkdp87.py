@@ -15,17 +15,45 @@ from ._rungekutta import ExplicitRungeKutta
 # SOLVERS ==============================================================================
 
 class RKDP87(ExplicitRungeKutta):
-    """Thirteen-stage, 8th order explicit Runge-Kutta method by Dormand and Prince (DOP8(7)).
+    """Thirteen-stage, 8th order explicit Runge-Kutta method by Dormand and Prince (DOP853).
 
     Features an embedded 7th order method for adaptive step size control. Designed for
-    problems requiring very high accuracy. FSAL property (not available in this implementation).
+    problems requiring very high accuracy with excellent error estimation. This is one
+    of the most efficient 8th order methods available. FSAL property (not available in
+    this implementation).
 
-    Characteristics:
-        * Order: 8 (Propagating solution)
-        * Embedded Order: 7
-        * Stages: 13 (12 effective due to FSAL)
-        * Explicit
-        * Adaptive timestep
+    Characteristics
+    ---------------
+    * Order: 8 (Propagating solution)
+    * Embedded Order: 7
+    * Stages: 13 (12 effective due to FSAL)
+    * Explicit
+    * Adaptive timestep
+    * State-of-the-art very high-order solver
+
+    When to Use
+    -----------
+    * **Extremely high accuracy**: When very tight error tolerances are required
+    * **Smooth high-dimensional problems**: Excellent for smooth ODEs in many dimensions
+    * **Long-time precision integration**: Orbital mechanics, celestial mechanics
+    * **Benchmark computations**: Reference solutions for method comparison
+    
+    Note
+    ----
+    Generally recommended as the highest-order general-purpose explicit method. More 
+    efficient than RKF78 for the same accuracy level. Only use when very high accuracy 
+    justifies the 13-stage computational cost.
+
+    References
+    ----------
+    .. [1] Dormand, J. R., & Prince, P. J. (1981). "High order embedded Runge-Kutta
+           formulae". Journal of Computational and Applied Mathematics, 7(1), 67-75.
+    .. [2] Hairer, E., Nørsett, S. P., & Wanner, G. (1993). "Solving Ordinary
+           Differential Equations I: Nonstiff Problems". Springer Series in Computational
+           Mathematics, Vol. 8.
+    .. [3] Prince, P. J., & Dormand, J. R. (1981). "High order embedded Runge-Kutta
+           formulae". Journal of Computational and Applied Mathematics, 7(1), 67-75.
+
     """
 
     def __init__(self, *solver_args, **solver_kwargs):
