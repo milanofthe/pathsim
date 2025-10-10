@@ -48,7 +48,7 @@ Key Features
 
    .. grid-item-card:: 🔢 Numerical Integrators
 
-      Wide range of solvers: implicit, explicit, high-order, and adaptive time-stepping. (:ref:`Numerical Solvers <api:numerical solvers>`)
+      Wide range of solvers: implicit, explicit, high-order, and adaptive time-stepping.
 
    .. grid-item-card:: 🏗️ Modular & Hierarchical
 
@@ -60,7 +60,7 @@ Key Features
 
    .. grid-item-card:: 🎓 Auto Differentiation
 
-      Fully **differentiable** system simulations for optimization and analysis (:ref:`ref-tutorials-ad`).
+      Fully **differentiable** system simulations for optimization and analysis (`example <examples/automatic_differentiation.ipynb>`_).
 
    .. grid-item-card:: 🔧 Extensible
 
@@ -132,13 +132,7 @@ Explore the Documentation
       :link: examples
       :link-type: doc
 
-      Explore practical examples demonstrating PathSim's capabilities, from simple oscillators to complex hybrid systems with event handling.
-
-   .. grid-item-card:: 🎓 Tutorials
-      :link: tutorials
-      :link-type: doc
-
-      In-depth tutorials covering advanced topics like automatic differentiation and system optimization.
+      Explore practical examples demonstrating PathSim's capabilities, from simple oscillators to complex hybrid systems with event handling and automatic differentiation.
 
    .. grid-item-card:: 📖 API Reference
       :link: api
@@ -169,7 +163,6 @@ Explore the Documentation
    :maxdepth: 2
 
    examples
-   tutorials
    roadmap
    contributing
    api
