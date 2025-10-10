@@ -1,0 +1,29 @@
+/* Custom CSS for PathSim Documentation */
+
+/* Fix link preview card backgrounds for light/dark mode */
+.sd-card {
+    background-color: var(--color-card-background) !important;
+}
+
+.sd-card-header {
+    background-color: var(--color-card-marginals-background) !important;
+}
+
+.sd-card-footer {
+    background-color: var(--color-card-marginals-background) !important;
+}
+
+/* Ensure link preview text is readable in both modes */
+.sd-card-text {
+    color: var(--color-foreground-primary) !important;
+}
+
+.sd-card-title {
+    color: var(--color-foreground-primary) !important;
+}
+
+/* Fix any link cards created by MyST linkify */
+a.reference.external .sd-card {
+    background-color: var(--color-card-background) !important;
+    border-color: var(--color-card-border) !important;
+}
