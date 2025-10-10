@@ -33,7 +33,7 @@ extensions = [
 
 html_theme = 'furo'
 html_static_path = ['_static']
-html_logo = 'logos/pathsim_logo_mono_g.png'
+html_logo = 'logos/pathsim_logo.png'
 html_title = "PathSim Documentation"
 
 html_theme_options = {
