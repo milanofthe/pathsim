@@ -2,8 +2,8 @@
 # Optimized for light/dark mode compatibility with transparent backgrounds
 
 # Figure
-figure.figsize: 10, 6
-figure.dpi: 120
+figure.figsize: 8, 4
+figure.dpi: 300
 figure.facecolor: none
 figure.edgecolor: none
 savefig.facecolor: none
@@ -16,7 +16,7 @@ savefig.pad_inches: 0.1
 axes.facecolor: none
 axes.edgecolor: 333333
 axes.linewidth: 1.8
-axes.grid: True
+axes.grid: False
 axes.axisbelow: True
 axes.labelsize: 11
 axes.titlesize: 12
