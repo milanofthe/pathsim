@@ -218,7 +218,7 @@ Analog and mixed-signal circuit simulations including ADCs and nonlinear compone
 Advanced Topics
 ---------------
 
-Complex systems featuring algebraic loops, subsystems, chemical processes, and automatic differentiation.
+Complex systems featuring algebraic loops, subsystems, chemical processes, automatic differentiation, and FMU co-simulation.
 
 .. grid:: 2
    :gutter: 3
@@ -247,6 +247,12 @@ Complex systems featuring algebraic loops, subsystems, chemical processes, and a
 
       Sensitivity analysis and uncertainty quantification using forward-mode automatic differentiation.
 
+   .. grid-item-card:: 🔌 FMU Co-Simulation
+      :link: examples/fmu_cosimulation
+      :link-type: doc
+
+      Integration of Functional Mock-up Units (FMU) as PathSim blocks using FMI standard.
+
 .. toctree::
    :hidden:
    :maxdepth: 1
@@ -255,3 +261,4 @@ Complex systems featuring algebraic loops, subsystems, chemical processes, and a
    examples/chemical_reactor.ipynb
    examples/nested_subsystems.ipynb
    examples/automatic_differentiation.ipynb
+   examples/fmu_cosimulation.ipynb
