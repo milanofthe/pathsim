@@ -71,4 +71,4 @@ xtick.minor.width: 1.2
 ytick.minor.width: 1.2
 
 # Color cycle - colors that work well with grey text
-axes.prop_cycle: cycler('color', ['2962ff', 'ff6f00', '00897b', 'd81b60', '8e24aa', '3949ab', '00acc1', '43a047'])
+axes.prop_cycle: cycler('color', ['e41a1c', '377eb8', '4daf4a', '984ea3', 'ff7f00'])
