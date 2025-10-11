@@ -4,8 +4,10 @@ RF block
 import numpy as np
 import skrf as rf
 from inspect import signature
+from pathlib import Path
 
 from .lti import StateSpace
+
 
 # TODO LIST
 # class RFAmplifier Model amplifier in RF systems
@@ -23,15 +25,20 @@ class RFNetwork(StateSpace):
 
     Parameters
     ----------
-    ntwk : :py:class:`~skrf.network.Network`
-        scikit-rf [skrf]_ RF Network object
+    ntwk : can be :py:class:`~skrf.network.Network`, str, Path, or file-object.
+        scikit-rf [skrf]_ RF Network object, or file to load information from.
+        Supported formats are touchstone file V1 (.s?p) or V2 (.ts).
 
     References
     ----------
     .. [skrf] scikit-rf webpage https://scikit-rf.org/
 
     """
-    def __init__(self, ntwk: rf.Network, auto_fit: bool = True,  **kwargs):
+
+    def __init__(self, ntwk: rf.Network | str | Path, auto_fit: bool = True, **kwargs):
+        if isinstance(ntwk, Path) or isinstance(ntwk, str):
+            ntwk = rf.Network(ntwk)
+
         # Select the vector fitting function from scikit-rf
         vf_fun_name = 'auto_fit' if auto_fit else 'vector_fit'
         vf_fun = getattr(rf.VectorFitting, vf_fun_name)

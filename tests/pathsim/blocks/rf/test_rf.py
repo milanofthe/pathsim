@@ -1,5 +1,5 @@
 # tests require scikit-rf package
-import pytest, sys
+import pytest, sys, os
 
 try:
     import skrf as rf
@@ -12,12 +12,15 @@ if "skrf" not in sys.modules:
 import unittest
 
 from numpy.testing import assert_allclose
+from pathlib import Path
 from pathsim.blocks.rf import RFNetwork
+
 
 class TestSkrf(unittest.TestCase):
     """
     Test that scikit-rf is properly installed and usable.
     """
+
     def test_vf(self):
         """
         Test that skrf vector fitting runs correctly.
@@ -28,10 +31,17 @@ class TestSkrf(unittest.TestCase):
         vf.vector_fit(n_poles_real=2, n_poles_cmplx=0, fit_proportional=True, fit_constant=True)
         self.assertLess(vf.get_rms_error(), 0.02)
 
+
 class TestOnePort(unittest.TestCase):
     def test_init(self):
-        one_port = RFNetwork(rf.data.ring_slot_meas)
-        print(one_port)
+        test_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
+        # skrf Network
+        one_port1 = RFNetwork(rf.data.ring_slot_meas)
+        # string
+        one_port2 = RFNetwork(test_dir + 'ring_slot_meas.s1p')
+        # Path
+        one_port3 = RFNetwork(Path(test_dir + 'ring_slot_meas.s1p'))
+        assert one_port1 == one_port2 == one_port3
 
     def test_ABCD(self):
         "Test space-state ABCD parameters."
@@ -59,10 +69,17 @@ class TestOnePort(unittest.TestCase):
         # check equality (with a large tolerance, since it's measurements vs VF model)
         assert_allclose(ntwk.s, s, atol=0.05)
 
+
 class TestTwoPort(unittest.TestCase):
     def test_init(self):
-        two_port = RFNetwork(rf.data.ring_slot)
-        print(two_port)
+        test_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
+        # skrf Network
+        two_port1 = RFNetwork(rf.data.ring_slot)
+        # string
+        two_port2 = RFNetwork(test_dir + 'ring_slot.s2p')
+        # Path
+        two_port3 = RFNetwork(Path(test_dir + 'ring_slot.s2p'))
+        assert two_port1 == two_port2 == two_port3
 
     def test_s_parameters(self):
         "Test S-parameters deduced from ABCD parameters for two-port Network."
