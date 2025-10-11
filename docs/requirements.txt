@@ -1,6 +1,6 @@
-numpy
-matplotlib
-scipy
+numpy>=1.15,<2
+matplotlib>=3.1
+scipy>=1.2
 sphinx
 furo
 myst-parser
@@ -11,3 +11,4 @@ nbsphinx
 jupyter
 ipykernel
 pandoc
+fmpy
