@@ -23,7 +23,7 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
 
     .. math::
 
-        \\mathbf{H}(s) = \\mathbf{D} + \\sum_{n=1}^N \\frac{\\mathbf{R}_n}{s - p_n}
+        \\mathbf{H}(s) = \\mathmf{D} + \\sum_{n=1}^N \\frac{\\mathbf{R}_n}{s - p_n} )
     
     statespace form:
         
@@ -125,14 +125,14 @@ def gilbert_realization(Poles=[], Residues=[], Const=0.0, tolerance=1e-9):
         a[k,k] = np.real(p)
         b[k] = 1.0
         if is_cc:
-            a[k, k-1] = + np.imag(p)
-            a[k-1, k] = - np.imag(p)
+            a[k, k-1] = - np.imag(p)
+            a[k-1, k] = np.imag(p)
             b[k]   = 0.0
             b[k-1] = 2.0
             
         #iterate columns of residue
         for i in range(n):
-            C[:,k+N*i] = -np.imag(R[:,i]) if is_cc else np.real(R[:,i])
+            C[:,k+N*i] = np.imag(R[:,i]) if is_cc else np.real(R[:,i])  
                 
     #build block diagonal
     A = np.kron(np.eye(n, dtype=float), a)
