@@ -293,7 +293,7 @@ class Subsystem(Block):
         """Assemble internal graph of subsystem for fast 
         algebraic evaluation during simulation.
         """
-        self.graph = Graph(self.blocks, self.connections)
+        self.graph = Graph(self.blocks + [self.interface], self.connections)
 
         #create boosters for loop closing connections
         if self.graph.has_loops:
