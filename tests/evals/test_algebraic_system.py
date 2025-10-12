@@ -57,7 +57,7 @@ class TestAlgebraicSystem(unittest.TestCase):
         self.assertEqual(na, 6) # 6 alg. blocks
         self.assertEqual(nd, 0) # 0 dyn. blocks
 
-        d_dag, d_loop = self.Sim.graph.depth()
+        d_dag, d_loop = self.Sim.graph.depth
         self.assertEqual(d_dag, 4) # dag depth is 4
         self.assertEqual(d_loop, 0) # no alg. loops
 
