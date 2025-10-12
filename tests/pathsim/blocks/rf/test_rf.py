@@ -10,11 +10,32 @@ if "skrf" not in sys.modules:
     pytest.skip(allow_module_level=True)
 
 import unittest
+import numpy as np
 
 from numpy.testing import assert_allclose
 from pathlib import Path
 from pathsim.blocks.rf import RFNetwork
 
+def is_equal(ss1, ss2):
+    """
+    Test if two StateSpace blocks are equal.
+
+    Parameters
+    ----------
+    ss1: StateSpace object
+    ss2: StateSpace object
+
+    Returns
+    -------
+    bool
+
+    """
+    if type(ss1) != type(ss2):
+        return False
+    for prop in ['A', 'B', 'C', 'D']:
+        if not np.all(np.abs(getattr(ss1, prop) - getattr(ss2, prop)) < 1e-6):
+            return False
+    return True
 
 class TestSkrf(unittest.TestCase):
     """
@@ -41,7 +62,8 @@ class TestOnePort(unittest.TestCase):
         one_port2 = RFNetwork(test_dir + 'ring_slot_meas.s1p')
         # Path
         one_port3 = RFNetwork(Path(test_dir + 'ring_slot_meas.s1p'))
-        assert one_port1 == one_port2 == one_port3
+        assert is_equal(one_port1, one_port2)
+        assert is_equal(one_port1, one_port3)
 
     def test_ABCD(self):
         "Test space-state ABCD parameters."
@@ -79,7 +101,8 @@ class TestTwoPort(unittest.TestCase):
         two_port2 = RFNetwork(test_dir + 'ring_slot.s2p')
         # Path
         two_port3 = RFNetwork(Path(test_dir + 'ring_slot.s2p'))
-        assert two_port1 == two_port2 == two_port3
+        assert is_equal(two_port1, two_port2)
+        assert is_equal(two_port1, two_port3)
 
     def test_s_parameters(self):
         "Test S-parameters deduced from ABCD parameters for two-port Network."

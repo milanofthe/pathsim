@@ -126,16 +126,6 @@ class StateSpace(Block):
         #check if direct passthrough exists
         return int(np.any(self.D)) if self._active else 0
 
-    def __eq__(self, other):
-        "Check if two StateSpace instances are equal."
-        if not isinstance(other, self.__class__):
-            return False
-        for prop in ['A', 'B', 'C', 'D']:
-            if not np.all(np.abs(getattr(self, prop) - getattr(other,prop))< 1e-6):
-                return False
-        # seems the same ABCD models
-        return True
-
     def set_solver(self, Solver, parent, **solver_args):
         """set the internal numerical integrator
 
