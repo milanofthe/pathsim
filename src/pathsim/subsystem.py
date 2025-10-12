@@ -212,26 +212,9 @@ class Subsystem(Block):
 
 
     def __len__(self):
-        """Recursively compute the longest signal path in the subsytem by 
-        depth first search, leveraging the '__len__' methods of the blocks. 
-
-        This enables the path length computation even for nested subsystems.
-
-        Iterate internal blocks and compute longest path from each block 
-        as starting block.
-
-        Basically the same as in the 'Simulation' class.
+        """Check if the Subsystem has algebraic passthrough by quering 
+        the graph for an algebraic path from the interface to itself.
         """
-
-        #no graph yet -> no passthrough anyway
-        if not self.graph:
-            return 0
-
-        #internal loops -> tainted (inf)
-        if self.graph.has_loops:
-            return None
-
-        #check if algebraic path from interface back to itself 
         is_alg = self.graph.is_algebraic_path(self.interface, self.interface)
         return int(is_alg)
 
