@@ -1,15 +1,16 @@
-#%%
 #########################################################################################
 ##
-##                     PathSim Example for the Spectrum block
+##                     PathSim Example for RF block
 ##
 #########################################################################################
 
 # IMPORTS ===============================================================================
 import numpy as np
 import matplotlib.pyplot as plt
-import skrf as rf  # requires the scikit-rf package
-
+try:
+    import skrf as rf  # requires the scikit-rf package
+except ImportError as e:
+    raise ImportError("This example requires the scikit-rf package to be installed.")
 # the standard blocks are imported like this
 from pathsim import Simulation, Connection
 from pathsim.blocks import Spectrum, GaussianPulseSource

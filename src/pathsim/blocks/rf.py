@@ -1,8 +1,19 @@
-"""
-RF block
-"""
+#########################################################################################
+##
+##                                     RF BLOCK
+##                                 (blocks/rf.py)
+##
+##            N-port RF network linear time invariant (LTI)
+##            multi input multi output (MIMO) state-space model.
+##
+#########################################################################################
+
 import numpy as np
-import skrf as rf
+try:
+    import skrf as rf
+except ImportError as e:
+    raise ImportError("The scikit-rf package is required to use this block.")
+
 from inspect import signature
 from pathlib import Path
 
