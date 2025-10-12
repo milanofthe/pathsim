@@ -647,8 +647,8 @@ class Simulation:
             ]
 
         self._logger_info(
-            "GRAPH (size: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
-                len(self.graph), *self.graph.depth(), T
+            "GRAPH (nodes: {}, edges: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
+                *self.graph.size, *self.graph.depth, T
                 )
             )
 
