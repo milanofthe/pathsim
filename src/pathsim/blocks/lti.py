@@ -126,7 +126,6 @@ class StateSpace(Block):
         #check if direct passthrough exists
         return int(np.any(self.D)) if self._active else 0
 
-
     def set_solver(self, Solver, parent, **solver_args):
         """set the internal numerical integrator
 

@@ -411,7 +411,7 @@ class Block(Serializable):
 
     def update(self, t):
         """The 'update' method is called iteratively for all blocks to evaluate the 
-        algbebraic components of the global system ode from the DAG. 
+        algebraic components of the global system ode from the DAG.
 
         It is meant for instant time blocks (blocks that dont have a delay due to the 
         timestep, such as Amplifier, etc.) and updates the 'outputs' of the block 
@@ -448,7 +448,7 @@ class Block(Serializable):
 
 
     def solve(self, t, dt):
-        """The 'solve' method performes one iterative solution step that is required 
+        """The 'solve' method performs one iterative solution step that is required
         to solve the implicit update equation of the solver if an implicit solver 
         (numerical integrator) is used.
 
@@ -479,7 +479,7 @@ class Block(Serializable):
         (numeric integration timestep, recording data, etc.) based on the current 
         inputs and the current internal state. 
 
-        It performes one timestep for the internal states. For instant time blocks, 
+        It performs one timestep for the internal states. For instant time blocks,
         the 'step' method does not has to be implemented specifically. 
         
         The method handles timestepping for dynamic blocks with internal states

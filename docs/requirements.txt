@@ -12,3 +12,4 @@ jupyter
 ipykernel
 pandoc
 fmpy
+scikit-rf
