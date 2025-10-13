@@ -47,6 +47,8 @@ If you want to contribute to **PathSim**s development, check out the [community 
 **PathSim** does not provide a GUI for visualization of the blocks, connections, etc. However other projects have taken on that burden:
 - [PathView](https://github.com/festim-dev/PathView)
 
+Pathsim does not guarantee that these projects are up to date with the newest features.
+
 
 ## Installation
 
