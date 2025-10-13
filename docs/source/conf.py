@@ -16,6 +16,8 @@ release = __version__
 
 # -- General configuration ---------------------------------------------------
 
+sys.path.insert(0, os.path.abspath('./_ext'))
+
 extensions = [
     'sphinx.ext.autodoc',  # Core Sphinx library for auto doc generation
     'sphinx.ext.napoleon', # Support for NumPy and Google style docstrings
@@ -27,6 +29,7 @@ extensions = [
     'sphinx_copybutton',
     'sphinx_design',  # Modern design components (cards, tabs, grids)
     'nbsphinx',  # Jupyter notebook support
+    'github_issues', # Automatic roadmap generation from active github issues
 ]
 
 # -- Options for HTML output -------------------------------------------------
