@@ -25,3 +25,4 @@ from .ode import *
 from .rng import *
 from .fir import *
 from .fmu import *
+from .rf import *

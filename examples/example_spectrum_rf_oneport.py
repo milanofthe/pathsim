@@ -13,8 +13,8 @@ except ImportError as e:
     raise ImportError("This example requires the scikit-rf package to be installed.")
 # the standard blocks are imported like this
 from pathsim import Simulation, Connection
-from pathsim.blocks import Spectrum, GaussianPulseSource
-from pathsim.blocks.rf import RFNetwork
+from pathsim.blocks import Spectrum, GaussianPulseSource, RFNetwork
+# from pathsim.blocks.rf import RFNetwork
 from pathsim.solvers import RKBS32
 
 # RF Network block is created from a scikit-rf Network object

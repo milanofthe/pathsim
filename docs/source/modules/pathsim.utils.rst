@@ -12,5 +12,4 @@ pathsim.utils
    pathsim.utils.progresstracker
    pathsim.utils.realtimeplotter
    pathsim.utils.serialization
-   pathsim.utils.utils
 
