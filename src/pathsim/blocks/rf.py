@@ -1,18 +1,28 @@
 #########################################################################################
 ##
 ##                                     RF BLOCK
-##                                 (blocks/rf.py)
+##                                  (blocks/rf.py)
 ##
-##            N-port RF network linear time invariant (LTI)
-##            multi input multi output (MIMO) state-space model.
+##                  N-port RF network linear time invariant (LTI)
+##               multi input multi output (MIMO) state-space model.
 ##
 #########################################################################################
 
+# TODO LIST
+# class RFAmplifier Model amplifier in RF systems
+# class Resistor/Capacitor/Inductor
+# class RFMixer for mixer in RF systems?
+
+
+# IMPORTS ===============================================================================
+
 import numpy as np
+
 try:
     import skrf as rf
+    HAS_SKRF = True
 except ImportError as e:
-    raise ImportError("The scikit-rf package is required to use this block.")
+    HAS_SKRF = False
 
 from inspect import signature
 from pathlib import Path
@@ -20,10 +30,7 @@ from pathlib import Path
 from .lti import StateSpace
 
 
-# TODO LIST
-# class RFAmplifier Model amplifier in RF systems
-# class Resistor/Capacitor/Inductor
-# class RFMixer for mixer in RF systems?
+# BLOCK DEFINITIONS =====================================================================
 
 class RFNetwork(StateSpace):
     """
@@ -33,6 +40,15 @@ class RFNetwork(StateSpace):
     The resulting approximation has guaranteed stable poles that are real or come in complex conjugate pairs.
 
     Assumes N inputs and N outputs, where N is the number of ports of the RF network.
+
+    Note
+    ----
+    This block requires scikit-rf [skrf]_ to be installed. Its an optional dependency of pathsim, 
+    to install it:
+
+    .. code-block::
+
+        pip install scikit-rf
 
     Parameters
     ----------
@@ -47,6 +63,13 @@ class RFNetwork(StateSpace):
     """
 
     def __init__(self, ntwk: rf.Network | str | Path, auto_fit: bool = True, **kwargs):
+
+        # Check if 'skrf' is installed, its an optional dependency,
+        # dont raise error at import but at initialization
+        if not HAS_SKRF:
+            _msg = "The scikit-rf package is required to use this block -> 'pip install scikit-rf'"
+            raise ImportError(_msg)
+
         if isinstance(ntwk, Path) or isinstance(ntwk, str):
             ntwk = rf.Network(ntwk)
 
@@ -65,6 +88,7 @@ class RFNetwork(StateSpace):
         self.vf = vf
 
         super().__init__(A, B, C, D)
+
 
     def s(self, freqs: np.ndarray) -> np.ndarray:
         """
