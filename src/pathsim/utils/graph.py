@@ -52,10 +52,6 @@ class Graph:
         self.blocks = [] if blocks is None else list(blocks)
         self.connections = [] if connections is None else list(connections)
 
-        # PRE-COMPUTE stable ordering once
-        self._block_order = {blk: idx for idx, blk in enumerate(self.blocks)}
-        self._block_key = lambda b: self._block_order.get(b, float('inf'))
-
         # loop flag
         self.has_loops = False
 
@@ -146,15 +142,6 @@ class Graph:
                 self._dnst_blk_blk_map[src_blk].add(tgt_blk)
                 self._upst_blk_blk_map[tgt_blk].add(src_blk)
         
-        # Sort outgoing connections deterministically
-        def _conn_key(c):
-            src_k = self._block_key(c.source.block)
-            tgt_keys = tuple(sorted((self._block_key(t.block) for t in c.targets)))
-            return (src_k, tgt_keys)
-        
-        for src in self._outg_blk_con_map:
-            self._outg_blk_con_map[src].sort(key=_conn_key)
-
 
     def _assemble(self):
         """Optimized assembly using DFS with proper cycle detection.
@@ -328,11 +315,9 @@ class Graph:
         """
         if not blocks_loop:
             return
-        
+
         # Find SCCs (already optimized)
-        sccs = self._find_strongly_connected_components(
-            sorted(blocks_loop, key=self._block_key)
-            )
+        sccs = self._find_strongly_connected_components(blocks_loop)
         
         current_depth = 0
 
