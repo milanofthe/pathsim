@@ -14,6 +14,7 @@ pathsim.blocks
    pathsim.blocks.function
    pathsim.blocks.integrator
    pathsim.blocks.lti
+   pathsim.blocks.rf
    pathsim.blocks.ode
    pathsim.blocks.rng
    pathsim.blocks.scope

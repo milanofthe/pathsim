@@ -182,7 +182,7 @@ Examples demonstrating frequency domain analysis, filters, and signal processing
 Electronics & Circuit Systems
 ------------------------------
 
-Analog and mixed-signal circuit simulations including ADCs and nonlinear components.
+Analog and mixed-signal circuit simulations including ADCs, nonlinear components and RF networks.
 
 .. grid:: 2
    :gutter: 3
@@ -205,6 +205,12 @@ Analog and mixed-signal circuit simulations including ADCs and nonlinear compone
 
       Successive approximation register ADC with binary search and comparator logic.
 
+   .. grid-item-card:: 📡 RF Network
+      :link: examples/rf_network_oneport
+      :link-type: doc
+
+      RF network with spectrum analysis. Enabled by **Scikit-rf** integration.
+
 .. toctree::
    :hidden:
    :maxdepth: 1
@@ -212,6 +218,7 @@ Analog and mixed-signal circuit simulations including ADCs and nonlinear compone
    examples/diode_circuit.ipynb
    examples/delta_sigma_adc.ipynb
    examples/sar_adc.ipynb
+   examples/rf_network_oneport.ipynb
 
 ----
 
