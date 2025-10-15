@@ -169,6 +169,12 @@ Examples demonstrating frequency domain analysis, filters, and signal processing
 
       Linear system representation using poles and residues with complex conjugate dynamics.
 
+   .. grid-item-card:: 📢 Noisy Amplifier
+      :link: examples/noisy_amplifier
+      :link-type: doc
+
+      Nonlinar noisy amplifier model as a subsystem with spectral sensitivities
+
 .. toctree::
    :hidden:
    :maxdepth: 1
@@ -176,6 +182,7 @@ Examples demonstrating frequency domain analysis, filters, and signal processing
    examples/fmcw_radar.ipynb
    examples/spectrum_analysis.ipynb
    examples/transfer_function.ipynb
+   examples/noisy_amplifier.ipynb
 
 ----
 
@@ -260,6 +267,12 @@ Complex systems featuring algebraic loops, subsystems, chemical processes, autom
 
       Integration of Functional Mock-up Units (FMU) as PathSim blocks using FMI standard.
 
+   .. grid-item-card:: 💫 Lorenz Poincaré Maps
+      :link: examples/poincare_maps
+      :link-type: doc
+
+      Using PathSim's event system to create Poincaré maps of the chaotic Lorenz attractor.
+
 .. toctree::
    :hidden:
    :maxdepth: 1
@@ -269,3 +282,4 @@ Complex systems featuring algebraic loops, subsystems, chemical processes, autom
    examples/nested_subsystems.ipynb
    examples/automatic_differentiation.ipynb
    examples/fmu_cosimulation.ipynb
+   examples/poincare_maps.ipynb
