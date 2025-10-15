@@ -38,8 +38,10 @@ class ConnectionBooster:
 
     def __init__(self, connection):
         self.connection = connection
-        self.accelerator = Anderson()
         self.history = self.get()
+
+        # initialize optimizer (default args)
+        self.accelerator = Anderson()
 
 
     def __bool__(self):

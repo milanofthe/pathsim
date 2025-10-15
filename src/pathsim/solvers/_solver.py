@@ -552,8 +552,8 @@ class ImplicitSolver(Solver):
         #intermediate evaluation times for multistage solvers as ratios between [t, t+dt]
         self.eval_stages = [1.0]
 
-        #initialize optimizer for solving implicit update equation
-        self.opt = NewtonAnderson(m=5, restart=False)
+        #initialize optimizer for solving implicit update equation (default args)
+        self.opt = NewtonAnderson()
 
 
     def buffer(self, dt):
