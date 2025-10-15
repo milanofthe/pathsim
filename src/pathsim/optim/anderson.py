@@ -3,8 +3,6 @@
 ##                               ANDERSON ACCELERATION 
 ##                                (optim/anderson.py)
 ##
-##                                 Milan Rother 2024
-##
 ########################################################################################
 
 # IMPORTS ==============================================================================
@@ -13,7 +11,13 @@ import numpy as np
 
 from collections import deque
 
-from .value import Value, der, jac
+from .value import Value
+
+from .._constants import (
+    TOLERANCE,
+    OPT_RESTART,
+    OPT_HISTORY
+    )
 
 
 # CLASS ================================================================================
@@ -37,7 +41,7 @@ class Anderson:
         clear buffer when full
     """
 
-    def __init__(self, m=5, restart=False):
+    def __init__(self, m=OPT_HISTORY, restart=OPT_RESTART):
 
         #length of buffer for next estimate
         self.m = m
@@ -65,6 +69,11 @@ class Anderson:
     def solve(self, func, x0, iterations_max=100, tolerance=1e-6):
         """Solve the function 'func' with initial 
         value 'x0' up to a certain tolerance.
+
+        Note
+        ----
+        This method is for testing purposes only and 
+        not used in the simulation loop.
         
         Parameters
         ----------
@@ -170,7 +179,7 @@ class Anderson:
             dR2 = np.dot(dR, dR)
 
             #catch division by zero
-            if dR2 <= 1e-14:
+            if dR2 <= TOLERANCE:
                 return g, abs(_res)
 
             #new solution and residual
@@ -195,7 +204,8 @@ class NewtonAnderson(Anderson):
 
 
     def solve(self, func, x0, jac=None, iterations_max=100, tolerance=1e-6):
-        """Solve the function 'func' with initial value 'x0' up to a certain tolerance.
+        """Solve the function 'func' with initial value 
+        'x0' up to a certain tolerance.
 
         Parameters
         ----------
@@ -209,6 +219,11 @@ class NewtonAnderson(Anderson):
             maximum number of solver iterations
         tolerance : float
             convergence condition
+
+        Note
+        ----
+        This method is for testing purposes only and 
+        not used in the simulation loop.
 
         Returns
         -------

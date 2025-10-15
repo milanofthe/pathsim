@@ -32,6 +32,12 @@ SOL_SCALE_MAX = 10             # max allowed timestep rescale factor (adaptive s
 SOL_BETA = 0.9                 # savety for timestep control (adaptive solvers)
 
 
+# optimizer default constants ----------------------------------------------------
+
+OPT_RESTART = False    # enable restart of anderson acceleration
+OPT_HISTORY = 5        # max history length for anderson acceleration
+
+
 # event default constants --------------------------------------------------------
 
 EVT_TOLERANCE = 1e-4   # tolerance for event detection (zero-crossing, condition)
