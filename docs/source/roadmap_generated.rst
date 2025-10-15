@@ -1,7 +1,24 @@
 .. raw:: html
 
    <div class='github-issues-container'>
-   <p class='issues-updated'>Last updated: 2025-10-13 15:03 UTC</p>
+   <p class='issues-updated'>Last updated: 2025-10-15 21:29 UTC</p>
+
+   <div class='github-issue-card'>
+      <div class='issue-header'>
+         <span class='issue-number'>#124</span>
+         <h3 class='issue-title'>Type Hints</h3>
+      </div>
+      <div class='issue-labels'>
+         <span class='issue-label'>documentation</span>
+      </div>
+      <div class='issue-body'>
+         <p>Currently, PathSim is not explicitly typed. Adding type hints makes sense.</p>
+      </div>
+      <div class='issue-footer'>
+         <span class='issue-date'>Created: Okt 15, 2025</span>
+         <a href='https://github.com/milanofthe/pathsim/issues/124' class='issue-link' target='_blank'>View on GitHub →</a>
+      </div>
+   </div>
 
    <div class='github-issue-card'>
       <div class='issue-header'>
