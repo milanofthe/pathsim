@@ -17,7 +17,32 @@ from pathsim.solvers._solver import Solver
 
 # TESTS ================================================================================
 
-#let there be tests
+class TestCoSimulationFMU(unittest.TestCase):
+    """
+    Test the implementation of the 'CoSimulationFMU' block class
+
+    Note: Most FMU tests require FMPy and actual FMU files, making comprehensive
+    testing difficult without proper test fixtures.
+    """
+
+    def test_import_error_without_fmpy(self):
+        """Test that ImportError is raised when FMPy is not available"""
+        import sys
+        import importlib
+
+        # This test only works if FMPy is not installed
+        # If FMPy is installed, we skip this test
+        try:
+            import fmpy
+            self.skipTest("FMPy is installed, cannot test ImportError case")
+        except ImportError:
+            pass
+
+        # Try to create FMU without FMPy installed
+        with self.assertRaises(ImportError) as context:
+            fmu = CoSimulationFMU("nonexistent.fmu")
+
+        self.assertIn("FMPy", str(context.exception))
 
 
 # RUN TESTS LOCALLY ====================================================================

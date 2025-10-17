@@ -242,6 +242,194 @@ class TestSubsystem(unittest.TestCase):
         self.assertTrue(B1._active)
 
 
+    def test_call_with_dynamic_blocks(self):
+        """Test __call__ method with blocks that have internal states"""
+        from pathsim.blocks import Integrator
+        from pathsim.solvers import EUF
+
+        I1 = Interface()
+        B1 = Integrator([1.0, 2.0])  # integrator with 2 states
+        B2 = Block()
+        C1 = Connection(I1, B1)
+        C2 = Connection(B1, I1, B2)
+        S = Subsystem(blocks=[I1, B1, B2], connections=[C1, C2])
+
+        # Set solver to enable states
+        S.set_solver(EUF, None)
+
+        # Call should return inputs, outputs, and states
+        i, o, s = S()
+
+        # Should have states from integrator
+        self.assertTrue(len(s) > 0)
+
+
+    def test_algebraic_loop_with_boosters(self):
+        """Test algebraic loop solving with boosters"""
+        from pathsim.blocks import Amplifier
+
+        I1 = Interface()
+        B1, B2, B3 = Amplifier(gain=1.0), Amplifier(gain=1.0), Amplifier(gain=1.0)
+
+        # Create algebraic loop: I1 -> B1 -> B2 -> B3 -> B1 (loop)
+        # Also B1 -> I1 for output
+        C1 = Connection(I1, B1)
+        C2 = Connection(B1, B2)
+        C3 = Connection(B2, B3)
+        C4 = Connection(B3, B1[1])  # This closes the loop (to port 1 of B1)
+        C5 = Connection(B1, I1)
+
+        S = Subsystem(
+            blocks=[I1, B1, B2, B3],
+            connections=[C1, C2, C3, C4, C5]
+        )
+
+        # Should have boosters for loop closing connections
+        self.assertIsNotNone(S.boosters)
+        self.assertTrue(len(S.boosters) > 0)
+        self.assertTrue(S.graph.has_loops)
+
+        # Should be able to update without error
+        S.update(0.0)
+
+
+    def test_plot_method(self):
+        """Test plot method calls plot on internal blocks"""
+        from pathsim.blocks import Scope
+
+        I1 = Interface()
+        scope = Scope()
+        C1 = Connection(I1, scope)
+        S = Subsystem(blocks=[I1, scope], connections=[C1])
+
+        # Should not raise error (even though Scope.plot might return None)
+        S.plot()
+
+
+    def test_linearize_delinearize(self):
+        """Test linearize and delinearize methods"""
+        from pathsim.blocks import Integrator, Amplifier
+
+        I1 = Interface()
+        B1 = Amplifier(gain=2.0)
+        B2 = Integrator(1.0)
+        C1 = Connection(I1, B1, B2)
+        C2 = Connection(B1, I1)
+        S = Subsystem(blocks=[I1, B1, B2], connections=[C1, C2])
+
+        # Should be able to linearize and delinearize
+        S.linearize(0.0)
+        S.delinearize()
+
+
+    def test_serialization(self):
+        """Test to_dict and from_dict serialization"""
+        from pathsim.blocks import Amplifier, Integrator
+
+        I1 = Interface()
+        B1 = Amplifier(gain=3.0)
+        B2 = Integrator(2.0)
+        C1 = Connection(I1, B1, B2)
+        C2 = Connection(B1, I1)
+        S = Subsystem(blocks=[I1, B1, B2], connections=[C1, C2])
+
+        # Serialize
+        data = S.to_dict()
+        self.assertIn("params", data)
+        self.assertIn("blocks", data["params"])
+        self.assertIn("connections", data["params"])
+
+        # Deserialize
+        S2 = Subsystem.from_dict(data)
+        self.assertEqual(len(S2.blocks), 2)  # B1 and B2 (not counting interface)
+        self.assertEqual(len(S2.connections), 2)
+
+
+    def test_events_property(self):
+        """Test that events are collected from internal blocks"""
+        from pathsim.events import Schedule
+        from pathsim.blocks import Scope
+
+        I1 = Interface()
+        scope = Scope(sampling_rate=0.1)  # Has scheduled event
+        C1 = Connection(I1, scope)
+        S = Subsystem(blocks=[I1, scope], connections=[C1])
+
+        # Should collect events from scope
+        events = S.events
+        self.assertTrue(len(events) > 0)
+
+
+    def test_sample_method(self):
+        """Test sample method on internal blocks"""
+        from pathsim.blocks import Scope
+
+        I1 = Interface()
+        scope = Scope()
+        C1 = Connection(I1, scope)
+        S = Subsystem(blocks=[I1, scope], connections=[C1])
+
+        # Should not raise error
+        S.sample(1.0)
+
+
+    def test_reset_method(self):
+        """Test reset method on subsystem and internal blocks"""
+        I1 = Interface()
+        B1 = Block()
+        C1 = Connection(I1, B1, I1)
+        S = Subsystem(blocks=[I1, B1], connections=[C1])
+
+        # Modify state
+        S.inputs[0] = 5.0
+
+        # Reset
+        S.reset()
+
+        # Should be reset
+        self.assertEqual(S.inputs[0], 0.0)
+
+
+    def test_solve_step_revert_buffer(self):
+        """Test that solve, step, revert, and buffer methods exist and are callable"""
+        from pathsim.blocks import Integrator
+        from pathsim.solvers import RKDP54
+
+        I1 = Interface()
+        B1 = Integrator(1.0)
+        C1 = Connection(I1, B1, I1)
+        S = Subsystem(blocks=[I1, B1], connections=[C1])
+
+        # Set solver - creates _blocks_dyn list
+        S.set_solver(RKDP54, None)
+
+        # Test that _blocks_dyn was created
+        self.assertIsNotNone(S._blocks_dyn)
+        self.assertEqual(len(S._blocks_dyn), 1)  # One integrator
+
+        # Test buffer method (should not raise)
+        S.buffer(0.01)
+
+        # Test revert method (should not raise)
+        S.revert()
+
+        # Solver methods would need proper simulation initialization to test fully
+
+
+    def test_len_with_algebraic_passthrough(self):
+        """Test __len__ correctly identifies algebraic passthrough"""
+        I1 = Interface()
+        B1 = Block()
+
+        # Direct passthrough from interface to itself through B1
+        C1 = Connection(I1, B1)
+        C2 = Connection(B1, I1)
+        S = Subsystem(blocks=[I1, B1], connections=[C1, C2])
+
+        # Interface has algebraic path to itself
+        self.assertEqual(len(S), 0)
+
+
     def test_graph(self): pass
     def test_nesting(self): pass
 
