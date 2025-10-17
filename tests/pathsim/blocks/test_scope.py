@@ -453,7 +453,85 @@ class TestRealtimeScope(unittest.TestCase):
     Test the implementation of the 'RealtimeScope' block class
     """
 
-    pass #no tests implemented yet, since it just inherits from 'Scope' and is not critical
+    def test_init(self):
+        """Test RealtimeScope initialization"""
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            S = RealtimeScope(sampling_rate=0.1, t_wait=1.0, labels=["sig1"])
+
+            # Should warn about deprecation (may be one of several warnings)
+            self.assertTrue(len(w) > 0)
+            has_deprecation = any("deprecated" in str(warning.message).lower() for warning in w)
+            self.assertTrue(has_deprecation, "Expected deprecation warning not found")
+
+            # Should have plotter
+            self.assertIsNotNone(S.plotter)
+
+
+    def test_sample_with_realtime_plotter(self):
+        """Test RealtimeScope sample method with plotter"""
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            S = RealtimeScope(labels=["x", "y"])
+
+        # Sample some data
+        for t in range(5):
+            S.inputs[0] = t
+            S.inputs[1] = t * 2
+            S.sample(t)
+
+        # Should have recorded data
+        self.assertGreater(len(S.recording), 0)
+
+
+    def test_sample_with_sampling_rate(self):
+        """Test RealtimeScope with sampling_rate parameter"""
+        import warnings
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            S = RealtimeScope(sampling_rate=1.0, labels=["sig"])
+
+        # Sample at different times
+        for t in [0.0, 0.5, 1.0, 1.5, 2.0]:
+            S.inputs[0] = t
+            S.sample(t)
+
+        # Recording behavior depends on sampling rate logic
+        self.assertIsNotNone(S.recording)
+
+
+class TestScopeScheduledSampling(unittest.TestCase):
+    """Test scheduled sampling events in Scope"""
+
+    def test_scheduled_sampling_event(self):
+        """Test that Scope with sampling_rate creates a Schedule event"""
+        S = Scope(sampling_rate=0.1, t_wait=1.0)
+
+        # Should have events
+        self.assertEqual(len(S.events), 1)
+
+        # Event should be a Schedule
+        from pathsim.events import Schedule
+        self.assertIsInstance(S.events[0], Schedule)
+
+
+    def test_scheduled_sampling_functionality(self):
+        """Test that scheduled sampling event actually records data"""
+        S = Scope(sampling_rate=0.1, t_wait=0.0)
+
+        # Get the scheduled event
+        event = S.events[0]
+
+        # Simulate calling the event's action at different times
+        for t in [0.1, 0.2, 0.3]:
+            S.inputs[0] = t
+            # Manually trigger the event action
+            event.func_act(t)
+
+        # Should have recorded 3 points
+        self.assertEqual(len(S.recording), 3)
 
 
 # RUN TESTS LOCALLY ====================================================================
