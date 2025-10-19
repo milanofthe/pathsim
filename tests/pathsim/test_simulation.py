@@ -48,8 +48,9 @@ class TestSimulation(unittest.TestCase):
 
         #test default initialization
         Sim = Simulation(log=False)
-        self.assertEqual(Sim.blocks, [])
-        self.assertEqual(Sim.connections, [])
+        self.assertEqual(Sim.blocks, set())
+        self.assertEqual(Sim.connections, set())
+        self.assertEqual(Sim.events, set())
         self.assertEqual(Sim.dt, SIM_TIMESTEP)
         self.assertEqual(Sim.dt_min, SIM_TIMESTEP_MIN)
         self.assertEqual(Sim.dt_max, SIM_TIMESTEP_MAX)
@@ -125,12 +126,12 @@ class TestSimulation(unittest.TestCase):
         
         Sim = Simulation(log=False)
 
-        self.assertEqual(Sim.blocks, [])
+        self.assertEqual(Sim.blocks, set())
 
         #test adding a block
         B1 = Block()
         Sim.add_block(B1)
-        self.assertEqual(Sim.blocks, [B1])
+        self.assertEqual(Sim.blocks, {B1})
 
         #test adding the same block again
         with self.assertRaises(ValueError):
@@ -148,23 +149,17 @@ class TestSimulation(unittest.TestCase):
             log=False
             )
 
-        self.assertEqual(Sim.connections, [C1])
+        self.assertEqual(Sim.connections, {C1})
 
         #test adding a connection
         C2 = Connection(B2, B3)
         Sim.add_connection(C2)
-        self.assertEqual(Sim.connections, [C1, C2])
+        self.assertEqual(Sim.connections, {C1, C2})
 
         #test adding the same connection again
         with self.assertRaises(ValueError):
             Sim.add_connection(C2)
-        self.assertEqual(Sim.connections, [C1, C2])
-
-        #test adding a connection that overrides B3
-        C3 = Connection(B1, B3) 
-        with self.assertRaises(ValueError):
-            Sim.add_connection(C3)
-        self.assertEqual(Sim.connections, [C1, C2])
+        self.assertEqual(Sim.connections, {C1, C2})
 
 
     def test_set_solver(self): 

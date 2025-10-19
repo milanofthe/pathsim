@@ -179,12 +179,15 @@ class Subsystem(Block):
         self.boosters = None
 
         #internal connecions
-        self.connections = [] if connections is None else connections
+        self.connections = set() 
+        if connections:
+            self.connections.update(connections)
         
         #collect and organize internal blocks
-        self.blocks, self.interface = [], None
+        self.blocks = set()
+        self.interface = None
 
-        if blocks is not None:
+        if blocks:
             for block in blocks:
                 if isinstance(block, Interface): 
                     
@@ -195,7 +198,7 @@ class Subsystem(Block):
                     self.interface = block
                 else: 
                     #regular blocks
-                    self.blocks.append(block)
+                    self.blocks.add(block)
 
         #check if interface is defined
         if self.interface is None:
@@ -203,9 +206,6 @@ class Subsystem(Block):
 
         #update port mappings of interface (reverse)
         self.interface.register_port_map(self._port_map_out, self._port_map_in)
-
-        #validate the internal connections upon initialization
-        self._check_connections()
 
         #assemble internal graph
         self._assemble_graph()
@@ -251,32 +251,13 @@ class Subsystem(Block):
         return other in self.blocks or other in self.connections
 
 
-    # methods for verification ----------------------------------------------------------
-
-    def _check_connections(self):
-        """Check if connections are valid and if there is no input port 
-        that recieves multiple outputs and could be overwritten unintentionally.
-
-        If multiple outputs are assigned to the same input, an error is raised.
-        """
-
-        #iterate connections and check if they are valid
-        for i, conn_1 in enumerate(self.connections):
-
-            #check if connections overwrite each other and raise exception
-            for conn_2 in self.connections[(i+1):]:
-                if conn_1.overwrites(conn_2):
-                    _msg = f"{conn_1} overwrites {conn_2}"
-                    raise ValueError(_msg)
-
-
     # subsystem graph assembly --------------------------------------------------------------
 
     def _assemble_graph(self):
         """Assemble internal graph of subsystem for fast 
         algebraic evaluation during simulation.
         """
-        self.graph = Graph(self.blocks + [self.interface], self.connections)
+        self.graph = Graph({*self.blocks, self.interface}, self.connections)
 
         #create boosters for loop closing connections
         if self.graph.has_loops:
@@ -389,7 +370,7 @@ class Subsystem(Block):
         data = super().to_dict()
         
         #serialization for internal blocks and interface
-        data["params"]["blocks"] = [block.to_dict() for block in self.blocks + [self.interface]]
+        data["params"]["blocks"] = [block.to_dict() for block in {*self.blocks, self.interface}]
 
         #serialize connections
         data["params"]["connections"] = [conn.to_dict() for conn in self.connections]

@@ -49,8 +49,11 @@ class Graph:
     """
 
     def __init__(self, blocks=None, connections=None):
-        self.blocks = [] if blocks is None else list(blocks)
-        self.connections = [] if connections is None else list(connections)
+        self.blocks = list(blocks) if blocks else []
+        self.connections = list(connections) if connections else []
+
+        # First check the connections for port conflicts
+        self._validate_connections()
 
         # loop flag
         self.has_loops = False
@@ -109,6 +112,26 @@ class Graph:
         return self._alg_depth, self._loop_depth
 
 
+    def _validate_connections(self):
+        """Fast O(N) validation that no connections overwrite each other.
+        
+        Checks that no two connections target the same (block, port) pair.
+        """
+        # {(block, port_idx): connection}
+        connected_targets = set()
+        
+        for connection in self.connections:
+            for target in connection.targets:
+                target_block = target.block
+                for port_idx in target.ports:
+                    key = (target_block, port_idx)
+                    if key in connected_targets:
+                        raise ValueError(
+                            f"Connection conflict detected"
+                        )
+                    connected_targets.add(key)
+
+
     def _build_all_maps(self):
         """Build all connection maps in a single pass for efficiency.
 
@@ -117,17 +140,14 @@ class Graph:
         connections based on pre-computed block order.
         """
 
-        self._alg_blocks = []
-        self._dyn_blocks = []
-        self._block_len_map = {}
+        self._alg_blocks = set()
+        self._dyn_blocks = set()
 
         for blk in self.blocks:
-            ln = len(blk)
-            self._block_len_map[blk] = ln
-            if ln > 0:
-                self._alg_blocks.append(blk)
+            if len(blk) > 0:
+                self._alg_blocks.add(blk)
             else:
-                self._dyn_blocks.append(blk)
+                self._dyn_blocks.add(blk)
 
         self._upst_blk_blk_map = defaultdict(set)
         self._dnst_blk_blk_map = defaultdict(set)
@@ -141,7 +161,7 @@ class Graph:
                 tgt_blk = trg.block
                 self._dnst_blk_blk_map[src_blk].add(tgt_blk)
                 self._upst_blk_blk_map[tgt_blk].add(src_blk)
-        
+            
 
     def _assemble(self):
         """Optimized assembly using DFS with proper cycle detection.
@@ -210,8 +230,11 @@ class Graph:
         dict
             mapping from blocks to their algebraic depths (None for cyclic blocks)
         """
+        
+        # Register states for ALL blocks
         WHITE, GRAY, BLACK = 0, 1, 2
-        state = {blk: WHITE for blk in self._alg_blocks}
+        state = {blk: WHITE for blk in self.blocks}
+        
         depths = {}
         
         for start_node in self._alg_blocks:
@@ -224,14 +247,14 @@ class Graph:
             while stack:
                 node, visit_type, preds_remaining = stack.pop()
 
-                # Using cached len
-                alg_len = self._block_len_map[node]
+                # Using O(1) set lookup
+                is_dyn = node in self._dyn_blocks
                 
                 if visit_type == 'pre':
                     # Pre-visit: first time seeing this node
                     
                     # Handle terminal cases 
-                    if alg_len == 0:
+                    if is_dyn:
                         depths[node] = 0
                         state[node] = BLACK
                         continue
@@ -249,16 +272,19 @@ class Graph:
                     # Mark as being processed
                     state[node] = GRAY
                                     
-                    # Get predecessors (filtered algebraic)
-                    preds = [
-                        prd for prd in self._upst_blk_blk_map[node] 
-                        if self._block_len_map[prd] > 0
-                        ]
+                    # Get predecessors and filtered algebraic
+                    preds = list(self._upst_blk_blk_map[node])
+                    alg_preds = [prd for prd in preds if prd in self._alg_blocks]
                     
-                    # No predecessors
                     if not preds:
-                        depths[node] = alg_len
+                        # No predecessors
+                        depths[node] = 0
                         state[node] = BLACK
+                        continue
+                    elif not alg_preds:
+                        # Has predecessors, but all are dynamic
+                        depths[node] = 1
+                        state[node] = BLACK  
                         continue
                     
                     # Schedule post-visit after all predecessors
@@ -294,7 +320,7 @@ class Graph:
                     if has_cycle:
                         depths[node] = None
                     else:
-                        depths[node] = max_depth + alg_len
+                        depths[node] = max_depth + int(not is_dyn)
                     
                     state[node] = BLACK
         
@@ -389,6 +415,7 @@ class Graph:
                         target_blk = target.block
                         if target_blk in scc_set:
                             target_local_depth = local_depths.get(target_blk, 0)
+
                             # Back edge if target depth <= source depth
                             if target_local_depth <= blk_local_depth:
                                 self._loop_closing_connections.append(con)
@@ -541,7 +568,7 @@ class Graph:
             return False
         
         # Check if end is algebraic (non-algebraic blocks can't be part of algebraic path)
-        if self._block_len_map[end_block] == 0:
+        if end_block in self._dyn_blocks:
             return False
         
         # Iterative DFS with visited set
@@ -566,7 +593,7 @@ class Graph:
                     return True
                 
                 # Skip non-algebraic blocks
-                if self._block_len_map[nbr] == 0:
+                if nbr in self._dyn_blocks:
                     continue
                 
                 # Skip already visited
@@ -593,7 +620,7 @@ class Graph:
             True if an algebraic self-loop exists, False otherwise
         """
         # Check if block is algebraic
-        if self._block_len_map[block] == 0:
+        if block in self._dyn_blocks:
             return False
         
         # Get immediate neighbors
@@ -619,7 +646,7 @@ class Graph:
             visited.add(node)
             
             # Skip non-algebraic
-            if self._block_len_map[node] == 0:
+            if node in self._dyn_blocks:
                 continue
             
             # Add neighbors

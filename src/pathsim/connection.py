@@ -247,41 +247,6 @@ class Connection:
         self._active = False
 
 
-    def overwrites(self, other):
-        """Check if the connection 'self' overwrites the target port of 
-        connection 'other' and return 'True' if so.
-    
-        Parameters
-        ----------
-        other : Connection
-            other connection to check 
-
-        Returns
-        -------
-        overwrites : bool
-            True if port is overwritten, False otherwise
-
-        """
-
-        #catch self checking
-        if self == other:
-            return False
-
-        #iterate all target permutations
-        for trg in self.targets:
-            for otrg in other.targets:
-
-                #check if same target block
-                if trg.block is otrg.block:
-
-                    #check if there is port overlap
-                    for prt in trg.ports:
-                        if prt in otrg.ports: 
-                            return True
-
-        return False 
-
-
     def to_dict(self):
         """Convert connection to dictionary representation for serialization"""
         return {
