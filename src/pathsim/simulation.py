@@ -175,9 +175,9 @@ class Simulation:
         ):
 
         #system definition
-        self.blocks      = []
-        self.connections = []
-        self.events      = []
+        self.blocks      = set()
+        self.connections = set()
+        self.events      = set()
 
         #simulation timestep and bounds
         self.dt     = dt
@@ -212,7 +212,7 @@ class Simulation:
         self.time = 0.0
 
         #collection of blocks with internal ODE solvers
-        self._blocks_dyn = []
+        self._blocks_dyn = set()
 
         #flag for setting the simulation active
         self._active = True
@@ -223,12 +223,12 @@ class Simulation:
         #prepare and add blocks (including internal events)
         if blocks is not None:
             for block in blocks:
-                self.add_block(block)
+                self.add_block(block, _defer_graph=True)
 
         #check and add connections
         if connections is not None:
             for connection in connections:
-                self.add_connection(connection)
+                self.add_connection(connection, _defer_graph=True)
 
         #check and add events
         if events is not None:
@@ -535,7 +535,7 @@ class Simulation:
 
     # adding system components ----------------------------------------------------
 
-    def add_block(self, block):
+    def add_block(self, block, _defer_graph=False):
         """Adds a new block to the simulation, initializes its local solver 
         instance and collects internal events of the new block. 
 
@@ -545,6 +545,8 @@ class Simulation:
         ----------
         block : Block 
             block to add to the simulation
+        _defer_graph : bool
+            flag for defering graph construction to a later stage
         """
 
         #check if block already in block list
@@ -557,10 +559,10 @@ class Simulation:
 
         #add to dynamic list if solver was initialized
         if block.engine and block not in self._blocks_dyn:
-            self._blocks_dyn.append(block)
+            self._blocks_dyn.add(block)
 
         #add block to global blocklist
-        self.blocks.append(block)
+        self.blocks.add(block)
 
         #logging message
         self._logger_info(
@@ -574,11 +576,11 @@ class Simulation:
             self.add_event(event)
 
         #if graph already exists, it needs to be rebuilt
-        if self.graph:
+        if not _defer_graph and self.graph:
             self._assemble_graph()
 
 
-    def add_connection(self, connection):
+    def add_connection(self, connection, _defer_graph=False):
         """Adds a new connection to the simulaiton and checks if 
         the new connection overwrites any existing connections.
 
@@ -588,6 +590,8 @@ class Simulation:
         ----------
         connection : Connection
             connection to add to the simulation
+        _defer_graph : bool
+            flag for defering graph construction to a later stage
         """
 
         #check if connection already in connection list
@@ -595,17 +599,11 @@ class Simulation:
             _msg = f"{connection} already part of simulation"
             self._logger_error(_msg, ValueError)
 
-        #check if connection overwrites existing connections
-        for conn in self.connections:
-            if connection.overwrites(conn):
-                _msg = f"{connection} overwrites {conn}"
-                self._logger_error(_msg, ValueError)
-
         #add connection to global connection list
-        self.connections.append(connection)
+        self.connections.add(connection)
 
         #if graph already exists, it needs to be rebuilt
-        if self.graph:
+        if not _defer_graph and self.graph:
             self._assemble_graph()
 
 
@@ -626,7 +624,7 @@ class Simulation:
             self._logger_error(_msg, ValueError)
 
         #add event to global event list
-        self.events.append(event)
+        self.events.add(event)
 
 
     # system assembly -------------------------------------------------------------
@@ -657,22 +655,22 @@ class Simulation:
 
     def _check_blocks_are_managed(self):
         """Check whether the blocks that are part of the connections are 
-        in the simulation block list ('self.blocks') and therefore managed 
+        in the simulation block set ('self.blocks') and therefore managed 
         by the simulation.
 
         If not, there will be a warning in the logging.            
         """
-        #collect blocks from connections
-        conn_blocks = []
-        for conn in self.connections:
-            conn_blocks.extend(conn.get_blocks())
 
-        #iterate set of blocks from connections (unique)
-        for blk in set(conn_blocks):
-            if blk not in self.blocks:
-                self._logger_warning(
-                    f"{blk} in 'connections' but not in 'blocks'!"
-                    )
+        # Collect connection blocks
+        conn_blocks = set()
+        for conn in self.connections:
+            conn_blocks.update(conn.get_blocks())
+
+        # Check subset actively managed
+        if not conn_blocks.issubset(self.blocks):
+            self._logger_warning(
+                f"{blk} in 'connections' but not in 'blocks'!"
+                )
 
 
     # solver management -----------------------------------------------------------

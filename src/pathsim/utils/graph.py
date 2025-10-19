@@ -49,8 +49,11 @@ class Graph:
     """
 
     def __init__(self, blocks=None, connections=None):
-        self.blocks = [] if blocks is None else list(blocks)
-        self.connections = [] if connections is None else list(connections)
+        self.blocks = list(blocks) if blocks else []
+        self.connections = list(connections) if connections else []
+
+        # First check the connections for port conflicts
+        self._validate_connections()
 
         # loop flag
         self.has_loops = False
@@ -109,6 +112,26 @@ class Graph:
         return self._alg_depth, self._loop_depth
 
 
+    def _validate_connections(self):
+        """Fast O(N) validation that no connections overwrite each other.
+        
+        Checks that no two connections target the same (block, port) pair.
+        """
+        # {(block, port_idx): connection}
+        connected_targets = set()
+        
+        for connection in self.connections:
+            for target in connection.targets:
+                target_block = target.block
+                for port_idx in target.ports:
+                    key = (target_block, port_idx)
+                    if key in connected_targets:
+                        raise ValueError(
+                            f"Connection conflict detected"
+                        )
+                    connected_targets.add(key)
+
+
     def _build_all_maps(self):
         """Build all connection maps in a single pass for efficiency.
 
@@ -138,7 +161,7 @@ class Graph:
                 tgt_blk = trg.block
                 self._dnst_blk_blk_map[src_blk].add(tgt_blk)
                 self._upst_blk_blk_map[tgt_blk].add(src_blk)
-        
+            
 
     def _assemble(self):
         """Optimized assembly using DFS with proper cycle detection.
@@ -207,8 +230,11 @@ class Graph:
         dict
             mapping from blocks to their algebraic depths (None for cyclic blocks)
         """
+        
+        # Register states for ALL blocks
         WHITE, GRAY, BLACK = 0, 1, 2
-        state = {blk: WHITE for blk in self._alg_blocks}
+        state = {blk: WHITE for blk in self.blocks}
+        
         depths = {}
         
         for start_node in self._alg_blocks:
@@ -246,16 +272,19 @@ class Graph:
                     # Mark as being processed
                     state[node] = GRAY
                                     
-                    # Get predecessors (filtered algebraic)
-                    preds = [
-                        prd for prd in self._upst_blk_blk_map[node] 
-                        if prd in self._alg_blocks
-                        ]
+                    # Get predecessors and filtered algebraic
+                    preds = list(self._upst_blk_blk_map[node])
+                    alg_preds = [prd for prd in preds if prd in self._alg_blocks]
                     
-                    # No predecessors
                     if not preds:
+                        # No predecessors
                         depths[node] = 0
                         state[node] = BLACK
+                        continue
+                    elif not alg_preds:
+                        # Has predecessors, but all are dynamic
+                        depths[node] = 1
+                        state[node] = BLACK  
                         continue
                     
                     # Schedule post-visit after all predecessors
