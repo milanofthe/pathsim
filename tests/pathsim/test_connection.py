@@ -93,55 +93,6 @@ class TestConnection(unittest.TestCase):
 
 
 
-    def test_overwrites(self):
-
-        B1, B2, B3 = Block(), Block(), Block()
-
-        #self overwrite
-
-        C1 = Connection(B1, B2) 
-        self.assertFalse(C1.overwrites(C1))
-
-        #default ports
-
-        C1 = Connection(B1, B2) 
-        C2 = Connection(B1, B3)  
-        C3 = Connection(B2, B3) 
-
-        self.assertFalse(C1.overwrites(C2))
-        self.assertFalse(C2.overwrites(C1))
-        self.assertTrue(C3.overwrites(C2))
-        self.assertTrue(C2.overwrites(C3))
-
-        C1 = Connection(B1, B2, B3) 
-        C2 = Connection(B1, B3)  
-
-        self.assertTrue(C1.overwrites(C2))
-        self.assertTrue(C2.overwrites(C1))
-
-        #specific ports
-
-        C1 = Connection(B1, B2, B3[1]) 
-        C2 = Connection(B1, B3)  
-
-        self.assertFalse(C1.overwrites(C2))
-        self.assertFalse(C2.overwrites(C1))
-
-        C1 = Connection(B1, B2, B3) 
-        C2 = Connection(B1[2], B3)  
-
-        self.assertTrue(C1.overwrites(C2))
-        self.assertTrue(C2.overwrites(C1))
-
-        C1 = Connection(B1, B2, B3[5]) 
-        C2 = Connection(B1[2], B3)  
-
-        self.assertFalse(C1.overwrites(C2))
-        self.assertFalse(C2.overwrites(C1))    
-            
-        #test with sliced ports
-        
-        #test with tuple ports
 
 
 

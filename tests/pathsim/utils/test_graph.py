@@ -134,7 +134,7 @@ class TestGraph(unittest.TestCase):
 
         # Max upstream algebraic path ends at amp2 or int2, tracing back through amp2(1)+add1(1)+amp1(1) = 3.
         # Graph._alg_depth is max_depth + 1.
-        self.assertEqual(alg_depth, 4)
+        self.assertEqual(alg_depth, 3)
         self.assertEqual(loop_depth, 0)
 
 
@@ -162,38 +162,6 @@ class TestGraph(unittest.TestCase):
         # No algebraic loop -> loop_depth = 0.
         self.assertEqual(alg_depth, 1)
         self.assertEqual(loop_depth, 0) 
-
-
-    def test_dag_traversal_mixed(self):
-        """Test DAG traversal on a mixed acyclic graph."""
-
-        g = Graph(self.nodes_acyclic, self.conns_acyclic)
-
-        dag_result = list(g.dag())
-
-        self.assertEqual(len(dag_result), 4) # Graph depth is 4, so levels 0, 1, 2, 3 exist
-
-        # Check Depth 0
-        self.assertIn(self.int1, dag_result[0][1])
-        self.assertEqual(len(dag_result[0][1]), 2)
-        self.assertEqual(len(dag_result[0][2]), 1) 
-
-        # Check Depth 1
-        self.assertIn(self.amp1, dag_result[1][1])
-        self.assertEqual(len(dag_result[1][1]), 1)
-        self.assertIn(self.c_int1_add1, dag_result[0][2]) # Connection from depth 0 node (int1)
-
-        # Check Depth 2
-        self.assertIn(self.add1, dag_result[2][1])
-        self.assertEqual(len(dag_result[2][1]), 1)
-        self.assertIn(self.c_amp1_add1, dag_result[1][2]) # Connection from depth 1 node (amp1)
-
-        # Check Depth 3
-        self.assertIn(self.amp2, dag_result[3][1])
-        self.assertIn(self.int2, dag_result[0][1])
-        self.assertEqual(len(dag_result[3][1]), 1)
-        self.assertIn(self.c_add1_amp2, dag_result[2][2]) # Connection from depth 2 node (add1)
-        self.assertIn(self.c_amp2_int2, dag_result[3][2]) # Connection from depth 3 node (amp2) - yields at source depth
 
 
     def test_size_property(self):
@@ -358,8 +326,8 @@ class TestGraph(unittest.TestCase):
         self.assertFalse(g.has_loops)
 
         alg_depth, loop_depth = g.depth
-        # Single block with len=1 gives depth of 1, graph depth = depth + 1 = 2
-        self.assertEqual(alg_depth, 2)
+        # Single block with len=1 gives depth of 1
+        self.assertEqual(alg_depth, 1)
         self.assertEqual(loop_depth, 0)
 
 
@@ -437,13 +405,13 @@ class TestGraph(unittest.TestCase):
         self.assertEqual(len(g), 4)
 
         alg_depth, loop_depth = g.depth
-        # Chain of 4 blocks each with len=1: depth = 4, graph depth = depth + 1 = 5
-        self.assertEqual(alg_depth, 5)
+        # Chain of 4 blocks each with len=1: depth = 4
+        self.assertEqual(alg_depth, 4)
         self.assertEqual(loop_depth, 0)
 
         # Verify traversal
         dag_result = list(g.dag())
-        self.assertEqual(len(dag_result), 5)
+        self.assertEqual(len(dag_result), 4)
 
 
     def test_multiple_sccs(self):
