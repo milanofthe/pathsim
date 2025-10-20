@@ -37,13 +37,11 @@ def fetch_github_issues(app, config):
             
             # Group by state
             open_issues = [i for i in issues if i['state'] == 'open']
-
-    
             
             if open_issues:
                 for issue in open_issues:
                     # Write only 'roadmap' labeled issues
-                    if 'roadmap' in issue.get('labels', []):
+                    if any(label['name'] == 'roadmap' for label in issue.get('labels', [])):
                         write_issue_html(f, issue)
             else:
                 f.write("   <p class='no-issues'>No roadmap items found.</p>\n")

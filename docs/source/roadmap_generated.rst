@@ -1,21 +1,7 @@
 .. raw:: html
 
    <div class='github-issues-container'>
-   <p class='issues-updated'>Last updated: 2025-10-20 12:57 UTC</p>
-
-   <div class='github-issue-card'>
-      <div class='issue-header'>
-         <span class='issue-number'>#127</span>
-         <h3 class='issue-title'>Port mapping of RFNetwork block</h3>
-      </div>
-      <div class='issue-body'>
-         <p>I'm currently playing around with the new RFNetwork block. It seems to work, but there are strange effects and the numbers are not quite right.<br><br>Now, I'm wondering if my issues have anything to do with the port mapping, which is actually very unclear to me. [In the docs](https://pathsim.readthedocs.io/en/latest/modules/pathsim.blocks.rf.html) it reads "*Assumes N inputs and N outputs, where N is t...</p>
-      </div>
-      <div class='issue-footer'>
-         <span class='issue-date'>Created: Okt 16, 2025</span>
-         <a href='https://github.com/milanofthe/pathsim/issues/127' class='issue-link' target='_blank'>View on GitHub →</a>
-      </div>
-   </div>
+   <p class='issues-updated'>Last updated: 2025-10-20 15:04 UTC</p>
 
    <div class='github-issue-card'>
       <div class='issue-header'>
