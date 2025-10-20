@@ -1,7 +1,21 @@
 .. raw:: html
 
    <div class='github-issues-container'>
-   <p class='issues-updated'>Last updated: 2025-10-15 21:29 UTC</p>
+   <p class='issues-updated'>Last updated: 2025-10-20 12:57 UTC</p>
+
+   <div class='github-issue-card'>
+      <div class='issue-header'>
+         <span class='issue-number'>#127</span>
+         <h3 class='issue-title'>Port mapping of RFNetwork block</h3>
+      </div>
+      <div class='issue-body'>
+         <p>I'm currently playing around with the new RFNetwork block. It seems to work, but there are strange effects and the numbers are not quite right.<br><br>Now, I'm wondering if my issues have anything to do with the port mapping, which is actually very unclear to me. [In the docs](https://pathsim.readthedocs.io/en/latest/modules/pathsim.blocks.rf.html) it reads "*Assumes N inputs and N outputs, where N is t...</p>
+      </div>
+      <div class='issue-footer'>
+         <span class='issue-date'>Created: Okt 16, 2025</span>
+         <a href='https://github.com/milanofthe/pathsim/issues/127' class='issue-link' target='_blank'>View on GitHub →</a>
+      </div>
+   </div>
 
    <div class='github-issue-card'>
       <div class='issue-header'>
@@ -10,6 +24,7 @@
       </div>
       <div class='issue-labels'>
          <span class='issue-label'>documentation</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>Currently, PathSim is not explicitly typed. Adding type hints makes sense.</p>
@@ -27,6 +42,7 @@
       </div>
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>Saving simulation state as checkpoint and loading simulation state from checkpoints.</p>
@@ -45,6 +61,7 @@
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
          <span class='issue-label'>numerics</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>Sometimes in big complex systems, individual components have wildly different timescales for their physics. In some cases it makes sense to approximate components with very fast dynamics as being in a steady state at each timestep, such that the component becomes purely algebraic.<br><br>To achieve this, the time derivative of the block ode <br><br>```math<br>\dot{x} = f(x, u, t) <br>```<br><br>will be forced to zero (tr...</p>
@@ -62,6 +79,7 @@
       </div>
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>PathSim already supports adding and activating/deactivating blocks and connections at simulation runtime. For example through events. Whats missing is the capability to cleanly replace and remove blocks in a similar fashion.<br><br>**What this will enable:**<br>Imagine you are running a big system simulation with many (maybe hundreds) of blocks that might be small or large individual models themself. Some ...</p>
@@ -80,6 +98,7 @@
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
          <span class='issue-label'>numerics</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>PathSim has a decentralized architecture for the blocks which lends itself to parallelism and asynchronizity. Expensive blocks should compute asynchronously and not make the other blocks wait. With free-threading from Python 3.13, parallelization of the block updates is possible and has been verified with multiprocessing (slow but validation of the concept) for an earlier build.<br><br>Near linear scali...</p>
@@ -97,6 +116,7 @@
       </div>
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>Implement a `copy` method for the blocks, the `Subsystem` class, and the `Simulation`. <br><br>This should enable convenient copying of standard blocks for defining a system.</p>
@@ -115,6 +135,7 @@
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
          <span class='issue-label'>numerics</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>Implementing implicit-explicit ode solvers. <br><br>Some blocks in large systems may exhibit local stiffness while the coupling to external blocks is non-stiff. In these cases it would be nice to use more stable implicit ode solvers for these blocks while using explicit solvers for the other, non-stiff blocks. <br><br>The global solver would remain explicit, while locally, blocks can be flagged as stiff and t...</p>
@@ -133,6 +154,7 @@
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
          <span class='issue-label'>numerics</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>Using exponential integrators is a way to eliminate stiffness from linear dynamical systems. Many pathsim blocks are pure linear odes such as the `StateSpace` blocks and its derivates, as well as the `Differentiator` and the `PID`. <br><br>They are more or less of the following form:<br><br>```math<br>\dot{\vec{x}} = \mathbf{A} \vec{x} + \mathbf{B} \vec{u} <br>```<br><br>Stiffness occurs when the eigenvalues of A are on ...</p>
@@ -150,6 +172,7 @@
       </div>
       <div class='issue-labels'>
          <span class='issue-label'>enhancement</span>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>It would be nice to be able to import existing FMUs as pathsim blocks and to export simulations as FMUs using the functional mockup interface (FMI).<br><br>This would enable cross compatibility between pathsim and other simulation tools.<br><br>The most straight forward way to to this is with [FMPy](https://github.com/CATIA-Systems/FMPy?tab=License-1-ov-file#readme).<br><br>The resulting blocks would be:<br>- `CoSimul...</p>
@@ -162,22 +185,11 @@
 
    <div class='github-issue-card'>
       <div class='issue-header'>
-         <span class='issue-number'>#64</span>
-         <h3 class='issue-title'>Port aliases with Subsystems</h3>
-      </div>
-      <div class='issue-body'>
-         <p>Consider the following MWE<br><br>```python<br>import pathsim<br>import pathsim.blocks<br><br>class Assembly(pathsim.Subsystem):<br>    _port_map_out = {<br>        "out1": 0,<br>        "out2": 1,<br>    }<br>    _port_map_in = {<br>        "in_1": 0,<br>        "in_2": 1,<br>    }<br><br>    def __init__(self):<br>        interface = pathsim.Interface()<br>        interface._port_map_in = self._port_map_in<br>        interface._port_map_out = self._po...</p>
-      </div>
-      <div class='issue-footer'>
-         <span class='issue-date'>Created: Aug 08, 2025</span>
-         <a href='https://github.com/milanofthe/pathsim/issues/64' class='issue-link' target='_blank'>View on GitHub →</a>
-      </div>
-   </div>
-
-   <div class='github-issue-card'>
-      <div class='issue-header'>
          <span class='issue-number'>#51</span>
          <h3 class='issue-title'>conda package</h3>
+      </div>
+      <div class='issue-labels'>
+         <span class='issue-label'>roadmap</span>
       </div>
       <div class='issue-body'>
          <p>It would be nice to have a conda package for pathsim!</p>

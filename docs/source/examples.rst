@@ -34,6 +34,12 @@ Basic examples demonstrating core PathSim concepts with linear and nonlinear sys
 
       Damped spring-mass-damper system with second-order dynamics and exponential decay.
 
+   .. grid-item-card:: 🔗 Coupled Oscillators
+      :link: examples/coupled_oscillators
+      :link-type: doc
+
+      Two spring-coupled spring-mass-damper systems with second-order dynamics.
+
    .. grid-item-card:: ⚙️ Pendulum
       :link: examples/pendulum
       :link-type: doc
@@ -58,6 +64,7 @@ Basic examples demonstrating core PathSim concepts with linear and nonlinear sys
 
    examples/linear_feedback.ipynb
    examples/harmonic_oscillator.ipynb
+   examples/coupled_oscillators.ipynb
    examples/pendulum.ipynb
    examples/vanderpol.ipynb
    examples/lorenz_attractor.ipynb
