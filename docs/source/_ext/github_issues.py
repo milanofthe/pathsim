@@ -40,9 +40,11 @@ def fetch_github_issues(app, config):
             
             if open_issues:
                 for issue in open_issues:
-                    write_issue_html(f, issue)
+                    # Write only 'roadmap' labeled issues
+                    if any(label['name'] == 'roadmap' for label in issue.get('labels', [])):
+                        write_issue_html(f, issue)
             else:
-                f.write("   <p class='no-issues'>No open issues found.</p>\n")
+                f.write("   <p class='no-issues'>No roadmap items found.</p>\n")
             
             f.write("   </div>\n\n")
         
