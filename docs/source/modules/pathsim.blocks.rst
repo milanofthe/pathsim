@@ -26,6 +26,7 @@ pathsim.blocks
    pathsim.blocks.noise
    pathsim.blocks.filters
    pathsim.blocks.fir
+   pathsim.blocks.kalman
    pathsim.blocks.converters
    pathsim.blocks.samplehold
    pathsim.blocks.comparator
