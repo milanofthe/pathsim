@@ -132,8 +132,8 @@ class KalmanFilter(Block):
         if self.dt is not None:
             self.events = [
                 Schedule(
-                    T=self.dt,
-                    func_act=self._kf_update
+                    t_period=self.dt,
+                    func_act=lambda _: self._kf_update()
                     )
                 ]
 
@@ -151,7 +151,7 @@ class KalmanFilter(Block):
         z, u = np.split(zu, [self.m])
 
         # Prediction
-        x_pred = self.F @ self.x + (self.B @ u if self.B else 0.0)
+        x_pred = self.F @ self.x + (self.B @ u if self.B is not None else 0.0)
         P_pred = self.F @ self.P @ self.F.T + self.Q
         
         # Innovation
@@ -159,7 +159,7 @@ class KalmanFilter(Block):
         S = self.H @ P_pred @ self.H.T + self.R   
         
         # Kalman gain
-        K = np.linalg.solve(S.T, (self.H @ P_pred).T).T
+        K = np.linalg.solve(S.T, (P_pred @ self.H.T).T).T
         
         # Update state
         self.x = x_pred + K @ y        

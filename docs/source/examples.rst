@@ -182,6 +182,12 @@ Examples demonstrating frequency domain analysis, filters, and signal processing
 
       Nonlinar noisy amplifier model as a subsystem with spectral sensitivities
 
+   .. grid-item-card:: 🎯 Kalman Filter
+      :link: examples/kalman_filter
+      :link-type: doc
+
+      Optimal state estimation from noisy measurements using the Kalman filter algorithm
+
 .. toctree::
    :hidden:
    :maxdepth: 1
@@ -190,6 +196,7 @@ Examples demonstrating frequency domain analysis, filters, and signal processing
    examples/spectrum_analysis.ipynb
    examples/transfer_function.ipynb
    examples/noisy_amplifier.ipynb
+   examples/kalman_filter.ipynb
 
 ----
 

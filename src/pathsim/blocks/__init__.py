@@ -13,6 +13,7 @@ from .counter import *
 from .filters import *
 from .switch import *
 from .dynsys import *
+from .kalman import *
 from .adder import *
 from .scope import *
 from .delay import *
