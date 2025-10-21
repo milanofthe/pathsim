@@ -23,14 +23,14 @@ from pathsim.blocks import (
 # KALMAN FILTER FOR POSITION/VELOCITY TRACKING =========================================
 
 # Simulation parameters
-dt = 0.01  # timestep
+dt = 0.05  # timestep
 
 # True system: object moving with constant velocity
 v_true = 2.0  # m/s
 x0_true = 0.0  # initial position
 
 # Measurement noise characteristics
-measurement_std = 0.6  # standard deviation of position sensor noise
+measurement_std = 0.5  # standard deviation of position sensor noise
 
 # Kalman filter parameters
 F = np.array([[1, dt], [0, 1]])        # state transition (constant velocity model)
@@ -91,43 +91,36 @@ if __name__ == "__main__":
     t_est, [pos_est, vel_est] = sc_est.read()
 
     # Create comparison plots
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), tight_layout=True, dpi=120)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6), tight_layout=True, dpi=200)
 
     # Position comparison
-    ax1.plot(t_true, pos_true, 'g-', lw=2.5, label='True Position', zorder=3)
-    ax1.plot(t_meas, pos_meas, 'r.', alpha=0.4, markersize=4, label='Noisy Measurement')
-    ax1.plot(t_est, pos_est, 'b-', lw=2, label='Kalman Estimate', zorder=2)
-    ax1.set_ylabel('Position [m]', fontsize=11)
-    ax1.legend(loc='upper left', fontsize=10)
-    ax1.grid(True, alpha=0.3)
-    ax1.set_title('Kalman Filter: Position and Velocity Estimation', fontsize=12, fontweight='bold')
+    ax1.set_title('Kalman Filter: Position and Velocity Estimation')
+    ax1.plot(t_meas, pos_meas, ".", label='Noisy Measurement')
+    ax1.plot(t_true, pos_true, "-", label='True Position')
+    ax1.plot(t_est, pos_est, "--", label='Kalman Estimate')
+    ax1.set_ylabel('Position [m]')
+    ax1.legend()
 
     # Velocity comparison
-    ax2.plot(t_true, vel_true, 'g-', lw=2.5, label='True Velocity', zorder=3)
-    ax2.plot(t_est, vel_est, 'b-', lw=2, label='Kalman Estimate', zorder=2)
-    ax2.axhline(v_true, color='gray', linestyle='--', alpha=0.5, label='Target Velocity')
-    ax2.set_ylabel('Velocity [m/s]', fontsize=11)
-    ax2.set_xlabel('Time [s]', fontsize=11)
-    ax2.legend(loc='upper left', fontsize=10)
-    ax2.grid(True, alpha=0.3)
+    ax2.plot(t_true, vel_true, "-", label='True Velocity')
+    ax2.plot(t_est, vel_est, "--", label='Kalman Estimate')
+    ax2.set_ylabel('Velocity [m/s]')
+    ax2.set_xlabel('Time [s]')
+    ax2.legend()
 
-    # Calculate and display estimation errors
+    # Calculate estimation errors
     pos_error = np.abs(pos_est - pos_true)
     vel_error = np.abs(vel_est - vel_true)
 
     # Estimation error over time
-    fig2, (ax3, ax4) = plt.subplots(2, 1, figsize=(10, 6), tight_layout=True, dpi=120)
-    
-    ax3.plot(t_est, pos_error, 'b-', lw=1.5)
-    ax3.fill_between(t_est, 0, pos_error, alpha=0.3)
-    ax3.set_ylabel('Position Error [m]', fontsize=11)
-    ax3.grid(True, alpha=0.3)
-    ax3.set_title('Kalman Filter Estimation Error', fontsize=12, fontweight='bold')
-    
-    ax4.plot(t_est, vel_error, 'b-', lw=1.5)
-    ax4.fill_between(t_est, 0, vel_error, alpha=0.3)
-    ax4.set_ylabel('Velocity Error [m/s]', fontsize=11)
-    ax4.set_xlabel('Time [s]', fontsize=11)
-    ax4.grid(True, alpha=0.3)
+    fig2, (ax3, ax4) = plt.subplots(2, 1, figsize=(8, 6), tight_layout=True, dpi=200)
+
+    ax3.plot(t_est, pos_error)
+    ax3.set_ylabel('Position Error [m]')
+    ax3.set_title('Kalman Filter Estimation Error')
+
+    ax4.plot(t_est, vel_error)
+    ax4.set_ylabel('Velocity Error [m/s]')
+    ax4.set_xlabel('Time [s]')
 
     plt.show()
