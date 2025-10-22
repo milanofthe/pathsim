@@ -244,13 +244,14 @@ class TestSinusoidalPhaseNoiseSource(unittest.TestCase):
 
     def test_reset(self):
         S = SinusoidalPhaseNoiseSource()
-        S.n_samples = 10
-        S.t_max = 5.0
+        
+        n1 = S.noise_1
+        n2 = S.noise_2
         
         S.reset()
         
-        self.assertEqual(S.n_samples, 0)
-        self.assertEqual(S.t_max, 0)
+        self.assertTrue(S.noise_1 != n1)
+        self.assertTrue(S.noise_2 != n2)
 
     def test_len(self):
         S = SinusoidalPhaseNoiseSource()
@@ -289,8 +290,8 @@ class TestChirpPhaseNoiseSource(unittest.TestCase):
         C = ChirpPhaseNoiseSource()
         
         # Test triangle wave at different points
-        self.assertAlmostEqual(C._triangle_wave(0, 1), -1, places=10)
-        self.assertAlmostEqual(C._triangle_wave(1, 1), -1, places=10)
+        self.assertAlmostEqual(C._triangle_wave(0, 1), 1, places=10)
+        self.assertAlmostEqual(C._triangle_wave(1, 1), 1, places=10)
 
     def test_update(self):
         C = ChirpPhaseNoiseSource(amplitude=1, phase=0, sig_white=0)

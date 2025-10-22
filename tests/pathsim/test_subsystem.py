@@ -370,7 +370,7 @@ class TestSubsystem(unittest.TestCase):
         S = Subsystem(blocks=[I1, scope], connections=[C1])
 
         # Should not raise error
-        S.sample(1.0)
+        S.sample(1.0, 0.1)
 
 
     def test_reset_method(self):

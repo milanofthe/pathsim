@@ -169,7 +169,7 @@ class KalmanFilter(Block):
         self.outputs.update_from_array(self.x)
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """Sample after successful timestep.
 
         Updates the internal state estimate using the current measurements and
@@ -179,6 +179,8 @@ class KalmanFilter(Block):
         ----------
         t : float
             evaluation time for sampling
+        dt : float
+            integration timestep
         """
         if self.dt is None:
             self._kf_update()

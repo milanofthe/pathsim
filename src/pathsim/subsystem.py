@@ -444,19 +444,21 @@ class Subsystem(Block):
 
     # methods for data recording ------------------------------------------------------------
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """Update the internal connections again and sample data from 
         the internal blocks that implement the 'sample' method.
     
         Parameters
         ----------
         t : float
-            evaluation time 
+            evaluation time
+        dt : float
+            integration timestep 
         """
 
         #record data if required
         for block in self.blocks:
-            block.sample(t)
+            block.sample(t, dt)
 
 
     # methods for block output and state updates --------------------------------------------

@@ -19,25 +19,25 @@ class Embedding:
         self.expected = expected
 
 
-    def check_SISO(self, t):
+    def check_SISO(self, t, dt=1.0):
 
-        u = self.source(t)  
+        u = self.source(t)
 
         self.block.inputs[0] = u
         self.block.update(t)
-        self.block.sample(t)
+        self.block.sample(t, dt)
 
         return self.block.outputs[0], self.expected(t)
 
 
-    def check_MIMO(self, t):
+    def check_MIMO(self, t, dt=1.0):
 
         U = self.source(t)
 
         for i, u in enumerate(U):
             self.block.inputs[i] = u
         self.block.update(t)
-        self.block.sample(t)
+        self.block.sample(t, dt)
 
         _1, Y, _2 = self.block.get_all()
 

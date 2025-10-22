@@ -277,13 +277,15 @@ class Spectrum(Block):
         return True, 0.0, 1.0
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """sample time of successfull timestep for waiting period
     
         Parameters
         ----------
         t : float
             sampling time
+        dt : float
+            integration timestep
         """
         self.t_sample = t
 

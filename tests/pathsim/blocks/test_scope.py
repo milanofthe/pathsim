@@ -68,7 +68,7 @@ class TestScope(unittest.TestCase):
         for t in range(10):
 
             S.inputs[0] = t
-            S.sample(t)
+            S.sample(t, None)
 
         #test that we have some recording
         self.assertGreater(len(S.recording), 0)
@@ -87,7 +87,7 @@ class TestScope(unittest.TestCase):
         for t in range(10):
 
             S.inputs[0] = t
-            S.sample(t)
+            S.sample(t, None)
 
             #test most recent recording
             self.assertEqual(S.recording[t], t)
@@ -101,7 +101,7 @@ class TestScope(unittest.TestCase):
             S.inputs[0] = t
             S.inputs[1] = 2*t
             S.inputs[2] = 3*t
-            S.sample(t)
+            S.sample(t, None)
 
             #test most recent recording
             self.assertTrue(np.all(np.equal(S.recording[t], [t, 2*t, 3*t])))
@@ -117,7 +117,7 @@ class TestScope(unittest.TestCase):
         for t in _time:
 
             S.inputs[0] = t
-            S.sample(t)
+            S.sample(t, None)
 
         time, result = S.read()
 
@@ -135,7 +135,7 @@ class TestScope(unittest.TestCase):
             S.inputs[0] = t
             S.inputs[1] = 2*t
             S.inputs[2] = 3*t
-            S.sample(t)
+            S.sample(t, None)
 
         time, result = S.read()
 
@@ -161,7 +161,7 @@ class TestScope(unittest.TestCase):
         for t in _time:
 
             S.inputs[0] = t
-            S.sample(t)
+            S.sample(t, None)
 
         time, result = S.read()
 
@@ -208,7 +208,7 @@ class TestScope(unittest.TestCase):
         for t in range(5):
             S.inputs[0] = np.sin(t)
             S.inputs[1] = np.cos(t)
-            S.sample(t)
+            S.sample(t, None)
 
         # Plot (non-blocking)
         fig, ax = S.plot()
@@ -248,7 +248,7 @@ class TestScope(unittest.TestCase):
         # Record only 1 channel
         for t in range(5):
             S.inputs[0] = t
-            S.sample(t)
+            S.sample(t, None)
 
         import warnings
         with warnings.catch_warnings(record=True) as w:
@@ -271,7 +271,7 @@ class TestScope(unittest.TestCase):
         for t in range(5):
             S.inputs[0] = t
             S.inputs[1] = t * 2
-            S.sample(t)
+            S.sample(t, None)
 
         fig, ax = S.plot2D(axes=(0, 1))
 
@@ -294,7 +294,7 @@ class TestScope(unittest.TestCase):
         for t in range(5):
             S.inputs[0] = t
             S.inputs[1] = t * 2
-            S.sample(t)
+            S.sample(t, None)
 
         import warnings
         with warnings.catch_warnings(record=True) as w:
@@ -332,7 +332,7 @@ class TestScope(unittest.TestCase):
         for t in range(5):
             S.inputs[0] = t
             S.inputs[1] = t * 2
-            S.sample(t)
+            S.sample(t, None)
 
         import warnings
         with warnings.catch_warnings(record=True) as w:
@@ -356,7 +356,7 @@ class TestScope(unittest.TestCase):
             S.inputs[0] = t
             S.inputs[1] = t * 2
             S.inputs[2] = t * 3
-            S.sample(t)
+            S.sample(t, None)
 
         fig, ax = S.plot3D(axes=(0, 1, 2))
 
@@ -376,7 +376,7 @@ class TestScope(unittest.TestCase):
             S.inputs[0] = t
             S.inputs[1] = t * 2
             S.inputs[2] = t * 3
-            S.sample(t)
+            S.sample(t, None)
 
         import warnings
         with warnings.catch_warnings(record=True) as w:
@@ -401,7 +401,7 @@ class TestScope(unittest.TestCase):
         for t in range(3):
             S.inputs[0] = t
             S.inputs[1] = t * 2
-            S.sample(t)
+            S.sample(t, None)
 
         # Save to CSV
         test_path = "test_scope_save.csv"
@@ -434,7 +434,7 @@ class TestScope(unittest.TestCase):
 
         for t in range(2):
             S.inputs[0] = t
-            S.sample(t)
+            S.sample(t, None)
 
         # Save without extension
         test_path = "test_scope_no_ext"
@@ -480,7 +480,7 @@ class TestRealtimeScope(unittest.TestCase):
         for t in range(5):
             S.inputs[0] = t
             S.inputs[1] = t * 2
-            S.sample(t)
+            S.sample(t, None)
 
         # Should have recorded data
         self.assertGreater(len(S.recording), 0)
@@ -496,7 +496,7 @@ class TestRealtimeScope(unittest.TestCase):
         # Sample at different times
         for t in [0.0, 0.5, 1.0, 1.5, 2.0]:
             S.inputs[0] = t
-            S.sample(t)
+            S.sample(t, None)
 
         # Recording behavior depends on sampling rate logic
         self.assertIsNotNone(S.recording)

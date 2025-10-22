@@ -1110,7 +1110,7 @@ class Simulation:
                 )
 
         #sample result
-        self._sample(self.time)
+        self._sample(self.time, self.dt)
 
         #log message 
         self._logger_info(
@@ -1138,7 +1138,7 @@ class Simulation:
             if block: block.revert()
 
 
-    def _sample(self, t):
+    def _sample(self, t, dt):
         """Sample data from blocks that implement the 'sample' method such 
         as 'Scope', 'Delay' and the blocks that sample from a random 
         distribution at a given time 't'.
@@ -1149,7 +1149,7 @@ class Simulation:
             time where to sample
         """
         for block in self.blocks:
-            if block: block.sample(t)
+            if block: block.sample(t, dt)
 
 
     def _buffer_blocks(self, dt):
@@ -1310,7 +1310,7 @@ class Simulation:
             total_evals += 1
 
         #sample data after successful timestep (+dt)
-        self._sample(time_dt)
+        self._sample(time_dt, dt)
  
         #increment global time and continue simulation
         self.time = time_dt 
@@ -1398,7 +1398,7 @@ class Simulation:
             total_evals += 1    
 
         #sample data after successful timestep (+dt)
-        self._sample(time_dt)
+        self._sample(time_dt, dt)
  
         #increment global time and continue simulation
         self.time = time_dt 
@@ -1499,7 +1499,7 @@ class Simulation:
                 return False, error_norm, ratio, total_evals, 0
         
         #sample data after successful timestep (+dt)
-        self._sample(time_dt)
+        self._sample(time_dt, dt)
 
         #increment global time and continue simulation
         self.time = time_dt    
@@ -1612,7 +1612,7 @@ class Simulation:
                 return False, error_norm, ratio, total_evals, total_solver_its
 
         #sample data after successful timestep (+dt)
-        self._sample(time_dt)
+        self._sample(time_dt, dt)
 
         #increment global time and continue simulation
         self.time = time_dt    
@@ -1735,7 +1735,7 @@ class Simulation:
             initial_evals += 1
     
         #sampling states and inputs at 'self.time == starting_time' 
-        self._sample(self.time)
+        self._sample(self.time, self.dt)
 
         #initialize progress tracker
         tracker = ProgressTracker(

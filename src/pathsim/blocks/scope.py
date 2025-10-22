@@ -120,7 +120,7 @@ class Scope(Block):
         return time, data
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """Sample the data from all inputs, and overwrites existing timepoints, 
         since we use a dict for storing the recorded data.
  
@@ -450,7 +450,7 @@ class RealtimeScope(Scope):
         warnings.warn("'RealtimeScope' block will be deprecated with release version 1.0.0")
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """Sample the data from all inputs, and overwrites existing timepoints, 
         since we use a dict for storing the recorded data.
 

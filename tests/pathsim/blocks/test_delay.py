@@ -54,9 +54,9 @@ class TestDelay(unittest.TestCase):
         D = Delay(tau=100)
 
         for t in range(10):
-            D.sample(t)
+            D.sample(t, 1.0)
 
-        self.assertEqual(len(D._buffer), 10)    
+        self.assertEqual(len(D._buffer), 10)
 
         D.reset()
 
@@ -73,7 +73,7 @@ class TestDelay(unittest.TestCase):
             #test internal buffer length
             self.assertEqual(len(D._buffer), t)
 
-            D.sample(t)
+            D.sample(t, None)
 
 
     def test_update(self):
@@ -84,7 +84,7 @@ class TestDelay(unittest.TestCase):
         for t in range(100):
 
             D.inputs[0] = t
-            D.sample(t)
+            D.sample(t, None)
 
             D.update(t)
 
@@ -97,7 +97,7 @@ class TestDelay(unittest.TestCase):
         for t in range(100):
 
             D.inputs[0] = t
-            D.sample(t)
+            D.sample(t, None)
 
             D.update(t)
 

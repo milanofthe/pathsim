@@ -35,8 +35,8 @@ f = 0.5
 
 #blocks that define the system
 Src = SquareWaveSource(frequency=f)
-Ns1 = PinkNoise(spectral_density=0.05)
-Ns2 = WhiteNoise(spectral_density=0.02)
+Ns1 = PinkNoise(spectral_density=0.01, sampling_rate=3*dt)
+Ns2 = WhiteNoise(spectral_density=0.005, sampling_rate=3*dt)
 FLT = ButterworthBandpassFilter((f-f/10, f+f/10), 4)
 Add = Adder()
 Sco = Scope(
@@ -84,5 +84,6 @@ if __name__ == "__main__":
     Sco.plot()
 
     Spc.plot()
+    Spc.ax.set_yscale("log")
 
     plt.show()
