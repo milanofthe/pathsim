@@ -642,7 +642,7 @@ class ChirpPhaseNoiseSource(Block):
 
 
     def _triangle_wave(self, t, f):
-        """Triangle wave with amplitude '1' and frequency 'f'
+        """Triangle wave from -1 to +1 with frequency f.
 
         Parameters
         ----------
@@ -656,7 +656,7 @@ class ChirpPhaseNoiseSource(Block):
         out : float
             triangle wave value
         """
-        return 2 * abs(t*f - np.floor(t*f + 0.5)) - 1
+        return 2 * abs(2 * ((t * f) % 1.0) - 1) - 1
 
 
     def reset(self):
