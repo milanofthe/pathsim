@@ -290,8 +290,8 @@ class TestChirpPhaseNoiseSource(unittest.TestCase):
         C = ChirpPhaseNoiseSource()
         
         # Test triangle wave at different points
-        self.assertAlmostEqual(C._triangle_wave(0, 1), -1, places=10)
-        self.assertAlmostEqual(C._triangle_wave(1, 1), -1, places=10)
+        self.assertAlmostEqual(C._triangle_wave(0, 1), 1, places=10)
+        self.assertAlmostEqual(C._triangle_wave(1, 1), 1, places=10)
 
     def test_update(self):
         C = ChirpPhaseNoiseSource(amplitude=1, phase=0, sig_white=0)
