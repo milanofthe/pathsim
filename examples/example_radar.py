@@ -31,7 +31,7 @@ from pathsim.blocks import (
 c0 = 3e8
 
 #chirp parameters
-B = 5e9
+B = 4e9
 T = 5e-7
 f_min = 1e9
 
@@ -45,7 +45,7 @@ tau = 2e-9
 R = c0 * tau / 2
 
 #frequencies for targets
-f_trg = 2 * R * B / (T * c0)
+f_trg = 4 * R * B / (T * c0)
 
 #initialize blocks
 Src = ChirpPhaseNoiseSource(f0=f_min, BW=B, T=T)
@@ -54,7 +54,7 @@ Dly = Delay(tau)
 Mul = Multiplier()
 Lpf = ButterworthLowpassFilter(f_trg*3, 2)
 Spc = Spectrum(
-    freq=np.logspace(6, 10, 500), 
+    freq=np.logspace(6, 10.5, 500), 
     labels=["chirp", "delay", "mixer", "lpf"]
     )
 Sco = Scope(
