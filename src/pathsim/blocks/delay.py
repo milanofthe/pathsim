@@ -104,7 +104,7 @@ class Delay(Block):
         self.outputs.update_from_array(y)
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """Sample input values and time of sampling 
         and add them to the buffer.
 
@@ -112,6 +112,8 @@ class Delay(Block):
         ----------
         t : float
             evaluation time for sampling
+        dt : float
+            integration timestep
         """
 
         #add new value to buffer

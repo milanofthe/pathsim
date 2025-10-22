@@ -368,7 +368,7 @@ class Block(Serializable):
 
     # methods for sampling data ---------------------------------------------------------
     
-    def sample(self, t):
+    def sample(self, t, dt):
         """Samples the data of the blocks inputs or internal state when called. 
 
         This can record block parameters after a succesful timestep such as 
@@ -379,6 +379,8 @@ class Block(Serializable):
         ----------
         t : float
             evaluation time for sampling
+        dt : float
+            integration timestep
         """
         pass
 

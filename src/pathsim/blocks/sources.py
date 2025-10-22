@@ -318,8 +318,24 @@ class GaussianPulseSource(Block):
 
 
 class SinusoidalPhaseNoiseSource(Block):
-    """Sinusoidal source with cumulative and white phase noise
-
+    """Sinusoidal source with cumulative and white phase noise.
+    
+    Generates a sinusoid with additive phase noise from two components:
+    
+    - White phase noise: sampled from a normal distribution at each sample
+    - Cumulative phase noise: integrated random walk process
+    
+    The output is given by:
+    
+    .. math::
+    
+        y(t) = A \\sin\\left(\\omega t + \\varphi_0 + \\sigma_w n_w(t) + \\sigma_c \\int_0^t n_c(\\tau) d\\tau\\right)
+    
+    where :math:`A` is amplitude, :math:`\\omega = 2\\pi f` is angular frequency,
+    :math:`\\varphi_0` is initial phase, :math:`\\sigma_w` and :math:`\\sigma_c` are 
+    the white and cumulative noise weights, and :math:`n_w(t)` and :math:`n_c(t)` are 
+    independent standard normal random processes sampled at the specified sampling rate.
+    
     Parameters
     ----------
     frequency : float
@@ -327,26 +343,25 @@ class SinusoidalPhaseNoiseSource(Block):
     amplitude : float
         amplitude of the sinusoid
     phase : float
-        phase of the sinusoid
+        initial phase of the sinusoid (radians)
     sig_cum : float
         weight for cumulative phase noise contribution
     sig_white : float
         weight for white phase noise contribution
-    sampling_rate : float
-        number of samples per unit time for the internal RNG 
+    sampling_rate : float, None
+        frequency with which the phase noise is sampled (Hz). If None,
+        noise is sampled every timestep (default is 10 Hz)
     
     Attributes
     ----------
     omega : float
         angular frequency of the sinusoid, derived from `frequency`
     noise_1 : float
-        internal noise value sampled from normal distribution
+        internal noise value for white phase noise
     noise_2 : float
-        internal noise value sampled from normal distribution
-    n_samples : int
-        bin counter for sampling
-    t_max : float
-        most recent sampling time, to ensure timing for sampling bins
+        internal noise value for cumulative phase noise
+    events : list[Schedule]
+        scheduled event for periodic sampling (only if sampling_rate is set)
     """
 
     #max number of ports
@@ -383,9 +398,22 @@ class SinusoidalPhaseNoiseSource(Block):
         self.noise_1 = np.random.normal() 
         self.noise_2 = np.random.normal() 
 
-        #bin counter
-        self.n_samples = 0
-        self.t_max = 0
+        #sampling produces discrete time behavior for noise
+        if sampling_rate is None:
+            pass  # sample every timestep
+        else:
+            #internal scheduled event for noise sampling
+            def _sample_noise(t):
+                self.noise_1 = np.random.normal()
+                self.noise_2 = np.random.normal()
+
+            self.events = [
+                Schedule(
+                    t_start=0,
+                    t_period=1/sampling_rate,
+                    func_act=_sample_noise
+                )
+            ]
 
 
     def __len__(self):
@@ -393,54 +421,82 @@ class SinusoidalPhaseNoiseSource(Block):
 
 
     def set_solver(self, Solver, parent, **solver_kwargs):
+        """Initialize or change the numerical integration engine for cumulative noise.
+        
+        Parameters
+        ----------
+        Solver : class
+            solver class to instantiate
+        parent : object
+            parent system object
+        **solver_kwargs : dict
+            additional keyword arguments for solver initialization
+        """
         #initialize the numerical integration engine 
-        if self.engine is None: self.engine = Solver(0.0, parent, **solver_kwargs)
+        if self.engine is None: 
+            self.engine = Solver(0.0, parent, **solver_kwargs)
         #change solver if already initialized
-        else: self.engine = Solver.cast(self.engine, parent, **solver_kwargs)
+        else: 
+            self.engine = Solver.cast(self.engine, parent, **solver_kwargs)
 
 
     def reset(self):
+        """Reset block state including noise samples."""
         super().reset()
 
-        #reset block specific attributes
-        self.n_samples = 0
-        self.t_max = 0
+        #reset noise samples
+        self.noise_1 = np.random.normal()
+        self.noise_2 = np.random.normal()
 
 
     def update(self, t):
-        """update system equation for fixed point loop, 
-        here just setting the outputs
+        """Update system equation for fixed point loop, evaluating the 
+        sinusoid with phase noise.
     
-        Note
-        ----
-        no direct passthrough, so the 'update' method 
-        is optimized for this case        
-
         Parameters
         ----------
         t : float
             evaluation time
         """
-
-        #compute phase error
+        #compute phase error from white and cumulative noise
         phase_error = self.sig_white * self.noise_1 + self.sig_cum * self.engine.get()
 
         #set output
         self.outputs[0] = self.amplitude * np.sin(self.omega*t + self.phase + phase_error)
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
+        """Sample from a normal distribution after successful timestep.
+        
+        Only used when sampling_rate is None (continuous sampling).
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
         """
-        Sample from a normal distribution after successful timestep.
-        """
-        if (self.sampling_rate is None or 
-            self.n_samples < t * self.sampling_rate):
+        if self.sampling_rate is None:
             self.noise_1 = np.random.normal() 
-            self.noise_2 = np.random.normal() 
-            self.n_samples += 1
+            self.noise_2 = np.random.normal()
 
 
     def solve(self, t, dt):
+        """Advance solution of implicit update equation for cumulative noise integration.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+            
+        Returns
+        -------
+        float
+            error estimate (always 0.0 for noise source)
+        """
         #advance solution of implicit update equation (no jacobian)
         f = self.noise_2
         self.engine.solve(f, None, dt)
@@ -448,6 +504,20 @@ class SinusoidalPhaseNoiseSource(Block):
 
 
     def step(self, t, dt):
+        """Compute update step with integration engine for cumulative noise.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+            
+        Returns
+        -------
+        tuple
+            (accepted, error, scale_factor) - always (True, 0.0, 1.0) for noise
+        """
         #compute update step with integration engine
         f = self.noise_2
         self.engine.step(f, dt)
@@ -456,9 +526,8 @@ class SinusoidalPhaseNoiseSource(Block):
         return True, 0.0, 1.0
 
 
-
 class ChirpPhaseNoiseSource(Block):
-    """Chirp source, sinusoid with frequency ramp up and ramp down.
+    """Chirp source, sinusoid with frequency ramp up and ramp down, plus phase noise.
 
     This works by using a time dependent triangle wave for the frequency 
     and integrating it with a numerical integration engine to get a 
@@ -476,7 +545,7 @@ class ChirpPhaseNoiseSource(Block):
 
     .. math::
 
-        \\varphi_n(t) = \\sigma_w \\, \\mathrm{RNG}_w(t) + \\sigma_c \\int_0^t \\mathrm{RNG}_c(\\tau) \\, d\\tau
+        \\varphi_n(t) = \\sigma_w \\, n_w(t) + \\sigma_c \\int_0^t n_c(\\tau) \\, d\\tau
     
     The phase contributions are then used to evaluate a sinusoid to get the final chirp signal:
 
@@ -495,13 +564,23 @@ class ChirpPhaseNoiseSource(Block):
     T : float
         period of the frequency ramp of the chirp signal
     phase : float
-        phase of sinusoid (initial)
+        phase of sinusoid (initial, radians)
     sig_cum : float
         weight for cumulative phase noise contribution
     sig_white : float
         weight for white phase noise contribution
-    sampling_rate : float
-        number of samples per unit time for the internal random number generators
+    sampling_rate : float, None
+        frequency with which phase noise is sampled (Hz). If None,
+        noise is sampled every timestep (default is 10 Hz)
+        
+    Attributes
+    ----------
+    noise_1 : float
+        internal noise value for white phase noise
+    noise_2 : float
+        internal noise value for cumulative phase noise
+    events : list[Schedule]
+        scheduled event for periodic sampling (only if sampling_rate is set)
     """
 
     #max number of ports
@@ -540,9 +619,22 @@ class ChirpPhaseNoiseSource(Block):
         self.noise_1 = np.random.normal() 
         self.noise_2 = np.random.normal() 
 
-        #bin counter
-        self.n_samples = 0
-        self.t_max = 0
+        #sampling produces discrete time behavior for noise
+        if sampling_rate is None:
+            pass  # sample every timestep
+        else:
+            #internal scheduled event for noise sampling
+            def _sample_noise(t):
+                self.noise_1 = np.random.normal()
+                self.noise_2 = np.random.normal()
+
+            self.events = [
+                Schedule(
+                    t_start=0,
+                    t_period=1/sampling_rate,
+                    func_act=_sample_noise
+                )
+            ]
 
 
     def __len__(self):
@@ -550,61 +642,99 @@ class ChirpPhaseNoiseSource(Block):
 
 
     def _triangle_wave(self, t, f):
-        """triangle wave with amplitude '1' and frequency 'f'
+        """Triangle wave with amplitude '1' and frequency 'f'
 
         Parameters
         ----------
         t : float
             evaluation time
         f : float
-            trig wave frequency
+            triangle wave frequency
 
         Returns
         -------
         out : float
-            trig wave value
+            triangle wave value
         """
         return 2 * abs(t*f - np.floor(t*f + 0.5)) - 1
 
 
     def reset(self):
+        """Reset block state including noise samples."""
         super().reset()
 
-        #reset 
-        self.n_samples = 0
-        self.t_max = 0
+        #reset noise samples
+        self.noise_1 = np.random.normal()
+        self.noise_2 = np.random.normal()
 
 
     def set_solver(self, Solver, parent, **solver_kwargs):
+        """Initialize or change the numerical integration engine for phase integration.
+        
+        Parameters
+        ----------
+        Solver : class
+            solver class to instantiate
+        parent : object
+            parent system object
+        **solver_kwargs : dict
+            additional keyword arguments for solver initialization
+        """
         if self.engine is None:
             #initialize the numerical integration engine
-            self.engine = Solver(self.f0, parent, **solver_kwargs)
+            self.engine = Solver(0.0, parent, **solver_kwargs)
         else:
             #change solver if already initialized
             self.engine = Solver.cast(self.engine, parent, **solver_kwargs)
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """Sample from a normal distribution after successful timestep 
-        to update internal noise samples
+        to update internal noise samples.
+        
+        Only used when sampling_rate is None (continuous sampling).
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
         """
-        if (self.sampling_rate is None or 
-            self.n_samples < t * self.sampling_rate):
+        if self.sampling_rate is None:
             self.noise_1 = np.random.normal() 
-            self.noise_2 = np.random.normal() 
-            self.n_samples += 1
+            self.noise_2 = np.random.normal()
 
 
     def update(self, t):
-        """update the block output, assebble phase and evaluate the sinusoid"""
+        """Update the block output, assemble phase and evaluate the sinusoid.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        """
         _phase = 2 * np.pi * (self.engine.get() + self.sig_white * self.noise_1) + self.phase
         self.outputs[0] = self.amplitude * np.sin(_phase)
 
 
     def solve(self, t, dt):
-        """advance implicit solver of implicit integration engine, evaluate 
-        the triangle wave and cumulative noise RNG"""
-        f = self.BW * (1 + self._triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
+        """Advance implicit solver of implicit integration engine, evaluate 
+        the triangle wave and cumulative noise RNG.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+            
+        Returns
+        -------
+        float
+            error estimate (always 0.0 for chirp source)
+        """
+        f = self.f0 + self.BW * (1 + self._triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
         self.engine.solve(f, None, dt)
 
         #no error for chirp source
@@ -612,9 +742,22 @@ class ChirpPhaseNoiseSource(Block):
 
 
     def step(self, t, dt):
-        """compute update step with integration engine, evaluate the triangle wave 
-        and cumulative noise RNG"""
-        f = self.BW * (1 + self._triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
+        """Compute update step with integration engine, evaluate the triangle wave 
+        and cumulative noise RNG.
+        
+        Parameters
+        ----------
+        t : float
+            evaluation time
+        dt : float
+            integration timestep
+            
+        Returns
+        -------
+        tuple
+            (accepted, error, scale_factor) - always (True, 0.0, 1.0) for chirp
+        """
+        f = self.f0 + self.BW * (1 + self._triangle_wave(t, 1/self.T))/2 + self.sig_cum * self.noise_2
         self.engine.step(f, dt)
 
         #no error control for chirp source
@@ -632,7 +775,8 @@ class ChirpSource(ChirpPhaseNoiseSource):
         phase=0, 
         sig_cum=0, 
         sig_white=0, 
-        sampling_rate=10):
+        sampling_rate=10
+        ):
         super().__init__(amplitude, f0, BW, T, phase, sig_cum, sig_white, sampling_rate)
 
         import warnings

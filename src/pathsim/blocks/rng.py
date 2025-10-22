@@ -82,7 +82,7 @@ class RandomNumberGenerator(Block):
             self.outputs[0] = self._sample
 
 
-    def sample(self, t):
+    def sample(self, t, dt):
         """Generating a new random sample at each timestep 
         in case of `samplingrate==None`, otherwise does nothing.
 
@@ -90,6 +90,8 @@ class RandomNumberGenerator(Block):
         ----------
         t : float
             evaluation time
+        dt : float
+            integration timestep
         """
         if self.sampling_rate is None:
             self._sample = np.random.rand()
