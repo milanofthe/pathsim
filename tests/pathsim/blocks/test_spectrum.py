@@ -172,10 +172,10 @@ class TestSpectrum(unittest.TestCase):
 
         self.assertEqual(S.t_sample, 0.0)
 
-        S.sample(5.0)
+        S.sample(5.0, None)
         self.assertEqual(S.t_sample, 5.0)
 
-        S.sample(10.0)
+        S.sample(10.0, None)
         self.assertEqual(S.t_sample, 10.0)
 
 

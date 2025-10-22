@@ -46,7 +46,7 @@ class TestRandomNumberGenerator(unittest.TestCase):
         R = RandomNumberGenerator()
 
         for t in range(10):
-            R.sample(t)
+            R.sample(t, None)
 
         R.reset()
 
@@ -64,7 +64,7 @@ class TestRandomNumberGenerator(unittest.TestCase):
             #test sample counter
             old = R.outputs[0]
 
-            R.sample(t)
+            R.sample(t, None)
             R.update(t)
 
             #test if new random value is sampled

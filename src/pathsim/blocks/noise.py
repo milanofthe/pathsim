@@ -183,10 +183,8 @@ class PinkNoise(Block):
         self.octave_values = np.random.normal(0, 1, self.num_octaves)
 
         #sampling produces discrete time behavior
-        if sampling_rate is None:
-            #initial sample 
-            self.outputs[0] = self._random(self.sampling_rate)
-        else:
+        if sampling_rate is not None:
+            
             #internal scheduled list event
             def _set(t):
                 self.outputs[0] = self._random(self.sampling_rate)

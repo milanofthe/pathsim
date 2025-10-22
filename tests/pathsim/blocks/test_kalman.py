@@ -251,7 +251,7 @@ class TestKalmanFilter(unittest.TestCase):
         initial_state = kf.x.copy()
 
         # Call sample
-        kf.sample(0.0)
+        kf.sample(0.0, 1)
 
         # State should have been updated
         self.assertNotEqual(kf.x[0], initial_state[0])
