@@ -153,8 +153,10 @@ class Simulation:
         get attributes and access to intermediate evaluation stages
     logger : logging.Logger
         global simulation logger
-    _blocks_dyn : list[Block]
-        list of blocks with internal ´Solver´ instances (stateful) 
+    _blocks_dyn : set[Block]
+        blocks with internal ´Solver´ instances (stateful) 
+    _blocks_evt : set[Block]
+        blocks with internal events (discrete time, eventful) 
     _active : bool
         flag for setting the simulation as active, used for interrupts
     """
@@ -213,6 +215,9 @@ class Simulation:
 
         #collection of blocks with internal ODE solvers
         self._blocks_dyn = set()
+
+        #collection of blocks with internal events
+        self._blocks_evt = set()
 
         #flag for setting the simulation active
         self._active = True
@@ -561,6 +566,10 @@ class Simulation:
         if block.engine and block not in self._blocks_dyn:
             self._blocks_dyn.add(block)
 
+        #add to eventful list if internal events
+        if block.events:
+            self._blocks_evt.add(block)
+
         #add block to global blocklist
         self.blocks.add(block)
 
@@ -570,10 +579,6 @@ class Simulation:
                 block.__class__.__name__, bool(block.engine), len(block.events)
                 )
             )
-
-        #add events of block to global event list
-        for event in block.events:
-            self.add_event(event)
 
         #if graph already exists, it needs to be rebuilt
         if not _defer_graph and self.graph:
@@ -701,13 +706,13 @@ class Simulation:
         self.engine = self.Solver()
 
         #iterate all blocks and set integration engines with tolerances
-        self._blocks_dyn = []
+        self._blocks_dyn = set()
         for block in self.blocks:
             block.set_solver(self.Solver, self.engine, **self.solver_kwargs)
             
             #add dynamic blocks to list
             if block.engine:
-                self._blocks_dyn.append(block)
+                self._blocks_dyn.add(block)
         
         #logging message
         self._logger_info(
@@ -799,6 +804,17 @@ class Simulation:
 
     # event system helpers --------------------------------------------------------
 
+    def _get_active_events(self):
+        """Helper method to collect all active events"""
+        events = []
+        for event in self.events:
+            if event: events.append(event)
+        for block in self._blocks_evt:
+            for event in block.events:
+                if event: events.append(event)
+        return events
+
+
     def _estimate_events(self, t):
         """Estimate the time until the next.
 
@@ -814,16 +830,18 @@ class Simulation:
         """
 
         dt_evt_min = None
-        for event in self.events:
 
-            #skip inactive events
-            if not event: continue
+        #check external events
+        for event in self._get_active_events():
 
             #get the estimate
             dt_evt = event.estimate(self.time)
+
+            #no estimate available
+            if dt_evt is None: continue
             
-            #check if estimate available and smaller than min
-            if dt_evt_min is None or (dt_evt is not None and dt_evt < dt_evt_min):
+            #smaller than min
+            if dt_evt_min is None or dt_evt < dt_evt_min:
                 dt_evt_min = dt_evt
 
         #return time until next event or None
@@ -844,8 +862,8 @@ class Simulation:
         """
 
         #buffer states for event detection (with timestamp)
-        for event in self.events:
-            if event: event.buffer(t)
+        for event in self._get_active_events():
+            event.buffer(t)
 
 
     def _detected_events(self, t):
@@ -865,10 +883,7 @@ class Simulation:
 
         #iterate all event managers
         detected_events = []
-        for event in self.events:
-
-            #skip inactive events
-            if not event: continue
+        for event in self._get_active_events():
             
             #check if an event is detected
             detected, close, ratio = event.detect(t)

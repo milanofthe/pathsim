@@ -30,7 +30,7 @@ v_true = 2.0  # m/s
 x0_true = 0.0  # initial position
 
 # Measurement noise characteristics
-measurement_std = 0.5  # standard deviation of position sensor noise
+measurement_std = 0.2  # standard deviation of position sensor noise
 
 # Kalman filter parameters
 F = np.array([[1, dt], [0, 1]])        # state transition (constant velocity model)
@@ -38,7 +38,7 @@ H = np.array([[1, 0]])                 # measurement matrix (measure position on
 Q = np.diag([0.01, 0.01])              # process noise covariance
 R = np.array([[measurement_std**2]])   # measurement noise covariance
 x0_kf = np.array([0, 0])               # initial estimate [position, velocity]
-P0_kf = np.eye(2) * 1                  # initial covariance
+P0_kf = np.eye(2) * 5                  # initial covariance
 
 # Build the system -----------------------------------------------------------------------
 
