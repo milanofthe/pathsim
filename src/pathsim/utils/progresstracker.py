@@ -307,33 +307,30 @@ class ProgressTracker:
 
     def close(self):
         """Modified to distinguish between normal finish and interrupt"""
-        
+
         if not self._closed:
-            
+
             if self.start_time is not None:
-                
+
                 # Calculate final runtime
                 runtime = time.perf_counter() - self.start_time
                 self.stats["runtime_ms"] = runtime * 1000
-                
-                # Log final progress
-                self._log_progress(is_final=True)
-                
-                # Choose log message based on interrupt state
+
+                # Log final message (no redundant 100% progress update)
                 if self.logger and self.log:
                     final_stats_str = (
                         f"total steps: {self.stats['total_steps']}, "
                         f"successful: {self.stats['successful_steps']}, "
                         f"runtime: {self.stats['runtime_ms']:.2f} ms"
                     )
-                    
+
                     if self._interrupted:
                         log_msg = f"INTERRUPTED -> {self.description} ({final_stats_str})"
                     else:
                         log_msg = f"FINISHED -> {self.description} ({final_stats_str})"
-                    
+
                     self.logger.log(self.log_level, log_msg)
-            
+
             self._closed = True
 
 
@@ -572,9 +569,9 @@ class ProgressTracker:
                     postfix_str = f" | {first_key}={first_val}"
 
             #assemble compact log message
-            # Format: [DESCRIPTION] ████████░░░░ 20% | 1.5s<6.0s | 100.5 it/s
+            # Format: ████████░░░░ 20% | 1.5s<6.0s | 100.5 it/s
             _msg = (
-                f"[{self.description}] {bar} {percentage:3.0f}% | "
+                f"{bar} {percentage:3.0f}% | "
                 f"{elapsed_str}<{eta_str} | {rate_str}{postfix_str}"
                 )
 
