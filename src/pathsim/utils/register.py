@@ -17,7 +17,9 @@ from bisect import insort
 class Register:
     """This class is a intended to be used for the inputs and outputs of blocks. 
 
-    Its basic functionality is similar to a `dict` but with some additional methods. 
+    Its basic functionality is similar to a `dict` but with some additional methods 
+    and implemented as a numpy array for fast data transfer. 
+    
     The core functionality is that values can be added dynamically and the size of the 
     register doesnt have to be specified. It also implements some methods to interact 
     with numpy arrays and to streamline convergence checks.
@@ -26,35 +28,24 @@ class Register:
     ----------
     size : int, optional
         initial size of the register 
+    mapping : dict[str: int]
+        string aliases for integer ports
 
     Attributes
     ----------
-    _values : dict[int, float]
-        internal dict that stores the values of the register
-    _sorted_keys : list[int]
-        internal sorted list of port keys for fast ordered iterations of `_values`
+    _data : np.ndarray
+        internal numpy array that holds the values
     _mapping : dict[str: int]
         internal mapping for port aliases from string to int (index)
     """
-
-    __slots__ = ["_values", "_sorted_keys", "_mapping"]
-
-
-    def __init__(self, size=1, mapping=None):
-        self._values = {k:0.0 for k in range(size)}
-        self._sorted_keys = list(range(size))
-        self._mapping = {} if mapping is None else mapping
-
-    def __len__(self):
-        """Returns the number of register entries / ports."""
-        return len(self._values)
-
-
-    def __iter__(self):
-        for k in self._sorted_keys:
-            yield self._values[k]
-
-
+    
+    __slots__ = ["_data", "_mapping"]
+    
+    def __init__(self, size=None, mapping=None, dtype=np.float64):
+        self._data = np.zeros(1 if size is None else size, dtype=dtype)
+        self._mapping = {} if mapping is None else mapping.copy()
+    
+    
     def _map(self, key):
         """Map string keys to integers defined in '_mapping'
 
@@ -69,100 +60,40 @@ class Register:
             port index 
         """
         return self._mapping.get(key, key)
+    
 
+    def _expand_to(self, index):
+        """Expands the internal numpy array up to an index"""
+        new_size = max(index + 1, len(self._data) * 2)
+        new_data = np.zeros(new_size, dtype=self._data.dtype)
+        new_data[:len(self._data)] = self._data
+        self._data = new_data
+    
 
-    def reset(self):
-        """Set all stored values of the register to zero."""
-        for k in self._values.keys():
-            self._values[k] = 0.0
+    def _get_max_index(self, key):
+        """Identify max index from different key types."""
+        if isinstance(key, int):
+            return key
+        elif isinstance(key, slice):
+            return key.stop - 1 if key.stop is not None else -1
+        elif isinstance(key, (list, tuple, np.ndarray)):
+            indices = np.asarray(key, dtype=np.intp)
+            return indices.max() if len(indices) > 0 else -1
+        return -1
+    
 
+    def __len__(self):
+        return len(self._data)
+    
 
-    def clear(self):
-        """Fully clear the register of all values to length is zero."""
-        self._values.clear()
-        self._sorted_keys.clear()
-        
-
-    def to_array(self):
-        """Convert the register to a numpy array with entries 
-        sorted by ports.
-
-        Note
-        ----
-        This method is performance critical, since it gets called **A LOT** 
-        and makes up a siginificant portion of all function calls during the 
-        main simulation loop! Its already profiled and optimized, so be 
-        careful with premature *improvements*.
-
-        Returns
-        -------
-        arr : numpy.ndarray
-            converted register as array
-        """
-        return np.array([self._values[k] for k in self._sorted_keys])
-
-
-    def update_from_array(self, arr):
-        """Update the register values from an array in place.
-
-        Note
-        ----
-        This method is performance critical, since it gets called **A LOT** 
-        and makes up a siginificant portion of all function calls during the 
-        main simulation loop! Its already profiled and optimized, so be 
-        careful with premature *improvements*.
-
-        Parameters
-        ----------
-        arr : numpy.ndarray, float
-            array or scalar that is used to update internal register values
-        """
-        if np.isscalar(arr):
-            self._values[0] = arr
-            return
-            
-        for k, a in enumerate(arr):
-            if k not in self._values:
-                insort(self._sorted_keys, k)
-            self._values[k] = a
-
-
-    def __contains__(self, key):
-        """Check if a port key is in mapping or is integer 
-
-        Parameters
-        ----------
-        key : int, str
-            port key to check
-
-        Returns
-        -------
-        in : bool
-            key exists in register
-        """
-        return key in self._mapping or isinstance(key, int)
-            
-
-    def __setitem__(self, key, val):
-        """Set the value of `_values`, wraps its setter method. 
-        For direct access to the register values.
-
-        Parameters
-        ----------
-        key : int, str
-            port key, where to set value
-        val : float, obj
-            value to set at port
-        """
-        _key = self._map(key)
-        if _key not in self._values:
-            insort(self._sorted_keys, _key) 
-        self._values[_key] = val
-
+    def __iter__(self):
+        """Iteration and unpacking into tuples or lists"""
+        return iter(self._data)
+    
 
     def __getitem__(self, key):
-        """Get the value of `_values`, wraps its getter method.
-        For direct access to the register values.
+        """Get the value for direct access to the 
+        register values.
         
         Parameters
         ----------
@@ -174,5 +105,88 @@ class Register:
         out : float, obj
             value from port at `key` position
         """
-        _key = self._map(key)
-        return self._values.get(_key, 0.0)
+        if isinstance(key, str):
+            key = self._map(key)
+            if not isinstance(key, int):
+                return 0.0
+        
+        if isinstance(key, int):
+            if key < 0 or key >= len(self._data):
+                return 0.0
+            return self._data[key]
+        
+        return self._data[key]
+    
+
+    def __setitem__(self, key, value):
+        """Set the value at key index for direct access 
+        to the register values.
+
+        Parameters
+        ----------
+        key : int, str
+            port key, where to set value
+        val : float, obj
+            value to set at port
+        """
+        if isinstance(key, str):
+            if key not in self._mapping:
+                self._mapping[key] = len(self._mapping)
+            key = self._mapping[key]
+        
+        max_idx = self._get_max_index(key)
+        if max_idx >= len(self._data):
+            self._expand_to(max_idx)
+        
+        self._data[key] = value
+    
+
+    def reset(self):
+        """Set all stored values to zero."""
+        self._data[:] = 0.0
+    
+
+    def clear(self):
+        """Clear the array to length zero."""
+        self._data = np.zeros(0, dtype=self._data.dtype)
+        self._mapping.clear()
+    
+
+    def to_array(self):
+        """Returns a copy of the internal array.
+
+        Returns
+        -------
+        arr : np.ndarray
+            converted register as array
+        """
+        return self._data.copy()
+    
+
+    def update_from_array(self, arr):
+        """Update the register values from an array in place.
+
+        Parameters
+        ----------
+        arr : np.ndarray, float
+            array or scalar that is used to update internal register values
+        """
+        if np.isscalar(arr):
+            if len(self._data) == 0:
+                self._data = np.array([arr], dtype=self._data.dtype)
+            else:
+                self._data[0] = arr
+            return
+        
+        if not isinstance(arr, np.ndarray):
+            arr = np.asarray(arr)
+        
+        if len(arr) > len(self._data):
+            self._expand_to(len(arr) - 1)
+        
+        np.copyto(self._data[:len(arr)], arr)
+
+    
+    def __contains__(self, key):
+        """Check if a key is in mapping or is valid integer index."""
+        return key in self._mapping or isinstance(key, int)

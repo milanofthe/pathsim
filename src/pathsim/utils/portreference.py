@@ -13,8 +13,8 @@ import numpy as np
 # CLASS =================================================================================
 
 class PortReference:
-    """This is a container class that holds a reference to a block 
-    and a list of ports.
+    """Container class that holds a reference to a block and a list of ports.
+    Optimized with cached integer indices for ultra-fast transfers.
 
     Note
     ----
@@ -28,38 +28,40 @@ class PortReference:
         list of port indices or names
     """
 
-    __slots__ = ["block", "ports"]
-
+    __slots__ = ["block", "ports", "_input_indices", "_output_indices"]
 
     def __init__(self, block=None, ports=None):
 
-        #default port is '0'
+        # Default port is '0'
         _ports = [0] if ports is None else ports 
 
-        #type validation for ports
+        # Type validation for ports
         if not isinstance(_ports, list):            
             raise ValueError(f"'ports' must be list[int, str] but is '{type(_ports)}'!")
         
         for p in _ports:
-
-            #type validation for individual ports
+            # Type validation for individual ports
             if not isinstance(p, (int, str)):
                 raise ValueError(f"Port '{p}' must be (int, str) but is '{type(p)}'!")
 
-            #validation for positive interger
+            # Validation for positive integer
             if isinstance(p, int) and p < 0:
                 raise ValueError(f"Port '{p}' is int but must be positive!")
             
-            #key existance validation for string ports
+            # Key existence validation for string ports
             if not (p in block.inputs or p in block.outputs):        
                 raise ValueError(f"Port alias '{p}' not defined for Block {block}!")
 
-        #port uniqueness validation
+        # Port uniqueness validation
         if len(_ports) != len(set(_ports)):
             raise ValueError("'ports' must be unique!")
 
         self.block = block
         self.ports = _ports
+        
+        # Cache for resolved integer indices (lazily initialized)
+        self._input_indices = None
+        self._output_indices = None
 
 
     def __len__(self):
@@ -67,8 +69,46 @@ class PortReference:
         return len(self.ports)
 
 
+    def _get_input_indices(self):
+        """Get cached input indices, resolving string aliases to integers.
+        Also expands the input array if needed.
+        """
+        if self._input_indices is None:
+
+            # Resolve indices/aliases through mapping   
+            self._input_indices = np.array([
+                self.block.inputs._map(p) for p in self.ports
+                ], dtype=np.intp)
+                            
+            # Expand array if needed to accommodate all indices
+            max_idx = self._input_indices.max()
+            if max_idx >= len(self.block.inputs._data):
+                self.block.inputs._expand_to(max_idx)
+        
+        return self._input_indices
+
+
+    def _get_output_indices(self):
+        """Get cached output indices, resolving string aliases to integers.
+        Also expands the output array if needed.
+        """
+        if self._output_indices is None:
+
+            # Resolve indices/aliases through mapping            
+            self._output_indices = np.array([
+                self.block.outputs._map(p) for p in self.ports
+                ], dtype=np.intp)
+           
+            # Expand array if needed to accommodate all indices
+            max_idx = self._output_indices.max()
+            if max_idx >= len(self.block.outputs._data):
+                self.block.outputs._expand_to(max_idx)
+        
+        return self._output_indices
+
+
     def _validate_input_ports(self):
-        """Check the existance of the input ports, specifically string port 
+        """Check the existence of the input ports, specifically string port 
         aliases for the block inputs. Raises a ValueError if not existent.
         """
         for p in self.ports:
@@ -77,8 +117,8 @@ class PortReference:
 
 
     def _validate_output_ports(self):
-        """Check the existance of the output ports, specifically string port 
-        aliases for the block inputs. Raises a ValueError if not existent.
+        """Check the existence of the output ports, specifically string port 
+        aliases for the block outputs. Raises a ValueError if not existent.
         """
         for p in self.ports:
             if not p in self.block.outputs:
@@ -88,14 +128,21 @@ class PortReference:
     def to(self, other):
         """Transfer the data between two `PortReference` instances, 
         in this direction `self` -> `other`. From outputs to inputs.
+        
+        Uses numpy fancy indexing with cached integer indices.
 
         Parameters
         ----------
         other : PortReference
             the `PortReference` instance to transfer data to from `self`
         """
-        for a, b in zip(other.ports, self.ports):
-            other.block.inputs[a] = self.block.outputs[b]
+
+        # Get cached integer indices (lazy, resolved once, reused forever)
+        src_indices = self._get_output_indices()
+        dst_indices = other._get_input_indices()
+        
+        # Single vectorized transfer 
+        other.block.inputs._data[dst_indices] = self.block.outputs._data[src_indices]
 
 
     def get_inputs(self):
@@ -103,10 +150,11 @@ class PortReference:
 
         Returns
         -------
-        out : list[float, obj]
+        out : numpy.ndarray
             input values of block
         """
-        return np.array([self.block.inputs[p] for p in self.ports])
+        indices = self._get_input_indices()
+        return self.block.inputs._data[indices]
 
 
     def set_inputs(self, vals):
@@ -114,11 +162,13 @@ class PortReference:
 
         Parameters
         ----------
-        vals : list[float, obj]
+        vals : array-like
             values to set at block input ports
         """
-        for v, p in zip(vals, self.ports):
-            self.block.inputs[p] = v
+        if not isinstance(vals, np.ndarray):
+            vals = np.asarray(vals)
+        indices = self._get_input_indices()
+        self.block.inputs._data[indices] = vals
 
 
     def get_outputs(self):
@@ -126,10 +176,11 @@ class PortReference:
 
         Returns
         -------
-        out : list[float, obj]
+        out : numpy.ndarray
             output values of block
         """
-        return np.array([self.block.outputs[p] for p in self.ports])
+        indices = self._get_output_indices()
+        return self.block.outputs._data[indices]
 
 
     def set_outputs(self, vals):
@@ -137,13 +188,15 @@ class PortReference:
 
         Parameters
         ----------
-        vals : list[float, obj]
+        vals : array-like
             values to set at block output ports
         """
-        for v, p in zip(vals, self.ports):
-            self.block.outputs[p] = v
-        
+        if not isinstance(vals, np.ndarray):
+            vals = np.asarray(vals)
+        indices = self._get_output_indices()
+        self.block.outputs._data[indices] = vals
 
+        
     def to_dict(self):
         """Serialization into dict"""
         return {

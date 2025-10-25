@@ -27,8 +27,8 @@ p2 = TransferFunctionZPG(Zeros=[], Poles=[-2], Gain=3)
 a1 = Adder()
 a2 = Adder()
 
-d1 = WhiteNoise(spectral_density=5e-5)
-d2 = WhiteNoise(spectral_density=5e-5)
+d1 = WhiteNoise(spectral_density=5e-7, sampling_rate=0.1)
+d2 = WhiteNoise(spectral_density=5e-7, sampling_rate=0.1)
 
 plant = Subsystem(
     blocks=[p1, p2, a1, a2, d1, d2, in1],
