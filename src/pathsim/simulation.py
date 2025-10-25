@@ -647,8 +647,8 @@ class Simulation:
             num_static = len(self.blocks) - num_dynamic
             num_eventful = len(self._blocks_evt)
             self.logger.info(
-                f"BLOCKS ({len(self.blocks)} total: {num_dynamic} dynamic, "
-                f"{num_static} static, {num_eventful} eventful)"
+                f"BLOCKS (total: {len(self.blocks)}, dynamic: {num_dynamic}, "
+                f"static: {num_static}, eventful: {num_eventful})"
                 )
 
             #log graph info
