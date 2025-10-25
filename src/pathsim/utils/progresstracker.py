@@ -76,15 +76,9 @@ class ProgressTracker:
         1 (inclusive). Default from '_constants.py'.
     bar_width : int, optional
         Width of the progress bar in characters. Defaults to 20.
-    use_colors : bool, optional
-        Enable ANSI color codes for enhanced visual output. Defaults to False.
     ema_alpha : float, optional
         Smoothing factor for exponential moving average of rate calculation
         (0 < alpha <= 1). Lower values = more smoothing. Defaults to 0.3.
-    ascii_only : bool, optional
-        Use ASCII characters instead of Unicode for progress bar. Set to True
-        for compatibility with terminals that don't support Unicode. Defaults
-        to False, but automatically enabled if Unicode encoding fails.
 
     """
 
@@ -98,9 +92,7 @@ class ProgressTracker:
         min_log_interval=LOG_MIN_INTERVAL,
         update_log_every=LOG_UPDATE_EVERY,
         bar_width=20,
-        use_colors=False,
-        ema_alpha=0.3,
-        ascii_only=False
+        ema_alpha=0.3
         ):
 
         #input validation
@@ -118,9 +110,7 @@ class ProgressTracker:
         self.update_log_every = update_log_every
         self.log = log
         self.bar_width = bar_width
-        self.use_colors = use_colors
         self.ema_alpha = max(0.01, min(1.0, ema_alpha))  #clamp to valid range
-        self.ascii_only = ascii_only
 
         #flag for interrupts
         self._interrupted = False
@@ -337,7 +327,7 @@ class ProgressTracker:
     # helper methods -------------------------------------------------------------------
 
     def _render_bar(self, progress):
-        """Render a progress bar with Unicode or ASCII characters.
+        """Render a progress bar with ASCII characters.
 
         Parameters
         ----------
@@ -352,30 +342,11 @@ class ProgressTracker:
         filled_width = int(progress * self.bar_width)
         empty_width = self.bar_width - filled_width
 
-        if self.ascii_only:
-            #ascii characters for compatibility
-            filled = '#' * filled_width
-            empty = '-' * empty_width
-        else:
-            #unicode block characters for smooth progress bar
-            filled = '█' * filled_width
-            empty = '░' * empty_width
+        #ascii characters for cross-platform compatibility
+        filled = '#' * filled_width
+        empty = '-' * empty_width
 
-        bar = filled + empty
-
-        #add color if enabled
-        if self.use_colors:
-            if progress >= 1.0:
-                #green for complete
-                bar = f"\033[32m{bar}\033[0m"
-            elif progress >= 0.5:
-                #cyan for over halfway
-                bar = f"\033[36m{bar}\033[0m"
-            else:
-                #default color
-                pass
-
-        return bar
+        return filled + empty
 
 
     def _format_time_adaptive(self, seconds):

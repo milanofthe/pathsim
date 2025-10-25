@@ -1766,8 +1766,7 @@ class Simulation:
             total_duration=duration,
             description="TRANSIENT",
             logger=self.logger,
-            log=self.log,
-            ascii_only=True  #use ASCII for cross-platform compatibility
+            log=self.log
             )
 
         #enter tracker context
