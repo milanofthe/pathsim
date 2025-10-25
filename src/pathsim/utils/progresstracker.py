@@ -151,7 +151,6 @@ class ProgressTracker:
         if self.log:
             self.logger.log(self.log_level,
                 f"STARTING -> {self.description} (Duration: {self.total_duration:.2f}s)")
-            self._log_progress()
 
 
     def update(self, progress, success=True, **kwargs):
@@ -243,20 +242,19 @@ class ProgressTracker:
 
         current_time = time.perf_counter()
 
-        #check if should log
+        #check if should log (skip initial 0% log)
         time_passed = (current_time - self._last_log_time) >= self.min_log_interval
         progress_milestone = self._progress >= (self._last_log_progress + self.update_log_every)
-        is_initial = (self._progress == 0.0 and self._last_log_progress < 0)
 
-        if not (time_passed or progress_milestone or is_initial):
+        if not (time_passed or progress_milestone):
             return
 
         #calculate display values
         elapsed = current_time - self.start_time
         percentage = int(self._progress * 100)
 
-        #skip if same percentage as last time
-        if percentage == self._last_logged_percentage:
+        #skip 0% and duplicate percentages
+        if percentage == 0 or percentage == self._last_logged_percentage:
             return
 
         #ETA from EMA progress rate

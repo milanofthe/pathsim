@@ -112,7 +112,7 @@ class LoggerManager:
         self._output = None
         self._level = logging.INFO
         self._format = "%(asctime)s - %(levelname)s - %(message)s"
-        self._date_format = None
+        self._date_format = '%H:%M:%S'  #shorter timestamp format
 
         #store handler reference for reconfiguration
         self._current_handler = None

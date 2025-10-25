@@ -326,11 +326,12 @@ class Simulation:
             #determine output destination
             output = self.log if isinstance(self.log, str) else None
 
-            #configure logger manager
+            #configure logger manager with short timestamp
             logger_mgr.configure(
                 enabled=True,
                 output=output,
-                level=logging.INFO
+                level=logging.INFO,
+                date_format='%H:%M:%S'
             )
         else:
             #disable logging
@@ -567,14 +568,6 @@ class Simulation:
         #add block to global blocklist
         self.blocks.add(block)
 
-        #logging message
-        if self.log:
-            self.logger.info(
-                "BLOCK (type: {}, dynamic: {}, events: {})".format(
-                    block.__class__.__name__, bool(block.engine), len(block.events)
-                    )
-                )
-
         #if graph already exists, it needs to be rebuilt
         if not _defer_graph and self.graph:
             self._assemble_graph()
@@ -649,6 +642,16 @@ class Simulation:
             ]
 
         if self.log:
+            #log block summary
+            num_dynamic = len(self._blocks_dyn)
+            num_static = len(self.blocks) - num_dynamic
+            num_eventful = len(self._blocks_evt)
+            self.logger.info(
+                f"BLOCKS ({len(self.blocks)} total: {num_dynamic} dynamic, "
+                f"{num_static} static, {num_eventful} eventful)"
+                )
+
+            #log graph info
             self.logger.info(
                 "GRAPH (nodes: {}, edges: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
                     *self.graph.size, *self.graph.depth, T
