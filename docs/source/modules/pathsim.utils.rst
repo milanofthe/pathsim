@@ -7,6 +7,7 @@ pathsim.utils
    pathsim.utils.adaptivebuffer
    pathsim.utils.analysis
    pathsim.utils.gilbert
+   pathsim.utils.logger
    pathsim.utils.portreference
    pathsim.utils.register
    pathsim.utils.progresstracker
