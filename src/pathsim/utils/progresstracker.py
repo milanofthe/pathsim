@@ -74,6 +74,17 @@ class ProgressTracker:
         Log a message every time the progress increases by at least this
         fraction (e.g., 0.1 for 10%). Must be between 0 (exclusive) and
         1 (inclusive). Default from '_constants.py'.
+    bar_width : int, optional
+        Width of the progress bar in characters. Defaults to 20.
+    use_colors : bool, optional
+        Enable ANSI color codes for enhanced visual output. Defaults to False.
+    ema_alpha : float, optional
+        Smoothing factor for exponential moving average of rate calculation
+        (0 < alpha <= 1). Lower values = more smoothing. Defaults to 0.3.
+    ascii_only : bool, optional
+        Use ASCII characters instead of Unicode for progress bar. Set to True
+        for compatibility with terminals that don't support Unicode. Defaults
+        to False, but automatically enabled if Unicode encoding fails.
 
     """
 
@@ -85,7 +96,11 @@ class ProgressTracker:
         log=True,
         log_level=logging.INFO,
         min_log_interval=LOG_MIN_INTERVAL,
-        update_log_every=LOG_UPDATE_EVERY
+        update_log_every=LOG_UPDATE_EVERY,
+        bar_width=20,
+        use_colors=False,
+        ema_alpha=0.3,
+        ascii_only=False
         ):
 
         #input validation
@@ -102,9 +117,16 @@ class ProgressTracker:
         self.min_log_interval = min_log_interval
         self.update_log_every = update_log_every
         self.log = log
+        self.bar_width = bar_width
+        self.use_colors = use_colors
+        self.ema_alpha = max(0.01, min(1.0, ema_alpha))  #clamp to valid range
+        self.ascii_only = ascii_only
 
         #flag for interrupts
         self._interrupted = False
+
+        #exponential moving average for rate smoothing
+        self._ema_rate = None
 
         #setup logger
         if logger is None:
@@ -317,6 +339,107 @@ class ProgressTracker:
 
     # helper methods -------------------------------------------------------------------
 
+    def _render_bar(self, progress):
+        """Render a progress bar with Unicode or ASCII characters.
+
+        Parameters
+        ----------
+        progress : float
+            Progress fraction (0.0 to 1.0)
+
+        Returns
+        -------
+        str
+            Rendered progress bar string
+        """
+        filled_width = int(progress * self.bar_width)
+        empty_width = self.bar_width - filled_width
+
+        if self.ascii_only:
+            #ascii characters for compatibility
+            filled = '#' * filled_width
+            empty = '-' * empty_width
+        else:
+            #unicode block characters for smooth progress bar
+            filled = '█' * filled_width
+            empty = '░' * empty_width
+
+        bar = filled + empty
+
+        #add color if enabled
+        if self.use_colors:
+            if progress >= 1.0:
+                #green for complete
+                bar = f"\033[32m{bar}\033[0m"
+            elif progress >= 0.5:
+                #cyan for over halfway
+                bar = f"\033[36m{bar}\033[0m"
+            else:
+                #default color
+                pass
+
+        return bar
+
+
+    def _format_time_adaptive(self, seconds):
+        """Format time adaptively based on duration.
+
+        Parameters
+        ----------
+        seconds : float or None
+            Duration in seconds
+
+        Returns
+        -------
+        str
+            Formatted time string (e.g., "5.2s", "05:23", "01:23:45")
+        """
+        #handle invalid inputs
+        if seconds is None or math.isinf(seconds) or math.isnan(seconds) or seconds < 0:
+            return "--:--"
+
+        if seconds < 60:
+            #show seconds with one decimal for short durations
+            return f"{seconds:.1f}s"
+        elif seconds < 3600:
+            #show MM:SS for under an hour
+            m, s = divmod(int(seconds), 60)
+            return f"{m:02d}:{s:02d}"
+        else:
+            #show HH:MM:SS for longer durations
+            m, s = divmod(int(seconds), 60)
+            h, m = divmod(m, 60)
+            return f"{h:02d}:{m:02d}:{s:02d}"
+
+
+    def _format_rate_adaptive(self, rate):
+        """Format rate with adaptive units based on magnitude.
+
+        Parameters
+        ----------
+        rate : float
+            Rate in steps per second
+
+        Returns
+        -------
+        str
+            Formatted rate string (e.g., "100.5 it/s", "5.2 it/min")
+        """
+        if rate is None or math.isnan(rate) or math.isinf(rate):
+            return "N/A"
+
+        if rate < 0.1:
+            #very slow, show per minute
+            rate_min = rate * 60
+            return f"{rate_min:.1f} it/min"
+        elif rate < 1:
+            #slow, show with more precision
+            return f"{rate:.2f} it/s"
+        else:
+            #normal speed
+            return f"{rate:.1f} it/s"
+
+
     def _format_time(self, seconds):
         """Formats a duration in seconds into HH:MM:SS string format.
 
@@ -344,7 +467,8 @@ class ProgressTracker:
     def _log_progress(self, is_final=False):
         """Internal method to format and log the current progress status if
         throttling conditions (time interval or progress milestone) are met,
-        or if it's the final call. Calculates rate based on interval since last log.
+        or if it's the final call. Uses exponential moving average for stable
+        rate calculation and compact progress bar format.
         """
 
         #don't log if closed unless final
@@ -357,7 +481,7 @@ class ProgressTracker:
         if not self.logger: return
 
         #don't log if logging not wanted
-        if not self.log: return                
+        if not self.log: return
 
         current_time = time.perf_counter()
 
@@ -366,7 +490,7 @@ class ProgressTracker:
         time_interval_reached = (current_time - self.last_log_time >= self.min_log_interval)
 
         #first log after start()
-        is_initial_log = (self.current_progress == 0 and self.last_log_progress_milestone < 0) 
+        is_initial_log = (self.current_progress == 0 and self.last_log_progress_milestone < 0)
 
         #log if final, or milestone reached, or time interval reached, or initial 0% log
         should_log = is_final or progress_milestone_reached or time_interval_reached or is_initial_log
@@ -376,58 +500,82 @@ class ProgressTracker:
             elapsed_time = current_time - self.start_time
             percentage = self.current_progress * 100
 
-            #calculate interval rate
+            #calculate instantaneous rate
             time_since_last_log = current_time - self.last_log_time
             steps_since_last_log = self.stats["total_steps"] - self.last_log_total_steps
 
-            rate = 0.0
-            rate_label = "steps/s"
+            rate = None
 
             if is_initial_log:
-
-                # For the very first log, interval rate is meaningless, show N/A or 0
-                rate_str = "N/A steps/s"
+                #no rate for initial log
+                self._ema_rate = None
+                rate_str = "N/A"
 
             elif is_final:
-
-                #for the final log -> overall average rate
+                #for final log, show overall average rate
                 if elapsed_time > 1e-6 and self.stats["total_steps"] > 0:
                     rate = self.stats["total_steps"] / elapsed_time
-                    rate_str = f"{rate:.1f} avg steps/s"
+                    rate_str = self._format_rate_adaptive(rate)
+                else:
+                    rate_str = "N/A"
 
             else:
-                #for intermediate logs, calculate interval rate
+                #calculate interval rate with EMA smoothing
                 if time_since_last_log > 1e-6 and steps_since_last_log > 0:
-                    rate = steps_since_last_log / time_since_last_log
-                    rate_str = f"{rate:.1f} {rate_label}"
+                    instantaneous_rate = steps_since_last_log / time_since_last_log
+
+                    #apply exponential moving average for smoothing
+                    if self._ema_rate is None:
+                        self._ema_rate = instantaneous_rate
+                    else:
+                        self._ema_rate = (self.ema_alpha * instantaneous_rate +
+                                         (1 - self.ema_alpha) * self._ema_rate)
+
+                    rate = self._ema_rate
+                    rate_str = self._format_rate_adaptive(rate)
 
                 elif steps_since_last_log == 0 and time_since_last_log > 1e-6:
-                    #0 rate if time passed but no steps
-                    rate_str = f"0.0 {rate_label}"
-
+                    #no progress made, show previous rate or 0
+                    if self._ema_rate is not None:
+                        rate_str = self._format_rate_adaptive(self._ema_rate)
+                    else:
+                        rate_str = "0.0 it/s"
                 else:
-                    #avoid division by zero or near-zero if log triggered rapidly
-                    rate_str = "calc steps/s..." 
+                    #avoid division by zero
+                    rate_str = "calc..."
 
-            #calculate ETA (based on percentage/time) - unchanged
+            #calculate ETA using EMA rate for better stability
             eta_seconds = None
-            if self.current_progress > 1e-6 and elapsed_time > 0.1:
+            if self.current_progress > 1e-6 and rate is not None and rate > 0:
+                #estimate remaining steps and divide by current rate
+                remaining_progress = 1.0 - self.current_progress
+                remaining_time_estimate = (self.total_duration * remaining_progress) / (self.total_duration * self.current_progress / elapsed_time)
+                eta_seconds = remaining_time_estimate
+            elif self.current_progress > 1e-6 and elapsed_time > 0.1:
+                #fallback to simple time-based estimate
                 eta_seconds = elapsed_time * (1.0 - self.current_progress) / self.current_progress
-            
-            eta_str = self._format_time(eta_seconds)
-            elapsed_str = self._format_time(elapsed_time)
 
-            #postfix
-            postfix_str = ", ".join([f"{k}={v}" for k, v in self.postfix_dict.items() if v is not None])
-            if postfix_str:
-                postfix_str = " [" + postfix_str + "]"
+            #format times adaptively
+            eta_str = self._format_time_adaptive(eta_seconds)
+            elapsed_str = self._format_time_adaptive(elapsed_time)
 
-            #assemble log message
+            #render progress bar
+            bar = self._render_bar(self.current_progress)
+
+            #handle postfix compactly (only show first item if present)
+            postfix_str = ""
+            if self.postfix_dict:
+                #just show first key-value pair to keep it compact
+                first_key = next(iter(self.postfix_dict))
+                first_val = self.postfix_dict[first_key]
+                if first_val is not None:
+                    postfix_str = f" | {first_key}={first_val}"
+
+            #assemble compact log message
+            # Format: [DESCRIPTION] ████████░░░░ 20% | 1.5s<6.0s | 100.5 it/s
             _msg = (
-                f"{self.description}: {percentage:3.0f}% | "
-                f"elapsed: {elapsed_str} (eta: {eta_str}) | "
-                f"{self.stats['total_steps']} steps ({rate_str})"
-                f"{postfix_str}"
+                f"[{self.description}] {bar} {percentage:3.0f}% | "
+                f"{elapsed_str}<{eta_str} | {rate_str}{postfix_str}"
                 )
 
             self.logger.log(self.log_level, _msg)

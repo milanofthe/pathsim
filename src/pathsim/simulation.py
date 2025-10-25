@@ -1763,10 +1763,11 @@ class Simulation:
 
         #initialize progress tracker
         tracker = ProgressTracker(
-            total_duration=duration, 
-            description="TRANSIENT", 
+            total_duration=duration,
+            description="TRANSIENT",
             logger=self.logger,
-            log=self.log
+            log=self.log,
+            ascii_only=True  #use ASCII for cross-platform compatibility
             )
 
         #enter tracker context
