@@ -11,11 +11,11 @@
 
 import logging
 import time
-import sys
 import math
 import warnings
 
 from .._constants import LOG_MIN_INTERVAL, LOG_UPDATE_EVERY
+from .logger import LoggerManager
 
 
 # HELPER CLASS =========================================================================
@@ -58,8 +58,9 @@ class ProgressTracker:
         log messages. Defaults to "Progress".
     logger : logging.Logger, optional
         The logger instance to use for outputting progress messages. If None,
-        a default logger named 'ProgressTracker_<description>' is created
-        and configured to print INFO level messages to stdout.
+        a logger is obtained from the LoggerManager singleton under the
+        'progress.<description>' hierarchy. For testing, you can pass a custom
+        logger instance.
     log : bool
         Flag to indicate if logging messages should be printed or not.
     log_level : int, optional
@@ -106,18 +107,13 @@ class ProgressTracker:
         self._interrupted = False
 
         #setup logger
-        self.logger = logger or logging.getLogger(f"ProgressTracker_{self.description[:10]}")
-
-        #ensure logger has a handler if none exists to enable output
-        if not self.logger.hasHandlers() and not self._has_configured_handler(self.logger):
-
-            #configure logger only if it hasn't been configured elsewhere
-            handler = logging.StreamHandler(sys.stdout)
-            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
-            self.logger.setLevel(logging.INFO)
-            self.logger.propagate = False
+        if logger is None:
+            #use LoggerManager to get a logger under the progress hierarchy
+            logger_mgr = LoggerManager()
+            self.logger = logger_mgr.get_logger(f"progress.{self.description}")
+        else:
+            #use provided logger (for testing or custom setups)
+            self.logger = logger
 
         #time tracking starts
         self.start_time = None
@@ -146,40 +142,6 @@ class ProgressTracker:
 
         #flag to indicate if close() has been called
         self._closed = False
-
-
-    @staticmethod
-    def _has_configured_handler(logger):
-        """Checks if the logger or any of its ancestors have configured
-        handlers. Helps prevent adding duplicate default handlers.
-
-        Parameters
-        ----------
-        logger : logging.Logger
-            the logger instance to check.
-
-        Returns
-        -------
-        bool
-            True if a configured handler is found, False otherwise.
-        """
-        l = logger
-        while l:
-
-            #check if any handler seems configured (e.g., has a formatter)
-            if l.handlers:
-                if any(h.formatter is not None for h in l.handlers):
-                    return True
-
-            #stop if propagation is disabled
-            if not l.propagate:
-                break
-
-            else:
-                #check parent logger
-                l = l.parent
-
-        return False
 
 
     # properties -----------------------------------------------------------------------

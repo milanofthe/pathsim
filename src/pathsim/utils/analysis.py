@@ -13,6 +13,8 @@ from time import perf_counter
 from functools import wraps
 from contextlib import ContextDecorator
 
+from .logger import LoggerManager
+
 try:
     import cProfile, pstats
     PROFILE_AVAILABLE = True
@@ -23,30 +25,31 @@ except ImportError:
 # CLASSES ==============================================================================
 
 class Timer(ContextDecorator):
-    """Context manager that times the execution time 
-    of the code inside of the context in 'ms' for 
+    """Context manager that times the execution time
+    of the code inside of the context in 'ms' for
     debugging purposes.
 
     Example
     -------
-    
+
     .. code-block:: python
-        
+
         #time the code within the context
         with Timer() as T:
             complicated_function()
-            
+
         #print the runtime in ms
         print(T)
-    
+
     Parameters
     ----------
     verbose : bool
-        flag for verbose output
+        flag for verbose output (uses logging at DEBUG level)
     """
     def __init__(self, verbose=True):
         self.verbose = verbose
         self.time = None
+        self.logger = LoggerManager().get_logger("analysis.timer")
 
 
     def __float__(self):
@@ -55,8 +58,8 @@ class Timer(ContextDecorator):
 
     def __repr__(self):
         if self.time is None: return None
-        return f"{self.time*1e3:.3f}ms" 
-        
+        return f"{self.time*1e3:.3f}ms"
+
 
     def __enter__(self):
         self._start = perf_counter()
@@ -65,13 +68,15 @@ class Timer(ContextDecorator):
 
     def __exit__(self, type, value, traceback):
         self.time = perf_counter() - self._start
-        if self.verbose: print(self)
+        if self.verbose:
+            self.logger.debug(str(self))
 
 
 def timer(func):
-    """Shows the execution time in milliseconds of the 
-    function object passed for debugging purposes
-    
+    """Shows the execution time in milliseconds of the
+    function object passed for debugging purposes (uses
+    logging at DEBUG level).
+
     Parameters
     ----------
     func : callable
@@ -80,9 +85,10 @@ def timer(func):
 
     @wraps(func)
     def wrap_func(*args, **kwargs):
+        logger = LoggerManager().get_logger("analysis.profiler")
         with Timer(verbose=False) as T:
             result = func(*args, **kwargs)
-        print(f"Function '{func.__name__!r}' executed in {T}")
+        logger.debug(f"Function '{func.__name__!r}' executed in {T}")
         return result
     return wrap_func
 

@@ -35,6 +35,7 @@ from .utils.graph import Graph
 from .utils.analysis import Timer
 from .utils.portreference import PortReference
 from .utils.progresstracker import ProgressTracker
+from .utils.logger import LoggerManager
 
 from .solvers import SSPRK22, SteadyState
 
@@ -309,47 +310,38 @@ class Simulation:
     # logger methods --------------------------------------------------------------
 
     def _initialize_logger(self):
+        """Setup and configure logging using the centralized LoggerManager.
+
+        The logger is configured based on the 'log' parameter which can be:
+        - True: logging enabled to stdout
+        - False: logging disabled
+        - str: logging enabled to file at specified path
         """
-        setup and configure logging
-        """
 
-        #initialize the logger
-        self.logger = logging.Logger("PathSim_Simulation_Logger")
+        #get logger manager singleton
+        logger_mgr = LoggerManager()
 
-        #capture warnings from the 'warnings' module
-        logging.captureWarnings(True)
+        #configure based on log parameter
+        if self.log:
+            #determine output destination
+            output = self.log if isinstance(self.log, str) else None
 
-        #check if logging is enabled
-        if self.log:    
+            #configure logger manager
+            logger_mgr.configure(
+                enabled=True,
+                output=output,
+                level=logging.INFO
+            )
+        else:
+            #disable logging
+            logger_mgr.configure(enabled=False)
 
-            #if a filename for logging is specified
-            if isinstance(self.log, str):
-                handler = logging.FileHandler(self.log) 
-            else:
-                handler = logging.StreamHandler()
+        #get logger for simulation
+        self.logger = logger_mgr.get_logger("simulation")
 
-            #logging format
-            handler.setFormatter(
-                logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")   
-                )
-
-            self.logger.addHandler(handler)
-            self.logger.setLevel(logging.INFO)
-
-            self._logger_info(f"LOGGING (log: {self.log})")
-
-
-    def _logger_info(self, message):
-        if self.log: self.logger.info(message)
-
-
-    def _logger_error(self, message, Error=None):
-        if self.log: self.logger.error(message)
-        if Error is not None: raise Error(message)
-
-
-    def _logger_warning(self, message):
-        if self.log: self.logger.warning(message)
+        #log initialization if enabled
+        if self.log:
+            self.logger.info(f"LOGGING (log: {self.log})")
 
 
     # visualization ---------------------------------------------------------------
@@ -557,7 +549,9 @@ class Simulation:
         #check if block already in block list
         if block in self.blocks:
             _msg = f"block {block} already part of simulation"
-            self._logger_error(_msg, ValueError)
+            if self.log:
+                self.logger.error(_msg)
+            raise ValueError(_msg)
 
         #initialize numerical integrator of block with parent
         block.set_solver(self.Solver, self.engine, **self.solver_kwargs)
@@ -574,11 +568,12 @@ class Simulation:
         self.blocks.add(block)
 
         #logging message
-        self._logger_info(
-            "BLOCK (type: {}, dynamic: {}, events: {})".format(
-                block.__class__.__name__, bool(block.engine), len(block.events)
+        if self.log:
+            self.logger.info(
+                "BLOCK (type: {}, dynamic: {}, events: {})".format(
+                    block.__class__.__name__, bool(block.engine), len(block.events)
+                    )
                 )
-            )
 
         #if graph already exists, it needs to be rebuilt
         if not _defer_graph and self.graph:
@@ -602,7 +597,9 @@ class Simulation:
         #check if connection already in connection list
         if connection in self.connections:
             _msg = f"{connection} already part of simulation"
-            self._logger_error(_msg, ValueError)
+            if self.log:
+                self.logger.error(_msg)
+            raise ValueError(_msg)
 
         #add connection to global connection list
         self.connections.add(connection)
@@ -626,7 +623,9 @@ class Simulation:
         #check if event already in event list
         if event in self.events:
             _msg = f"{event} already part of simulation"
-            self._logger_error(_msg, ValueError)
+            if self.log:
+                self.logger.error(_msg)
+            raise ValueError(_msg)
 
         #add event to global event list
         self.events.add(event)
@@ -649,11 +648,12 @@ class Simulation:
                 ConnectionBooster(conn) for conn in self.graph.loop_closing_connections()
             ]
 
-        self._logger_info(
-            "GRAPH (nodes: {}, edges: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
-                *self.graph.size, *self.graph.depth, T
+        if self.log:
+            self.logger.info(
+                "GRAPH (nodes: {}, edges: {}, alg. depth: {}, loop depth: {}, runtime: {})".format(
+                    *self.graph.size, *self.graph.depth, T
+                    )
                 )
-            )
 
 
     # topological checks ----------------------------------------------------------
@@ -673,9 +673,10 @@ class Simulation:
 
         # Check subset actively managed
         if not conn_blocks.issubset(self.blocks):
-            self._logger_warning(
-                f"{blk} in 'connections' but not in 'blocks'!"
-                )
+            if self.log:
+                self.logger.warning(
+                    f"{blk} in 'connections' but not in 'blocks'!"
+                    )
 
 
     # solver management -----------------------------------------------------------
@@ -715,14 +716,15 @@ class Simulation:
                 self._blocks_dyn.add(block)
         
         #logging message
-        self._logger_info(
-            "SOLVER (dyn. blocks: {}) -> {} (adaptive: {}, explicit: {})".format(
-                len(self._blocks_dyn),
-                self.engine,
-                self.engine.is_adaptive, 
-                self.engine.is_explicit
+        if self.log:
+            self.logger.info(
+                "SOLVER (dyn. blocks: {}) -> {} (adaptive: {}, explicit: {})".format(
+                    len(self._blocks_dyn),
+                    self.engine,
+                    self.engine.is_adaptive,
+                    self.engine.is_explicit
+                    )
                 )
-            )
 
 
     # resetting -------------------------------------------------------------------
@@ -746,7 +748,8 @@ class Simulation:
             simulation time for reset
         """
 
-        self._logger_info(f"RESET (time: {time})")
+        if self.log:
+            self.logger.info(f"RESET (time: {time})")
 
         #set active again
         self._active = True
@@ -791,7 +794,8 @@ class Simulation:
             for block in self.blocks:
                 block.linearize(self.time)
 
-        self._logger_info(f"LINEARIZED (runtime: {T})")
+        if self.log:
+            self.logger.info(f"LINEARIZED (runtime: {T})")
 
 
     def delinearize(self):
@@ -799,7 +803,8 @@ class Simulation:
         for block in self.blocks: 
             block.delinearize()
 
-        self._logger_info("DELINEARIZED")
+        if self.log:
+            self.logger.info("DELINEARIZED")
 
 
     # event system helpers --------------------------------------------------------
@@ -998,12 +1003,12 @@ class Simulation:
                 return
 
         #not converged -> error
-        self._logger_error(
-            "algebraic loop not converged (iters: {}, err: {})".format(
-                self.iterations_max, max_err
-                ), 
-            RuntimeError
+        _msg = "algebraic loop not converged (iters: {}, err: {})".format(
+            self.iterations_max, max_err
             )
+        if self.log:
+            self.logger.error(_msg)
+        raise RuntimeError(_msg)
 
 
     def _solve(self, t, dt):
@@ -1110,7 +1115,8 @@ class Simulation:
         self._set_solver(SteadyState)
 
         #log message begin of steady state solver
-        self._logger_info(f"STEADYSTATE -> STARTING (reset: {reset})")
+        if self.log:
+            self.logger.info(f"STEADYSTATE -> STARTING (reset: {reset})")
 
         #solve for steady state at current time
         with Timer(verbose=False) as T:
@@ -1118,20 +1124,21 @@ class Simulation:
 
         #catch non convergence
         if not success:
-            self._logger_error(
-                "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
-                    success, evals, iters, T), 
-                RuntimeError
-                )
+            _msg = "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
+                success, evals, iters, T)
+            if self.log:
+                self.logger.error(_msg)
+            raise RuntimeError(_msg)
 
         #sample result
         self._sample(self.time, self.dt)
 
-        #log message 
-        self._logger_info(
-            "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
-                success, evals, iters, T)
-            )
+        #log message
+        if self.log:
+            self.logger.info(
+                "STEADYSTATE -> FINISHED (success: {}, evals: {}, iters: {}, runtime: {})".format(
+                    success, evals, iters, T)
+                )
 
         #switch back to original solver
         self._set_solver(_solver)
@@ -1384,9 +1391,10 @@ class Simulation:
 
                 #warning if implicit solver didnt converge in timestep
                 if not success:
-                    self._logger_warning(
-                        f"implicit solver not converged in {solver_its} iterations!"
-                        )
+                    if self.log:
+                        self.logger.warning(
+                            f"implicit solver not converged in {solver_its} iterations!"
+                            )
 
                 #count solver iterations and function evaluations
                 total_solver_its += solver_its
@@ -1676,9 +1684,10 @@ class Simulation:
 
     def step(self, dt=None, adaptive=True):
         """Wraps 'Simulation.timestep' for backward compatibility"""
-        self._logger_warning(
-            "'Simulation.step' method will be deprecated with release version 1.0.0, use 'Simulation.timestep' instead!"
-            )
+        if self.log:
+            self.logger.warning(
+                "'Simulation.step' method will be deprecated with release version 1.0.0, use 'Simulation.timestep' instead!"
+                )
         return self.timestep(dt, adaptive)
 
 
