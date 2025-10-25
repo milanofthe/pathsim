@@ -95,6 +95,7 @@ class ProgressTracker:
         self._last_log_time = 0.0
         self._last_log_progress = -self.update_log_every
         self._last_log_steps = 0
+        self._last_logged_percentage = None
 
         #EMA tracking
         self._ema_progress_rate = None  #progress per second
@@ -252,7 +253,11 @@ class ProgressTracker:
 
         #calculate display values
         elapsed = current_time - self.start_time
-        percentage = self._progress * 100
+        percentage = int(self._progress * 100)
+
+        #skip if same percentage as last time
+        if percentage == self._last_logged_percentage:
+            return
 
         #ETA from EMA progress rate
         if self._ema_progress_rate and self._ema_progress_rate > 1e-6 and self._progress < 1.0:
@@ -268,12 +273,13 @@ class ProgressTracker:
         time_str = f"{self._format_time(elapsed)}<{self._format_time(eta)}"
         rate_str = self._format_rate(step_rate) if step_rate else "N/A"
 
-        msg = f"{bar} {percentage:3.0f}% | {time_str} | {rate_str}"
+        msg = f"{bar} {percentage:3d}% | {time_str} | {rate_str}"
         self.logger.log(self.log_level, msg)
 
         #update logging state
         self._last_log_time = current_time
         self._last_log_progress = (self._progress // self.update_log_every) * self.update_log_every
+        self._last_logged_percentage = percentage
 
 
     def _render_bar(self, progress):
