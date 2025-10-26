@@ -17,12 +17,19 @@
 # IMPORTS ===============================================================================
 
 import numpy as np
+from typing import TYPE_CHECKING, TypeVar
 
 try:
     import skrf as rf
     HAS_SKRF = True
-except ImportError as e:
+except ImportError:
     HAS_SKRF = False
+    raise ImportError("The scikit-rf package is required to use this block.")
+
+if TYPE_CHECKING and HAS_SKRF:
+        NetworkType = rf.Network
+else:
+    NetworkType = TypeVar('NetworkType')
 
 from inspect import signature
 from pathlib import Path
@@ -62,8 +69,7 @@ class RFNetwork(StateSpace):
 
     """
 
-    def __init__(self, ntwk: rf.Network | str | Path, auto_fit: bool = True, **kwargs):
-
+    def __init__(self, ntwk: NetworkType | str | Path, auto_fit: bool = True, **kwargs):
         # Check if 'skrf' is installed, its an optional dependency,
         # dont raise error at import but at initialization
         if not HAS_SKRF:
