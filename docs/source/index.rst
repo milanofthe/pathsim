@@ -8,7 +8,7 @@ PathSim
 
    <div style="text-align: center; margin-bottom: 2rem;">
       <p style="font-size: 1.3rem; color: var(--color-foreground-secondary); max-width: 800px; margin: 0 auto;">
-         A flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and event handling!
+         A scalable block-based time-domain system simulation framework in Python with hierarchical modeling and event handling!
       </p>
    </div>
 
@@ -57,10 +57,6 @@ Key Features
    .. grid-item-card:: ⚡ Event Handling
 
       Detect and resolve discrete events with **zero-crossing detection** (`example <examples/bouncing_ball.ipynb>`_).
-
-   .. grid-item-card:: 🎓 Auto Differentiation
-
-      Fully **differentiable** system simulations for optimization and analysis (`example <examples/automatic_differentiation.ipynb>`_).
 
    .. grid-item-card:: 🔧 Extensible
 
@@ -132,7 +128,7 @@ Explore the Documentation
       :link: examples
       :link-type: doc
 
-      Explore practical examples demonstrating PathSim's capabilities, from simple oscillators to complex hybrid systems with event handling and automatic differentiation.
+      Explore practical examples demonstrating PathSim's capabilities, from simple oscillators to complex hybrid systems with event handling and hierarchical modeling.
 
    .. grid-item-card:: 📖 API Reference
       :link: api

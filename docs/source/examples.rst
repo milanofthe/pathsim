@@ -133,7 +133,7 @@ Feedback control examples including PID controllers and cascade architectures.
       :link: examples/pid_controller
       :link-type: doc
 
-      Classical PID feedback control demonstrating proportional, integral, and derivative actions.
+      Classical PID feedback control of a linear plant.
 
    .. grid-item-card:: 🔗 Cascade Controller
       :link: examples/cascade_controller
@@ -269,10 +269,6 @@ Complex systems featuring algebraic loops, subsystems, chemical processes, autom
 
       Hierarchical modeling with nested subsystems for modular system design.
 
-   .. grid-item-card:: 🎓 Automatic Differentiation
-      :link: examples/automatic_differentiation
-      :link-type: doc
-
       Sensitivity analysis and uncertainty quantification using forward-mode automatic differentiation.
 
    .. grid-item-card:: 🔌 FMU Co-Simulation
@@ -294,6 +290,5 @@ Complex systems featuring algebraic loops, subsystems, chemical processes, autom
    examples/algebraic_loop.ipynb
    examples/chemical_reactor.ipynb
    examples/nested_subsystems.ipynb
-   examples/automatic_differentiation.ipynb
    examples/fmu_cosimulation.ipynb
    examples/poincare_maps.ipynb
