@@ -11,7 +11,6 @@
 
 import numpy as np
 
-from .value import Value
 from .numerical import num_jac
 
 
@@ -148,13 +147,8 @@ class Operator(object):
             Jacobian matrix at x
         """
         if self._jac is None:
-            try:
-                # Try automatic differentiation
-                _x = Value.array(x)
-                return Value.jac(self._func(_x), _x)
-            except:
-                # Fallback to numerical differentiation
-                return num_jac(self._func, x)
+            # Fallback to numerical differentiation
+            return num_jac(self._func, x)
         else:
             # Use analytical jacobian
             return self._jac(x)
@@ -349,14 +343,8 @@ class DynamicOperator(object):
             # Keep u and t as is
             def func_x(_x):
                 return self._func(_x, u, t)
-
-            try:
-                # Try automatic differentiation
-                _x = Value.array(x)
-                return Value.jac(func_x(_x), _x)
-            except:
-                # Fallback to numerical differentiation
-                return num_jac(func_x, x)
+            # Fallback to numerical differentiation
+            return num_jac(func_x, x)
         else:
             # Use analytical jacobian
             return self._jac_x(x, u, t)
@@ -388,14 +376,8 @@ class DynamicOperator(object):
             # Keep x and t as is
             def func_u(_u):
                 return self._func(x, _u, t)
-
-            try:
-                # Try automatic differentiation
-                _u = Value.array(u)
-                return Value.jac(func_u(_u), _u)
-            except:
-                # Fallback to numerical differentiation
-                return num_jac(func_u, u)
+            # Fallback to numerical differentiation
+            return num_jac(func_u, u)
         else:
             # Use analytical jacobian
             return self._jac_u(x, u, t)

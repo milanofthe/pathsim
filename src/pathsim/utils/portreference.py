@@ -79,12 +79,11 @@ class PortReference:
             self._input_indices = np.array([
                 self.block.inputs._map(p) for p in self.ports
                 ], dtype=np.intp)
-                            
-            # Expand array if needed to accommodate all indices
+
+            # Resize register to accomodate indices
             max_idx = self._input_indices.max()
-            if max_idx >= len(self.block.inputs._data):
-                self.block.inputs._expand_to(max_idx)
-        
+            self.block.inputs.resize(max_idx + 1)
+                                    
         return self._input_indices
 
 
@@ -98,11 +97,10 @@ class PortReference:
             self._output_indices = np.array([
                 self.block.outputs._map(p) for p in self.ports
                 ], dtype=np.intp)
-           
-            # Expand array if needed to accommodate all indices
+
+            # Resize register to accomodate indices
             max_idx = self._output_indices.max()
-            if max_idx >= len(self.block.outputs._data):
-                self.block.outputs._expand_to(max_idx)
+            self.block.outputs.resize(max_idx + 1)
         
         return self._output_indices
 

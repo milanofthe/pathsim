@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 from pathsim import Simulation, Connection
 from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope, PID
 from pathsim.solvers import RKCK54, RKBS32
-from pathsim.optim import Value
 
 
 # SYSTEM SETUP AND SIMULATION ===========================================================
@@ -21,7 +20,7 @@ from pathsim.optim import Value
 K = 0.4
 
 #pid parameters
-Kp, Ki, Kd = Value.array([1.5, 0.5, 0.1]) 
+Kp, Ki, Kd = 1.5, 0.5, 0.1
 
 #source function
 def f_s(t):
@@ -58,19 +57,6 @@ if __name__ == "__main__":
     #run the simulation for some time
     Sim.run(100)
 
-    sco.plot(".-", lw=2)
-
-    #plot sensitivities
-    time, [sp, ot, er] = sco.read()
-
-    fig, ax = plt.subplots(figsize=(8, 4), dpi=120, tight_layout=True)
-
-    ax.plot(time, Value.der(er, Kp), lw=2, label=r"$\partial \epsilon / \partial K_p $")
-    ax.plot(time, Value.der(er, Ki), lw=2, label=r"$\partial \epsilon / \partial K_i $")
-    ax.plot(time, Value.der(er, Kd), lw=2, label=r"$\partial \epsilon / \partial K_d $")
-
-    ax.legend(fancybox=False)
-    ax.set_xlabel("time [s]")
-    ax.grid()
+    sco.plot(lw=2)
 
     plt.show()

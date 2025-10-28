@@ -11,8 +11,6 @@ import numpy as np
 
 from collections import deque
 
-from .value import Value
-
 from .._constants import (
     TOLERANCE,
     OPT_RESTART,
@@ -136,15 +134,15 @@ class Anderson:
         """
 
         #make numeric if value
-        _x = Value.numeric(x)
-        _g = Value.numeric(g)
+        _x = np.asarray(x).ravel()
+        _g = np.asarray(g).ravel()
 
         #residual (this gets minimized)
         _res = _g - _x
         
         #fallback to regular fpi if 'm == 0'
         if self.m == 0:
-            return g, np.linalg.norm(_res)
+            return _g, np.linalg.norm(_res)
     
         #if no buffer, regular fixed-point update
         if self.x_prev is None:
@@ -153,7 +151,7 @@ class Anderson:
             self.x_prev = _x
             self.r_prev = _res
 
-            return g, np.linalg.norm(_res)
+            return _g, np.linalg.norm(_res)
 
         #append to difference buffer
         self.dx_buffer.append(_x - self.x_prev)
@@ -166,7 +164,7 @@ class Anderson:
         #if buffer size 'm' reached, restart
         if self.restart and len(self.dx_buffer) >= self.m:
             self.reset()
-            return g, np.linalg.norm(_res)
+            return _g, np.linalg.norm(_res)
 
         #get difference matrices 
         dX = np.array(self.dx_buffer)
@@ -180,16 +178,16 @@ class Anderson:
 
             #catch division by zero
             if dR2 <= TOLERANCE:
-                return g, abs(_res)
+                return _g, abs(_res)
 
             #new solution and residual
-            return x - _res * np.dot(dR, dX) / dR2, abs(_res)
+            return _x - _res * np.dot(dR, dX) / dR2, abs(_res)
 
         #compute coefficients from least squares problem
         C, *_ = np.linalg.lstsq(dR.T, _res, rcond=None)
 
         #new solution and residual norm
-        return x - C @ dX, np.linalg.norm(_res)
+        return _x - C @ dX, np.linalg.norm(_res)
 
 
 
@@ -265,21 +263,22 @@ class NewtonAnderson(Anderson):
             residual norm
         """
 
-        #make numeric if value
-        _x   = Value.numeric(x)
-        _g   = Value.numeric(g)
-        _jac = Value.numeric(jac)
+        #preprocess formats
+        _x = np.asarray(x).ravel()
+        _g = np.asarray(g).ravel()
         
+        _jac = np.asarray(jac)
+
         #compute residual
         _res = _g - _x
 
         #early exit for scalar or purely vectorial values
         if np.isscalar(_res) or np.ndim(_jac) == 1:
             
-            return x - _res / (_jac - 1.0), np.linalg.norm(_res)
+            return _x - _res / (_jac - 1.0), np.linalg.norm(_res)
 
         #vectorial values (newton raphson)
-        return x - np.linalg.solve(_jac - np.eye(len(_res)), _res), np.linalg.norm(_res)
+        return _x - np.linalg.solve(_jac - np.eye(len(_res)), _res), np.linalg.norm(_res)
 
 
     def step(self, x, g, jac=None):

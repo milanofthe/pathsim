@@ -7,5 +7,4 @@ pathsim.optim
    pathsim.optim.operator
    pathsim.optim.anderson
    pathsim.optim.booster
-   pathsim.optim.value
    pathsim.optim.numerical

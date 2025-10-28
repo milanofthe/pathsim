@@ -9,8 +9,6 @@
 
 import numpy as np
 
-from bisect import insort
-
 
 # CLASSES ===============================================================================
 
@@ -43,7 +41,7 @@ class Register:
     
     def __init__(self, size=None, mapping=None, dtype=np.float64):
         self._data = np.zeros(1 if size is None else size, dtype=dtype)
-        self._mapping = {} if mapping is None else mapping.copy()
+        self._mapping = {} if mapping is None else mapping
     
     
     def _map(self, key):
@@ -62,14 +60,6 @@ class Register:
         return self._mapping.get(key, key)
     
 
-    def _expand_to(self, index):
-        """Expands the internal numpy array up to an index"""
-        new_size = max(index + 1, len(self._data) * 2)
-        new_data = np.zeros(new_size, dtype=self._data.dtype)
-        new_data[:len(self._data)] = self._data
-        self._data = new_data
-    
-
     def _get_max_index(self, key):
         """Identify max index from different key types."""
         if isinstance(key, int):
@@ -77,8 +67,7 @@ class Register:
         elif isinstance(key, slice):
             return key.stop - 1 if key.stop is not None else -1
         elif isinstance(key, (list, tuple, np.ndarray)):
-            indices = np.asarray(key, dtype=np.intp)
-            return indices.max() if len(indices) > 0 else -1
+            return max(key) if key else -1
         return -1
     
 
@@ -129,27 +118,21 @@ class Register:
         val : float, obj
             value to set at port
         """
-        if isinstance(key, str):
-            if key not in self._mapping:
-                self._mapping[key] = len(self._mapping)
+        if key in self._mapping:
             key = self._mapping[key]
-        
         max_idx = self._get_max_index(key)
-        if max_idx >= len(self._data):
-            self._expand_to(max_idx)
-        
+        self.resize(max_idx + 1)
         self._data[key] = value
-    
+
+
+    def resize(self, size):
+        if size > len(self._data):
+            self._data.resize(size)          
+
 
     def reset(self):
         """Set all stored values to zero."""
         self._data[:] = 0.0
-    
-
-    def clear(self):
-        """Clear the array to length zero."""
-        self._data = np.zeros(0, dtype=self._data.dtype)
-        self._mapping.clear()
     
 
     def to_array(self):
@@ -172,19 +155,16 @@ class Register:
             array or scalar that is used to update internal register values
         """
         if np.isscalar(arr):
-            if len(self._data) == 0:
-                self._data = np.array([arr], dtype=self._data.dtype)
-            else:
-                self._data[0] = arr
+            self._data[0] = arr
             return
         
         if not isinstance(arr, np.ndarray):
             arr = np.asarray(arr)
         
-        if len(arr) > len(self._data):
-            self._expand_to(len(arr) - 1)
+        n_arr = len(arr)
+        self.resize(n_arr)
         
-        np.copyto(self._data[:len(arr)], arr)
+        np.copyto(self._data[:n_arr], arr)
 
     
     def __contains__(self, key):
