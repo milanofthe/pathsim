@@ -142,7 +142,7 @@ class Anderson:
         
         #fallback to regular fpi if 'm == 0'
         if self.m == 0:
-            return _g, np.linalg.norm(_res)
+            return g, np.linalg.norm(_res)
     
         #if no buffer, regular fixed-point update
         if self.x_prev is None:
@@ -151,7 +151,7 @@ class Anderson:
             self.x_prev = _x
             self.r_prev = _res
 
-            return _g, np.linalg.norm(_res)
+            return g, np.linalg.norm(_res)
 
         #append to difference buffer
         self.dx_buffer.append(_x - self.x_prev)
@@ -164,11 +164,11 @@ class Anderson:
         #if buffer size 'm' reached, restart
         if self.restart and len(self.dx_buffer) >= self.m:
             self.reset()
-            return _g, np.linalg.norm(_res)
+            return g, np.linalg.norm(_res)
 
         #get difference matrices 
-        dX = np.array(self.dx_buffer)
-        dR = np.array(self.dr_buffer)
+        dX = np.vstack(self.dx_buffer)
+        dR = np.vstack(self.dr_buffer)
 
         #exit for scalar values
         if np.isscalar(_res):
@@ -178,7 +178,7 @@ class Anderson:
 
             #catch division by zero
             if dR2 <= TOLERANCE:
-                return _g, abs(_res)
+                return g, abs(_res)
 
             #new solution and residual
             return _x - _res * np.dot(dR, dX) / dR2, abs(_res)

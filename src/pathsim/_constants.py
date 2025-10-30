@@ -3,8 +3,6 @@
 ##                  GLOBAL CONSTANTS AND TOLERANCES FOR PATHSIM
 ##                               (_constants.py)
 ##
-##                              Milan Rother 2025
-##
 ##################################################################################
 
 # global floating point tolerance ------------------------------------------------
@@ -24,7 +22,7 @@ SIM_ITERATIONS_MAX = 200    # max number of optimizer / alg. loop solver iterati
 # solver default constants -------------------------------------------------------
 
 SOL_TOLERANCE_LTE_ABS = 1e-8   # absolute local truncation error (adaptive solvers)
-SOL_TOLERANCE_LTE_REL = 1e-5   # relative local truncation error (adaptive solvers)
+SOL_TOLERANCE_LTE_REL = 1e-4   # relative local truncation error (adaptive solvers)
 SOL_TOLERANCE_FPI = 1e-9       # tolerance for optimizer convergence (implicit solvers)
 SOL_ITERATIONS_MAX = 200       # max number of optimizer iterations (for standalone implicit solvers)
 SOL_SCALE_MIN = 0.1            # min allowed timestep rescale factor (adaptive solvers)
@@ -35,7 +33,7 @@ SOL_BETA = 0.9                 # savety for timestep control (adaptive solvers)
 # optimizer default constants ----------------------------------------------------
 
 OPT_RESTART = False    # enable restart of anderson acceleration
-OPT_HISTORY = 5        # max history length for anderson acceleration
+OPT_HISTORY = 4        # max history length for anderson acceleration
 
 
 # event default constants --------------------------------------------------------
