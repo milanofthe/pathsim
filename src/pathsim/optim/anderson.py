@@ -134,15 +134,15 @@ class Anderson:
         """
 
         #make numeric if value
-        _x = np.asarray(x).ravel()
-        _g = np.asarray(g).ravel()
+        _x = np.asarray(x).flatten()
+        _g = np.asarray(g).flatten()
 
         #residual (this gets minimized)
         _res = _g - _x
         
         #fallback to regular fpi if 'm == 0'
         if self.m == 0:
-            return g, np.linalg.norm(_res)
+            return _g, np.linalg.norm(_res)
     
         #if no buffer, regular fixed-point update
         if self.x_prev is None:
@@ -151,7 +151,7 @@ class Anderson:
             self.x_prev = _x
             self.r_prev = _res
 
-            return g, np.linalg.norm(_res)
+            return _g, np.linalg.norm(_res)
 
         #append to difference buffer
         self.dx_buffer.append(_x - self.x_prev)
@@ -164,7 +164,7 @@ class Anderson:
         #if buffer size 'm' reached, restart
         if self.restart and len(self.dx_buffer) >= self.m:
             self.reset()
-            return g, np.linalg.norm(_res)
+            return _g, np.linalg.norm(_res)
 
         #get difference matrices 
         dX = np.vstack(self.dx_buffer)
@@ -178,7 +178,7 @@ class Anderson:
 
             #catch division by zero
             if dR2 <= TOLERANCE:
-                return g, abs(_res)
+                return _g, abs(_res)
 
             #new solution and residual
             return _x - _res * np.dot(dR, dX) / dR2, abs(_res)
@@ -264,8 +264,8 @@ class NewtonAnderson(Anderson):
         """
 
         #preprocess formats
-        _x = np.asarray(x).ravel()
-        _g = np.asarray(g).ravel()
+        _x = np.asarray(x).flatten()
+        _g = np.asarray(g).flatten()
         
         _jac = np.asarray(jac)
 
