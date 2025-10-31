@@ -108,7 +108,7 @@ class Register:
     
 
     def __setitem__(self, key, value):
-        """Set the value at key index for direct access 
+        """Set the value at key index for direct access
         to the register values.
 
         Parameters
@@ -122,6 +122,11 @@ class Register:
             key = self._mapping[key]
         max_idx = self._get_max_index(key)
         self.resize(max_idx + 1)
+
+        #convert to scalar if needed to avoid numpy deprecation warning
+        if isinstance(value, np.ndarray) and value.ndim == 0:
+            value = value.item()
+
         self._data[key] = value
 
 

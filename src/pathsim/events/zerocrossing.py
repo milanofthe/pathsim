@@ -107,7 +107,11 @@ class ZeroCrossing(Event):
 
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE, None)
-        
+
+        #convert to scalar if needed to avoid numpy deprecation warning
+        if isinstance(ratio, np.ndarray):
+            ratio = ratio.item()
+
         return True, close, float(ratio)
 
 
@@ -157,7 +161,11 @@ class ZeroCrossingUp(Event):
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE, None)
-        
+
+        #convert to scalar if needed to avoid numpy deprecation warning
+        if isinstance(ratio, np.ndarray):
+            ratio = ratio.item()
+
         return True, close, float(ratio)
 
 
@@ -207,5 +215,9 @@ class ZeroCrossingDown(Event):
         
         #linear interpolation to find event time ratio (secant crosses x-axis)
         ratio = abs(_result) / np.clip(abs(_result - result), TOLERANCE, None)
-        
+
+        #convert to scalar if needed to avoid numpy deprecation warning
+        if isinstance(ratio, np.ndarray):
+            ratio = ratio.item()
+
         return True, close, float(ratio)
