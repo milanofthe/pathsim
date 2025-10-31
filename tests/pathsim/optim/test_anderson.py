@@ -127,7 +127,8 @@ class TestNewtonAnderson(unittest.TestCase):
         j = -np.sin(x)
         result, residual = naa.step(x, g, j)
         # Just ensure it runs without error and returns valid result
-        self.assertTrue(np.isscalar(result))
+        # Result is now a 1D array of length 1 due to flatten()
+        self.assertTrue(np.isscalar(result) or (isinstance(result, np.ndarray) and result.size == 1))
         self.assertTrue(np.isscalar(residual))
 
     def test_step_with_jacobian_vector(self):

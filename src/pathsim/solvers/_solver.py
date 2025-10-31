@@ -72,11 +72,15 @@ class Solver:
         tolerance_lte_rel=SOL_TOLERANCE_LTE_REL
         ):
 
-        #set state and initial condition    
-        self.x = self.initial_value = initial_value
+        #set state and initial condition (ensure array format for consistency)
+        self.initial_value = initial_value
+        self.x = np.atleast_1d(initial_value).copy()
+
+        #track if initial value was scalar for output formatting
+        self._scalar_initial = np.isscalar(initial_value)
 
         #tolerances for local truncation error (for adaptive solvers)
-        self.tolerance_lte_abs = tolerance_lte_abs  
+        self.tolerance_lte_abs = tolerance_lte_abs
         self.tolerance_lte_rel = tolerance_lte_rel  
 
         #parent solver instance
@@ -202,8 +206,8 @@ class Solver:
     def reset(self):
         """"Resets integration engine to initial value"""
 
-        #overwrite state with initial value
-        self.x = self.initial_value
+        #overwrite state with initial value (ensure array format)
+        self.x = np.atleast_1d(self.initial_value).copy()
         self.history.clear()
 
 
@@ -516,7 +520,12 @@ class ExplicitSolver(Solver):
                 dt = np.clip(scale*dt, dt_min, dt_max)
 
         #return the evaluation times and the states
-        return np.array(output_times), np.array(output_states)
+        #squeeze output if initial value was scalar
+        output_states_arr = np.array(output_states)
+        if self._scalar_initial:
+            output_states_arr = output_states_arr.squeeze()
+
+        return np.array(output_times), output_states_arr
 
 
 class ImplicitSolver(Solver):
@@ -740,7 +749,7 @@ class ImplicitSolver(Solver):
         """
 
         #output lists with initial state
-        output_states = [self.x]
+        output_states = [self.x.copy()]
         output_times = [time_start]
 
         #integration starting time
@@ -751,11 +760,11 @@ class ImplicitSolver(Solver):
 
             #integrate for single timestep
             success, _, scale = self.integrate_singlestep(
-                func, 
+                func,
                 jac,
-                time, 
-                dt, 
-                tolerance_fpi, 
+                time,
+                dt,
+                tolerance_fpi,
                 max_iterations
                 )
 
@@ -765,7 +774,7 @@ class ImplicitSolver(Solver):
                 self.revert()
             else:
                 time += dt
-                output_states.append(self.x)
+                output_states.append(self.x.copy())
                 output_times.append(time)
 
             #rescale and apply bounds to timestep
@@ -775,4 +784,9 @@ class ImplicitSolver(Solver):
                 dt = np.clip(scale*dt, dt_min, dt_max)
 
         #return the evaluation times and the states
-        return np.array(output_times), np.array(output_states)
+        #squeeze output if initial value was scalar
+        output_states_arr = np.array(output_states)
+        if self._scalar_initial:
+            output_states_arr = output_states_arr.squeeze()
+
+        return np.array(output_times), output_states_arr

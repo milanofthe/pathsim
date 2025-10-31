@@ -6,8 +6,6 @@
 ##              This module implements the 'Connection' class that transfers
 ##                data between the blocks and their input/output channels
 ##
-##                               Milan Rother 2023/24/2025
-##
 #########################################################################################
 
 # IMPORTS ===============================================================================

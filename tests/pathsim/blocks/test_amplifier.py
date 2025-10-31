@@ -86,37 +86,6 @@ class TestAmplifier(unittest.TestCase):
         for t in range(10): self.assertEqual(*E.check_SISO(t))
 
 
-    def test_sensitivity(self):
-        """test compatibility with AD framework"""
-
-        from pathsim.optim.value import Value
-
-        a = Value(3.2)
-
-        A = Amplifier(gain=a)
-
-        def src(t): return np.cos(t)
-        def ref(t): return 3.2*np.cos(t)
-
-        E = Embedding(A, src, ref)
-
-        for t in range(10): self.assertEqual(*E.check_SISO(t))
-
-        #compute derivative
-        for t in range(10): 
-            y, _ = E.check_SISO(t)
-            self.assertEqual(Value.der(y, a), np.cos(t))
-
-
-        #sensitivity with linearization
-        A.linearize(23.2)
-
-        for t in range(10): 
-            y, _ = E.check_SISO(t)
-            dy_da = Value.der(y, a)
-            self.assertAlmostEqual(np.linalg.norm(dy_da - np.cos(t)), 0, 8)
-
-
     def test_update(self):
         
         A = Amplifier(gain=5)

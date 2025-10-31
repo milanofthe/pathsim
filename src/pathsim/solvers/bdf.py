@@ -7,6 +7,8 @@
 
 # IMPORTS ==============================================================================
 
+import numpy as np
+
 from collections import deque
 
 from ._solver import ImplicitSolver
@@ -120,8 +122,8 @@ class BDF(ImplicitSolver):
         #clear history (BDF solution buffer)
         self.history.clear()
 
-        #overwrite state with initial value
-        self.x = self.initial_value
+        #overwrite state with initial value (ensure array format)
+        self.x = np.atleast_1d(self.initial_value).copy()
 
         #reset startup solver
         self.startup.reset()

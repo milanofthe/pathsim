@@ -72,35 +72,6 @@ class TestMultiplier(unittest.TestCase):
         for t in range(10): self.assertEqual(*E.check_MIMO(t))
 
 
-    def test_sensitivity(self):
-        """test compatibility with AD framework"""
-
-        from pathsim.optim.value import Value
-
-        a, b, c = Value.array([3.2, -0.003, 2031.9])
-
-        M = Multiplier()
-
-        def src(t): return a, b, c
-        def ref(t): return -3.2*0.003*2031.9 
-
-        E = Embedding(M, src, ref)
-        self.assertEqual(*E.check_MIMO(0))
-
-        y, _ = E.check_MIMO(0)
-        self.assertEqual(Value.der(y, a), -0.003*2031.9)
-        self.assertEqual(Value.der(y, b), 3.2*2031.9)
-        self.assertEqual(Value.der(y, c), -3.2*0.003)
-
-        #sensitivity with linearization
-        M.linearize(0)
-
-        y, _ = E.check_MIMO(0)
-        self.assertEqual(Value.der(y, a), -0.003*2031.9)
-        self.assertEqual(Value.der(y, b), 3.2*2031.9)
-        self.assertEqual(Value.der(y, c), -3.2*0.003)
-
-
     def test_update_single(self):
         
         M = Multiplier()

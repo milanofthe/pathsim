@@ -266,7 +266,7 @@ class NewtonAnderson(Anderson):
         #preprocess formats
         _x = np.asarray(x).flatten()
         _g = np.asarray(g).flatten()
-        
+
         _jac = np.asarray(jac)
 
         #compute residual

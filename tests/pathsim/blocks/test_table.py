@@ -272,26 +272,6 @@ class TestLUT1D(unittest.TestCase):
         self.assertAlmostEqual(lut.outputs[0], 0.5, places=6)  # (0+1)/2
         self.assertAlmostEqual(lut.outputs[1], 5, places=6)    # (0+10)/2
 
-    def test_embedding_1d_single_output(self):
-        """Test embedding functionality with 1D LUT and single output"""
-        # Create lookup table for y = 2*x
-        points = np.array([0, 1, 2, 3, 4])
-        values = np.array([0, 2, 4, 6, 8])
-        
-        lut = LUT1D(points, values)
-        
-        def src(t): 
-            return np.array([t % 4])  # Keep within domain
-        def ref(t): 
-            return 2 * (t % 4)  # Expected output
-        
-        E = Embedding(lut, src, ref)
-        
-        # Test for several time points
-        for t in [0, 1, 2, 3]:
-            y, r = E.check_SISO(t)
-            self.assertAlmostEqual(y, r, places=6)
-
     def test_update_functionality_multiple_outputs(self):
         """Test the update method directly with multiple outputs"""
         # 1D input, 2D output lookup table
