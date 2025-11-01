@@ -107,19 +107,6 @@ class TestOperator(unittest.TestCase):
         result_jac = op.jac(x)
         self.assertTrue(np.allclose(result_jac, expected_jac))
         
-    def test_jac_automatic(self):
-        """Test Jacobian computation with automatic differentiation."""
-        def func(x):
-            return np.array([x**2, np.sin(x)])
-            
-        op = Operator(func)
-        
-        x = 1.0
-        expected_jac = np.array([[2.0], [np.cos(1.0)]])
-        result_jac = op.jac(x)
-
-        self.assertTrue(np.allclose(result_jac, expected_jac))
-        
     def test_linearize(self):
         """Test linearization of an operator."""
         def func(x):

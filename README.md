@@ -18,7 +18,7 @@
 
 ## Overview
 
-**PathSim** is a flexible block-based time-domain system simulation framework in Python with automatic differentiation capabilities and an event handling mechanism! It provides a variety of classes that enable modeling and simulation of complex interconnected dynamical systems through Python scripting in the block diagram paradigm.
+**PathSim** is a flexible block-based time-domain system simulation framework in Python! It provides a variety of classes that enable modeling and simulation of complex interconnected dynamical systems through Python scripting in the block diagram paradigm.
 
 All of that with minimal dependencies, only `numpy`, `scipy` and `matplotlib` (and `dill` if you want to use serialization)!
 
@@ -29,7 +29,6 @@ Key Features:
 - Wide range of **numerical integrators** (implicit, explicit, high order, adaptive), able to handle [stiff systems](#stiff-systems)
 - **Modular and hierarchical** modeling with (nested) subsystems
 - [Event handling](#event-detection) system to detect and resolve **discrete events** (zero-crossing detection)
-- **Automatic differentiation** for end-to-end [differentiable simulations](#differentiable-simulation)
 - **Extensibility** by subclassing the base `Block` class and implementing just a handful of methods
 
 
@@ -193,94 +192,6 @@ Sc.plot(".-")
 ```
 
 ![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_result_g.png)
-
-
-
-## Differentiable Simulation
-
-PathSim also includes a fully fledged automatic differentiation framework based on a dual number system with overloaded operators and numpy ufunc integration. This makes the system simulation fully differentiable end-to-end with respect to a predefined set of parameters. Works with all integrators, adaptive, fixed, implicit, explicit. 
-
-To demonstrate this lets consider the following linear feedback system and perform a sensitivity analysis on it with respect to some system parameters. 
-
-
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/linear_feedback_blockdiagram_g.png)
-
-
-The source term is a scaled unit step function (scaled by $b$). In this example, the parameters for the sensitivity analysis are the feedback term $a$, the initial condition $x_0$ and the amplitude of the source term $b$.
-
-
-```python
-from pathsim import Simulation, Connection
-from pathsim.blocks import Source, Integrator, Amplifier, Adder, Scope
-
-#AD module
-from pathsim.optim import Value, der
-
-#values for derivative propagation / parameters for sensitivity analysis
-a  = Value(-1)
-b  = Value(1)
-x0 = Value(2)
-
-#simulation timestep
-dt = 0.01
-
-#step function
-tau = 3
-def s(t):
-    return b*int(t>tau)
-
-#blocks that define the system
-Src = Source(s)
-Int = Integrator(x0)
-Amp = Amplifier(a)
-Add = Adder()
-Sco = Scope(labels=["step", "response"])
-
-blocks = [Src, Int, Amp, Add, Sco]
-
-#the connections between the blocks
-connections = [
-    Connection(Src, Add[0], Sco[0]),
-    Connection(Amp, Add[1]),
-    Connection(Add, Int),
-    Connection(Int, Amp, Sco[1])
-    ]
-
-#initialize simulation with the blocks, connections, timestep
-Sim = Simulation(blocks, connections, dt=dt)
-    
-#run the simulation for some time
-Sim.run(4*tau)
-
-Sco.plot()
-```
-
-
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/linear_feedback_result_g.png)
-
-
-Now the recorded time series data is of type `Value` and we can evaluate the automatically computed partial derivatives at each timestep. For example the response, differentiated with respect to the linear feedback parameter $\partial x(t) / \partial a$ can be extracted from the data like this `der(data, a)`.
-
-
-```python
-import matplotlib.pyplot as plt
-
-#read data from the scope
-time, [step, data] = Sco.read()
-
-fig, ax = plt.subplots(nrows=1, tight_layout=True, figsize=(8, 4), dpi=120)
-
-#evaluate and plot partial derivatives
-ax.plot(time, der(data, a), label=r"$\partial x / \partial a$")
-ax.plot(time, der(data, x0), label=r"$\partial x / \partial x_0$")
-ax.plot(time, der(data, b), label=r"$\partial x / \partial b$")
-
-ax.set_xlabel("time [s]")
-ax.grid(True)
-ax.legend(fancybox=False)
-```
-
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/linear_feedback_result_sensitivity_g.png)
 
 
 ## Event Detection

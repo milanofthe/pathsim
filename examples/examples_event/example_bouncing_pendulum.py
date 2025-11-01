@@ -23,8 +23,6 @@ from pathsim.solvers import RKCK54, RKBS32, SSPRK33
 
 from pathsim.events import ZeroCrossing
 
-from pathsim.optim import Value
-
 
 # MATHEMATICAL PENDULUM =================================================================
 
@@ -35,7 +33,7 @@ phi0, omega0 = 0.99*np.pi, 0.0
 g, l = 9.81, 1
 
 #bounceback for sensitivity
-b = Value(0.9)
+b = 0.9
 
 #blocks that define the system
 In1 = Integrator(omega0) 
@@ -99,22 +97,6 @@ if __name__ == "__main__":
 
     #add the events to scope plot
     for t in E1: ax.axvline(t, c="k", ls="--")
-
-    #read the recordings from the scope
-    time, [om, ph] = Sco.read()
-
-    #sensitivities
-    dom_db = Value.der(om, b)
-    dph_db = Value.der(ph, b)
-
-    fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
-
-    ax.plot(time, dom_db, lw=2, c="tab:red", label=r"$\partial \omega / \partial b$")
-    ax.plot(time, dph_db, lw=2, c="tab:blue", label=r"$\partial \phi / \partial b$")
-
-    ax.set_xlabel("time [s]")
-    ax.legend()
-    ax.grid(True)
 
 
     plt.show()

@@ -24,6 +24,7 @@ from pathsim.solvers import RKBS32
 from pathsim.blocks._block import Block
 from pathsim.events import Schedule
 
+
 class SAR(Block):
 
     def __init__(self, n_bits=4, T=1, tau=0):
@@ -36,7 +37,7 @@ class SAR(Block):
         self.register = 0
         self.trial_weight = 1 << (self.n_bits - 1)
 
-        self.outputs = {i: 0 for i in range(self.n_bits)}
+        # self.outputs = {i: 0 for i in range(self.n_bits)}
 
         def _step(t):
             comparator_result = self.inputs[0]

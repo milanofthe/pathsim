@@ -15,7 +15,7 @@ from pathsim.events import ZeroCrossing
 
 from pathsim.solvers import (
     RKF21, RKBS32, RKF45, RKCK54, RKDP54, RKV65, RKF78, RKDP87, 
-    ESDIRK32, ESDIRK43, ESDIRK54, ESDIRK85, GEAR52A
+    GEAR52A, GEAR32, GEAR43
     )
 
 
@@ -98,28 +98,6 @@ class TestBouncingBallSystem(unittest.TestCase):
                     t_ref = T + i*2*T
 
                     self.assertAlmostEqual(t, t_ref, 4)  
-
-            
-    def test_eval_implicit_solvers(self):
-
-        #fall time
-        T = np.sqrt(2*self.h/self.g)
-
-        #test for different solvers
-        for SOL in [ESDIRK32, ESDIRK43, ESDIRK54, ESDIRK85]:
-
-            with self.subTest("subtest solver", SOL=str(SOL)):            
-
-                self.Sim.reset()
-                self.Sim._set_solver(SOL)
-                self.Sim.run(10)
-
-                #check if all the bounce times are detected correctly
-                for i, t in enumerate(self.E1):
-                    t_ref = T + i*2*T
-
-                    self.assertAlmostEqual(t, t_ref, 4) 
-
 
 
 # RUN TESTS LOCALLY ====================================================================

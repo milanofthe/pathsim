@@ -191,12 +191,12 @@ class GEAR(ImplicitSolver):
     def reset(self):
         """"Resets integration engine to initial state."""
 
-        #clear buffers 
+        #clear buffers
         self.history.clear()
         self.history_dt.clear()
 
-        #overwrite state with initial value
-        self.x = self.initial_value
+        #overwrite state with initial value (ensure array format)
+        self.x = np.atleast_1d(self.initial_value).copy()
 
         #reset startup solver
         self.startup.reset()

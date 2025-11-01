@@ -99,7 +99,7 @@ PathSim provides a wide range of ODE solvers with different characteristics and 
 Optimization & Differentiation
 ------------------------------
 
-Advanced features for optimization, nonlinear solving, and automatic differentiation.
+Advanced features for optimization and nonlinear solving.
 
 .. grid:: 1
    :gutter: 3
@@ -108,7 +108,7 @@ Advanced features for optimization, nonlinear solving, and automatic differentia
       :link: modules/pathsim.optim
       :link-type: doc
 
-      Nonlinear solvers, optimizers, and automatic differentiation framework for fully differentiable simulations.
+      Nonlinear solvers and optimizers.
 
 .. toctree::
    :hidden:

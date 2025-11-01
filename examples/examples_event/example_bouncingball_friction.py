@@ -15,8 +15,6 @@ from pathsim.solvers import RKBS32, ESDIRK32
 
 from pathsim.events import ZeroCrossing
 
-from pathsim.optim import Value, der
-
 
 # BOUNCING BALL SYSTEM ==================================================================
 
@@ -24,16 +22,16 @@ from pathsim.optim import Value, der
 dt = 0.01
 
 #gravitational acceleration
-g = Value(9.81)
+g = 9.81
 
 #elasticity of bounce
-b = Value(0.95)
+b = 0.95
 
 #mass normalized friction coefficientand
-k = Value(0.2)
+k = 0.2
 
 #initial values
-x0, v0 = Value(1), Value(5)
+x0, v0 = 1, 5
 
 #newton friction
 def fric(v): 
@@ -123,21 +121,5 @@ if __name__ == "__main__":
     ax.set_xlabel("time [s]")
     ax.grid(True)
 
-
-    # derivatives ---------------------------------------------------------------------------
-
-    fig, ax = plt.subplots(figsize=(8,4), tight_layout=True, dpi=120)
-
-    for t in E1: ax.axvline(t, ls="--", c="k")
-
-    ax.plot(time, der(x, k), lw=2, label="$dx/dk$")
-    ax.plot(time, der(x, g), lw=2, label="$dx/dg$")
-    ax.plot(time, der(x, b), lw=2, label="$dx/db$")
-    ax.plot(time, der(x, v0), lw=2, label="$dx/dv_0$")
-    ax.plot(time, der(x, x0), lw=2, label="$dx/dx_0$")
-
-    ax.set_xlabel("time [s]")
-    ax.legend()
-    ax.grid(True)
 
     plt.show()

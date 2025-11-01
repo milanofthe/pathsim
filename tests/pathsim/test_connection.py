@@ -241,9 +241,17 @@ class TestDuplex(unittest.TestCase):
 
         #slicing
 
-        D = Duplex(B1[1:4], B2[:3]) 
-        B1.outputs = {0:33, 1:99, 2:44, 3:77, 4:11}
-        B2.outputs = {0:0.33, 1:0.99, 2:0.44, 3:0.77, 4:0.11}
+        D = Duplex(B1[1:4], B2[:3])
+        B1.outputs[0] = 33
+        B1.outputs[1] = 99
+        B1.outputs[2] = 44
+        B1.outputs[3] = 77
+        B1.outputs[4] = 11
+        B2.outputs[0] = 0.33
+        B2.outputs[1] = 0.99
+        B2.outputs[2] = 0.44
+        B2.outputs[3] = 0.77
+        B2.outputs[4] = 0.11
         D.update()
         self.assertEqual(B1.inputs[3], 0.44)
         self.assertEqual(B2.inputs[1], 44)

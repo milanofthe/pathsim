@@ -132,46 +132,6 @@ class TestAdder(unittest.TestCase):
         for t in range(10): self.assertEqual(*E.check_MIMO(t))
 
 
-    def test_sensitivity(self):
-        """test compatibility with AD framework"""
-
-        from pathsim.optim.value import Value
-
-
-        a, b, c = Value.array([3.2, -0.3, 1000])
-
-        A = Adder()
-
-        def src(t): return a, b, c
-        def ref(t): return a + b + c
-
-        E = Embedding(A, src, ref)
-
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
-
-        for t in range(10): 
-            y, _ = E.check_MIMO(t)
-            self.assertEqual(Value.der(y, a), 1.0)
-            self.assertEqual(Value.der(y, b), 1.0)
-            self.assertEqual(Value.der(y, c), 1.0)
-
-
-        A = Adder("+-0")
-
-        def src(t): return a, b, c
-        def ref(t): return a - b
-
-        E = Embedding(A, src, ref)
-
-        for t in range(10): self.assertEqual(*E.check_MIMO(t))
-
-        for t in range(10): 
-            y, _ = E.check_MIMO(t)
-            self.assertEqual(Value.der(y, a), 1.0)
-            self.assertEqual(Value.der(y, b), -1.0)
-            self.assertEqual(Value.der(y, c), 0.0)
-        
-
     def test_update_single(self):
         
         A = Adder()

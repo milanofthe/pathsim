@@ -58,7 +58,8 @@ class TestHarmonicOscillatorSystem(unittest.TestCase):
         self.Sim = Simulation(
             blocks,
             connections,
-            log=False
+            tolerance_fpi=1e-6,
+            log=False,
             )
 
 

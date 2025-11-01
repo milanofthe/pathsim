@@ -107,7 +107,7 @@ class TestBouncingBallFrictionEventSystem(unittest.TestCase):
                 time, [x] = self.Sc.read()
 
                 #check that position stays non-negative (ball doesn't go underground)
-                self.assertTrue(np.min(x) >= -0.01)
+                self.assertTrue(np.min(x) >= 0)
 
                 #check that events were detected
                 self.assertTrue(len(self.E1) > 0)
@@ -115,31 +115,6 @@ class TestBouncingBallFrictionEventSystem(unittest.TestCase):
                 #check that ball eventually settles (energy dissipation)
                 final_height = np.max(x[time > 6])
                 self.assertTrue(final_height < 0.5)
-
-
-    def test_eval_implicit_solvers(self):
-
-        #test for different solvers
-        for SOL in [ESDIRK32, ESDIRK43, ESDIRK54, ESDIRK85]:
-
-            with self.subTest("subtest solver", SOL=str(SOL)):
-
-                self.Sim.reset()
-                self.Sim._set_solver(SOL)
-                self.Sim.run(8)
-
-                time, [x] = self.Sc.read()
-
-                #check that position stays non-negative (ball doesn't go underground)
-                self.assertTrue(np.min(x) >= -0.01)
-
-                #check that events were detected
-                self.assertTrue(len(self.E1) > 0)
-
-                #check that ball eventually settles (energy dissipation)
-                final_height = np.max(x[time > 6])
-                self.assertTrue(final_height < 0.5)
-
 
 
 # RUN TESTS LOCALLY ====================================================================

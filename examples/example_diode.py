@@ -20,8 +20,6 @@ from pathsim.blocks import (
     Scope
     )
 
-from pathsim.solvers import RKBS32
-
 
 # DIODE CIRCUIT =========================================================================
 
@@ -62,8 +60,7 @@ connections = [
 Sim = Simulation(
     blocks, 
     connections, 
-    dt=0.001, 
-    Solver=RKBS32,
+    dt=0.01, 
     tolerance_fpi=1e-12
     )
 
