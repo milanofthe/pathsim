@@ -124,7 +124,7 @@ Hybrid dynamical systems with discrete events and zero-crossing detection.
 Control Systems
 ---------------
 
-Feedback control examples including PID controllers and cascade architectures.
+Feedback control examples including PID controllers, multi-domain systems, and automotive control.
 
 .. grid:: 2
    :gutter: 3
@@ -141,12 +141,26 @@ Feedback control examples including PID controllers and cascade architectures.
 
       Two-loop cascade control architecture with nested PID controllers and subsystems.
 
+   .. grid-item-card:: ⚡ DC Motor Control
+      :link: examples/dcmotor_control
+      :link-type: doc
+
+      Multi-domain DC motor modeling with anti-windup PID speed control and load rejection.
+
+   .. grid-item-card:: 🚗 ABS Braking
+      :link: examples/abs_braking
+      :link-type: doc
+
+      Anti-lock braking system with Pacejka tire model and slip ratio control.
+
 .. toctree::
    :hidden:
    :maxdepth: 1
 
    examples/pid_controller.ipynb
    examples/cascade_controller.ipynb
+   examples/dcmotor_control.ipynb
+   examples/abs_braking.ipynb
 
 ----
 
