@@ -25,7 +25,6 @@ try:
     HAS_SKRF = True
 except ImportError:
     HAS_SKRF = False
-    raise ImportError("The scikit-rf package is required to use this block.")
 
 if TYPE_CHECKING and HAS_SKRF:
     NetworkType = rf.Network
