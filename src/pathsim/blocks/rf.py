@@ -21,15 +21,15 @@ from typing import TYPE_CHECKING, TypeVar
 
 try:
     import skrf as rf
+
     HAS_SKRF = True
 except ImportError:
     HAS_SKRF = False
-    raise ImportError("The scikit-rf package is required to use this block.")
 
 if TYPE_CHECKING and HAS_SKRF:
-        NetworkType = rf.Network
+    NetworkType = rf.Network
 else:
-    NetworkType = TypeVar('NetworkType')
+    NetworkType = TypeVar("NetworkType")
 
 from inspect import signature
 from pathlib import Path
@@ -38,6 +38,7 @@ from .lti import StateSpace
 
 
 # BLOCK DEFINITIONS =====================================================================
+
 
 class RFNetwork(StateSpace):
     """
@@ -50,7 +51,7 @@ class RFNetwork(StateSpace):
 
     Note
     ----
-    This block requires scikit-rf [skrf]_ to be installed. Its an optional dependency of pathsim, 
+    This block requires scikit-rf [skrf]_ to be installed. Its an optional dependency of pathsim,
     to install it:
 
     .. code-block::
@@ -80,7 +81,7 @@ class RFNetwork(StateSpace):
             ntwk = rf.Network(ntwk)
 
         # Select the vector fitting function from scikit-rf
-        vf_fun_name = 'auto_fit' if auto_fit else 'vector_fit'
+        vf_fun_name = "auto_fit" if auto_fit else "vector_fit"
         vf_fun = getattr(rf.VectorFitting, vf_fun_name)
         # Filter kwargs for the selected vf function
         vf_fun_keys = signature(vf_fun).parameters
@@ -94,7 +95,6 @@ class RFNetwork(StateSpace):
         self.vf = vf
 
         super().__init__(A, B, C, D)
-
 
     def s(self, freqs: np.ndarray) -> np.ndarray:
         """
@@ -110,4 +110,6 @@ class RFNetwork(StateSpace):
         s : :py:class:`~numpy.ndarray`
             Complex-valued S-matrices (fxNxN) calculated at frequencies `freqs`.
         """
-        return rf.VectorFitting._get_s_from_ABCDE(freqs, self.A, self.B, self.C, self.D, 0)
+        return rf.VectorFitting._get_s_from_ABCDE(
+            freqs, self.A, self.B, self.C, self.D, 0
+        )
