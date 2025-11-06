@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/logos/pathsim_logo.png" width="300" alt="Pathsim Logo" />
+  <img src="https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/logos/pathsim_logo.png" width="300" alt="Pathsim Logo" />
 </p>
 
 ------------
@@ -9,8 +9,8 @@
 
 # PathSim - A System Simulation Framework
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.08158/status.svg)](https://doi.org/10.21105/joss.08158)
-![GitHub License](https://img.shields.io/github/license/milanofthe/pathsim)
-![GitHub Release](https://img.shields.io/github/v/release/milanofthe/pathsim)
+![GitHub License](https://img.shields.io/github/license/pathsim/pathsim)
+![GitHub Release](https://img.shields.io/github/v/release/pathsim/pathsim)
 [![Documentation Status](https://readthedocs.org/projects/pathsim/badge/?version=latest)](https://pathsim.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Downloads](https://img.shields.io/pypi/dw/pathsim)
 [![codecov](https://codecov.io/gh/milanofthe/pathsim/branch/master/graph/badge.svg)](https://codecov.io/gh/pathsim/pathsim)
@@ -34,7 +34,7 @@ Key Features:
 
 For the full **documentation**, tutorials and API-reference visit [Read the Docs](https://pathsim.readthedocs.io/en/latest/)!
 
-The source code can be found in the [GitHub repository](https://github.com/milanofthe/pathsim) and is fully open source under **MIT license**. Consider starring PathSim to support its development.
+The source code can be found in the [GitHub repository](https://github.com/pathsim/pathsim) and is fully open source under **MIT license**. Consider starring PathSim to support its development.
 
 
 ## Contributing and Future
@@ -59,12 +59,12 @@ pip install pathsim
 
 ## Example - Harmonic Oscillator
 
-There are lots of [examples](https://github.com/milanofthe/pathsim/tree/master/examples) of dynamical system simulations in the GitHub repository that showcase PathSim's capabilities. 
+There are lots of [examples](https://github.com/pathsim/pathsim/tree/master/examples) of dynamical system simulations in the GitHub repository that showcase PathSim's capabilities. 
 
 But first, lets have a look at how we can simulate the harmonic oscillator (a spring mass damper 2nd order system) using PathSim. The system and its corresponding equivalent block diagram are shown in the figure below:
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/harmonic_oscillator_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/harmonic_oscillator_g.png)
 
 
 The equation of motion that defines the harmonic oscillator it is give by
@@ -124,7 +124,7 @@ Sc.plot()
 time, data = Sc.read()
 ```
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/harmonic_oscillator_result_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/harmonic_oscillator_result_g.png)
 
 
 ## Stiff Systems
@@ -140,7 +140,7 @@ $$
 The Van der Pol ODE can be translated into a block diagram like the one below, where the two states are handled by two distinct integrators.
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_blockdiagram_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_blockdiagram_g.png)
 
 
 Lets translate it to PathSim using two `Integrator` blocks and a `Function` block. The parameter is set to $\mu = 1000$ which means severe stiffness. 
@@ -191,7 +191,7 @@ Sim.run(3*mu)
 Sc.plot(".-")
 ```
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_result_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/vanderpol_result_g.png)
 
 
 ## Event Detection
@@ -201,7 +201,7 @@ PathSim has an event handling system that monitors the simulation state and can 
 This enables the simulation of hybrid continuous time systems with discrete events. 
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_g.png)
 
 
 Probably the most popular example for this is the bouncing ball (see figure above) where discrete events occur whenever the ball touches the floor. The event in this case is a zero-crossing.
@@ -209,7 +209,7 @@ Probably the most popular example for this is the bouncing ball (see figure abov
 The dynamics of this system can be translated into a block diagramm in the following way:
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_blockdiagram_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_blockdiagram_g.png)
 
 
 And built and simulated with `PathSim` like this:
@@ -278,7 +278,7 @@ Sim.run(20)
 Sc.plot()
 ```
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_result_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_result_g.png)
 
 During the event handling, the simulator approaches the event until the specified tolerance is met. You can see this by analyzing the timesteps taken by the adaptive integrator `RKBS32`.
 
@@ -304,5 +304,5 @@ ax.grid(True)
 ```
 
 
-![png](https://raw.githubusercontent.com/milanofthe/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_result_timesteps_g.png)
+![png](https://raw.githubusercontent.com/pathsim/pathsim/master/docs/source/examples/figures/figures_g/bouncing_ball_result_timesteps_g.png)
 
