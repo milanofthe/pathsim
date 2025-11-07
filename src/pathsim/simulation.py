@@ -1117,21 +1117,26 @@ class Simulation:
 
     # timestepping helpers --------------------------------------------------------
 
-    def _revert(self):
+    def _revert(self, t):
         """Revert simulation state to previous timestep for adaptive solvers 
         when local truncation error is too large and timestep has to be 
-        retaken with smaller timestep. 
+        retaken with smaller timestep.
+
+        Parameters
+        ----------
+        t : float
+            evaluation time for simulation revert 
         """
 
-        #revert only if dynamic blocks present
-        if self._blocks_dyn:
+        #revert dummy engine (for history, allways)
+        self.engine.revert()
 
-            #revert dummy engine (for history)
-            self.engine.revert()
+        #revert block states
+        for block in self._blocks_dyn:
+            if block: block.revert()
 
-            #revert block states
-            for block in self._blocks_dyn:
-                if block: block.revert()
+        #update the simulation (evaluation of rhs)
+        self._update(t)
 
 
     def _sample(self, t, dt):
@@ -1172,7 +1177,7 @@ class Simulation:
         for event in self._get_active_events():
             event.buffer(t)
 
-        #buffer the dummy engine
+        #buffer the dummy engine (allways)
         self.engine.buffer(dt)
 
         #buffer internal states of stateful blocks
@@ -1465,8 +1470,7 @@ class Simulation:
 
             #if step not successful -> roll back timestep
             if not success:
-                self._revert()
-                self._update(self.time) 
+                self._revert(self.time)
                 total_evals += 1
                 return False, error_norm, scale, total_evals, 0
 
@@ -1490,8 +1494,7 @@ class Simulation:
     
             #not close enough -> roll back timestep (secant step)
             else:
-                self._revert()
-                self._update(self.time) 
+                self._revert(self.time)
                 total_evals += 1
                 return False, error_norm, ratio, total_evals, 0
         
@@ -1567,8 +1570,7 @@ class Simulation:
 
                 #if solver did not converge -> quit early (adaptive only)
                 if not success:
-                    self._revert()
-                    self._update(self.time) 
+                    self._revert(self.time)
                     return False, 0.0, 0.5, total_evals+1, total_solver_its  
 
                 #timestep for dynamical blocks (with internal states)
@@ -1576,8 +1578,7 @@ class Simulation:
 
             #if step not successful -> roll back timestep
             if not success:
-                self._revert()
-                self._update(self.time) 
+                self._revert(self.time)
                 return False, error_norm, scale, total_evals+1, total_solver_its
 
         #system time after timestep
@@ -1600,8 +1601,7 @@ class Simulation:
     
             #not close enough -> roll back timestep (secant step)
             else:
-                self._revert()
-                self._update(self.time) 
+                self._revert(self.time)
                 total_evals += 1
                 return False, error_norm, ratio, total_evals, total_solver_its
 
