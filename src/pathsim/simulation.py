@@ -846,24 +846,6 @@ class Simulation:
         return dt_evt_min
 
 
-    def _buffer_events(self, t):
-        """Buffer states for event monitoring before the timestep 
-        is taken. 
-
-        This is required to set reference for event monitoring and 
-        backtracking for root finding.
-
-        Parameters
-        ----------
-        t : float 
-            evaluation time for buffering
-        """
-
-        #buffer states for event detection (with timestamp)
-        for event in self._get_active_events():
-            event.buffer(t)
-
-
     def _detected_events(self, t):
         """Check for possible (active) events and return them chronologically, 
         sorted by their timestep ratios (closest to the initial point in time).
@@ -1141,12 +1123,15 @@ class Simulation:
         retaken with smaller timestep. 
         """
 
-        #revert dummy engine (for history)
-        self.engine.revert()
+        #revert only if dynamic blocks present
+        if self._blocks_dyn:
 
-        #revert block states
-        for block in self._blocks_dyn:
-            if block: block.revert()
+            #revert dummy engine (for history)
+            self.engine.revert()
+
+            #revert block states
+            for block in self._blocks_dyn:
+                if block: block.revert()
 
 
     def _sample(self, t, dt):
@@ -1163,20 +1148,30 @@ class Simulation:
             if block: block.sample(t, dt)
 
 
-    def _buffer_blocks(self, dt):
-        """Buffer internal states of blocks before the timestep is taken. 
+    def _buffer(self, t, dt):
+        """Buffer states for event monitoring and internal states of blocks 
+        before the timestep is taken. 
 
-        This is required for runge-kutta integrators but also for the 
-        zero crossing detection of the event handling system.
-    
-        The timesteps are also buffered because some integrators such as 
-        GEAR-type methods need a history of the timesteps.
+        For events, this is required to set reference for event monitoring and 
+        backtracking for root finding.
+
+        for blocks, this is required for runge-kutta integrators but also for the 
+        zero crossing detection of the event handling system. The timesteps are 
+        also buffered because some integrators such as GEAR-type methods need a 
+        history of the timesteps.
 
         Parameters
         ----------
+        t : float 
+            evaluation time for buffering
         dt : float
             timestep
         """
+
+        #buffer states for event detection (with timestamp)
+        for event in self._get_active_events():
+            event.buffer(t)
+
         #buffer the dummy engine
         self.engine.buffer(dt)
 
@@ -1284,14 +1279,11 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #buffer states for event system
-        self._buffer_events(self.time)
+        #buffer events and dynamic blocks
+        self._buffer(self.time, dt)
 
         #if no dynamic blocks -> skip the solver step        
         if self._blocks_dyn:
-
-            #buffer internal states for solvers
-            self._buffer_blocks(dt)
 
             #iterate explicit solver stages with evaluation time (generator)
             for time_stage in self.engine.stages(self.time, dt):
@@ -1363,14 +1355,11 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #buffer states for event system
-        self._buffer_events(self.time)
+        #buffer events and dynamic blocks
+        self._buffer(self.time, dt)
 
         #if no dynamic blocks -> skip the solver step        
         if self._blocks_dyn:
-
-            #buffer internal states for solvers
-            self._buffer_blocks(dt)
 
             #iterate explicit solver stages with evaluation time (generator)
             for time_stage in self.engine.stages(self.time, dt):
@@ -1458,14 +1447,11 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #buffer states for event system
-        self._buffer_events(self.time)
+        #buffer events and dynamic blocks
+        self._buffer(self.time, dt)
 
         #if no dynamic blocks -> skip the solver step        
         if self._blocks_dyn:
-
-            #buffer internal states for solvers
-            self._buffer_blocks(dt)
 
             #iterate explicit solver stages with evaluation time (generator)
             for time_stage in self.engine.stages(self.time, dt):
@@ -1563,14 +1549,11 @@ class Simulation:
         if dt is None: 
             dt = self.dt
 
-        #buffer states for event system
-        self._buffer_events(self.time)
+        #buffer events and dynamic blocks
+        self._buffer(self.time, dt)
 
         #if no dynamic blocks -> skip the solver step        
         if self._blocks_dyn:
-
-            #buffer internal states for solvers
-            self._buffer_blocks(dt)
 
             #iterate explicit solver stages with evaluation time (generator)
             for time_stage in self.engine.stages(self.time, dt):
