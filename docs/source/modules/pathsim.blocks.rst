@@ -31,5 +31,3 @@ pathsim.blocks
    pathsim.blocks.samplehold
    pathsim.blocks.comparator
    pathsim.blocks.dynsys
-
-   pathsim.blocks.tritium
